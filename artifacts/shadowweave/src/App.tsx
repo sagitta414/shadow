@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Login from "./pages/Login";
 import Homepage from "./pages/Homepage";
 import CharacterParameters from "./pages/CharacterParameters";
 import StoryEditor from "./pages/StoryEditor";
@@ -9,6 +10,7 @@ import ScenarioGenerator from "./pages/ScenarioGenerator";
 import InteractiveStory from "./pages/InteractiveStory";
 
 type Page =
+  | "login"
   | "home"
   | "character-params"
   | "story-editor"
@@ -63,7 +65,7 @@ function BackgroundEffects() {
 }
 
 export default function App() {
-  const [page, setPage] = useState<Page>("home");
+  const [page, setPage] = useState<Page>("login");
   const [captorAnswers, setCaptorAnswers] = useState<Record<number, string>>({});
   const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
 
@@ -74,7 +76,11 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#000000", color: "#C8C8D8" }}>
-      <BackgroundEffects />
+      {page === "login" && (
+        <Login onEnter={() => navigate("home")} />
+      )}
+
+      {page !== "login" && <BackgroundEffects />}
 
       {page === "home" && (
         <Homepage
