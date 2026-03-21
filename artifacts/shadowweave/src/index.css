@@ -1,0 +1,348 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Raleway:wght@200;300;400;500;600;700&family=Montserrat:wght@200;300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --void-black: #000000;
+  --abyss-purple: #0A0015;
+  --blood-crimson: #8B0000;
+  --violet-veins: #2D1B69;
+  --shadow-silver: #C0C0C0;
+  --poison-green: #00FF41;
+  --moonlight: #F0F0FF;
+  --chained-gold: #B8860B;
+  --blood-red: #800000;
+  --gold-chain: #D4AF37;
+  --shadow: #050505;
+  --bondage-purple: #3D0A4A;
+  --dark-purple: #1A0A2E;
+  --midnight: #0F0F1E;
+  --tactical-gray: #2C3E50;
+  --steel: #7F8C8D;
+  --tactical-black: #1C2833;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background: var(--void-black);
+  color: var(--shadow-silver);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.font-cinzel { font-family: 'Cinzel', serif; }
+.font-crimson { font-family: 'Crimson Text', serif; }
+.font-raleway { font-family: 'Raleway', sans-serif; }
+.font-montserrat { font-family: 'Montserrat', sans-serif; }
+
+@keyframes voidDrift {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
+@keyframes progressGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.void-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.void-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.3) 0%, transparent 50%);
+  animation: voidDrift 20s ease-in-out infinite;
+}
+
+.logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--blood-crimson), var(--chained-gold), var(--moonlight));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+.captor-logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--blood-crimson), var(--steel), var(--moonlight));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+.progress-bar-gradient {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--blood-crimson), var(--chained-gold), var(--violet-veins));
+  animation: progressGlow 3s ease-in-out infinite;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease;
+}
+
+.question-option {
+  background: rgba(139, 0, 0, 0.2);
+  border: 2px solid rgba(139, 0, 0, 0.5);
+  border-radius: 15px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.question-option:hover {
+  background: rgba(139, 0, 0, 0.4);
+  border-color: var(--chained-gold);
+  transform: translateX(5px);
+}
+
+.question-option.selected {
+  background: rgba(184, 134, 11, 0.3);
+  border-color: var(--chained-gold);
+  box-shadow: 0 0 20px rgba(184, 134, 11, 0.4);
+}
+
+.captor-option {
+  background: rgba(44, 62, 80, 0.2);
+  border: 2px solid rgba(44, 62, 80, 0.5);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.captor-option:hover {
+  background: rgba(139, 0, 0, 0.3);
+  border-color: var(--steel);
+  transform: translateX(3px);
+}
+
+.captor-option.selected {
+  background: rgba(127, 140, 141, 0.3);
+  border-color: var(--steel);
+  box-shadow: 0 0 15px rgba(127, 140, 141, 0.4);
+}
+
+.enter-button {
+  background: linear-gradient(135deg, var(--blood-crimson), var(--violet-veins));
+  border: none;
+  border-radius: 50px;
+  padding: 1.5rem 3rem;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow: 0 10px 30px rgba(139, 0, 0, 0.5);
+}
+
+.enter-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(139, 0, 0, 0.7);
+}
+
+.action-button {
+  padding: 1.25rem 2.5rem;
+  background: linear-gradient(135deg, var(--blood-crimson), var(--violet-veins));
+  border: none;
+  border-radius: 30px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(139, 0, 0, 0.6);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-button.secondary {
+  background: linear-gradient(135deg, var(--violet-veins), var(--bondage-purple));
+}
+
+.captor-action-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--tactical-gray), var(--blood-crimson));
+  border: none;
+  border-radius: 25px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.captor-action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 0, 0, 0.5);
+}
+
+.captor-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.captor-action-btn.secondary {
+  background: linear-gradient(135deg, var(--tactical-gray), var(--steel));
+}
+
+.tool-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, var(--blood-red), var(--blood-crimson));
+  border: none;
+  border-radius: 10px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.tool-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 0, 0, 0.5);
+}
+
+.tool-button.secondary {
+  background: linear-gradient(135deg, var(--violet-veins), var(--bondage-purple));
+}
+
+.followup-input,
+.followup-select,
+.followup-textarea {
+  width: 100%;
+  padding: 0.875rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--violet-veins);
+  border-radius: 10px;
+  color: var(--shadow-silver);
+  font-size: 0.95rem;
+  font-family: 'Raleway', sans-serif;
+  transition: all 0.3s ease;
+  resize: vertical;
+}
+
+.followup-input:focus,
+.followup-select:focus,
+.followup-textarea:focus {
+  outline: none;
+  border-color: var(--chained-gold);
+  box-shadow: 0 0 20px rgba(184, 134, 11, 0.4);
+}
+
+.captor-followup-input,
+.captor-followup-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--tactical-gray);
+  border-radius: 8px;
+  color: var(--shadow-silver);
+  font-size: 0.9rem;
+  font-family: 'Raleway', sans-serif;
+  transition: all 0.3s ease;
+  resize: vertical;
+}
+
+.captor-followup-input:focus,
+.captor-followup-textarea:focus {
+  outline: none;
+  border-color: var(--steel);
+  box-shadow: 0 0 15px rgba(127, 140, 141, 0.4);
+}
+
+.prompt-item {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.875rem;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  border-left: 4px solid var(--blood-red);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.prompt-item:hover {
+  transform: translateX(5px);
+  border-left-color: var(--chained-gold);
+  background: rgba(139, 0, 0, 0.3);
+}
+
+input[type="radio"] {
+  accent-color: var(--chained-gold);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+textarea {
+  font-family: 'Raleway', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--blood-crimson);
+  border-radius: 3px;
+}
