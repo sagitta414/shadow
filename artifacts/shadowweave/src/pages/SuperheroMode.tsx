@@ -526,18 +526,28 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           const num = i + 1 as Step;
           const isActive = step === num;
           const isDone = step > num;
+          const canCurrentProceed = step === 1 ? canProceedStep1() : step === 2 ? canProceedStep2() : step === 3 ? canProceedStep3() : false;
+          const isNext = num === step + 1 && canCurrentProceed;
+          const isClickable = isDone || isNext;
           return (
             <div key={num} style={{ flex: 1, display: "flex", alignItems: "center" }}>
               <button
-                onClick={() => isDone && setStep(num)}
-                disabled={!isDone}
+                onClick={() => {
+                  if (isDone) { setStep(num); }
+                  else if (isNext) { setStep(num); }
+                }}
+                disabled={!isClickable}
                 style={{
                   flex: 1,
                   padding: "0.625rem 0.5rem",
-                  background: isActive ? "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,107,0,0.15))" : "transparent",
-                  border: `1px solid ${isActive ? "rgba(255,184,0,0.45)" : "transparent"}`,
+                  background: isActive
+                    ? "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,107,0,0.15))"
+                    : isNext
+                      ? "rgba(255,184,0,0.06)"
+                      : "transparent",
+                  border: `1px solid ${isActive ? "rgba(255,184,0,0.45)" : isNext ? "rgba(255,184,0,0.18)" : "transparent"}`,
                   borderRadius: "8px",
-                  cursor: isDone ? "pointer" : "default",
+                  cursor: isClickable ? "pointer" : "default",
                   display: "flex",
                   alignItems: "center",
                   gap: "0.5rem",
@@ -545,16 +555,18 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   transition: "all 0.25s ease",
                   color: "inherit",
                 }}
+                onMouseEnter={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(255,184,0,0.12)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.35)"; } }}
+                onMouseLeave={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(255,184,0,0.06)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.18)"; } }}
               >
-                <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: isActive ? "rgba(255,184,0,0.3)" : isDone ? "rgba(0,200,100,0.25)" : "rgba(255,255,255,0.05)", border: `1px solid ${isActive ? "rgba(255,184,0,0.6)" : isDone ? "rgba(0,200,100,0.5)" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", flexShrink: 0 }}>
-                  {isDone ? <span style={{ color: "#00C870" }}>✓</span> : <span style={{ color: isActive ? "#FFB800" : "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.65rem" }}>{num}</span>}
+                <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: isActive ? "rgba(255,184,0,0.3)" : isDone ? "rgba(0,200,100,0.25)" : isNext ? "rgba(255,184,0,0.15)" : "rgba(255,255,255,0.05)", border: `1px solid ${isActive ? "rgba(255,184,0,0.6)" : isDone ? "rgba(0,200,100,0.5)" : isNext ? "rgba(255,184,0,0.4)" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", flexShrink: 0 }}>
+                  {isDone ? <span style={{ color: "#00C870" }}>✓</span> : <span style={{ color: isActive ? "#FFB800" : isNext ? "rgba(255,184,0,0.7)" : "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.65rem" }}>{num}</span>}
                 </div>
-                <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#FFB800" : isDone ? "#00C870" : "rgba(200,200,220,0.3)", whiteSpace: "nowrap" }}>
+                <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#FFB800" : isDone ? "#00C870" : isNext ? "rgba(255,184,0,0.6)" : "rgba(200,200,220,0.3)", whiteSpace: "nowrap" }}>
                   {label}
                 </span>
               </button>
               {i < stepLabels.length - 1 && (
-                <div style={{ width: "20px", height: "1px", background: step > num + 1 ? "rgba(0,200,100,0.4)" : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
+                <div style={{ width: "20px", height: "1px", background: isDone && step > num + 1 ? "rgba(0,200,100,0.4)" : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
               )}
             </div>
           );
