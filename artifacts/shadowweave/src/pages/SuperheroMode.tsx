@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -171,6 +171,57 @@ const WEAPONS = [
   "Symbiote Suit", "Neural Override Tech", "Time Displacement Device", "Omega Beams", "Phoenix Force",
 ];
 
+const RESTRAINTS = [
+  { id: "power-collar",      label: "Power-Dampening Collar",   desc: "Suppresses metahuman abilities" },
+  { id: "vibranium-chains",  label: "Vibranium Chains",         desc: "Indestructible Wakandan metal" },
+  { id: "kryptonite-cuffs",  label: "Kryptonite Shackles",      desc: "Drains Kryptonian strength" },
+  { id: "neural-inhibitor",  label: "Neural Inhibitor Cuffs",   desc: "Blocks nerve impulses & control" },
+  { id: "adamantium-cuffs",  label: "Adamantium Manacles",      desc: "Unbreakable metal restraints" },
+  { id: "anti-magic",        label: "Anti-Magic Bindings",      desc: "Nullifies sorcery & spells" },
+  { id: "energy-cage",       label: "Energy Suppression Cage",  desc: "Containment field that drains power" },
+  { id: "shock-collar",      label: "Neural Shock Collar",      desc: "Remote-triggered pain compliance" },
+  { id: "enchanted-rope",    label: "Enchanted Rope",           desc: "Binds even the strongest hero" },
+  { id: "titanium-suit",     label: "Titanium Restraint Suit",  desc: "Full-body immobilisation harness" },
+  { id: "symbiote-bonds",    label: "Symbiote Tendrils",        desc: "Living bonds that tighten with struggle" },
+  { id: "dim-anchor",        label: "Dimensional Anchor",       desc: "Prevents teleportation or phasing" },
+  { id: "sedative",          label: "Paralysis Toxin",          desc: "Chemical agent that immobilises" },
+  { id: "psi-crown",         label: "Psychic Suppression Crown",desc: "Seals all telepathic & psionic power" },
+  { id: "gravity-shackles",  label: "Gravity Shackles",         desc: "Pin the hero under crushing G-force" },
+];
+
+const TONES = [
+  { id: "action",     label: "Action-Packed",     desc: "High-octane combat & explosive set-pieces",    icon: "💥" },
+  { id: "psych",      label: "Psychological",     desc: "Mind games, manipulation, inner conflict",      icon: "🧠" },
+  { id: "slowburn",   label: "Slow Burn",         desc: "Tension builds gradually toward an explosion",  icon: "🕯" },
+  { id: "escape",     label: "Escape Focused",    desc: "Hero's desperate fight to break free",          icon: "🔓" },
+  { id: "dark",       label: "Dark & Brutal",     desc: "No holds barred — grim, visceral, unflinching", icon: "🌑" },
+  { id: "dramatic",   label: "Dramatic Climax",   desc: "Emotional confrontation at a pivotal moment",   icon: "🎭" },
+];
+
+const CAPTURE_METHODS = [
+  { id: "force",      label: "Overwhelming Force",     desc: "Direct assault with superior power",          icon: "⚡" },
+  { id: "trap",       label: "Elaborate Trap",          desc: "Pre-planned ambush the hero walks into",      icon: "🕸" },
+  { id: "manip",      label: "Psychological Manipulation", desc: "Exploiting her emotions & trust",          icon: "🎭" },
+  { id: "tech",       label: "Advanced Technology",    desc: "Science & engineering to neutralise powers",  icon: "🤖" },
+  { id: "magic",      label: "Magic / Cosmic Power",   desc: "Sorcery or cosmic energy overwhelms her",     icon: "✨" },
+  { id: "hostage",    label: "Using Hostages",          desc: "Forces surrender by threatening others",      icon: "🎯" },
+];
+
+const HERO_STATES = [
+  { id: "peak",       label: "At Full Strength",       icon: "💪" },
+  { id: "weakened",   label: "Powers Suppressed",      icon: "📉" },
+  { id: "injured",    label: "Already Injured",        icon: "🩸" },
+  { id: "alone",      label: "Isolated — No Allies",   icon: "🌑" },
+  { id: "exhausted",  label: "Exhausted Post-Battle",  icon: "😮‍💨" },
+  { id: "emotional",  label: "Emotionally Vulnerable", icon: "💔" },
+];
+
+const STORY_LENGTHS = [
+  { id: "short",  label: "Quick Strike",  desc: "2–3 punchy paragraphs", icon: "⚡" },
+  { id: "medium", label: "Standard",      desc: "5–6 paragraphs",        icon: "📖" },
+  { id: "epic",   label: "Epic Saga",     desc: "9–10 paragraphs",       icon: "📜" },
+];
+
 type Step = 1 | 2 | 3 | 4;
 type UniverseFilter = "ALL" | "MARVEL" | "DC";
 
@@ -188,14 +239,24 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [selectedSetting, setSelectedSetting] = useState<string>("");
   const [selectedStakes, setSelectedStakes] = useState<string>("");
   const [selectedWeapons, setSelectedWeapons] = useState<string[]>([]);
+  const [selectedRestraints, setSelectedRestraints] = useState<string[]>([]);
+  const [customRestraints, setCustomRestraints] = useState("");
+  const [storyTone, setStoryTone] = useState<string>("");
+  const [captureMethod, setCaptureMethod] = useState<string>("");
+  const [heroState, setHeroState] = useState<string>("");
+  const [storyLength, setStoryLength] = useState<string>("medium");
   const [extraDetails, setExtraDetails] = useState("");
 
-  // Story generation
-  const [story, setStory] = useState("");
+  // Story generation & chapters
+  const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [continuing, setContinuing] = useState(false);
+  const [continuePrompt, setContinuePrompt] = useState("");
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const story = chapters.join("\n\n");
 
   const allHeroes = [
     ...MARVEL_HEROES.map((h) => ({ ...h, universe: "MARVEL" })),
@@ -211,6 +272,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   function toggleWeapon(w: string) {
     setSelectedWeapons((prev) => prev.includes(w) ? prev.filter((x) => x !== w) : [...prev, w]);
   }
+  function toggleRestraint(id: string) {
+    setSelectedRestraints((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  }
 
   function canProceedStep1() { return !!selectedHero; }
   function canProceedStep2() {
@@ -218,58 +282,74 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   }
   function canProceedStep3() { return !!selectedSetting && !!selectedStakes; }
 
-  async function generateStory() {
-    setLoading(true);
-    setStory("");
-    setStreamingText("");
-    setError("");
-
+  function buildPrompt() {
     const villain = villainMode === "pick" ? selectedVillain?.name : customVillain;
     const villainScheme = villainMode === "pick" ? selectedVillain?.scheme : "achieve their sinister goal";
     const settingLabel = SETTINGS.find((s) => s.id === selectedSetting)?.label ?? selectedSetting;
     const stakesLabel = STAKES.find((s) => s.id === selectedStakes)?.label ?? selectedStakes;
+    const toneLabel = TONES.find((t) => t.id === storyTone)?.label ?? "";
+    const captureLabel = CAPTURE_METHODS.find((c) => c.id === captureMethod)?.label ?? "";
+    const heroStateLabel = HERO_STATES.find((h) => h.id === heroState)?.label ?? "";
+    const lengthLabel = STORY_LENGTHS.find((l) => l.id === storyLength)?.label ?? "Standard";
+    const restraintLabels = selectedRestraints.map((id) => RESTRAINTS.find((r) => r.id === id)?.label ?? id);
+    const allRestraints = [...restraintLabels, ...(customRestraints.trim() ? [customRestraints.trim()] : [])];
 
-    const prompt = {
+    return {
       hero: `${selectedHero?.name} (${selectedHero?.alias}) — Power: ${selectedHero?.power} — Universe: ${selectedHero?.universe}`,
       villain: `${villain} — Scheme: ${villainScheme}`,
       setting: settingLabel,
       stakes: stakesLabel,
       weapons: selectedWeapons.join(", ") || "standard powers",
+      restraints: allRestraints.join(", ") || "none specified",
+      tone: toneLabel || "action-packed",
+      captureMethod: captureLabel || "direct confrontation",
+      heroState: heroStateLabel || "at full strength",
+      storyLength: lengthLabel,
       details: extraDetails,
     };
+  }
 
-    try {
-      const res = await fetch("/api/story/superhero", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(prompt),
-      });
+  async function streamRequest(endpoint: string, body: object, onChunk: (c: string) => void): Promise<string> {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let full = "";
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let accumulated = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const payload = JSON.parse(line.slice(6));
-          if (payload.chunk) {
-            accumulated += payload.chunk;
-            setStreamingText(accumulated);
-            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-          }
-          if (payload.done) setStory(payload.story);
-          if (payload.error) throw new Error(payload.error);
-        }
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const payload = JSON.parse(line.slice(6));
+        if (payload.chunk) { full += payload.chunk; onChunk(payload.chunk); bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }
+        if (payload.error) throw new Error(payload.error);
       }
+    }
+    return full;
+  }
+
+  async function generateStory() {
+    setLoading(true);
+    setChapters([]);
+    setStreamingText("");
+    setError("");
+    let accumulated = "";
+    try {
+      const full = await streamRequest("/api/story/superhero", buildPrompt(), (c) => {
+        accumulated += c;
+        setStreamingText(accumulated);
+      });
+      setChapters([full]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Story generation failed");
     } finally {
@@ -278,8 +358,35 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     }
   }
 
+  async function continueStory() {
+    if (chapters.length === 0) return;
+    setContinuing(true);
+    setStreamingText("");
+    setError("");
+    let accumulated = "";
+    try {
+      const full = await streamRequest("/api/story/superhero-continue", {
+        ...buildPrompt(),
+        previousStory: story,
+        chapterNumber: chapters.length + 1,
+        continueDirection: continuePrompt.trim() || "",
+      }, (c) => {
+        accumulated += c;
+        setStreamingText(accumulated);
+      });
+      setChapters((prev) => [...prev, full]);
+      setContinuePrompt("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Continuation failed");
+    } finally {
+      setContinuing(false);
+      setStreamingText("");
+    }
+  }
+
   function exportStory() {
-    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHERO: ${selectedHero?.name} (${selectedHero?.alias})\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${SETTINGS.find((s) => s.id === selectedSetting)?.label}\nSTAKES: ${STAKES.find((s) => s.id === selectedStakes)?.label}\n\n${"═".repeat(50)}\n\n${story}`;
+    const chapterText = chapters.map((c, i) => `${"═".repeat(50)}\nCHAPTER ${i + 1}\n${"═".repeat(50)}\n\n${c}`).join("\n\n");
+    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHERO: ${selectedHero?.name} (${selectedHero?.alias})\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${SETTINGS.find((s) => s.id === selectedSetting)?.label}\nSTAKES: ${STAKES.find((s) => s.id === selectedStakes)?.label}\nTONE: ${TONES.find((t) => t.id === storyTone)?.label ?? "standard"}\n\n${chapterText}`;
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -557,6 +664,93 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           </div>
 
+          {/* Story Tone */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Tone <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
+              {TONES.map((t) => {
+                const isSel = storyTone === t.id;
+                return (
+                  <button key={t.id} onClick={() => setStoryTone(isSel ? "" : t.id)} style={{ background: isSel ? "rgba(96,160,255,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(96,160,255,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(96,160,255,0.2)" : "none" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(96,160,255,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                  >
+                    <div style={{ fontSize: "1.2rem", marginBottom: "0.4rem" }}>{t.icon}</div>
+                    <div className="font-cinzel" style={{ fontSize: "0.75rem", color: isSel ? "#60A0FF" : "#E8E8F0", fontWeight: 700, marginBottom: "0.25rem" }}>{t.label}</div>
+                    <div style={{ fontSize: "0.63rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif" }}>{t.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Villain's Capture Method */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How the Villain Subdues Her <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
+              {CAPTURE_METHODS.map((cm) => {
+                const isSel = captureMethod === cm.id;
+                return (
+                  <button key={cm.id} onClick={() => setCaptureMethod(isSel ? "" : cm.id)} style={{ background: isSel ? "rgba(200,0,50,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(200,0,50,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(200,0,50,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
+                      <span style={{ fontSize: "1.1rem" }}>{cm.icon}</span>
+                      <div className="font-cinzel" style={{ fontSize: "0.75rem", color: isSel ? "#FF4060" : "#E8E8F0", fontWeight: 700 }}>{cm.label}</div>
+                    </div>
+                    <div style={{ fontSize: "0.63rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif" }}>{cm.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Hero's Current State */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Hero's Condition Entering the Conflict <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              {HERO_STATES.map((hs) => {
+                const isSel = heroState === hs.id;
+                return (
+                  <button key={hs.id} onClick={() => setHeroState(isSel ? "" : hs.id)} style={{ padding: "0.5rem 1rem", background: isSel ? "rgba(255,184,0,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,184,0,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "20px", color: isSel ? "#FFB800" : "rgba(200,200,220,0.5)", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "0.4rem" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,184,0,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                  >
+                    <span>{hs.icon}</span> {hs.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Restraints & Equipment */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(160,0,80,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#E040A0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.375rem" }}>Restraints &amp; Containment Gear <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional — pick any)</span></div>
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem" }}>Specify how the villain restrains and contains the hero's power during captivity.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: "0.5rem", marginBottom: "1rem" }}>
+              {RESTRAINTS.map((r) => {
+                const isSel = selectedRestraints.includes(r.id);
+                return (
+                  <button key={r.id} onClick={() => toggleRestraint(r.id)} style={{ background: isSel ? "rgba(224,64,160,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(224,64,160,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", padding: "0.625rem 0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", display: "flex", flexDirection: "column", gap: "0.15rem" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(224,64,160,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                  >
+                    <span className="font-cinzel" style={{ fontSize: "0.72rem", color: isSel ? "#E040A0" : "#D0D0E8", fontWeight: 700 }}>{r.label}</span>
+                    <span style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif" }}>{r.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div>
+              <label style={{ fontSize: "0.62rem", color: "rgba(224,64,160,0.5)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>Custom / Additional Restraint Description</label>
+              <input value={customRestraints} onChange={(e) => setCustomRestraints(e.target.value)} placeholder="e.g. an enchanted straightjacket laced with nullifying runes, power-sapping handcuffs…" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(224,64,160,0.4)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
+              />
+            </div>
+          </div>
+
           {/* Special weapons */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#C060E0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Special Weapons / Power Elements <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional — pick any)</span></div>
@@ -575,10 +769,30 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           </div>
 
+          {/* Story Length */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#D4AF37", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Length</div>
+            <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
+              {STORY_LENGTHS.map((sl) => {
+                const isSel = storyLength === sl.id;
+                return (
+                  <button key={sl.id} onClick={() => setStoryLength(sl.id)} style={{ flex: 1, minWidth: "130px", padding: "0.875rem 1rem", background: isSel ? "rgba(212,175,55,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(212,175,55,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 12px rgba(212,175,55,0.2)" : "none" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                  >
+                    <div style={{ fontSize: "1.2rem", marginBottom: "0.3rem" }}>{sl.icon}</div>
+                    <div className="font-cinzel" style={{ fontSize: "0.78rem", color: isSel ? "#D4AF37" : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem" }}>{sl.label}</div>
+                    <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif" }}>{sl.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Extra details */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
             <label style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.35)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.5rem" }}>Additional Story Details <span style={{ color: "rgba(200,200,220,0.2)", fontWeight: 400 }}>(optional)</span></label>
-            <textarea value={extraDetails} onChange={(e) => setExtraDetails(e.target.value)} placeholder="Any specific plot twists, tone preferences, character backstory, team members, or anything else you want included in the story…" rows={3} style={{ width: "100%", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.75rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", lineHeight: 1.65, outline: "none", resize: "vertical", boxSizing: "border-box" }}
+            <textarea value={extraDetails} onChange={(e) => setExtraDetails(e.target.value)} placeholder="Any specific plot twists, character backstory, team members, specific scenes, or anything else you want included…" rows={3} style={{ width: "100%", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.75rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", lineHeight: 1.65, outline: "none", resize: "vertical", boxSizing: "border-box" }}
               onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,184,0,0.35)")}
               onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
             />
@@ -637,14 +851,40 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           )}
 
-          {/* Story content */}
-          {(story || streamingText) && (
-            <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", marginBottom: "1.5rem", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(90deg, transparent, #FF4060 20%, #FFB800 50%, #C060E0 80%, transparent)" }} />
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.2), transparent)" }} />
-              <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>
-                {story || streamingText}
-                {loading && <span style={{ display: "inline-block", width: "2px", height: "1.1em", background: "#FFB800", marginLeft: "2px", verticalAlign: "text-bottom", animation: "progressGlow 0.8s ease-in-out infinite" }} />}
+          {/* Chapters */}
+          {chapters.map((ch, i) => (
+            <div key={i} style={{ marginBottom: "1.5rem", position: "relative" }}>
+              {chapters.length > 1 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.875rem" }}>
+                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.4), transparent)" }} />
+                  <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "#FFB800", textTransform: "uppercase" }}>Chapter {i + 1}</span>
+                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.4))" }} />
+                </div>
+              )}
+              <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: i === 0 ? "linear-gradient(90deg, transparent, #FF4060 20%, #FFB800 50%, #C060E0 80%, transparent)" : "linear-gradient(90deg, transparent, #C060E0 30%, #FFB800 70%, transparent)" }} />
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.2), transparent)" }} />
+                <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>{ch}</div>
+              </div>
+            </div>
+          ))}
+
+          {/* Streaming new chapter */}
+          {streamingText && (
+            <div style={{ marginBottom: "1.5rem", position: "relative" }}>
+              {chapters.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.875rem" }}>
+                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(192,96,224,0.4), transparent)" }} />
+                  <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "#C060E0", textTransform: "uppercase" }}>Chapter {chapters.length + 1}</span>
+                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(192,96,224,0.4))" }} />
+                </div>
+              )}
+              <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(192,96,224,0.2)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(90deg, transparent, #C060E0 50%, transparent)" }} />
+                <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>
+                  {streamingText}
+                  <span style={{ display: "inline-block", width: "2px", height: "1.1em", background: "#FFB800", marginLeft: "2px", verticalAlign: "text-bottom", animation: "progressGlow 0.8s ease-in-out infinite" }} />
+                </div>
               </div>
             </div>
           )}
@@ -656,14 +896,49 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           )}
 
+          {/* Continue story panel */}
+          {chapters.length > 0 && !loading && !continuing && (
+            <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.2)", borderRadius: "16px", padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+              <div className="font-cinzel" style={{ fontSize: "0.65rem", color: "#C060E0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.75rem" }}>
+                ✦ Continue the Story — Chapter {chapters.length + 1}
+              </div>
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end" }}>
+                <input
+                  value={continuePrompt}
+                  onChange={(e) => setContinuePrompt(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); continueStory(); } }}
+                  placeholder="Steer the next chapter… (e.g. 'She attempts escape', 'The villain reveals his plan', 'Allies arrive') or leave blank for AI to decide"
+                  style={{ flex: 1, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none" }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(192,96,224,0.4)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
+                />
+                <button
+                  onClick={continueStory}
+                  style={{ padding: "0.65rem 1.25rem", background: "rgba(192,96,224,0.2)", border: "1px solid rgba(192,96,224,0.45)", borderRadius: "8px", color: "#C060E0", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", whiteSpace: "nowrap", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(192,96,224,0.3)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(192,96,224,0.3)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(192,96,224,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  + Next Chapter
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Continuing spinner */}
+          {continuing && (
+            <div style={{ textAlign: "center", padding: "1.5rem", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(192,96,224,0.15)", borderRadius: "12px", marginBottom: "1.5rem" }}>
+              <p className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.85rem", letterSpacing: "2px" }}>Writing Chapter {chapters.length + 1}…</p>
+            </div>
+          )}
+
           {/* Actions */}
           <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "space-between" }}>
             <button onClick={() => setStep(3)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Edit Scenario</button>
             <div style={{ display: "flex", gap: "0.75rem" }}>
-              {story && (
+              {chapters.length > 0 && (
                 <>
-                  <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>Export Story</button>
-                  <button onClick={() => { setStory(""); generateStory(); }} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
+                  <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>Export {chapters.length > 1 ? `(${chapters.length} ch.)` : ""}</button>
+                  <button onClick={() => { setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
                 </>
               )}
             </div>
