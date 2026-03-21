@@ -122,7 +122,6 @@ const DC_HEROES = [
   { name: "Bleez",            alias: "Red Lantern",       power: "Rage-fueled red ring & flight",       icon: "❤" },
   { name: "Renee Montoya",    alias: "The Question",      power: "Detective & martial arts master",     icon: "❓" },
   { name: "Troia",            alias: "Donna Troy Alt",    power: "Cosmic awareness & Amazon power",     icon: "🌌" },
-  { name: "Dawnstar",         alias: "Legion Hero",       power: "Cosmic tracking & flight",            icon: "✨" },
   { name: "Argent",           alias: "Toni Monetti",      power: "Alien silver plasma generation",      icon: "🔘" },
   { name: "Arrowette",        alias: "Cissie King-Jones", power: "Olympic-level archery",               icon: "🏹" },
   { name: "Shrinking Violet", alias: "Salu Digby",        power: "Size reduction to microscopic",       icon: "🔬" },
@@ -313,6 +312,13 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [storyLength, setStoryLength] = useState<string>("medium");
   const [extraDetails, setExtraDetails] = useState("");
 
+  // ── Advanced Systems ──
+  const [powerDegradation, setPowerDegradation] = useState(0);
+  const [powerDegradationDesc, setPowerDegradationDesc] = useState("");
+  const [traumaState, setTraumaState] = useState<"" | "compliance" | "defiance" | "breakdown">("");
+  const [sensoryModeActive, setSensoryModeActive] = useState(false);
+  const [sensoryMode, setSensoryMode] = useState<string>("");
+
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
@@ -368,6 +374,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     const restraintLabels = selectedRestraints.map((id) => RESTRAINTS.find((r) => r.id === id)?.label ?? id);
     const allRestraints = [...restraintLabels, ...(customRestraints.trim() ? [customRestraints.trim()] : [])];
 
+    const degradationLevel = powerDegradation === 0 ? "none" : powerDegradation <= 20 ? "minimal flicker" : powerDegradation <= 40 ? "noticeable drain" : powerDegradation <= 60 ? "significant suppression" : powerDegradation <= 80 ? "near-total loss" : "complete power void";
+    const traumaDesc = traumaState === "compliance" ? "Compliance — the hero's resistance has begun to erode; she is increasingly obedient, her will bending under sustained pressure" : traumaState === "defiance" ? "Defiance — she fights back at every turn; each act of resistance triggers harsher countermeasures and escalating restraints" : traumaState === "breakdown" ? "Breakdown — psychological fracture; she experiences dissociation, hallucinations, and unpredictable power surges" : "not specified";
+    const sensoryDesc = !sensoryModeActive ? "none" : sensoryMode;
+
     return {
       hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
       villain: `${villain} — Scheme: ${villainScheme}`,
@@ -380,6 +390,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       heroState: heroStateLabel || "at full strength",
       storyLength: lengthLabel,
       details: extraDetails,
+      powerDegradation: powerDegradation > 0 ? `${degradationLevel} (${powerDegradation}%)${powerDegradationDesc ? ` — ${powerDegradationDesc}` : ""}` : "none",
+      traumaState: traumaDesc,
+      sensoryOverride: sensoryDesc,
     };
   }
 
@@ -873,6 +886,181 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
               />
             </div>
+          </div>
+
+          {/* ── DYNAMIC POWER DEGRADATION SYSTEM ── */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,100,0,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.3rem" }}>
+              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF6400", letterSpacing: "2.5px", textTransform: "uppercase" }}>⚡ Dynamic Power Degradation System</div>
+              <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
+            </div>
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
+              Define how the hero's powers progressively fade during captivity — tied to restraint choices for emergent storytelling.
+            </p>
+
+            {/* Degradation Rate Slider */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.6rem" }}>
+                <span style={{ fontSize: "0.62rem", color: "rgba(255,100,0,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 700 }}>Degradation Rate</span>
+                <span className="font-cinzel" style={{ fontSize: "0.78rem", fontWeight: 900, color: powerDegradation === 0 ? "rgba(200,200,220,0.3)" : powerDegradation <= 20 ? "#80FF80" : powerDegradation <= 40 ? "#FFCC00" : powerDegradation <= 60 ? "#FF8800" : powerDegradation <= 80 ? "#FF4400" : "#FF0040" }}>
+                  {powerDegradation === 0 ? "Disabled" : powerDegradation <= 20 ? `${powerDegradation}% — Minimal Flicker` : powerDegradation <= 40 ? `${powerDegradation}% — Noticeable Drain` : powerDegradation <= 60 ? `${powerDegradation}% — Significant Suppression` : powerDegradation <= 80 ? `${powerDegradation}% — Near-Total Loss` : `${powerDegradation}% — Complete Power Void`}
+                </span>
+              </div>
+              <div style={{ position: "relative", height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", marginBottom: "0.4rem" }}>
+                <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${powerDegradation}%`, borderRadius: "2px", background: powerDegradation === 0 ? "transparent" : `linear-gradient(90deg, #80FF80, ${powerDegradation <= 40 ? "#FFCC00" : powerDegradation <= 70 ? "#FF8800" : "#FF0040"})`, transition: "width 0.2s ease, background 0.3s ease" }} />
+              </div>
+              <input
+                type="range" min={0} max={100} step={5}
+                value={powerDegradation}
+                onChange={(e) => setPowerDegradation(Number(e.target.value))}
+                style={{ width: "100%", accentColor: "#FF6400", cursor: "pointer", background: "transparent" }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.2rem" }}>
+                {["None", "Flicker", "Drain", "Suppressed", "Near-Zero", "Void"].map((l) => (
+                  <span key={l} style={{ fontSize: "0.45rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "0.5px" }}>{l}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Degradation Description */}
+            {powerDegradation > 0 && (
+              <div>
+                <label style={{ fontSize: "0.62rem", color: "rgba(255,100,0,0.5)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>How it manifests <span style={{ color: "rgba(200,200,220,0.2)" }}>(optional)</span></label>
+                <input
+                  value={powerDegradationDesc}
+                  onChange={(e) => setPowerDegradationDesc(e.target.value)}
+                  placeholder={'e.g. "Her telekinesis flickers with each scream" / "Speed drains 10% per hour under neural dampeners"'}
+                  style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,100,0,0.4)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
+                />
+                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.6rem" }}>
+                  {["Her telekinesis flickers with each scream", "Speed drains 10% per hour under neural dampeners", "Fire control gutters when the inhibitor pulse fires", "Strength halved with every failed escape attempt"].map((ex) => (
+                    <button key={ex} onClick={() => setPowerDegradationDesc(ex)} style={{ padding: "0.2rem 0.55rem", background: "rgba(255,100,0,0.07)", border: "1px solid rgba(255,100,0,0.2)", borderRadius: "4px", color: "rgba(255,140,60,0.6)", fontSize: "0.58rem", fontFamily: "'Raleway', sans-serif", cursor: "pointer", transition: "all 0.2s" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(255,100,0,0.45)"; e.currentTarget.style.color = "rgba(255,140,60,0.9)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,100,0,0.2)"; e.currentTarget.style.color = "rgba(255,140,60,0.6)"; }}
+                    >{ex}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── TRAUMA RESONANCE METER ── */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(180,0,60,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.3rem" }}>
+              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF2060", letterSpacing: "2.5px", textTransform: "uppercase" }}>💗 Trauma Resonance Meter</div>
+              <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
+            </div>
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
+              Track the hero's psychological state. Each mode unlocks different narrative paths and AI writing choices.
+            </p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.25rem" }}>
+              {([
+                { id: "compliance", label: "Compliance", icon: "🕊", col: "#40D090", bg: "rgba(0,160,90,0.15)", border: "rgba(0,200,110,0.5)", desc: "Resistance erodes. New dialogue paths unlock as her will bends.", sub: "Lowers resistance · unlocks obedience arcs" },
+                { id: "defiance",   label: "Defiance",   icon: "⚔", col: "#FFB800", bg: "rgba(200,140,0,0.15)", border: "rgba(255,184,0,0.5)", desc: "She fights at every turn. Triggers harsher restraints and escalation.", sub: "Triggers countermeasures · may reveal escape routes" },
+                { id: "breakdown",  label: "Breakdown",  icon: "💔", col: "#FF2060", bg: "rgba(180,0,60,0.15)", border: "rgba(255,40,96,0.5)", desc: "Psychological fracture. Hallucinations, flashbacks, power surges.", sub: "Activates hallucinations · unpredictable power surges" },
+              ] as const).map((ts) => {
+                const isSel = traumaState === ts.id;
+                return (
+                  <button key={ts.id} onClick={() => setTraumaState(isSel ? "" : ts.id)} style={{ background: isSel ? ts.bg : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? ts.border : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem", cursor: "pointer", textAlign: "left", transition: "all 0.25s", color: "inherit", boxShadow: isSel ? `0 0 18px ${ts.col}33` : "none" }}
+                    onMouseEnter={(e) => { if (!isSel) { e.currentTarget.style.borderColor = ts.border.replace("0.5", "0.25"); e.currentTarget.style.background = ts.bg.replace("0.15", "0.07"); } }}
+                    onMouseLeave={(e) => { if (!isSel) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.4)"; } }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem" }}>
+                      <span style={{ fontSize: "1.1rem" }}>{ts.icon}</span>
+                      <span className="font-cinzel" style={{ fontSize: "0.75rem", fontWeight: 700, color: isSel ? ts.col : "#E8E8F0" }}>{ts.label}</span>
+                    </div>
+                    <div style={{ fontSize: "0.6rem", color: isSel ? "rgba(220,215,255,0.6)" : "rgba(200,200,220,0.35)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.55, marginBottom: "0.4rem" }}>{ts.desc}</div>
+                    <div style={{ fontSize: "0.52rem", color: isSel ? ts.col : "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "0.5px" }}>{ts.sub}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Heart-monitor SVG — animated based on state */}
+            {traumaState && (
+              <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", padding: "0.75rem 1rem", position: "relative", overflow: "hidden" }}>
+                <div style={{ fontSize: "0.48rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "0.5rem" }}>
+                  Psychological Trace — {traumaState === "compliance" ? "Stable / Diminishing" : traumaState === "defiance" ? "Elevated / Volatile" : "Critical / Fragmenting"}
+                </div>
+                <svg width="100%" height="48" viewBox="0 0 400 48" preserveAspectRatio="none" style={{ display: "block" }}>
+                  <defs>
+                    <linearGradient id="traceGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor={traumaState === "compliance" ? "#40D090" : traumaState === "defiance" ? "#FFB800" : "#FF2060"} stopOpacity="0" />
+                      <stop offset="40%" stopColor={traumaState === "compliance" ? "#40D090" : traumaState === "defiance" ? "#FFB800" : "#FF2060"} stopOpacity="1" />
+                      <stop offset="100%" stopColor={traumaState === "compliance" ? "#40D090" : traumaState === "defiance" ? "#FFB800" : "#FF2060"} stopOpacity="0.6" />
+                    </linearGradient>
+                  </defs>
+                  {traumaState === "compliance" && (
+                    <polyline points="0,24 40,24 60,16 80,32 100,24 160,24 180,18 200,30 220,24 320,24 340,20 360,28 380,24 400,24" fill="none" stroke="url(#traceGrad)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  )}
+                  {traumaState === "defiance" && (
+                    <polyline points="0,24 30,24 35,4 42,44 48,8 54,24 90,24 95,6 100,42 106,10 112,24 160,24 165,2 172,46 178,6 184,24 230,24 235,8 240,38 246,12 252,24 320,24 325,4 332,44 338,8 344,24 400,24" fill="none" stroke="url(#traceGrad)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  )}
+                  {traumaState === "breakdown" && (
+                    <polyline points="0,24 15,24 18,4 21,44 23,2 26,40 28,10 30,24 55,24 57,6 60,42 62,2 65,38 67,16 70,24 95,24 98,8 100,44 103,4 106,36 109,18 112,24 140,24 143,2 146,46 149,6 152,38 155,20 158,24 190,24 193,10 196,42 199,4 202,40 205,16 208,24 250,24 253,6 256,44 259,8 262,36 265,20 268,24 310,24 313,4 316,46 319,8 322,38 325,18 328,24 380,24 383,10 386,42 389,14 392,36 395,24 400,24" fill="none" stroke="url(#traceGrad)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  )}
+                  {/* Travelling pulse dot */}
+                  <circle r="3" fill={traumaState === "compliance" ? "#40D090" : traumaState === "defiance" ? "#FFB800" : "#FF2060"} style={{ filter: `drop-shadow(0 0 4px ${traumaState === "compliance" ? "#40D090" : traumaState === "defiance" ? "#FFB800" : "#FF2060"})` }}>
+                    <animateMotion dur={traumaState === "compliance" ? "3s" : traumaState === "defiance" ? "2s" : "1.2s"} repeatCount="indefinite">
+                      {traumaState === "compliance" && <mpath href="#compPath" />}
+                      {traumaState === "defiance" && <mpath href="#defPath" />}
+                      {traumaState === "breakdown" && <mpath href="#brkPath" />}
+                    </animateMotion>
+                  </circle>
+                  {traumaState === "compliance" && <path id="compPath" d="M 0,24 L 40,24 L 60,16 L 80,32 L 100,24 L 160,24 L 180,18 L 200,30 L 220,24 L 320,24 L 340,20 L 360,28 L 380,24 L 400,24" fill="none" />}
+                  {traumaState === "defiance" && <path id="defPath" d="M 0,24 L 30,24 L 35,4 L 42,44 L 48,8 L 54,24 L 90,24 L 95,6 L 100,42 L 106,10 L 112,24 L 160,24 L 165,2 L 172,46 L 178,6 L 184,24 L 230,24 L 235,8 L 240,38 L 246,12 L 252,24 L 320,24 L 325,4 L 332,44 L 338,8 L 344,24 L 400,24" fill="none" />}
+                  {traumaState === "breakdown" && <path id="brkPath" d="M 0,24 L 15,24 L 18,4 L 21,44 L 23,2 L 26,40 L 28,10 L 30,24 L 55,24 L 57,6 L 60,42 L 62,2 L 65,38 L 67,16 L 70,24 L 95,24 L 98,8 L 100,44 L 103,4 L 106,36 L 109,18 L 112,24 L 140,24 L 143,2 L 146,46 L 149,6 L 152,38 L 155,20 L 158,24 L 190,24 L 193,10 L 196,42 L 199,4 L 202,40 L 205,16 L 208,24 L 250,24 L 253,6 L 256,44 L 259,8 L 262,36 L 265,20 L 268,24 L 310,24 L 313,4 L 316,46 L 319,8 L 322,38 L 325,18 L 328,24 L 380,24 L 383,10 L 386,42 L 389,14 L 392,36 L 395,24 L 400,24" fill="none" />}
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* ── SENSORY OVERRIDE MODE ── */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: `1px solid ${sensoryModeActive ? "rgba(120,60,200,0.4)" : "rgba(255,255,255,0.06)"}`, borderRadius: "16px", padding: "1.5rem", transition: "border-color 0.3s" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: sensoryModeActive ? "1rem" : 0 }}>
+              <div>
+                <div className="font-cinzel" style={{ fontSize: "0.7rem", color: sensoryModeActive ? "#A060FF" : "rgba(160,96,255,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", transition: "color 0.3s" }}>👁 Sensory Override Mode</div>
+                <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", marginTop: "0.2rem" }}>Deprivation or overload — links to Mood Lighting for immersive atmosphere</div>
+              </div>
+              <button
+                onClick={() => { setSensoryModeActive(!sensoryModeActive); if (sensoryModeActive) setSensoryMode(""); }}
+                style={{ padding: "0.35rem 0.875rem", background: sensoryModeActive ? "rgba(120,60,200,0.25)" : "rgba(255,255,255,0.04)", border: `1px solid ${sensoryModeActive ? "rgba(160,96,255,0.55)" : "rgba(255,255,255,0.1)"}`, borderRadius: "20px", cursor: "pointer", color: sensoryModeActive ? "#A060FF" : "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "2px", transition: "all 0.25s", flexShrink: 0 }}
+              >
+                {sensoryModeActive ? "ON  ●" : "OFF  ○"}
+              </button>
+            </div>
+
+            {sensoryModeActive && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.625rem", marginTop: "0.25rem" }}>
+                {([
+                  { id: "deprivation",  icon: "🙈", label: "Blindfolded + Soundproof", desc: "All visual and auditory input stripped — forces hyper-awareness of touch, temperature, heartbeat, scent", mood: "Isolation / Cold" },
+                  { id: "overload",     icon: "⚡", label: "Strobe + Sub-bass",        desc: "Strobing light and sub-bass frequency — induces panic, vertigo, time dilation and spatial disorientation", mood: "Static Glitch" },
+                  { id: "scent",        icon: "🌸", label: "Scent Triggers",            desc: "Ozone, blood, perfume, burning metal — each scent hijacks memory and emotion, producing involuntary flashbacks", mood: "Candlelight" },
+                  { id: "void",         icon: "🌑", label: "Total Void",                desc: "Complete removal of all sensory input including proprioception — dissolves self-concept and temporal awareness", mood: "Void Black" },
+                ] as const).map((sm) => {
+                  const isSel = sensoryMode === sm.id;
+                  return (
+                    <button key={sm.id} onClick={() => setSensoryMode(isSel ? "" : sm.id)} style={{ background: isSel ? "rgba(120,60,200,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(160,96,255,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 16px rgba(120,60,200,0.25)" : "none" }}
+                      onMouseEnter={(e) => { if (!isSel) { e.currentTarget.style.borderColor = "rgba(160,96,255,0.3)"; e.currentTarget.style.background = "rgba(120,60,200,0.07)"; } }}
+                      onMouseLeave={(e) => { if (!isSel) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.4)"; } }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.45rem" }}>
+                        <span style={{ fontSize: "1.2rem" }}>{sm.icon}</span>
+                        <span className="font-cinzel" style={{ fontSize: "0.72rem", fontWeight: 700, color: isSel ? "#A060FF" : "#D0D0E8" }}>{sm.label}</span>
+                      </div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.55, marginBottom: "0.4rem" }}>{sm.desc}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                        <span style={{ fontSize: "0.45rem", color: isSel ? "rgba(160,96,255,0.6)" : "rgba(200,200,220,0.18)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Mood Link:</span>
+                        <span style={{ fontSize: "0.45rem", color: isSel ? "#A060FF" : "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>{sm.mood}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Special weapons */}

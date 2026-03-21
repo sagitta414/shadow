@@ -212,6 +212,9 @@ Story guidance (follow faithfully):
 - If HERO'S CONDITION is specified, she begins the story in that state
 - If RESTRAINTS/CONTAINMENT GEAR is specified, weave it into the narrative as the method of control — describe the gear, how it feels, how it suppresses her power
 - If STORY LENGTH is "Quick Strike", write 2–3 paragraphs. If "Standard", write 5–6 paragraphs. If "Epic Saga", write 9–10 paragraphs
+- If POWER DEGRADATION is specified, portray the hero's abilities fading progressively through the story using the described mechanism — show the degradation happening in real time with visceral sensory detail
+- If TRAUMA STATE is specified, it defines the hero's psychological arc: Compliance means her will is eroding and her resistance slowly gives way; Defiance means she fights back and triggers escalating countermeasures; Breakdown means she experiences dissociation, hallucinations, and unpredictable power surges
+- If SENSORY OVERRIDE is specified, layer that sensory experience throughout — Blindfolded + Soundproof means focus intensely on touch, temperature, sound of breathing; Strobe + Sub-bass means portray disorientation and panic; Scent Triggers means use smell to unlock memory flashbacks; Total Void means describe the dissolution of self-perception
 
 Your prose is vivid and punchy. Mix high-octane action with genuine character depth. Capture the hero's voice, the villain's menace, and the weight of what's at stake. Include inner monologue from the hero and specific use of her powers.
 
@@ -219,7 +222,7 @@ Do not use JSON. Write pure narrative prose. No headers, no bullet points.`;
 
 router.post("/story/superhero", async (req, res) => {
   try {
-    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details } = req.body as {
+    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride } = req.body as {
       hero: string;
       villain: string;
       setting: string;
@@ -231,6 +234,9 @@ router.post("/story/superhero", async (req, res) => {
       heroState?: string;
       storyLength?: string;
       details?: string;
+      powerDegradation?: string;
+      traumaState?: string;
+      sensoryOverride?: string;
     };
 
     const userMessage = [
@@ -244,6 +250,9 @@ router.post("/story/superhero", async (req, res) => {
       heroState ? `HERO'S CONDITION: ${heroState}` : "",
       restraints && restraints !== "none specified" ? `RESTRAINTS/CONTAINMENT GEAR: ${restraints}` : "",
       weapons && weapons !== "standard powers" ? `WEAPONS / POWER ELEMENTS: ${weapons}` : "",
+      powerDegradation && powerDegradation !== "none" ? `POWER DEGRADATION: ${powerDegradation}` : "",
+      traumaState && traumaState !== "not specified" ? `TRAUMA STATE: ${traumaState}` : "",
+      sensoryOverride && sensoryOverride !== "none" ? `SENSORY OVERRIDE: ${sensoryOverride}` : "",
       storyLength ? `STORY LENGTH: ${storyLength}` : "",
       details ? `\nADDITIONAL DETAILS: ${details}` : "",
       `\nMake it gripping, visceral, and true to both characters.`,
