@@ -132,10 +132,12 @@ export default function Homepage(props: HomepageProps) {
         @media (max-width: 700px) {
           .hp-nav { padding: 0 1rem !important; }
           .hp-nav-stats { display: none !important; }
-          .hp-banner { flex-direction: column !important; gap: 1rem !important; padding: 1.25rem !important; margin: 0.75rem !important; }
+          .hp-banner { flex-direction: column !important; gap: 0.75rem !important; padding: 1.25rem !important; margin: 0.75rem !important; }
+          .hp-banner-cta { display: none !important; }
           .tool-row { padding: 1rem 1.25rem !important; }
           .row-features { display: none !important; }
           .row-num { display: none !important; }
+          .row-desc { max-height: 3rem !important; opacity: 1 !important; margin-top: 0.35rem !important; }
         }
       `}</style>
 
@@ -222,7 +224,7 @@ export default function Homepage(props: HomepageProps) {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "2rem", position: "relative", zIndex: 1, flexShrink: 0 }}>
+        <div className="hp-banner-cta" style={{ display: "flex", alignItems: "center", gap: "2rem", position: "relative", zIndex: 1, flexShrink: 0 }}>
           {[["118+", "Heroines"], ["53", "Villains"], ["AI", "Chapters"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "1.25rem", fontWeight: 900, color: "rgba(255,210,60,0.82)", lineHeight: 1 }}>{v}</div>

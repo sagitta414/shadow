@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -309,6 +310,7 @@ type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB";
 
 // ── Component ─────────────────────────────────────────────────
 export default function SuperheroMode({ onBack }: SuperheroModeProps) {
+  const isMobile = useIsMobile();
   const [step, setStep] = useState<Step>(1);
   const [universeFilter, setUniverseFilter] = useState<UniverseFilter>("ALL");
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
@@ -547,10 +549,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const stepLabels = ["Choose Hero", "Choose Villain", "Scenario", "Story"];
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem", minHeight: "100vh" }}>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh" }}>
 
       {/* ── Header ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: isMobile ? "1rem" : "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", marginBottom: "0.5rem" }}>
             <div style={{ padding: "0.25rem 0.75rem", background: "linear-gradient(135deg, rgba(255,180,0,0.2), rgba(255,80,0,0.15))", border: "1px solid rgba(255,180,0,0.4)", borderRadius: "20px", fontSize: "0.65rem", color: "#FFB800", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
@@ -568,7 +570,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       </div>
 
       {/* ── Step Progress ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: "2.5rem", background: "rgba(0,0,0,0.4)", borderRadius: "12px", padding: "0.5rem", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: isMobile ? "1.25rem" : "2.5rem", background: "rgba(0,0,0,0.4)", borderRadius: "12px", padding: "0.5rem", border: "1px solid rgba(255,255,255,0.05)" }}>
         {stepLabels.map((label, i) => {
           const num = i + 1 as Step;
           const isActive = step === num;
@@ -608,9 +610,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: isActive ? "rgba(255,184,0,0.3)" : isDone ? "rgba(0,200,100,0.25)" : isNext ? "rgba(255,184,0,0.15)" : "rgba(255,255,255,0.05)", border: `1px solid ${isActive ? "rgba(255,184,0,0.6)" : isDone ? "rgba(0,200,100,0.5)" : isNext ? "rgba(255,184,0,0.4)" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", flexShrink: 0 }}>
                   {isDone ? <span style={{ color: "#00C870" }}>✓</span> : <span style={{ color: isActive ? "#FFB800" : isNext ? "rgba(255,184,0,0.7)" : "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.65rem" }}>{num}</span>}
                 </div>
-                <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#FFB800" : isDone ? "#00C870" : isNext ? "rgba(255,184,0,0.6)" : "rgba(200,200,220,0.3)", whiteSpace: "nowrap" }}>
-                  {label}
-                </span>
+                {!isMobile && (
+                  <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#FFB800" : isDone ? "#00C870" : isNext ? "rgba(255,184,0,0.6)" : "rgba(200,200,220,0.3)", whiteSpace: "nowrap" }}>
+                    {label}
+                  </span>
+                )}
               </button>
               {i < stepLabels.length - 1 && (
                 <div style={{ width: "20px", height: "1px", background: isDone && step > num + 1 ? "rgba(0,200,100,0.4)" : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
@@ -626,15 +630,15 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       {step === 1 && (
         <div>
           {/* Filters */}
-          <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
+            <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
               {(["ALL", "MARVEL", "DC", "CW", "TB"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
                   {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : "The Boys ✦"}
                 </button>
               ))}
             </div>
-            <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+            <div style={{ position: "relative", flex: 1, width: isMobile ? "100%" : undefined, minWidth: isMobile ? undefined : "200px" }}>
               <span style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", color: "rgba(200,200,220,0.3)", fontSize: "0.8rem", pointerEvents: "none" }}>⌕</span>
               <input
                 value={search}
@@ -681,7 +685,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           )}
 
           {/* Hero grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
             {filteredHeroes.map((hero) => {
               const isMarvel = hero.universe === "MARVEL";
               const isCW = hero.universe === "CW";
@@ -761,10 +765,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {villainMode === "pick" ? (
             <>
               {/* Villain universe filter */}
-              <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
+                <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined }}>
                   {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
                       {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : "The Boys ✦"}
                     </button>
                   ))}
@@ -773,7 +777,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).length} villains
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
                 {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).map((villain) => {
                   const isSelected = selectedVillain?.name === villain.name;
                   const isMv = villain.universe === "Marvel";
@@ -1169,7 +1173,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               Track the hero's psychological state. Each mode unlocks different narrative paths and AI writing choices.
             </p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.25rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.25rem" }}>
               {([
                 { id: "compliance", label: "Compliance", icon: "🕊", col: "#40D090", bg: "rgba(0,160,90,0.15)", border: "rgba(0,200,110,0.5)", desc: "Resistance erodes. New dialogue paths unlock as her will bends.", sub: "Lowers resistance · unlocks obedience arcs" },
                 { id: "defiance",   label: "Defiance",   icon: "⚔", col: "#FFB800", bg: "rgba(200,140,0,0.15)", border: "rgba(255,184,0,0.5)", desc: "She fights at every turn. Triggers harsher restraints and escalation.", sub: "Triggers countermeasures · may reveal escape routes" },
@@ -1247,7 +1251,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
 
             {sensoryModeActive && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.625rem", marginTop: "0.25rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "150px" : "220px"}, 1fr))`, gap: "0.625rem", marginTop: "0.25rem" }}>
                 {([
                   { id: "deprivation",  icon: "🙈", label: "Blindfolded + Soundproof", desc: "All visual and auditory input stripped — forces hyper-awareness of touch, temperature, heartbeat, scent", mood: "Isolation / Cold" },
                   { id: "overload",     icon: "⚡", label: "Strobe + Sub-bass",        desc: "Strobing light and sub-bass frequency — induces panic, vertigo, time dilation and spatial disorientation", mood: "Static Glitch" },

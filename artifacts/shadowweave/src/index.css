@@ -785,3 +785,43 @@ body.theme-glitch {
     grid-template-columns: 1fr !important;
   }
 }
+
+@media (max-width: 640px) {
+  /* Glass card compact padding */
+  .glass-card {
+    padding: 1.25rem !important;
+  }
+
+  /* Buttons full width where appropriate */
+  .enter-button {
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+  }
+
+  /* Action buttons reduce padding */
+  .action-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* Question options */
+  .question-option {
+    padding: 1rem 1.1rem;
+  }
+
+  /* Section header */
+  .section-header {
+    font-size: 0.95rem;
+  }
+
+  /* Tool rows in homepage */
+  .row-arrow {
+    display: none;
+  }
+
+  /* Prevent wide absolute positioned watermark numbers from causing overflow */
+  body {
+    overflow-x: hidden;
+  }
+}
