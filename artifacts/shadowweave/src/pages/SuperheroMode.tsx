@@ -4,6 +4,17 @@ interface SuperheroModeProps {
   onBack: () => void;
 }
 
+function heroImg(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-|-$/g, "");
+  const jpgSlugs = ["ms-marvel", "mary-marvel", "cassandra-cain", "arrowette"];
+  return `/heroes/${slug}.${jpgSlugs.includes(slug) ? "jpg" : "png"}`;
+}
+
 // ── DATA ─────────────────────────────────────────────────────────
 const MARVEL_HEROES = [
   { name: "Black Widow",      alias: "Natasha Romanoff",  power: "Master spy & martial artist",        icon: "🕸" },
@@ -531,12 +542,21 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}60`; e.currentTarget.style.background = accentBg; } }}
                   onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
                 >
-                  {isSelected && <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", width: "16px", height: "16px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000" }}>✓</div>}
-                  <div style={{ fontSize: "1.5rem", marginBottom: "0.4rem" }}>{hero.icon}</div>
-                  <div className="font-cinzel" style={{ fontSize: "0.8rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.2rem", lineHeight: 1.3 }}>{hero.name}</div>
-                  <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.4rem" }}>{hero.alias}</div>
-                  <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.55)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
-                  <div style={{ marginTop: "0.5rem", fontSize: "0.55rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, opacity: 0.7 }}>{hero.universe}</div>
+                  {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", zIndex: 2, fontWeight: 700 }}>✓</div>}
+                  {/* Portrait image tile */}
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)" }}>
+                    <img
+                      src={heroImg(hero.name)}
+                      alt={hero.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
+                  </div>
+                  <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{hero.name}</div>
+                  <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>{hero.alias}</div>
+                  <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
                 </button>
               );
             })}
