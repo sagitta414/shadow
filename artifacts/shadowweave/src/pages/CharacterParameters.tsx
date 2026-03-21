@@ -16,121 +16,162 @@ export default function CharacterParameters({ onBack, onProceed }: CharacterPara
     setAnswers((prev) => ({ ...prev, [qId]: value }));
   }
 
-  function next() {
-    if (currentQ < total) setCurrentQ((q) => q + 1);
-  }
+  function next() { if (currentQ < total) setCurrentQ((q) => q + 1); }
+  function prev() { if (currentQ > 1)    setCurrentQ((q) => q - 1); }
 
-  function prev() {
-    if (currentQ > 1) setCurrentQ((q) => q - 1);
-  }
-
-  const currentAnswer = answers[currentQ];
-  const question = questions[currentQ - 1];
+  const currentAnswer  = answers[currentQ];
+  const question       = questions[currentQ - 1];
   const followupFields = currentAnswer
     ? followupsData[question.followupKey]?.[currentAnswer]
     : undefined;
-
-  const allAnswered = Object.keys(answers).length === total;
+  const allAnswered    = Object.keys(answers).length === total;
+  const pct            = Math.round((Object.keys(answers).length / total) * 100);
 
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "2rem",
-        background: "rgba(10,0,21,0.9)",
-        minHeight: "100vh",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "2rem", minHeight: "100vh" }}>
+
+      <div className="fade-in" style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+        <span className="badge badge-crimson" style={{ marginBottom: "1rem" }}>Character Configuration</span>
         <h1
           className="font-cinzel"
-          style={{
-            fontSize: "clamp(2rem, 4vw, 3rem)",
-            color: "#B8860B",
-            marginBottom: "0.75rem",
-            textShadow: "0 0 30px rgba(184,134,11,0.6)",
-          }}
+          style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#D4AF37", marginBottom: "0.5rem", fontWeight: 700 }}
         >
-          Character Configuration
+          Victim Profile Builder
         </h1>
-        <p className="font-montserrat" style={{ fontSize: "1.2rem", color: "#F0F0FF", opacity: 0.9 }}>
-          Build your character's psychological profile
+        <p style={{ color: "rgba(200,200,220,0.65)", fontSize: "1rem" }}>
+          Craft your character's psychological landscape
         </p>
       </div>
 
-      <div style={{ background: "rgba(0,0,0,0.5)", borderRadius: "20px", padding: "1.5rem", marginBottom: "2.5rem", textAlign: "center" }}>
-        <div className="font-cinzel" style={{ fontSize: "1.2rem", color: "#B8860B", marginBottom: "1rem" }}>
-          Configuration Progress
+      <div
+        className="glass-card"
+        style={{ marginBottom: "2rem", padding: "1.5rem", cursor: "default" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <span className="font-cinzel" style={{ fontSize: "0.85rem", color: "#B8860B", letterSpacing: "2px", textTransform: "uppercase" }}>
+            Progress
+          </span>
+          <span style={{ fontSize: "0.85rem", color: "rgba(200,200,220,0.6)" }}>
+            {pct}% Complete
+          </span>
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
-          {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
-            <div
-              key={n}
-              onClick={() => setCurrentQ(n)}
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                background: n < currentQ
-                  ? "rgba(184,134,11,0.4)"
-                  : n === currentQ
-                  ? "rgba(139,0,0,0.6)"
-                  : "rgba(139,0,0,0.3)",
-                border: n <= currentQ ? "2px solid #B8860B" : "2px solid #800000",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 600,
-                color: n < currentQ ? "#B8860B" : "#C0C0C0",
-                fontSize: "0.85rem",
-                cursor: "pointer",
-                boxShadow: n === currentQ ? "0 0 20px rgba(184,134,11,0.5)" : "none",
-                transition: "all 0.3s ease",
-              }}
-            >
-              {n < currentQ ? "✓" : n}
-            </div>
-          ))}
+
+        <div
+          style={{
+            height: "4px",
+            background: "rgba(255,255,255,0.06)",
+            borderRadius: "4px",
+            overflow: "hidden",
+            marginBottom: "1.25rem",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${pct}%`,
+              background: "linear-gradient(90deg, #8B0000, #B8860B)",
+              borderRadius: "4px",
+              boxShadow: "0 0 10px rgba(184,134,11,0.6)",
+              transition: "width 0.5s cubic-bezier(0.23,1,0.32,1)",
+            }}
+          />
         </div>
-        <div style={{ fontSize: "0.9rem", color: "#C0C0C0", opacity: 0.8 }}>
-          Question {currentQ} of {total} — {Math.round((Object.keys(answers).length / total) * 100)}% Complete
+
+        <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+          {Array.from({ length: total }, (_, i) => i + 1).map((n) => {
+            const done   = n < currentQ || !!answers[n];
+            const active = n === currentQ;
+            return (
+              <div
+                key={n}
+                onClick={() => setCurrentQ(n)}
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "50%",
+                  background: done
+                    ? "rgba(184,134,11,0.25)"
+                    : active
+                    ? "rgba(139,0,0,0.35)"
+                    : "rgba(255,255,255,0.04)",
+                  border: done
+                    ? "1.5px solid rgba(184,134,11,0.7)"
+                    : active
+                    ? "1.5px solid rgba(139,0,0,0.7)"
+                    : "1.5px solid rgba(255,255,255,0.12)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700,
+                  color: done ? "#D4AF37" : active ? "#FF6666" : "rgba(200,200,220,0.4)",
+                  fontSize: "0.75rem",
+                  cursor: "pointer",
+                  boxShadow: active ? "0 0 16px rgba(139,0,0,0.5), 0 0 30px rgba(139,0,0,0.2)" : "none",
+                  transition: "all 0.3s cubic-bezier(0.23,1,0.32,1)",
+                  fontFamily: "'Cinzel', serif",
+                }}
+              >
+                {done && !active ? "✓" : n}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div
+        key={currentQ}
+        className="slide-in glass-card"
         style={{
-          background: "rgba(0,0,0,0.6)",
-          border: `2px solid ${currentAnswer ? "#B8860B" : "#2D1B69"}`,
-          borderRadius: "25px",
-          padding: "2.5rem",
           marginBottom: "2rem",
-          backdropFilter: "blur(15px)",
-          position: "relative",
-          overflow: "hidden",
-          boxShadow: currentAnswer ? "0 0 40px rgba(184,134,11,0.3)" : "none",
-          transition: "all 0.3s ease",
+          padding: "2.5rem",
+          cursor: "default",
+          borderColor: currentAnswer ? "rgba(184,134,11,0.45)" : "rgba(139,0,0,0.3)",
+          boxShadow: currentAnswer ? "0 0 50px rgba(184,134,11,0.1), 0 20px 40px rgba(0,0,0,0.5)" : "0 20px 40px rgba(0,0,0,0.4)",
         }}
       >
-        <div className="progress-bar-gradient" style={{ position: "absolute", top: 0, left: 0, right: 0 }} />
+        <div className="progress-bar-gradient" style={{ position: "absolute", top: 0, left: 0, right: 0, borderRadius: "20px 20px 0 0" }} />
 
-        <div
-          className="font-cinzel"
-          style={{ fontSize: "1rem", color: "#00FF41", marginBottom: "1rem", fontWeight: 600, letterSpacing: "2px" }}
-        >
-          {question.label}
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+          <span
+            className="font-montserrat"
+            style={{
+              fontSize: "0.7rem",
+              color: "#00FF41",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
+            {question.label}
+          </span>
+          <span
+            style={{
+              fontSize: "0.7rem",
+              color: "rgba(200,200,220,0.35)",
+              letterSpacing: "1px",
+            }}
+          >
+            Question {currentQ} of {total}
+          </span>
         </div>
-        <div
+
+        <h2
           className="font-cinzel"
-          style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", color: "#F0F0FF", marginBottom: "1rem", lineHeight: 1.4 }}
+          style={{
+            fontSize: "clamp(1.2rem, 2.5vw, 1.7rem)",
+            color: "#F0F0FF",
+            marginBottom: "0.75rem",
+            lineHeight: 1.4,
+            fontWeight: 600,
+          }}
         >
           {question.title}
-        </div>
-        <div style={{ fontSize: "1rem", color: "#C0C0C0", marginBottom: "2rem", lineHeight: 1.6, opacity: 0.8 }}>
+        </h2>
+        <p style={{ fontSize: "0.95rem", color: "rgba(200,200,220,0.65)", marginBottom: "2rem", lineHeight: 1.7 }}>
           {question.description}
-        </div>
+        </p>
 
-        <div style={{ display: "grid", gap: "0.875rem" }}>
+        <div style={{ display: "grid", gap: "0.75rem" }}>
           {question.options.map((opt) => (
             <div
               key={opt.value}
@@ -144,8 +185,12 @@ export default function CharacterParameters({ onBack, onProceed }: CharacterPara
                 onChange={() => selectOption(currentQ, opt.value)}
               />
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, color: "#F0F0FF", marginBottom: "0.3rem" }}>{opt.title}</div>
-                <div style={{ fontSize: "0.85rem", color: "#C0C0C0", opacity: 0.8 }}>{opt.desc}</div>
+                <div style={{ fontWeight: 600, color: "#F0F0FF", marginBottom: "0.3rem", fontSize: "0.95rem" }}>
+                  {opt.title}
+                </div>
+                <div style={{ fontSize: "0.82rem", color: "rgba(200,200,220,0.6)", lineHeight: 1.5 }}>
+                  {opt.desc}
+                </div>
               </div>
             </div>
           ))}
@@ -156,29 +201,21 @@ export default function CharacterParameters({ onBack, onProceed }: CharacterPara
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginTop: "2rem" }}>
+      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
         <button className="action-button secondary" onClick={prev} disabled={currentQ === 1}>
-          Previous
+          ← Previous
         </button>
         {currentQ < total ? (
-          <button
-            className="action-button"
-            onClick={next}
-            disabled={!currentAnswer}
-          >
-            Next Question
+          <button className="action-button" onClick={next} disabled={!currentAnswer}>
+            Next Question →
           </button>
         ) : (
-          <button
-            className="action-button"
-            onClick={() => onProceed(answers)}
-            disabled={!allAnswered}
-          >
-            Begin Story Creation
+          <button className="action-button" onClick={() => onProceed(answers)} disabled={!allAnswered}>
+            Begin Story Creation ✦
           </button>
         )}
         <button className="action-button secondary" onClick={onBack}>
-          Back to Portal
+          ← Portal
         </button>
       </div>
     </div>

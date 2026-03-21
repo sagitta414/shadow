@@ -18,22 +18,57 @@ function BackgroundEffects() {
   return (
     <div className="void-bg">
       <div className="void-layer" />
+      <div
+        className="void-orb"
+        style={{
+          width: "600px",
+          height: "600px",
+          top: "10%",
+          left: "-10%",
+          background: "radial-gradient(circle, rgba(139,0,0,0.18) 0%, transparent 70%)",
+          "--dur": "28s",
+          "--delay": "0s",
+        } as React.CSSProperties}
+      />
+      <div
+        className="void-orb"
+        style={{
+          width: "500px",
+          height: "500px",
+          top: "50%",
+          right: "-5%",
+          background: "radial-gradient(circle, rgba(45,27,105,0.2) 0%, transparent 70%)",
+          "--dur": "22s",
+          "--delay": "-8s",
+        } as React.CSSProperties}
+      />
+      <div
+        className="void-orb"
+        style={{
+          width: "400px",
+          height: "400px",
+          bottom: "5%",
+          left: "30%",
+          background: "radial-gradient(circle, rgba(61,10,74,0.15) 0%, transparent 70%)",
+          "--dur": "35s",
+          "--delay": "-15s",
+        } as React.CSSProperties}
+      />
     </div>
   );
 }
 
 export default function App() {
   const [page, setPage] = useState<Page>("home");
-  const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
   const [captorAnswers, setCaptorAnswers] = useState<Record<number, string>>({});
 
   function navigate(p: Page) {
     setPage(p);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#000000", color: "#C0C0C0" }}>
+    <div style={{ minHeight: "100vh", background: "#000000", color: "#C8C8D8" }}>
       <BackgroundEffects />
 
       {page === "home" && (
@@ -46,10 +81,7 @@ export default function App() {
       {page === "character-params" && (
         <CharacterParameters
           onBack={() => navigate("home")}
-          onProceed={(answers) => {
-            setCharacterAnswers(answers);
-            navigate("story-editor");
-          }}
+          onProceed={() => navigate("story-editor")}
         />
       )}
 

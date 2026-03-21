@@ -1,0 +1,239 @@
+Here is the code for the additional scenario questions and the setup logic. This is a self-contained HTML page with the necessary JavaScript to handle the dynamic question generation.
+
+### How to Use This Code
+1.  Copy the entire code block below.
+2.  Save it as an HTML file (e.g., `shadowweave_questions.html`).
+3.  Open the file in your web browser.
+
+This code provides the user interface for the captor's traits and generates the follow-up questions. It is designed to be the part of your editor that *creates* the questions; you would then integrate the generated question data into your main story application.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHADOWWEAVE - Captor Configuration</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #c0c0c0;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #333;
+            padding: 20px;
+            background-color: #111;
+        }
+        h1, h2 {
+            color: #e0e0e0;
+            text-align: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px dashed #555;
+            background-color: #181818;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #b0b0b0;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            background-color: #222;
+            border: 1px solid #555;
+            color: #e0e0e0;
+            border-radius: 4px;
+            box-sizing: border-box; /* Important for width calculation */
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            background-color: #5a0a0a;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #7a0a0a;
+        }
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .output-title {
+            color: #e0e0e0;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>SHADOWWEAVE</h1>
+        <h2>Captor Configuration & Scenario Generation</h2>
+
+        <form id="captorForm">
+            <!-- Question 1: Motive -->
+            <div class="question-block">
+                <label for="motive">1. What is the captor's primary motive?</label>
+                <select id="motive" name="motive">
+                    <option value="financial">Financial (Ransom)</option>
+                    <option value="revenge">Revenge</option>
+                    <option value="psychological">Psychological (Torture/Control)</option>
+                    <option value="ideological">Ideological (Making a Statement)</option>
+                </select>
+            </div>
+
+            <!-- Question 2: Gear -->
+            <div class="question-block">
+                <label for="gear">2. What is the captor's primary gear/method of control?</label>
+                <select id="gear" name="gear">
+                    <option value="restraints">Restraints (Ropes, Chains, Cuffs)</option>
+                    <option value="technological">Technological (Drones, Locks, Surveillance)</option>
+                    <option value="psychological">Psychological (Drugs, Gas, Mind Games)</option>
+                    <option value="brute_force">Brute Force (Overwhelming Physical Presence)</option>
+                </select>
+            </div>
+
+            <!-- Question 3: Violence -->
+            <div class="question-block">
+                <label for="violence">3. What is the captor's baseline level of violence?</label>
+                <select id="violence" name="violence">
+                    <option value="non_lethal">Non-lethal (Intimidation, Restriction)</option>
+                    <option value="calibrated_pain">Calibrated Pain (Inflicting pain for a purpose)</option>
+                    <option value="unstable">Unstable (Erratic, unpredictable violence)</option>
+                    <option value="lethal">Lethal (Willing to kill)</option>
+                </select>
+            </div>
+
+            <!-- Question 4: Psychological Approach -->
+            <div class="question-block">
+                <label for="psychology">4. What is the captor's psychological approach?</label>
+                <select id="psychology" name="psychology">
+                    <option value="detached_professional">Detached Professional (Cold, efficient)</option>
+                    <option value="intimate_predator">Intimate Predator (Grooming, manipulation)</option>
+                    <option value="sadist">Sadist (Enjoys suffering)</option>
+                    <option value="desperate">Desperate (Panicked, prone to mistakes)</option>
+                </select>
+            </div>
+
+            <div class="button-container">
+                <button type="button" onclick="generateQuestions()">Generate Scenario Questions</button>
+            </div>
+        </form>
+
+        <div id="output">
+            <div class="output-title">Generated Follow-up Questions:</div>
+            <span id="questionsText">Answer the questions above and click the button to generate your custom scenario questions.</span>
+        </div>
+    </div>
+
+    <script>
+        function generateQuestions() {
+            // Get user selections
+            const motive = document.getElementById('motive').value;
+            const gear = document.getElementById('gear').value;
+            const violence = document.getElementById('violence').value;
+            const psychology = document.getElementById('psychology').value;
+
+            let questions = [];
+
+            // --- Motive-Based Questions ---
+            if (motive === 'financial') {
+                questions.push("How much is the ransom, and who is expected to pay it?");
+                questions.push("Is there a deadline, and what are the consequences of missing it?");
+            } else if (motive === 'revenge') {
+                questions.push("What specific past event is this revenge for?");
+                questions.push("Does the captor want the victim to understand *why* this is happening?");
+            } else if (motive === 'psychological') {
+                questions.push("What is the captor trying to 'break' in the victim? Their will, their mind, or their spirit?");
+                questions.push("Is there a specific 'end state' the captor wants to achieve?");
+            } else if (motive === 'ideological') {
+                questions.push("What is the captor's ideology, and how does the victim represent the opposition?");
+                questions.push("Does the captor plan to make a public statement, or is this a symbolic act?");
+            }
+
+            // --- Gear-Based Questions ---
+            if (gear === 'restraints') {
+                questions.push("What specific materials are used for the restraints, and are there escape opportunities?");
+                questions.push("Are the restraints a form of constant torment (e.g., too tight, abrasive)?");
+            } else if (gear === 'technological') {
+                questions.push("What is the extent of the technological surveillance? Is privacy an illusion?");
+                questions.push("Is there a flaw in the system the victim can exploit?");
+            } else if (gear === 'psychological') {
+                questions.push("Are the substances used for sedation, hallucination, or memory alteration?");
+                questions.push("How does the victim perceive reality under the influence?");
+            } else if (gear === 'brute_force') {
+                questions.push("Does the captor's presence alone prevent escape, or is it a constant active threat?");
+                questions.push("Are there moments of exhaustion or vulnerability in the captor?");
+            }
+
+            // --- Violence-Based Questions ---
+            if (violence === 'non_lethal') {
+                questions.push("What is the line the captor will not cross with physical harm?");
+                questions.push("Is the threat of violence more potent than its actual application?");
+            } else if (violence === 'calibrated_pain') {
+                questions.push("Is the pain used for interrogation, punishment, or pleasure?");
+                questions.push("Does the captor have medical knowledge to prevent accidental death?");
+            } else if (violence === 'unstable') {
+                questions.push("What triggers the captor's violent outbursts?");
+                questions.push("Can the victim learn to navigate the captor's moods to survive?");
+            } else if (violence === 'lethal') {
+                questions.push("Is the victim's life already forfeit, or is it a bargaining chip?");
+                questions.push("Under what specific circumstances would the captor end the victim's life?");
+            }
+
+            // --- Psychology-Based Questions ---
+            if (psychology === 'detached_professional') {
+                questions.push("Is there any flicker of humanity or empathy in the captor?");
+                questions.push("Can the victim appeal to the captor's logic or sense of self-preservation?");
+            } else if (psychology === 'intimate_predator') {
+                questions.push("Does the captor genuinely believe they care for the victim?");
+                questions.push("What past traumas does the captor project onto the victim?");
+            } else if (psychology === 'sadist') {
+                questions.push("What form of suffering pleases the captor most: physical, emotional, or psychological?");
+                questions.push("Is there a 'safe word' or a point where the captor loses interest?");
+            } else if (psychology === 'desperate') {
+                questions.push("What is the source of the captor's desperation (e.g., being hunted, time constraint)?");
+                questions.push("Can the victim exploit the captor's panic to create an opportunity?");
+            }
+            
+            // Display the generated questions
+            const outputDiv = document.getElementById('questionsText');
+            if (questions.length > 0) {
+                // Format the questions into a numbered list
+                let formattedQuestions = questions.map((q, index) => `${index + 1}. ${q}`).join('\n\n');
+                outputDiv.textContent = formattedQuestions;
+            } else {
+                outputDiv.textContent = "Could not generate questions. Please make all selections.";
+            }
+        }
+    </script>
+
+</body>
+</html>
+```
