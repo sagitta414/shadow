@@ -744,6 +744,41 @@ textarea {
   color: var(--bright-gold);
 }
 
+/* ─── Theme Animations ────────────────────────────── */
+@keyframes glitchScan {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+}
+
+@keyframes candleFlicker {
+  0%,100% { opacity: 0.6; transform: scaleY(1); }
+  20%     { opacity: 0.8; transform: scaleY(1.02); }
+  40%     { opacity: 0.5; transform: scaleY(0.98); }
+  60%     { opacity: 0.75; transform: scaleY(1.01); }
+  80%     { opacity: 0.55; transform: scaleY(0.99); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme: Cold Blue — subtle font shift via body class */
+body.theme-cold-blue {
+  --void-black: #000811;
+}
+
+/* Theme: Candlelight — warm sepia body */
+body.theme-candlelight {
+  --void-black: #0a0500;
+}
+
+/* Theme: Glitch — green matrix */
+body.theme-glitch {
+  --void-black: #000500;
+  font-family: 'Courier New', monospace;
+}
+
 /* ─── Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
   .editor-grid {
