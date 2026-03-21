@@ -1,7 +1,12 @@
 import { Router } from "express";
-import { openai } from "@workspace/integrations-openai-ai-server";
+import OpenAI from "openai";
 
 const router = Router();
+
+const venice = new OpenAI({
+  baseURL: "https://api.venice.ai/api/v1",
+  apiKey: process.env["VENICE_API_KEY"] ?? "",
+});
 
 const SYSTEM_PROMPT = `You are a dark fiction narrative engine for an adult creative writing studio called SHADOWWEAVE. You write intense, psychological, literary dark fiction — not gratuitous, but unflinching. Your prose is atmospheric, character-driven, and precise. Third-person limited perspective unless told otherwise.
 
@@ -57,9 +62,9 @@ router.post("/story/generate", async (req, res) => {
 
     let fullContent = "";
 
-    const stream = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      max_completion_tokens: 8192,
+    const stream = await venice.chat.completions.create({
+      model: "llama-3.3-70b",
+      max_tokens: 4096,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -75,12 +80,10 @@ router.post("/story/generate", async (req, res) => {
       }
     }
 
-    // Parse and validate the JSON
     let parsed: { scene: string; choices: string[] };
     try {
       parsed = JSON.parse(fullContent);
     } catch {
-      // Try to extract JSON from the response
       const match = fullContent.match(/\{[\s\S]*\}/);
       if (match) {
         parsed = JSON.parse(match[0]);

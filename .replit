@@ -24,3 +24,8 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VENICE_API_KEY = "VENICE_ADMIN_KEY_FS141xKqKaUt8ImKl8rNJ88XVSqe9yAMX_ZhsgGLOR"
