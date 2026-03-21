@@ -4,105 +4,355 @@ interface ScenarioGeneratorProps {
   onBack: () => void;
 }
 
-const motiveOptions = [
-  { value: "financial",     label: "Financial (Ransom)" },
-  { value: "revenge",       label: "Revenge" },
-  { value: "psychological", label: "Psychological (Torture / Control)" },
-  { value: "ideological",   label: "Ideological (Making a Statement)" },
+// ─── Question Definitions ──────────────────────────
+
+const QUESTIONS = [
+  {
+    key: "motive",
+    label: "Primary Motive",
+    icon: "🎯",
+    description: "What drives the captor's actions?",
+    options: [
+      { value: "financial",     label: "Financial — Ransom or profit" },
+      { value: "revenge",       label: "Revenge — Personal grievance" },
+      { value: "control",       label: "Control — Power and domination" },
+      { value: "ideological",   label: "Ideological — Making a statement" },
+      { value: "obsession",     label: "Obsession — Fixation on the victim" },
+      { value: "coercion",      label: "Coercion — Forcing information or action" },
+    ],
+  },
+  {
+    key: "setting",
+    label: "Location & Setting",
+    icon: "🏚️",
+    description: "Where is the captivity taking place?",
+    options: [
+      { value: "rural_isolated",  label: "Rural — Isolated cabin, farmhouse, wilderness" },
+      { value: "urban_apartment", label: "Urban — Apartment, warehouse, city building" },
+      { value: "underground",     label: "Underground — Bunker, basement, tunnel" },
+      { value: "mobile",          label: "Mobile — Vehicle, boat, constantly moving" },
+      { value: "institutional",   label: "Institutional — Abandoned hospital, facility" },
+      { value: "domestic",        label: "Domestic — Victim's own home or workplace" },
+    ],
+  },
+  {
+    key: "duration",
+    label: "Scenario Duration",
+    icon: "⏳",
+    description: "How long has the captivity been ongoing?",
+    options: [
+      { value: "hours",   label: "Hours — The first terrifying hours" },
+      { value: "days",    label: "Days — Settling into a brutal routine" },
+      { value: "weeks",   label: "Weeks — Psychological patterns emerging" },
+      { value: "months",  label: "Months — Deep psychological conditioning" },
+    ],
+  },
+  {
+    key: "background",
+    label: "Captor's Background",
+    icon: "🧩",
+    description: "What is the captor's training or history?",
+    options: [
+      { value: "military",    label: "Military / Law Enforcement — Tactical, disciplined" },
+      { value: "criminal",    label: "Career Criminal — Experienced, street-smart" },
+      { value: "civilian",    label: "Ordinary Civilian — Amateur, driven by emotion" },
+      { value: "organized",   label: "Organized Group — Multiple actors, chain of command" },
+      { value: "academic",    label: "Academic / Medical — Clinical, knowledgeable" },
+    ],
+  },
+  {
+    key: "control",
+    label: "Method of Control",
+    icon: "⛓️",
+    description: "How does the captor maintain dominance?",
+    options: [
+      { value: "restraints",    label: "Physical Restraints — Ropes, chains, cuffs" },
+      { value: "technological", label: "Technological — Surveillance, electronic locks" },
+      { value: "chemical",      label: "Chemical — Drugs, sedatives, gas" },
+      { value: "brute_force",   label: "Brute Force — Physical dominance and presence" },
+      { value: "social",        label: "Social Isolation — Cutting off all outside contact" },
+    ],
+  },
+  {
+    key: "violence",
+    label: "Violence Threshold",
+    icon: "🔪",
+    description: "What is the captor's baseline level of violence?",
+    options: [
+      { value: "non_lethal",      label: "Non-lethal — Intimidation only, no physical harm" },
+      { value: "calibrated_pain", label: "Calibrated — Pain as a tool, purposeful" },
+      { value: "unstable",        label: "Unstable — Erratic, unpredictable outbursts" },
+      { value: "lethal",          label: "Lethal — Willing and able to kill" },
+    ],
+  },
+  {
+    key: "psychology",
+    label: "Psychological Profile",
+    icon: "🧠",
+    description: "How does the captor engage with the victim mentally?",
+    options: [
+      { value: "detached",       label: "Detached Professional — Cold, transactional, efficient" },
+      { value: "predator",       label: "Intimate Predator — Grooming, false care, manipulation" },
+      { value: "sadist",         label: "Sadist — Derives pleasure from suffering" },
+      { value: "desperate",      label: "Desperate — Panicked, irrational, prone to mistakes" },
+      { value: "idealist",       label: "True Believer — Convinced they are righteous" },
+    ],
+  },
+  {
+    key: "endgame",
+    label: "Endgame / Exit Strategy",
+    icon: "🚪",
+    description: "What does the captor ultimately want to achieve?",
+    options: [
+      { value: "release",     label: "Release — Victim freed once demands are met" },
+      { value: "permanent",   label: "Permanent — No intention of ever letting go" },
+      { value: "elimination", label: "Elimination — Victim is to be killed" },
+      { value: "conversion",  label: "Conversion — Breaking and reshaping the victim" },
+      { value: "spectacle",   label: "Spectacle — A public reveal or broadcast event" },
+    ],
+  },
 ];
 
-const gearOptions = [
-  { value: "restraints",     label: "Restraints (Ropes, Chains, Cuffs)" },
-  { value: "technological",  label: "Technological (Drones, Locks, Surveillance)" },
-  { value: "psychological",  label: "Psychological (Drugs, Gas, Mind Games)" },
-  { value: "brute_force",    label: "Brute Force (Overwhelming Physical Presence)" },
-];
+// ─── Question Generation Logic ─────────────────────
 
-const violenceOptions = [
-  { value: "non_lethal",       label: "Non-lethal (Intimidation, Restriction)" },
-  { value: "calibrated_pain",  label: "Calibrated Pain (Inflicting pain for a purpose)" },
-  { value: "unstable",         label: "Unstable (Erratic, unpredictable violence)" },
-  { value: "lethal",           label: "Lethal (Willing to kill)" },
-];
+type Answers = Record<string, string>;
 
-const psychologyOptions = [
-  { value: "detached_professional", label: "Detached Professional (Cold, efficient)" },
-  { value: "intimate_predator",     label: "Intimate Predator (Grooming, manipulation)" },
-  { value: "sadist",                label: "Sadist (Enjoys suffering)" },
-  { value: "desperate",             label: "Desperate (Panicked, prone to mistakes)" },
-];
-
-function generateQuestions(motive: string, gear: string, violence: string, psychology: string): string[] {
-  const questions: string[] = [];
-
-  if (motive === "financial") {
-    questions.push("How much is the ransom, and who is expected to pay it?");
-    questions.push("Is there a deadline, and what are the consequences of missing it?");
-  } else if (motive === "revenge") {
-    questions.push("What specific past event is this revenge for?");
-    questions.push("Does the captor want the victim to understand why this is happening?");
-  } else if (motive === "psychological") {
-    questions.push("What is the captor trying to 'break' in the victim? Their will, their mind, or their spirit?");
-    questions.push("Is there a specific 'end state' the captor wants to achieve?");
-  } else if (motive === "ideological") {
-    questions.push("What is the captor's ideology, and how does the victim represent the opposition?");
-    questions.push("Does the captor plan to make a public statement, or is this a symbolic act?");
-  }
-
-  if (gear === "restraints") {
-    questions.push("What specific materials are used for the restraints, and are there escape opportunities?");
-    questions.push("Are the restraints a form of constant torment (e.g., too tight, abrasive)?");
-  } else if (gear === "technological") {
-    questions.push("What is the extent of the technological surveillance? Is privacy an illusion?");
-    questions.push("Is there a flaw in the system the victim can exploit?");
-  } else if (gear === "psychological") {
-    questions.push("Are the substances used for sedation, hallucination, or memory alteration?");
-    questions.push("How does the victim perceive reality under the influence?");
-  } else if (gear === "brute_force") {
-    questions.push("Does the captor's presence alone prevent escape, or is it a constant active threat?");
-    questions.push("Are there moments of exhaustion or vulnerability in the captor?");
-  }
-
-  if (violence === "non_lethal") {
-    questions.push("What is the line the captor will not cross with physical harm?");
-    questions.push("Is the threat of violence more potent than its actual application?");
-  } else if (violence === "calibrated_pain") {
-    questions.push("Is the pain used for interrogation, punishment, or pleasure?");
-    questions.push("Does the captor have medical knowledge to prevent accidental death?");
-  } else if (violence === "unstable") {
-    questions.push("What triggers the captor's violent outbursts?");
-    questions.push("Can the victim learn to navigate the captor's moods to survive?");
-  } else if (violence === "lethal") {
-    questions.push("Is the victim's life already forfeit, or is it a bargaining chip?");
-    questions.push("Under what specific circumstances would the captor end the victim's life?");
-  }
-
-  if (psychology === "detached_professional") {
-    questions.push("Is there any flicker of humanity or empathy in the captor?");
-    questions.push("Can the victim appeal to the captor's logic or sense of self-preservation?");
-  } else if (psychology === "intimate_predator") {
-    questions.push("Does the captor genuinely believe they care for the victim?");
-    questions.push("What past traumas does the captor project onto the victim?");
-  } else if (psychology === "sadist") {
-    questions.push("What form of suffering pleases the captor most: physical, emotional, or psychological?");
-    questions.push("Is there a point where the captor loses interest?");
-  } else if (psychology === "desperate") {
-    questions.push("What is the source of the captor's desperation (e.g., being hunted, time constraint)?");
-    questions.push("Can the victim exploit the captor's panic to create an opportunity?");
-  }
-
-  return questions;
+interface QuestionGroup {
+  category: string;
+  icon: string;
+  questions: string[];
 }
 
+function generateGroups(answers: Answers): QuestionGroup[] {
+  const groups: QuestionGroup[] = [];
+
+  // Motive
+  const motiveQs: string[] = [];
+  if (answers.motive === "financial") {
+    motiveQs.push("How much is the ransom, and who specifically is expected to pay it?");
+    motiveQs.push("Is there a hard deadline? What happens to the victim if it is missed?");
+    motiveQs.push("Does the captor have a backup plan if payment fails or is delayed?");
+  } else if (answers.motive === "revenge") {
+    motiveQs.push("What specific past event is the captor avenging, and does the victim know it?");
+    motiveQs.push("Is the victim the direct cause of the harm, or collateral — a proxy for someone else?");
+    motiveQs.push("What would constitute 'enough'? Is there an act of revenge that would satisfy the captor?");
+  } else if (answers.motive === "control") {
+    motiveQs.push("What is the captor trying to 'break' in the victim — their will, their identity, or their spirit?");
+    motiveQs.push("What does total submission look like to the captor? What is the 'end state' they are engineering?");
+    motiveQs.push("Is the control an end in itself, or is it preparation for something else?");
+  } else if (answers.motive === "ideological") {
+    motiveQs.push("What is the captor's ideology, and how does the victim personally symbolize the enemy?");
+    motiveQs.push("Is the captor planning a public declaration, or is this a private, symbolic act of faith?");
+    motiveQs.push("Does the captor believe the victim can be converted, or are they simply a sacrifice?");
+  } else if (answers.motive === "obsession") {
+    motiveQs.push("How long has the captor been fixated on this specific victim, and what triggered it?");
+    motiveQs.push("Does the captor believe the victim belongs to them, or that they are 'saving' the victim from something?");
+    motiveQs.push("What would shatter the obsession — and is the victim capable of doing it?");
+  } else if (answers.motive === "coercion") {
+    motiveQs.push("What information, action, or access is the captor trying to extract from the victim?");
+    motiveQs.push("Is the victim the target, or are they leverage against a third party?");
+    motiveQs.push("What happens once the captor gets what they want? Is there a plan beyond the coercion?");
+  }
+  if (motiveQs.length) groups.push({ category: "Motive & Goal", icon: "🎯", questions: motiveQs });
+
+  // Setting
+  const settingQs: string[] = [];
+  if (answers.setting === "rural_isolated") {
+    settingQs.push("How remote is the location? What would the victim need to survive if they escaped into the wilderness?");
+    settingQs.push("Does the isolation breed false intimacy between captor and victim, or only paranoia?");
+    settingQs.push("Are there any sounds, smells, or environmental details that give clues about location?");
+  } else if (answers.setting === "urban_apartment") {
+    settingQs.push("How much external noise penetrates the walls — traffic, neighbors, footsteps — and does it taunt the victim?");
+    settingQs.push("Is there a risk that someone in the building will hear or notice something wrong?");
+    settingQs.push("How does the captor manage routine things — deliveries, building staff, trash — without exposure?");
+  } else if (answers.setting === "underground") {
+    settingQs.push("What is the air situation — ventilation, humidity, temperature? How does the environment itself become a threat?");
+    settingQs.push("How does the victim lose track of time in a place with no natural light?");
+    settingQs.push("Is the captor above ground while the victim is below, creating an extreme power asymmetry?");
+  } else if (answers.setting === "mobile") {
+    settingQs.push("How does the victim track time and distance when constantly moving? What sensory information bleeds through?");
+    settingQs.push("What is the risk of exposure at stops — fuel stations, border crossings, traffic?");
+    settingQs.push("Is constant movement a tactic to prevent the victim from mapping their location?");
+  } else if (answers.setting === "institutional") {
+    settingQs.push("What remnants of the building's former purpose surround the victim — old equipment, signage, smells?");
+    settingQs.push("Does the decayed institutional setting amplify the hopelessness, or give the victim things to use?");
+    settingQs.push("Is the location known to anyone — and could someone stumble upon it accidentally?");
+  } else if (answers.setting === "domestic") {
+    settingQs.push("How does captivity in a familiar space distort the victim's sense of safety and reality?");
+    settingQs.push("Are there people who would normally visit this space — friends, family, delivery workers?");
+    settingQs.push("What has been altered or removed from the space, and does the victim notice these changes?");
+  }
+  if (settingQs.length) groups.push({ category: "Location & Setting", icon: "🏚️", questions: settingQs });
+
+  // Duration
+  const durationQs: string[] = [];
+  if (answers.duration === "hours") {
+    durationQs.push("What is the victim's psychological state in these first hours — shock, denial, raw terror?");
+    durationQs.push("Is the captor still establishing control, or did they arrive with everything already planned?");
+    durationQs.push("What window for escape or rescue exists in these early hours before routines are entrenched?");
+  } else if (answers.duration === "days") {
+    durationQs.push("What routines have already formed — feeding, sleeping, pain — and how do they structure the victim's existence?");
+    durationQs.push("Has the victim begun the psychological inventory of their captor — looking for patterns, weaknesses?");
+    durationQs.push("What does the victim do with hope when days pass and no one comes?");
+  } else if (answers.duration === "weeks") {
+    durationQs.push("What psychological shifts have occurred — has the victim begun to adapt, regress, or fracture?");
+    durationQs.push("Have any strange dynamics emerged between captor and victim — dependency, bargaining, dark connection?");
+    durationQs.push("Is the world outside still looking? What does the victim believe about their chances of being found?");
+  } else if (answers.duration === "months") {
+    durationQs.push("What version of the victim remains after months of captivity? What has been permanently altered?");
+    durationQs.push("Have the power dynamics shifted at all — has the victim found leverage, or only deeper helplessness?");
+    durationQs.push("What does the captor think of the victim now, compared to when this began? Has anything changed for them?");
+  }
+  if (durationQs.length) groups.push({ category: "Duration & Time", icon: "⏳", questions: durationQs });
+
+  // Background
+  const bgQs: string[] = [];
+  if (answers.background === "military") {
+    bgQs.push("How does military training shape the captor's planning — what mistakes do they not make?");
+    bgQs.push("Is there a code the captor still adheres to, even in this context — and can the victim find it?");
+    bgQs.push("Does the captor's discipline make them more or less human in the victim's eyes?");
+  } else if (answers.background === "criminal") {
+    bgQs.push("What criminal history has the captor drawn on to set this up — what have they done before?");
+    bgQs.push("Does the captor have associates, suppliers, or contacts who could become variables in the victim's situation?");
+    bgQs.push("How does the captor's experience calibrate their risk tolerance? What won't rattle them?");
+  } else if (answers.background === "civilian") {
+    bgQs.push("What mistakes is the captor making that a professional would not — and does the victim see them?");
+    bgQs.push("How does the captor's emotional state leak into their actions? Where does the amateur show?");
+    bgQs.push("What specific event crossed the captor from ordinary person to this — and how recent was it?");
+  } else if (answers.background === "organized") {
+    bgQs.push("Who is giving orders, and does the captor the victim sees have autonomy or are they following instructions?");
+    bgQs.push("What happens to the victim if the captor is removed — is there a chain of command that continues?");
+    bgQs.push("Is there tension or disagreement within the group about how to handle the victim?");
+  } else if (answers.background === "academic") {
+    bgQs.push("How does the captor's knowledge — medical, psychological, scientific — shape the precision of the captivity?");
+    bgQs.push("Does the captor study the victim clinically, documenting responses, patterns, thresholds?");
+    bgQs.push("Is there a detached, experimental quality to the captor's approach that the victim finds uniquely disturbing?");
+  }
+  if (bgQs.length) groups.push({ category: "Captor Background", icon: "🧩", questions: bgQs });
+
+  // Control Method
+  const controlQs: string[] = [];
+  if (answers.control === "restraints") {
+    controlQs.push("What specific restraints are used, and what physical toll do they take over time — circulation, sores, muscle?");
+    controlQs.push("Are there moments when restraints are loosened — and are those moments traps or genuine opportunities?");
+    controlQs.push("How does the victim relate to their own body when it is permanently bound — dissociation, rage, bargaining?");
+  } else if (answers.control === "technological") {
+    controlQs.push("What is the full scope of the surveillance system — is there anywhere the victim is truly unseen?");
+    controlQs.push("Is there a vulnerability in the technology — a dead zone, a power dependency, a forgotten camera angle?");
+    controlQs.push("How does living under constant observation change the victim's internal life — what do they hide, and how?");
+  } else if (answers.control === "chemical") {
+    controlQs.push("What do the substances do — sedate, disorient, cause hallucination, alter memory, create compliance?");
+    controlQs.push("How does the victim distinguish real experience from chemically induced perception?");
+    controlQs.push("Is there a withdrawal effect when substances are withheld — and does the captor use this as leverage?");
+  } else if (answers.control === "brute_force") {
+    controlQs.push("Is the captor's physical dominance constant, or do they allow brief, calculated moments of apparent safety?");
+    controlQs.push("How does the victim survive the psychological weight of inhabiting a body that cannot fight back?");
+    controlQs.push("Are there moments of physical exhaustion or vulnerability in the captor that the victim has catalogued?");
+  } else if (answers.control === "social") {
+    controlQs.push("What is the victim's subjective experience of total silence from the outside world — who do they miss first?");
+    controlQs.push("Does the captor deliberately remind the victim they have been forgotten, or let the silence speak?");
+    controlQs.push("How long before isolation begins to reshape the victim's sense of self and reality?");
+  }
+  if (controlQs.length) groups.push({ category: "Control & Method", icon: "⛓️", questions: controlQs });
+
+  // Violence
+  const violenceQs: string[] = [];
+  if (answers.violence === "non_lethal") {
+    violenceQs.push("What is the line the captor has drawn — and has the victim found the edge of it yet?");
+    violenceQs.push("Is the restraint from violence a moral boundary, a practical one, or both — and which is more fragile?");
+    violenceQs.push("How does the victim process the captor's restraint — as mercy, strategy, or something more unsettling?");
+  } else if (answers.violence === "calibrated_pain") {
+    violenceQs.push("What specific purpose does each act of pain serve — interrogation, punishment, training, demonstration?");
+    violenceQs.push("Does the captor have medical knowledge or skill to keep the victim functional through ongoing harm?");
+    violenceQs.push("How does the victim's body begin to anticipate pain — what does flinching before anything happens mean?");
+  } else if (answers.violence === "unstable") {
+    violenceQs.push("What are the captor's triggers — what specific words, actions, or looks invite the violence?");
+    violenceQs.push("Has the victim begun to successfully map the captor's moods, or does unpredictability remain total?");
+    violenceQs.push("What happens to the captor after an episode — remorse, indifference, escalation?");
+  } else if (answers.violence === "lethal") {
+    violenceQs.push("Is the victim's death already scheduled or certain, or is life still conditionally available?");
+    violenceQs.push("How does the victim behave differently knowing that death is a real, proximate possibility?");
+    violenceQs.push("Under exactly what circumstances would the captor pull the trigger — and has the victim identified them?");
+  }
+  if (violenceQs.length) groups.push({ category: "Violence & Threat", icon: "🔪", questions: violenceQs });
+
+  // Psychology
+  const psychQs: string[] = [];
+  if (answers.psychology === "detached") {
+    psychQs.push("Is there any flicker of humanity in the captor — a hesitation, a glance, something that looks like doubt?");
+    psychQs.push("Can the victim appeal to the captor's logic or self-preservation instinct rather than their empathy?");
+    psychQs.push("What does the captor think of the victim — as a person, a problem, an asset, or nothing at all?");
+  } else if (answers.psychology === "predator") {
+    psychQs.push("Does the captor genuinely believe they care for the victim — and how does that delusion manifest?");
+    psychQs.push("What past relationship or trauma does the captor project onto the victim — who do they think they see?");
+    psychQs.push("Can the victim use the captor's desire for connection as leverage — and how dangerous is that attempt?");
+  } else if (answers.psychology === "sadist") {
+    psychQs.push("What specific form of suffering satisfies the captor most — physical agony, emotional devastation, or humiliation?");
+    psychQs.push("Is there a point of satiation — a moment when the captor is done — or does the appetite only grow?");
+    psychQs.push("Does the victim have any power in this dynamic, or is resistance itself just another form of entertainment?");
+  } else if (answers.psychology === "desperate") {
+    psychQs.push("What is the source of the captor's desperation — time, external threat, crumbling plan, emotional instability?");
+    psychQs.push("Can the victim sense the desperation and exploit the captor's panic to introduce mistakes?");
+    psychQs.push("What does a cornered, desperate captor do when the situation shifts outside their control?");
+  } else if (answers.psychology === "idealist") {
+    psychQs.push("Does the captor believe they are righteous — and how does that conviction insulate them from doubt?");
+    psychQs.push("Can the victim challenge the ideology directly, or does that only harden the captor's resolve?");
+    psychQs.push("Is there a moment where the captor's beliefs and reality collide — and who does the victim need to be in that moment?");
+  }
+  if (psychQs.length) groups.push({ category: "Psychological Dynamic", icon: "🧠", questions: psychQs });
+
+  // Endgame
+  const endgameQs: string[] = [];
+  if (answers.endgame === "release") {
+    endgameQs.push("What are the exact conditions of release — and how does the victim know if those conditions are real?");
+    endgameQs.push("Does the captor plan to release the victim with their identity intact, or altered?");
+    endgameQs.push("What does the victim do with hope when release is promised but not yet delivered?");
+  } else if (answers.endgame === "permanent") {
+    endgameQs.push("How does the victim's psychology shift when they understand there is no intended end to this?");
+    endgameQs.push("What does 'permanent' mean to the captor — what future are they envisioning?");
+    endgameQs.push("Is escape the only real option, and what price does the attempt carry?");
+  } else if (answers.endgame === "elimination") {
+    endgameQs.push("Does the victim know their death has been decided — and what does that knowledge do to their behavior?");
+    endgameQs.push("Is there anything the victim can offer that would change the calculus, or is the outcome fixed?");
+    endgameQs.push("How does the captor feel about the scheduled end — clinical, reluctant, eager, conflicted?");
+  } else if (answers.endgame === "conversion") {
+    endgameQs.push("What does 'broken and reshaped' look like to the captor — what is the target state they are engineering?");
+    endgameQs.push("Does the victim resist conversion consciously, or does resistance require no effort — yet?");
+    endgameQs.push("At what point does the victim begin to wonder if some part of them has already been altered?");
+  } else if (answers.endgame === "spectacle") {
+    endgameQs.push("What is the audience for this spectacle — a single person, a group, the public?");
+    endgameQs.push("Does the victim know they are going to be used for something public — and does that knowledge change their options?");
+    endgameQs.push("What is the captor staging, and how much of it depends on the victim's performance or cooperation?");
+  }
+  if (endgameQs.length) groups.push({ category: "Endgame & Resolution", icon: "🚪", questions: endgameQs });
+
+  return groups;
+}
+
+function buildSummary(answers: Answers): string {
+  const labels: Record<string, Record<string, string>> = {
+    motive: { financial: "financial gain", revenge: "revenge", control: "control and domination", ideological: "ideological conviction", obsession: "obsession", coercion: "coercion" },
+    setting: { rural_isolated: "an isolated rural location", urban_apartment: "an urban space", underground: "an underground location", mobile: "a mobile situation", institutional: "an abandoned institutional building", domestic: "the victim's own environment" },
+    duration: { hours: "hours", days: "days", weeks: "weeks", months: "months" },
+    background: { military: "military or law enforcement training", criminal: "a career criminal background", civilian: "no prior criminal background", organized: "an organized group", academic: "academic or medical expertise" },
+    control: { restraints: "physical restraints", technological: "technological surveillance", chemical: "chemical agents", brute_force: "brute physical force", social: "social isolation" },
+    violence: { non_lethal: "non-lethal intimidation", calibrated_pain: "calibrated, purposeful pain", unstable: "unstable, unpredictable violence", lethal: "lethal intent" },
+    psychology: { detached: "a detached, professional demeanor", predator: "an intimate predator dynamic", sadist: "sadistic pleasure in suffering", desperate: "desperate, erratic behavior", idealist: "ideological certainty" },
+    endgame: { release: "conditional release", permanent: "permanent captivity", elimination: "elimination of the victim", conversion: "breaking and reshaping the victim", spectacle: "a public spectacle" },
+  };
+  const get = (k: string) => labels[k]?.[answers[k]] ?? "unknown";
+  return `A captor motivated by ${get("motive")}, operating from ${get("setting")} over the course of ${get("duration")}. They bring ${get("background")}, maintaining control through ${get("control")}. Their violence threshold is ${get("violence")}, their psychological approach is ${get("psychology")}, and their endgame is ${get("endgame")}.`;
+}
+
+// ─── Select Field Component ────────────────────────
+
 function SelectField({
-  label,
-  number,
-  value,
-  options,
-  onChange,
+  label, number, icon, description, value, options, onChange,
 }: {
   label: string;
   number: number;
+  icon: string;
+  description: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (v: string) => void;
@@ -111,39 +361,43 @@ function SelectField({
     <div
       style={{
         background: "rgba(0,0,0,0.45)",
-        border: "1px solid rgba(139,0,0,0.3)",
+        border: "1px solid rgba(139,0,0,0.25)",
         borderRadius: "14px",
-        padding: "1.5rem",
+        padding: "1.25rem 1.5rem",
         backdropFilter: "blur(10px)",
         transition: "border-color 0.3s ease",
       }}
     >
-      <label
-        className="font-montserrat"
-        style={{
-          display: "block",
-          fontSize: "0.75rem",
-          color: "#00FF41",
-          letterSpacing: "2px",
-          textTransform: "uppercase",
-          marginBottom: "0.5rem",
-          fontWeight: 700,
-        }}
-      >
-        {number.toString().padStart(2, "0")} — {label}
-      </label>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.3rem" }}>
+        <span style={{ fontSize: "1rem" }}>{icon}</span>
+        <label
+          className="font-montserrat"
+          style={{
+            fontSize: "0.7rem",
+            color: "#00FF41",
+            letterSpacing: "2px",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          {String(number).padStart(2, "0")} — {label}
+        </label>
+      </div>
+      <p style={{ fontSize: "0.78rem", color: "rgba(200,200,220,0.4)", marginBottom: "0.75rem" }}>
+        {description}
+      </p>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
           width: "100%",
-          padding: "0.875rem 1rem",
+          padding: "0.8rem 2.5rem 0.8rem 1rem",
           background: "rgba(0,0,0,0.6)",
           border: "1px solid rgba(45,27,105,0.6)",
           borderRadius: "10px",
-          color: value ? "#F0F0FF" : "rgba(200,200,220,0.4)",
+          color: "#F0F0FF",
           fontFamily: "'Raleway', sans-serif",
-          fontSize: "0.95rem",
+          fontSize: "0.9rem",
           outline: "none",
           cursor: "pointer",
           transition: "all 0.3s ease",
@@ -151,11 +405,10 @@ function SelectField({
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B8860B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right 1rem center",
-          paddingRight: "2.5rem",
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = "#B8860B";
-          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(184,134,11,0.15)";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(184,134,11,0.12)";
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = "rgba(45,27,105,0.6)";
@@ -172,183 +425,265 @@ function SelectField({
   );
 }
 
+// ─── Main Component ────────────────────────────────
+
+const DEFAULT_ANSWERS: Answers = Object.fromEntries(
+  QUESTIONS.map((q) => [q.key, q.options[0].value])
+);
+
 export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
-  const [motive,     setMotive]     = useState(motiveOptions[0].value);
-  const [gear,       setGear]       = useState(gearOptions[0].value);
-  const [violence,   setViolence]   = useState(violenceOptions[0].value);
-  const [psychology, setPsychology] = useState(psychologyOptions[0].value);
-  const [questions,  setQuestions]  = useState<string[]>([]);
-  const [generated,  setGenerated]  = useState(false);
+  const [answers, setAnswers] = useState<Answers>({ ...DEFAULT_ANSWERS });
+  const [groups,   setGroups]   = useState<ReturnType<typeof generateGroups>>([]);
+  const [summary,  setSummary]  = useState("");
+  const [generated, setGenerated] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+
+  function setAnswer(key: string, value: string) {
+    setAnswers((prev) => ({ ...prev, [key]: value }));
+  }
 
   function handleGenerate() {
-    const q = generateQuestions(motive, gear, violence, psychology);
-    setQuestions(q);
+    const g = generateGroups(answers);
+    const s = buildSummary(answers);
+    setGroups(g);
+    setSummary(s);
+    setTotalCount(g.reduce((acc, gr) => acc + gr.questions.length, 0));
     setGenerated(true);
+    setTimeout(() => {
+      document.getElementById("output-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   }
 
   function handleReset() {
-    setMotive(motiveOptions[0].value);
-    setGear(gearOptions[0].value);
-    setViolence(violenceOptions[0].value);
-    setPsychology(psychologyOptions[0].value);
-    setQuestions([]);
+    setAnswers({ ...DEFAULT_ANSWERS });
+    setGroups([]);
+    setSummary("");
     setGenerated(false);
+    setTotalCount(0);
   }
 
-  function handleCopy() {
-    const text = questions.map((q, i) => `${i + 1}. ${q}`).join("\n\n");
-    navigator.clipboard.writeText(text).catch(() => {});
+  function handleCopyAll() {
+    const lines: string[] = [];
+    let n = 1;
+    groups.forEach((g) => {
+      lines.push(`── ${g.category} ──`);
+      g.questions.forEach((q) => { lines.push(`${n}. ${q}`); n++; });
+      lines.push("");
+    });
+    navigator.clipboard.writeText(lines.join("\n")).catch(() => {});
   }
 
   return (
-    <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "2rem", minHeight: "100vh" }}>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "2rem", minHeight: "100vh" }}>
+
+      {/* Header */}
       <div className="fade-in" style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-        <span className="badge badge-crimson" style={{ marginBottom: "1rem" }}>Scenario Engine</span>
+        <span className="badge" style={{ background: "rgba(0,200,80,0.1)", borderColor: "rgba(0,200,80,0.3)", color: "#00CC44", marginBottom: "1rem" }}>
+          ⚡ Scenario Engine
+        </span>
         <h1
           className="font-cinzel"
-          style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#D4AF37", marginBottom: "0.5rem", fontWeight: 700 }}
+          style={{ fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: "#D4AF37", marginBottom: "0.5rem", fontWeight: 700 }}
         >
           Scenario Question Generator
         </h1>
-        <p style={{ color: "rgba(200,200,220,0.65)", fontSize: "1rem" }}>
-          Configure the captor's traits to generate targeted narrative questions
+        <p style={{ color: "rgba(200,200,220,0.55)", fontSize: "0.95rem", maxWidth: "550px", margin: "0 auto" }}>
+          Configure all 8 parameters of your scenario. Each selection generates 3 targeted narrative questions — up to 24 in total.
         </p>
-        <div className="divider" style={{ maxWidth: "350px", margin: "1rem auto 0" }}>
+        <div className="divider" style={{ maxWidth: "350px", margin: "1.25rem auto 0" }}>
           <span className="divider-symbol">✦</span>
         </div>
       </div>
 
+      {/* Question Grid */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "1.25rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "1rem",
           marginBottom: "2rem",
         }}
       >
-        <SelectField label="Primary Motive"         number={1} value={motive}     options={motiveOptions}     onChange={setMotive} />
-        <SelectField label="Method of Control"      number={2} value={gear}       options={gearOptions}       onChange={setGear} />
-        <SelectField label="Baseline Violence"      number={3} value={violence}   options={violenceOptions}   onChange={setViolence} />
-        <SelectField label="Psychological Approach" number={4} value={psychology} options={psychologyOptions} onChange={setPsychology} />
+        {QUESTIONS.map((q, i) => (
+          <SelectField
+            key={q.key}
+            label={q.label}
+            number={i + 1}
+            icon={q.icon}
+            description={q.description}
+            value={answers[q.key]}
+            options={q.options}
+            onChange={(v) => setAnswer(q.key, v)}
+          />
+        ))}
       </div>
 
+      {/* Controls */}
       <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginBottom: "2.5rem", flexWrap: "wrap" }}>
-        <button className="enter-button" onClick={handleGenerate} style={{ fontSize: "1rem", padding: "1.1rem 2.5rem" }}>
-          Generate Questions
+        <button className="enter-button" onClick={handleGenerate} style={{ fontSize: "1rem", padding: "1.1rem 2.75rem" }}>
+          Generate {QUESTIONS.length * 3} Questions
         </button>
         <button className="action-button secondary" onClick={handleReset}>
-          Reset
+          Reset All
+        </button>
+        <button className="action-button secondary" onClick={onBack} style={{ opacity: 0.7 }}>
+          ← Portal
         </button>
       </div>
 
-      {generated && questions.length > 0 && (
-        <div
-          className="slide-in"
-          style={{
-            background: "rgba(0,0,0,0.55)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(184,134,11,0.35)",
-            borderRadius: "20px",
-            padding: "2rem",
-            marginBottom: "2rem",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div className="progress-bar-gradient" style={{ position: "absolute", top: 0, left: 0, right: 0, borderRadius: "20px 20px 0 0" }} />
+      {/* Output */}
+      {generated && groups.length > 0 && (
+        <div id="output-section" className="slide-in">
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "0.75rem" }}>
-            <div className="section-header" style={{ margin: 0, border: "none", paddingBottom: 0 }}>
-              Generated Questions
+          {/* Scenario Summary */}
+          <div
+            style={{
+              background: "rgba(139,0,0,0.1)",
+              border: "1px solid rgba(139,0,0,0.3)",
+              borderRadius: "16px",
+              padding: "1.5rem 2rem",
+              marginBottom: "1.5rem",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div className="progress-bar-gradient" style={{ position: "absolute", top: 0, left: 0, right: 0, borderRadius: "16px 16px 0 0" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
+              <div style={{ flex: 1 }}>
+                <div className="font-cinzel" style={{ fontSize: "0.75rem", letterSpacing: "2px", color: "#B8860B", marginBottom: "0.6rem", textTransform: "uppercase" }}>
+                  Scenario Summary
+                </div>
+                <p className="font-crimson" style={{ fontSize: "1.05rem", color: "#F0F0FF", lineHeight: 1.7, fontStyle: "italic" }}>
+                  {summary}
+                </p>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div className="font-cinzel" style={{ fontSize: "2rem", color: "#D4AF37", fontWeight: 700, lineHeight: 1 }}>
+                  {totalCount}
+                </div>
+                <div style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.4)", letterSpacing: "1px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>
+                  Questions
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Copy button */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
             <button
-              onClick={handleCopy}
+              onClick={handleCopyAll}
               style={{
-                background: "rgba(184,134,11,0.15)",
-                border: "1px solid rgba(184,134,11,0.4)",
+                background: "rgba(184,134,11,0.12)",
+                border: "1px solid rgba(184,134,11,0.35)",
                 borderRadius: "8px",
-                padding: "0.5rem 1rem",
+                padding: "0.5rem 1.25rem",
                 color: "#D4AF37",
                 fontFamily: "'Cinzel', serif",
-                fontSize: "0.8rem",
+                fontSize: "0.78rem",
                 cursor: "pointer",
                 letterSpacing: "1px",
                 transition: "all 0.2s ease",
               }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.3)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.15)";
-              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.25)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.12)")}
             >
-              Copy All
+              Copy All Questions
             </button>
           </div>
 
-          <div style={{ display: "grid", gap: "1rem" }}>
-            {questions.map((q, i) => (
+          {/* Question Groups */}
+          <div style={{ display: "grid", gap: "1.25rem" }}>
+            {groups.map((group) => (
               <div
-                key={i}
+                key={group.category}
                 style={{
-                  display: "flex",
-                  gap: "1rem",
-                  alignItems: "flex-start",
-                  padding: "1rem 1.25rem",
-                  background: "rgba(0,0,0,0.4)",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(45,27,105,0.35)",
-                  borderLeft: "3px solid rgba(184,134,11,0.6)",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.background = "rgba(184,134,11,0.06)";
-                  (e.currentTarget as HTMLDivElement).style.borderLeftColor = "#B8860B";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,0.4)";
-                  (e.currentTarget as HTMLDivElement).style.borderLeftColor = "rgba(184,134,11,0.6)";
+                  background: "rgba(0,0,0,0.5)",
+                  backdropFilter: "blur(15px)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  borderRadius: "16px",
+                  overflow: "hidden",
                 }}
               >
-                <span
-                  className="font-cinzel"
+                {/* Group header */}
+                <div
                   style={{
-                    fontSize: "0.8rem",
-                    color: "#B8860B",
-                    fontWeight: 700,
-                    minWidth: "28px",
-                    paddingTop: "2px",
-                    opacity: 0.9,
+                    padding: "0.875rem 1.5rem",
+                    background: "rgba(255,255,255,0.03)",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
                   }}
                 >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p
-                  className="font-crimson"
-                  style={{
-                    fontSize: "1.05rem",
-                    color: "#F0F0FF",
-                    lineHeight: 1.65,
-                    fontStyle: "italic",
-                  }}
-                >
-                  {q}
-                </p>
+                  <span style={{ fontSize: "1rem" }}>{group.icon}</span>
+                  <span
+                    className="font-cinzel"
+                    style={{ fontSize: "0.85rem", color: "#B8860B", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}
+                  >
+                    {group.category}
+                  </span>
+                  <span
+                    style={{
+                      marginLeft: "auto",
+                      fontSize: "0.7rem",
+                      color: "rgba(200,200,220,0.3)",
+                      fontFamily: "'Montserrat', sans-serif",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    {group.questions.length} questions
+                  </span>
+                </div>
+
+                {/* Questions */}
+                <div style={{ padding: "0.75rem" }}>
+                  {group.questions.map((q, qi) => (
+                    <div
+                      key={qi}
+                      style={{
+                        display: "flex",
+                        gap: "1rem",
+                        alignItems: "flex-start",
+                        padding: "0.875rem 1rem",
+                        borderRadius: "10px",
+                        transition: "background 0.2s ease",
+                        cursor: "default",
+                      }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.background = "rgba(184,134,11,0.05)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.background = "transparent")}
+                    >
+                      <span
+                        className="font-cinzel"
+                        style={{
+                          fontSize: "0.7rem",
+                          color: "rgba(184,134,11,0.5)",
+                          fontWeight: 700,
+                          minWidth: "20px",
+                          paddingTop: "3px",
+                          letterSpacing: "1px",
+                        }}
+                      >
+                        {String(qi + 1).padStart(2, "0")}
+                      </span>
+                      <p
+                        className="font-crimson"
+                        style={{
+                          fontSize: "1.05rem",
+                          color: "#E8E8F5",
+                          lineHeight: 1.65,
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {q}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
-
-          <div style={{ marginTop: "1.25rem", fontSize: "0.8rem", color: "rgba(200,200,220,0.4)", textAlign: "center" }}>
-            {questions.length} questions generated from your configuration
-          </div>
         </div>
       )}
-
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button className="action-button secondary" onClick={onBack}>
-          ← Back to Portal
-        </button>
-      </div>
     </div>
   );
 }
