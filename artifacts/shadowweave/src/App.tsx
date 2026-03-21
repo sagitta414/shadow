@@ -14,6 +14,7 @@ import CharacterMapper from "./pages/CharacterMapper";
 import SoundingBoard from "./pages/SoundingBoard";
 import CaptorLogic from "./pages/CaptorLogic";
 import SuperheroMode from "./pages/SuperheroMode";
+import InterrogationRoom from "./pages/InterrogationRoom";
 
 type Page =
   | "login"
@@ -28,7 +29,8 @@ type Page =
   | "character-mapper"
   | "sounding-board"
   | "captor-logic"
-  | "superhero-mode";
+  | "superhero-mode"
+  | "interrogation-room";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -137,6 +139,7 @@ function AppInner() {
           onSoundingBoard={() => navigate("sounding-board")}
           onCaptorLogic={() => navigate("captor-logic")}
           onSuperheroMode={() => navigate("superhero-mode")}
+          onInterrogationRoom={() => navigate("interrogation-room")}
         />
       )}
 
@@ -207,6 +210,10 @@ function AppInner() {
 
       {page === "superhero-mode" && (
         <SuperheroMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "interrogation-room" && (
+        <InterrogationRoom onBack={() => navigate("home")} />
       )}
     </div>
   );

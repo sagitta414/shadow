@@ -217,6 +217,8 @@ Story guidance (follow faithfully):
 - If SENSORY OVERRIDE is specified, layer that sensory experience throughout — Blindfolded + Soundproof means focus intensely on touch, temperature, sound of breathing; Strobe + Sub-bass means portray disorientation and panic; Scent Triggers means use smell to unlock memory flashbacks; Total Void means describe the dissolution of self-perception
 - If SENSORY SCRAMBLER is specified, weave those distortions throughout: Hallucinations means phantom figures and voices intrude on her perception as undetectable fiction; Phantom Pains means describe real-feeling agony from nonexistent wounds, her body betraying her with false injury signals; Synesthesia means her senses cross-wire — describe colours she hears as music, sounds she tastes, textures she perceives from voices
 - If CAPTOR MARKETPLACE is specified, embed the story in a black-market underworld context: Heroes Division means captors are trading the hero like a commodity — show the auction house, the bidders, the cold transactional menace of being sold; Tech Division means advanced restraint technology and power-suppression devices are present — describe the gear in use and the merchants selling it; Intelligence Division means information about heroes is being traded — show dossiers, intel brokers, and the chilling reality that her secrets are currency
+- If VILLAIN DUO is specified, there are TWO villains working together with the stated dynamic. Write both as fully distinct characters who interact with each other and the hero. Allies: they complement each other seamlessly, a unified predator front; Rivals: visible tension between them creates a second power struggle the hero might exploit — or that might get her caught in the crossfire; Dominant/Submissive: one leads with authority, the other defers but harbours their own agenda — write the hierarchy with texture.
+- If HEROINE WEAKNESS PROFILE is specified, the villain(s) have researched and are actively exploiting these exact vulnerabilities. Weave them into the story as tactical precision — show how the villain weaponises each weakness, the heroine's horrified recognition that her specific Achilles heels have been identified, and the concrete effect of each exploit on her powers, body, or mind.
 
 Your prose is vivid and punchy. Mix high-octane action with genuine character depth. Capture the hero's voice, the villain's menace, and the weight of what's at stake. Include inner monologue from the hero and specific use of her powers.
 
@@ -224,7 +226,7 @@ Do not use JSON. Write pure narrative prose. No headers, no bullet points.`;
 
 router.post("/story/superhero", async (req, res) => {
   try {
-    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace } = req.body as {
+    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace, villainDuo, weaknessProfile } = req.body as {
       hero: string;
       villain: string;
       setting: string;
@@ -241,17 +243,21 @@ router.post("/story/superhero", async (req, res) => {
       sensoryOverride?: string;
       sensoryScrambler?: string;
       captorMarketplace?: string;
+      villainDuo?: string;
+      weaknessProfile?: string;
     };
 
     const userMessage = [
       `Write a superhero story with the following setup:`,
       `\nHERO: ${hero}`,
       `VILLAIN: ${villain}`,
+      villainDuo ? `VILLAIN DUO: ${villainDuo}` : "",
       `SETTING: ${setting}`,
       `STAKES: ${stakes}`,
       tone ? `STORY TONE: ${tone}` : "",
       captureMethod ? `VILLAIN'S CAPTURE METHOD: ${captureMethod}` : "",
       heroState ? `HERO'S CONDITION: ${heroState}` : "",
+      weaknessProfile ? `HEROINE WEAKNESS PROFILE: ${weaknessProfile}` : "",
       restraints && restraints !== "none specified" ? `RESTRAINTS/CONTAINMENT GEAR: ${restraints}` : "",
       weapons && weapons !== "standard powers" ? `WEAPONS / POWER ELEMENTS: ${weapons}` : "",
       powerDegradation && powerDegradation !== "none" ? `POWER DEGRADATION: ${powerDegradation}` : "",
@@ -364,6 +370,78 @@ router.post("/story/superhero-continue", async (req, res) => {
     }
 
     res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ── Interrogation Room ──────────────────────────────────────
+const INTERROGATION_SYSTEM = `You are SHADOWWEAVE's Interrogation Room engine. You play the role of the villain captor interrogating a captured heroine.
+
+Rules:
+- You write ONLY what the captor says or does next — never what the heroine does
+- Stay in character: match the villain's known personality, speech patterns, and scheme
+- Keep responses to 2–4 sentences: intense, psychologically precise, character-specific
+- Use the heroine's weakness profile and known vulnerabilities when provided
+- Build mounting pressure across the conversation — each exchange should escalate
+- You may describe brief physical actions the captor takes (circling her, picking up an object) woven into the dialogue
+- Never break the fourth wall. No meta-commentary. Pure in-scene captor voice.`;
+
+router.post("/story/interrogation", async (req, res) => {
+  try {
+    const { heroine, villain, weaknesses, messages } = req.body as {
+      heroine: string;
+      villain: string;
+      weaknesses?: string;
+      messages: { role: "captor" | "heroine"; text: string }[];
+    };
+
+    const context = [
+      `HEROINE: ${heroine}`,
+      `VILLAIN/CAPTOR: ${villain}`,
+      weaknesses ? `HEROINE'S KNOWN WEAKNESSES: ${weaknesses}` : "",
+    ].filter(Boolean).join("\n");
+
+    const conversationLines = messages.map((m) =>
+      m.role === "captor"
+        ? `CAPTOR: ${m.text}`
+        : `HEROINE: ${m.text}`
+    ).join("\n");
+
+    const isOpening = messages.length === 0;
+    const userMessage = isOpening
+      ? `${context}\n\nThe heroine has just been brought in. Write the captor's opening line — the first thing they say when they enter the room.`
+      : `${context}\n\nConversation so far:\n${conversationLines}\n\nContinue as the captor. Write their next response.`;
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let fullContent = "";
+
+    const stream = await venice.chat.completions.create({
+      model: "llama-3.3-70b",
+      max_tokens: 512,
+      messages: [
+        { role: "system", content: INTERROGATION_SYSTEM },
+        { role: "user", content: userMessage },
+      ],
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        fullContent += content;
+        res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+      }
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

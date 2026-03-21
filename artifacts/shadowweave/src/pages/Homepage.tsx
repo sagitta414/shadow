@@ -8,6 +8,7 @@ interface HomepageProps {
   onSoundingBoard: () => void;
   onCaptorLogic: () => void;
   onSuperheroMode: () => void;
+  onInterrogationRoom: () => void;
 }
 
 const TOOLS = [
@@ -74,15 +75,25 @@ const TOOLS = [
     features: ["Rules Engine", "Goal Mapping", "Risk Analysis"],
     hex: "#7D3C98", light: "#C39BD3", r: 120, g: 20, b: 160,
   },
+  {
+    id: "interrogation", num: "08",
+    icon: "◉",
+    title: "Interrogation Room",
+    subtitle: "Dialogue Simulator",
+    desc: "The captor questions. You answer as the heroine. The AI escalates each exchange — a live back-and-forth with mounting pressure.",
+    features: ["Live Dialogue", "AI Captor", "Streaming Responses"],
+    hex: "#8B0000", light: "#FF6060", r: 180, g: 0, b: 0,
+  },
 ];
 
 function handleClick(id: string, fns: HomepageProps) {
-  if (id === "victim")       fns.onEnter();
-  if (id === "captor")       fns.onCaptorPortal();
-  if (id === "scenario")     fns.onScenarioGenerator();
-  if (id === "mapper")       fns.onCharacterMapper();
-  if (id === "sounding")     fns.onSoundingBoard();
-  if (id === "captor-logic") fns.onCaptorLogic();
+  if (id === "victim")        fns.onEnter();
+  if (id === "captor")        fns.onCaptorPortal();
+  if (id === "scenario")      fns.onScenarioGenerator();
+  if (id === "mapper")        fns.onCharacterMapper();
+  if (id === "sounding")      fns.onSoundingBoard();
+  if (id === "captor-logic")  fns.onCaptorLogic();
+  if (id === "interrogation") fns.onInterrogationRoom();
   if (id === "themes") {
     const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null;
     btn?.click();

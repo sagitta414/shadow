@@ -229,6 +229,98 @@ const VILLAINS = [
   { name: "Lamplighter",      universe: "TB",     scheme: "Burn any loose end Vought orders him to eliminate", icon: "🔥" },
 ];
 
+// ── Weakness Catalog ──────────────────────────────────────────
+const WEAKNESS_CATALOG: Record<string, string[]> = {
+  "Black Widow":       ["No superhuman durability — fully human limits", "Psychological Red Room conditioning exploited", "Equipment seizure removes primary advantages", "Isolation from SHIELD support network"],
+  "Captain Marvel":    ["Power absorption overload destabilises her", "Psychic intrusion bypasses cosmic defences", "Binary form burns energy reserves rapidly", "Neural disruption tech temporarily grounds her flight"],
+  "Storm":             ["Claustrophobia induces panic that breaks weather control", "Psionic suppression disrupts her environmental sense", "Emotional overload fractures concentration — storms she can't contain", "Electrostatic dampeners absorb her lightning"],
+  "Jean Grey":         ["Psychic feedback loops from amplified psi-traffic", "Phoenix suppression via forced emotional neutrality", "Physical sedation bypasses telekinetic defences", "Telepaths who can hide from her scans"],
+  "Scarlet Witch":     ["Emotional destabilisation collapses probability fields", "Reality anchor devices nullify chaos magic", "Psychic intervention interrupts hex casting", "Suppressed grief rewrites spells unpredictably"],
+  "She-Hulk":          ["Gamma suppression field reverts her to Jennifer Walters", "Emotional manipulation triggers uncontrolled surges", "Legal leverage exploiting her rational professional mind", "Anti-radiation containment foam"],
+  "Spider-Woman":      ["Bioelectric drain devices disrupt her venom blasts", "Pheromone countermeasures neutralise her aura", "Frictionless surfaces strand her", "HYDRA conditioning emotional triggers"],
+  "Rogue":             ["Absorption-nullifying barrier suits prevent power theft", "Psychic overload from absorbed personalities", "Skin-contact prevention gear removes her primary offence", "Memory floods from past absorptions destabilise identity"],
+  "Gamora":            ["Cybernetic nerve-override hack through her implants", "Pain cascades when multiple implants are disrupted", "Emotional manipulation via Thanos trauma", "Infinity Stone proximity amplifies responses"],
+  "Wasp":              ["Vulnerability when shrunk — adhesives and swatters", "Pym particle disruption prevents size-shifting", "Sonic disruption while miniaturised", "Standard human vulnerability at base size"],
+  "Ms. Marvel":        ["Overextension causes painful snap-back", "Crystallised form inhibitors lock her polymer structure", "Emotional anchors to family disrupt focus", "Inhuman mist sensitivity triggers power instability"],
+  "Invisible Woman":   ["Sustained invisibility drains concentration — pain breaks it", "Force field implosion from reverse-polarity tech", "Emotional distress collapses shield coherence", "Telepathic intrusion reveals position while invisible"],
+  "Psylocke":          ["Psychic backlash when her blade strikes defended minds", "Telepathic overload from simultaneous multiple targets", "Shadow-teleport jamming in shielded zones", "Emotional investment weakens psi-blade focus"],
+  "Emma Frost":        ["Diamond form has no telepathic access — a mental blind spot", "Physical damage in diamond form is permanent", "Psi-jammers block diamond-to-flesh transitions", "Emotional suppression leaves her open to manipulation"],
+  "Ghost-Spider":      ["Web-fluid dependency — running dry leaves her stranded", "Dimensional displacement sickness from universe-hopping", "Sonic vibrations disrupt spider-sense feedback", "Standard human resilience without augmentation"],
+  "X-23":              ["Berserker trigger phrase activates uncontrolled rage", "Adamantium weight creates drowning risk", "Healing factor delayed by adamantium poisoning", "Emotional manipulation targeting her clone identity crisis"],
+  "Ironheart":         ["EMP pulse takes down her suit instantly", "Without the suit she is a baseline human", "Neural-interface override and hacking", "Armour joint vulnerabilities at articulation points"],
+  "America Chavez":    ["Emotional instability closes her star portals", "Anti-magic fields suppress her Utopian power source", "Grief-based anchors prevent dimensional escape", "Cosmic dampeners ground her strength"],
+  "Kate Bishop":       ["No superhuman powers — elite but fully human", "Psychological pressure exploiting need to prove herself", "Equipment dependency — disarmed she loses most advantages", "Confined spaces reduce archery effectiveness"],
+  "Valkyrie":          ["Asgardian mead impairs judgment", "Dark dimension energy disrupts her death-sense", "Cosmic power-suppression drains Asgardian physiology", "Necrosword vibrations destabilise connection to Valhalla"],
+  "Nebula":            ["Cybernetic override via Thanos's neural backdoor", "System cascade failure when multiple implants disrupted", "Memory wipe of learned combat adaptations", "Emotional triggers from Gamora and Thanos"],
+  "Elektra":           ["Hand assassins who know her combat style exactly", "Mystical unbinding of her resurrection", "Sonic disruption shatters meditation focus", "Daredevil — the one anchor that compromises mission discipline"],
+  "Silk":              ["Spider-sense tuned to Morlun's frequency — draws him to her", "Organic web supply depletes with no cartridge backup", "Bunker-sickness from prolonged isolation trauma", "Acoustic dampeners confuse web-locating ability"],
+  "Magik":             ["Soulsword only cuts magical beings — useless against tech", "Limbo instability bleeds into Earth when she is emotional", "Stepping disc disruption in electromagnetically sealed zones", "Demonic Darkchylde corruption threatening to resurface"],
+  "Polaris":           ["Non-magnetic materials bypass her power completely", "Magneto's voice destabilises her magnetic field coherence", "Psychiatric medication was used to suppress her mutation historically", "Genosha massacre trauma causes field collapses under stress"],
+  "Shadowcat":         ["Prolonged phasing risks molecular dissociation", "Electrical disruption solidifies her inside objects", "Adamantium is the one material she cannot phase through", "Emotional shock breaks phase concentration"],
+  "Spectrum":          ["Specific energy frequencies outside her conversion range", "Forced reversion to human form by dimensional anchors", "Absorption overload when processing multiple energy types", "Light-speed movement requires clear line-of-sight paths"],
+  "Domino":            ["Probability fields require subconscious engagement — forced calm nullifies her luck", "Opponents who account for probability deviation in planning", "Luck only affects her — teammates are fully exposed", "High-stress panic breaks passive probability manipulation"],
+  "Firestar":          ["Radiation-absorbing containment suits neutralise her microwaves", "Emotional overwhelm causes uncontrolled emissions", "Magnetic field disruption prevents microwave focusing", "Cannot be immune to her own radiation at proximity"],
+  "Dazzler":           ["Total soundproofing starves her power source", "Sensory overload when input exceeds conversion capacity", "Physical attacks bypass her light constructs entirely", "Sonic negation fields prevent light-to-sound transfer"],
+  "Black Cat":         ["Bad luck field cannot be directed — applies randomly", "Standard human vulnerability in sustained combat", "Targeted good-luck cancellation nullifies her aura", "Emotional investment creating tactical blind spots"],
+  "Wolfsbane":         ["Silver weapons cause severe injury bypassing healing", "Full moon compulsion overriding her conscious choice", "Soul link with Rictor exploited against her", "Mutant-targeting drugs trap her in partial wolf form"],
+  "Wonder Woman":      ["Ancient Aphrodite's law — bound by a man weakens her", "Severing her from Olympus removes divine power", "Powerful magic from equivalent divine sources", "Lasso of Truth — she cannot lie while it touches her either"],
+  "Supergirl":         ["Kryptonite — green weakens, red causes bizarre changes, gold removes powers", "Red sun radiation strips all Kryptonian powers", "Magic bypasses invulnerability completely", "Lead barriers block her X-ray vision"],
+  "Batgirl / Oracle":  ["No meta-abilities — human limits even at peak", "Oracle identity relies on tech — EMP renders her blind", "Emotional investment in Gordon family exploited as leverage", "Back injury history — physical spinal trauma"],
+  "Batwoman":          ["Human limits despite military elite training", "PTSD from military service exploited under psychological assault", "No supernatural resilience — conventional weapons work", "Family used as hostages — Jacob Kane and her sister"],
+  "Black Canary":      ["Sonic dampeners neutralise her Canary Cry", "Close-quarters saturation — multiple opponents simultaneously", "Tech-jamming blocks non-meta gear enhancements", "Emotional triggers from her original history as Dinah Drake"],
+  "Starfire":          ["Sealed from UV light slowly drains energy reserves", "Emotional state directly affects starbolt power output", "Tamaranian loyalty exploited via hostage scenarios", "Language absorption requires physical contact — creates vulnerabilities"],
+  "Raven":             ["Anger breaks empathic control and risks civilian harm", "Trigon's voice destabilises her — her father's influence exploited", "Demonic possession windows when meditation is forcibly interrupted", "Soul self is vulnerable when outside her body — it can be captured"],
+  "Hawkgirl":          ["Nth metal removal strips flight and weapon enhancement", "Hawk curse — traumatic past-life memories triggered by specific objects", "Standard human physiology when weaponless", "Reincarnation cycle — death means starting over"],
+  "Power Girl":        ["Kryptonite in all forms", "Magic entirely bypasses invulnerability", "Emotional buttons about being from a vanished Earth-2", "Direct eye-contact vulnerability when exposed to specific wavelengths"],
+  "Zatanna":           ["Speaking backwards under physical restraint is impossible — gag or injury silences her", "Sound dampening prevents verbal spellcasting", "Anti-magic zones block all her power", "Grief-casting produces unpredictable and dangerous results"],
+  "Huntress":          ["Human limits — no superpowers", "Catholic guilt and moral code exploited under pressure", "Bertinelli mafia connections weaponised against her", "Obsessive mission focus creates exploitable tunnel vision"],
+  "Catwoman":          ["No metapowers — clever and agile but fully human", "Emotional investment in Gotham's forgotten used as leverage", "Batman-contingency protocols designed specifically for her skill set", "Jewel thief instinct — rare objects used as predictable bait"],
+  "Mera":              ["Dehydration — outside water her hydrokinesis weakens rapidly", "Dry environments progressively limit her power", "Atlantean political conflicts paralyse her", "Severed from Atlantean supply leaves her drawing on ambient moisture only"],
+  "Stargirl":          ["Cosmic Staff responds to her will — psychological manipulation corrupts its output", "Cosmic Converter Belt power is finite between recharges", "Student hero — inexperience creates tactical gaps", "Emotional anchors to JSA legacy exploited through senior hero threats"],
+  "Jade":              ["Yellow impurity applies — power is a direct GL ring analogue", "Emotional state affects energy construct stability", "Willpower sapped by prolonged isolation or helplessness", "Alan Scott's ring can be disrupted by shadow"],
+  "Jessica Cruz":      ["Anxiety and PTSD weaponised directly against her will", "Power Ring of Volthoom still has residual influence", "Self-doubt directly weakens construct integrity", "Past hostage trauma used to trigger panic responses"],
+  "Katana":            ["Soultaker contains her deceased husband's soul — leverage from within the blade", "Sword separated means power is purely human martial arts", "Grief over Maseo is a constant open wound", "The blade demands blood — if unused it eventually uses her"],
+  "Sara Lance":        ["League of Assassins conditioning — trigger phrases can be reactivated", "Human limits — powerful magic or tech overwhelms her", "Temporal paradox anxiety — she is aware she shouldn't exist", "Time displacement sickness from prolonged temporal exposure"],
+  "Laurel Lance":      ["Tech-dependent Canary Cry — device destroyed means silence", "Human fighter only — no metahuman edge", "Black Siren doppelganger creates identity confusion attacks", "Emotional grief over Oliver and Tommy"],
+  "Caitlin Snow":      ["Forced personality shift — Killer Frost emerges under trauma and doesn't share Caitlin's values", "Killer Frost powers fail in extreme heat environments", "Scientific training over combat training — not a fighter", "Harrison Wells emotional conditioning"],
+  "Iris West-Allen":   ["No powers — fully human, fully vulnerable", "Barry Allen — any threat to him destroys her judgment", "Journalist ethics preventing cover maintenance", "Speed Force conduit status is latent and unreliable"],
+  "Nia Nal":           ["Dream power requires sleep — sleep deprivation neutralises her", "Naltorian ancestors she doesn't fully understand yet", "Emotional connection to Brainy disrupts calm dreaming state", "Energy blast training still developing — range and precision limited"],
+  "M'gann M'orzz":     ["White Martian form — true form revealed triggers distrust", "Telepathic link opened too wide floods her with others' trauma", "Fire — Martian physiology is severely vulnerable", "Martian racial guilt weaponised against her"],
+  "Starlight":         ["Electrical power drains in shielded environments", "Vought International — corporate leverage and compound V dependency risks", "Homelander's authority over her — she cannot openly defy him", "Light absorbed by sufficiently dense materials blocks her blasts"],
+  "Queen Maeve":       ["Compound V dependency — what was given can be taken", "Homelander's psychological dominance after years of forced partnership", "Survivor guilt from the Flight 37 incident weaponised against her", "Specifically engineered compound V inhibitors"],
+  "Kimiko":            ["No verbal communication — she cannot call for help or negotiate", "Regeneration has limits — overwhelm the rate of healing", "Emotional connection to Frenchie is the most powerful lever", "Bound hands remove her ability to communicate in sign language"],
+  "Firecracker":       ["Her real past identity buried but usable against her", "Compound V-driven powers are newer and less refined", "Media and image-based vulnerability", "Victoria Neuman's political entanglements make her a liability"],
+  "Sister Sage":       ["Intelligence doesn't equal physical power — fragile in direct combat", "Neural manipulation used against others can be reversed", "Self-harm induced cognitive resets as her coping mechanism", "Blind spots in her calculations create exploitable gaps"],
+  "Victoria Neuman":   ["Head-explosion range is limited — distance and shielding matter", "Congressional accountability — public exposure ends her career", "Starlight has witnessed her power — living witness she cannot eliminate", "Hughie's blood-pressure drug suppresses her ability"],
+};
+
+function getHeroWeaknesses(hero: { name: string; power: string }): string[] {
+  if (WEAKNESS_CATALOG[hero.name]) return WEAKNESS_CATALOG[hero.name];
+  const p = hero.power.toLowerCase();
+  if (p.includes("martial") || p.includes("archer") || p.includes("spy") || p.includes("detective") || p.includes("mercenary") || p.includes("agent")) {
+    return ["No superhuman durability — fully human limits", "Equipment seizure removes primary advantages", "Psychological conditioning exploited under sustained pressure", "Isolation from support network"];
+  }
+  if (p.includes("magic") || p.includes("sorcery") || p.includes("spell") || p.includes("enchant")) {
+    return ["Anti-magic containment fields", "Gestural/verbal spell requirements — bound and gagged silences her", "Emotional destabilisation corrupts spellcasting", "Reality anchor devices block dimensional access"];
+  }
+  if (p.includes("telepat") || p.includes("psionic") || p.includes("psychic") || p.includes("empathy") || p.includes("mind")) {
+    return ["Psionic dampeners block mental transmission", "Psychic feedback from mass casualties", "Emotional flooding from unfiltered empathy", "Psi-null materials blocking projection"];
+  }
+  if (p.includes("speed") || p.includes("speedster")) {
+    return ["Speed Force disruption devices", "Molecular vibration destabilisation", "Anti-friction containment surfaces", "Temporal paradox vulnerability"];
+  }
+  if (p.includes("krypton")) {
+    return ["Kryptonite exposure", "Red sun radiation strips all powers", "Magic bypasses invulnerability", "Lead barriers blocking X-ray vision"];
+  }
+  if (p.includes("strength") || p.includes("durability") || p.includes("invulner")) {
+    return ["Power nullification containment field", "Gamma or cosmic radiation suppression tech", "Emotional manipulation bypassing physical defences", "Anti-power pharmaceutical agents"];
+  }
+  if (p.includes("flight") || p.includes("energy") || p.includes("cosmic")) {
+    return ["Energy absorption overload destabilises her", "Atmospheric containment grounds flight", "Cosmic dampening field", "Power drain devices targeting her energy source"];
+  }
+  return ["Power nullification containment", "Emotional vulnerability exploited under pressure", "Isolated from allies and backup", "Specialised anti-power countermeasures"];
+}
+
 const SETTINGS = [
   { id: "city",      label: "City in Chaos",         desc: "Urban skyline under siege",          icon: "🌆" },
   { id: "space",     label: "Cosmic Void",            desc: "Deep space confrontation",           icon: "🌌" },
@@ -340,6 +432,15 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [sensoryMode, setSensoryMode] = useState<string>("");
   const [sensoryScrambler, setSensoryScrambler] = useState<string[]>([]);
 
+  // ── Team-up Mode ──
+  const [isVillainDuo, setIsVillainDuo] = useState(false);
+  const [selectedVillain2, setSelectedVillain2] = useState<typeof VILLAINS[0] | null>(null);
+  const [villainDynamic, setVillainDynamic] = useState<"allies" | "rivals" | "dominant" | "">("");
+  const [villainFilter2, setVillainFilter2] = useState<VillainFilter>("ALL");
+
+  // ── Weakness Catalog ──
+  const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>([]);
+
   // ── Captor Marketplace ──
   const [marketplaceActive, setMarketplaceActive] = useState(false);
   const [marketplaceCategories, setMarketplaceCategories] = useState<string[]>([]);
@@ -387,7 +488,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   }
   function canProceedStep1() { return selectedHeroes.length > 0; }
   function canProceedStep2() {
-    return villainMode === "pick" ? !!selectedVillain : !!customVillain.trim();
+    const primary = villainMode === "pick" ? !!selectedVillain : !!customVillain.trim();
+    if (!primary) return false;
+    if (isVillainDuo) return !!selectedVillain2 && !!villainDynamic;
+    return true;
   }
   function canProceedStep3() { return !!selectedSetting && !!selectedStakes; }
 
@@ -415,9 +519,16 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
         ).join("; ")
       : "none";
 
+    const dynamicLabel = villainDynamic === "allies" ? "Allies — united front, complementary threats"
+      : villainDynamic === "rivals" ? "Rivals — competing with each other while sharing the captive"
+      : villainDynamic === "dominant" ? "Dominant/Submissive — one villain leads, the other defers but has their own agenda"
+      : "";
+
     return {
       hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
       villain: `${villain} — Scheme: ${villainScheme}`,
+      villainDuo: isVillainDuo && selectedVillain2 ? `SECOND VILLAIN: ${selectedVillain2.name} — Scheme: ${selectedVillain2.scheme} | DYNAMIC: ${dynamicLabel}` : undefined,
+      weaknessProfile: selectedWeaknesses.length > 0 ? selectedWeaknesses.join("; ") : undefined,
       setting: settingLabel,
       stakes: stakesLabel,
       weapons: selectedWeapons.join(", ") || "standard powers",
@@ -753,8 +864,20 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       ══════════════════════════════════════════════════════ */}
       {step === 2 && (
         <div>
+          {/* Solo / Duo toggle */}
+          <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", alignItems: "center" }}>
+            <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
+              {([false, true] as const).map((duo) => (
+                <button key={String(duo)} onClick={() => { setIsVillainDuo(duo); if (!duo) { setSelectedVillain2(null); setVillainDynamic(""); } }} style={{ padding: "0.5rem 1.25rem", background: isVillainDuo === duo ? "rgba(200,0,50,0.22)" : "transparent", border: "none", borderRight: !duo ? "1px solid rgba(255,255,255,0.06)" : "none", color: isVillainDuo === duo ? "#FF4060" : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {duo ? "⚔ Villain Duo" : "Solo Villain"}
+                </button>
+              ))}
+            </div>
+            {isVillainDuo && <span style={{ fontSize: "0.65rem", color: "rgba(200,0,50,0.5)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>Pick two villains + a dynamic</span>}
+          </div>
+
           {/* Mode tabs */}
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
             {(["pick", "custom"] as const).map((mode) => (
               <button key={mode} onClick={() => setVillainMode(mode)} style={{ padding: "0.5rem 1.25rem", background: villainMode === mode ? "rgba(200,0,50,0.2)" : "rgba(0,0,0,0.35)", border: `1px solid ${villainMode === mode ? "rgba(200,0,50,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "8px", color: villainMode === mode ? "#FF4060" : "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
                 {mode === "pick" ? "Choose from List" : "Create Custom Villain"}
@@ -762,10 +885,12 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             ))}
           </div>
 
+          {isVillainDuo && <div style={{ fontSize: "0.6rem", color: "#FF4060", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>▸ Villain 1</div>}
+
           {villainMode === "pick" ? (
             <>
-              {/* Villain universe filter */}
-              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
+              {/* Villain 1 universe filter */}
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", alignItems: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined }}>
                   {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
                     <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
@@ -777,7 +902,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).length} villains
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: isVillainDuo ? "320px" : "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
                 {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).map((villain) => {
                   const isSelected = selectedVillain?.name === villain.name;
                   const isMv = villain.universe === "Marvel";
@@ -785,23 +910,18 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isTB = villain.universe === "TB";
                   const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
                   const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
+                  const isV2Taken = selectedVillain2?.name === villain.name;
                   return (
                     <button
                       key={villain.name}
-                      onClick={() => setSelectedVillain(villain)}
-                      style={{ background: isSelected ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSelected ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSelected ? "0 0 16px rgba(200,0,50,0.35)" : "none" }}
-                      onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
-                      onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                      onClick={() => !isV2Taken && setSelectedVillain(villain)}
+                      style={{ background: isSelected ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSelected ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: isV2Taken ? "not-allowed" : "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSelected ? "0 0 16px rgba(200,0,50,0.35)" : "none", opacity: isV2Taken ? 0.3 : 1 }}
+                      onMouseEnter={(e) => { if (!isSelected && !isV2Taken) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
+                      onMouseLeave={(e) => { if (!isSelected && !isV2Taken) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
                     >
-                      {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>✓</div>}
-                      {/* Portrait image */}
+                      {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>1</div>}
                       <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(30,0,0,0.6)" }}>
-                        <img
-                          src={villainImg(villain.name)}
-                          alt={villain.name}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                        />
+                        <img src={villainImg(villain.name)} alt={villain.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? "rgba(200,0,50,0.45)" : "rgba(0,0,0,0.55)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
                         <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{villain.universe}</div>
                       </div>
@@ -820,6 +940,70 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
               />
               <p style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>The AI will develop their scheme and personality from the scenario you build.</p>
+            </div>
+          )}
+
+          {/* ── Villain 2 picker (duo mode only) ── */}
+          {isVillainDuo && villainMode === "pick" && (
+            <div style={{ marginTop: "1.25rem" }}>
+              <div style={{ fontSize: "0.6rem", color: "#FF6060", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>▸ Villain 2</div>
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.875rem", alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden" }}>
+                  {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter2(v)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: villainFilter2 === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter2 === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : "The Boys ✦"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "280px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
+                {VILLAINS.filter((v) => (villainFilter2 === "ALL" || v.universe === villainFilter2) && v.name !== selectedVillain?.name).map((villain) => {
+                  const isSel2 = selectedVillain2?.name === villain.name;
+                  const isMv = villain.universe === "Marvel"; const isCW = villain.universe === "CW"; const isTB = villain.universe === "TB";
+                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
+                  const accentBg = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
+                  return (
+                    <button key={villain.name} onClick={() => setSelectedVillain2(villain)}
+                      style={{ background: isSel2 ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSel2 ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSel2 ? "0 0 16px rgba(200,0,50,0.35)" : "none" }}
+                      onMouseEnter={(e) => { if (!isSel2) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
+                      onMouseLeave={(e) => { if (!isSel2) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                    >
+                      {isSel2 && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>2</div>}
+                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(30,0,0,0.6)" }}>
+                        <img src={villainImg(villain.name)} alt={villain.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSel2 ? "rgba(200,0,50,0.45)" : "rgba(0,0,0,0.55)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{villain.universe}</div>
+                      </div>
+                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSel2 ? "#FF4060" : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{villain.name}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.48)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{villain.scheme}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Villain Dynamic selector */}
+              <div style={{ marginTop: "1.25rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,80,0,0.2)", borderRadius: "14px", padding: "1.25rem" }}>
+                <div className="font-cinzel" style={{ fontSize: "0.65rem", color: "#FF6400", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.875rem" }}>Villain Dynamic</div>
+                <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
+                  {([
+                    { id: "allies",   label: "Allies",              desc: "United front — complementary threats, seamless coordination",    icon: "🤝" },
+                    { id: "rivals",   label: "Rivals",              desc: "Competing for control of the captive — tension creates crossfire", icon: "⚔" },
+                    { id: "dominant", label: "Dominant / Submissive", desc: "One leads with authority, the other defers but has their own agenda", icon: "👑" },
+                  ] as { id: "allies" | "rivals" | "dominant"; label: string; desc: string; icon: string }[]).map((d) => {
+                    const isSel = villainDynamic === d.id;
+                    return (
+                      <button key={d.id} onClick={() => setVillainDynamic(isSel ? "" : d.id)} style={{ flex: 1, minWidth: "140px", padding: "0.875rem 1rem", background: isSel ? "rgba(255,100,0,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,100,0,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit" }}
+                        onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,100,0,0.3)"; }}
+                        onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                      >
+                        <div style={{ fontSize: "1.2rem", marginBottom: "0.3rem" }}>{d.icon}</div>
+                        <div className="font-cinzel" style={{ fontSize: "0.73rem", color: isSel ? "#FF6400" : "#E8E8F0", fontWeight: 700, marginBottom: "0.2rem" }}>{d.label}</div>
+                        <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", lineHeight: 1.4 }}>{d.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
 
@@ -1385,6 +1569,44 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           </div>
 
+          {/* ── WEAKNESS CATALOG ── */}
+          {selectedHeroes.length > 0 && (() => {
+            const allWeaknesses = Array.from(new Set(
+              selectedHeroes.flatMap((h) => getHeroWeaknesses(h))
+            ));
+            return (
+              <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(180,0,255,0.2)", borderRadius: "16px", padding: "1.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.35rem" }}>
+                  <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#C060FF", letterSpacing: "2.5px", textTransform: "uppercase" }}>🔍 Heroine Weakness Profile</div>
+                  <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
+                </div>
+                <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem" }}>
+                  Select the specific vulnerabilities the villain has identified and will exploit throughout the story.
+                  {selectedWeaknesses.length > 0 && <span style={{ color: "#C060FF", marginLeft: "0.5rem" }}>{selectedWeaknesses.length} selected</span>}
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {allWeaknesses.map((w) => {
+                    const isSel = selectedWeaknesses.includes(w);
+                    return (
+                      <button key={w} onClick={() => setSelectedWeaknesses((prev) => isSel ? prev.filter((x) => x !== w) : [...prev, w])}
+                        style={{ padding: "0.45rem 0.875rem", background: isSel ? "rgba(192,96,255,0.2)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(192,96,255,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "20px", color: isSel ? "#C060FF" : "rgba(200,200,220,0.45)", fontFamily: "'Raleway', sans-serif", fontSize: "0.75rem", cursor: "pointer", transition: "all 0.2s", textAlign: "left", lineHeight: 1.4 }}
+                        onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(192,96,255,0.35)"; }}
+                        onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                      >
+                        {isSel && <span style={{ marginRight: "0.4rem", color: "#C060FF" }}>✓</span>}{w}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedWeaknesses.length > 0 && (
+                  <button onClick={() => setSelectedWeaknesses([])} style={{ marginTop: "0.75rem", padding: "0.3rem 0.75rem", background: "transparent", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px" }}>
+                    Clear all
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Story Length */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#D4AF37", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Length</div>
@@ -1446,8 +1668,16 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               </div>
               <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
               <div>
-                <div style={{ fontSize: "0.58rem", color: "rgba(255,64,96,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>VILLAIN</div>
+                <div style={{ fontSize: "0.58rem", color: "rgba(255,64,96,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>
+                  {isVillainDuo ? "VILLAIN DUO" : "VILLAIN"}
+                </div>
                 <div className="font-cinzel" style={{ color: "#FF4060", fontWeight: 700, fontSize: "1rem" }}>{villainMode === "pick" ? selectedVillain?.name : customVillain}</div>
+                {isVillainDuo && selectedVillain2 && (
+                  <>
+                    <div style={{ fontSize: "0.55rem", color: "rgba(255,100,0,0.5)", fontFamily: "'Montserrat', sans-serif", margin: "0.15rem 0" }}>⚔ {villainDynamic.toUpperCase()}</div>
+                    <div className="font-cinzel" style={{ color: "#FF6030", fontWeight: 700, fontSize: "0.9rem" }}>{selectedVillain2.name}</div>
+                  </>
+                )}
               </div>
               <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
               <div>
