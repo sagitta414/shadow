@@ -203,4 +203,69 @@ router.post("/story/captor-logic", async (req, res) => {
   }
 });
 
+// ── Superhero Story Forge ───────────────────────────────────
+const SUPERHERO_PROMPT = `You are an electrifying comic-book story writer for SHADOWWEAVE's Superhero Mode. You write action-packed, cinematic, emotionally resonant superhero fiction in the style of the best Marvel/DC storylines.
+
+Your prose is vivid and punchy. You mix high-octane action with genuine character depth. Capture the hero's voice, the villain's menace, and the weight of what's at stake. Use dynamic scene structure: open with impact, build through confrontation, land with a powerful climax.
+
+Write 5-7 paragraphs. Include inner monologue from the hero, specific use of their powers, and a moment where the villain nearly wins before the hero finds a way through. End on a triumphant but costly note — victory should feel earned.
+
+Do not use JSON. Write pure narrative prose. No headers, no bullet points.`;
+
+router.post("/story/superhero", async (req, res) => {
+  try {
+    const { hero, villain, setting, stakes, weapons, details } = req.body as {
+      hero: string;
+      villain: string;
+      setting: string;
+      stakes: string;
+      weapons: string;
+      details: string;
+    };
+
+    const userMessage = [
+      `Write a superhero story with the following setup:`,
+      `\nHERO: ${hero}`,
+      `VILLAIN: ${villain}`,
+      `SETTING: ${setting}`,
+      `STAKES: ${stakes}`,
+      `WEAPONS / POWER ELEMENTS IN PLAY: ${weapons}`,
+      details ? `\nADDITIONAL DETAILS: ${details}` : "",
+      `\nMake it thrilling, cinematic, and true to both characters. The hero should be pushed to their limits before prevailing.`,
+    ].join("\n");
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let fullContent = "";
+
+    const stream = await venice.chat.completions.create({
+      model: "llama-3.3-70b",
+      max_tokens: 4096,
+      messages: [
+        { role: "system", content: SUPERHERO_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        fullContent += content;
+        res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+      }
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
 export default router;

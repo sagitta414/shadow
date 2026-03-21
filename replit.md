@@ -1,3 +1,12 @@
+# SHADOWWEAVE — Dark Narrative Studio
+
+## Features
+- 7 dark narrative tools: Victim Profile, Captor Config, Scenario Engine, Character Mapper, Mood Lighting, AI Sounding Board, Captor Logic Simulator
+- **Superhero Mode**: Hero Story Forge with 100 heroines (Marvel/DC), villain selector, 4-step wizard, AI story generation
+- Venice AI (`llama-3.3-70b`) for all AI features
+- 4 visual themes: Void / Cold Blue / Candlelight / Glitch
+- Sanity + Hope meters in Interactive Story
+
 # Workspace
 
 ## Overview

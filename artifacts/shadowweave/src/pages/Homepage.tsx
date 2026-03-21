@@ -7,6 +7,7 @@ interface HomepageProps {
   onCharacterMapper: () => void;
   onSoundingBoard: () => void;
   onCaptorLogic: () => void;
+  onSuperheroMode: () => void;
 }
 
 const tools = [
@@ -131,7 +132,7 @@ const tools = [
   },
 ];
 
-export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator, onCharacterMapper, onSoundingBoard, onCaptorLogic }: HomepageProps) {
+export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator, onCharacterMapper, onSoundingBoard, onCaptorLogic, onSuperheroMode }: HomepageProps) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   function handleClick(id: string) {
@@ -168,6 +169,42 @@ export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator,
         <p className="font-crimson" style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", color: "rgba(220,220,240,0.55)", fontStyle: "italic", letterSpacing: "0.06em", maxWidth: "500px" }}>
           Where darkness becomes narrative
         </p>
+
+        {/* Superhero Mode Toggle */}
+        <button
+          onClick={onSuperheroMode}
+          style={{
+            marginTop: "2rem",
+            padding: "0.75rem 2rem",
+            background: "linear-gradient(135deg, rgba(255,184,0,0.12) 0%, rgba(255,0,128,0.1) 50%, rgba(96,160,255,0.12) 100%)",
+            border: "1px solid rgba(255,184,0,0.35)",
+            borderRadius: "30px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.625rem",
+            color: "inherit",
+            transition: "all 0.35s ease",
+            position: "relative",
+            overflow: "hidden",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,184,0,0.22) 0%, rgba(255,0,128,0.18) 50%, rgba(96,160,255,0.22) 100%)";
+            e.currentTarget.style.borderColor = "rgba(255,184,0,0.65)";
+            e.currentTarget.style.boxShadow = "0 4px 30px rgba(255,184,0,0.3), 0 0 60px rgba(255,0,128,0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,184,0,0.12) 0%, rgba(255,0,128,0.1) 50%, rgba(96,160,255,0.12) 100%)";
+            e.currentTarget.style.borderColor = "rgba(255,184,0,0.35)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <span style={{ fontSize: "1.1rem" }}>⚡</span>
+          <span className="font-cinzel" style={{ fontSize: "0.78rem", letterSpacing: "3px", textTransform: "uppercase", background: "linear-gradient(90deg, #FFB800, #FF0080, #60A0FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", fontWeight: 700 }}>
+            Switch to Superhero Mode
+          </span>
+          <span style={{ fontSize: "1.1rem" }}>⚡</span>
+        </button>
 
         <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "120px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.8), transparent)" }} />
       </header>
