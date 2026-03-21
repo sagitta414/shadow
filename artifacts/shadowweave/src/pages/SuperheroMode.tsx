@@ -318,6 +318,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [traumaState, setTraumaState] = useState<"" | "compliance" | "defiance" | "breakdown">("");
   const [sensoryModeActive, setSensoryModeActive] = useState(false);
   const [sensoryMode, setSensoryMode] = useState<string>("");
+  const [sensoryScrambler, setSensoryScrambler] = useState<string[]>([]);
 
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
@@ -377,6 +378,14 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     const degradationLevel = powerDegradation === 0 ? "none" : powerDegradation <= 20 ? "minimal flicker" : powerDegradation <= 40 ? "noticeable drain" : powerDegradation <= 60 ? "significant suppression" : powerDegradation <= 80 ? "near-total loss" : "complete power void";
     const traumaDesc = traumaState === "compliance" ? "Compliance — the hero's resistance has begun to erode; she is increasingly obedient, her will bending under sustained pressure" : traumaState === "defiance" ? "Defiance — she fights back at every turn; each act of resistance triggers harsher countermeasures and escalating restraints" : traumaState === "breakdown" ? "Breakdown — psychological fracture; she experiences dissociation, hallucinations, and unpredictable power surges" : "not specified";
     const sensoryDesc = !sensoryModeActive ? "none" : sensoryMode;
+    const scramblerDesc = sensoryScrambler.length > 0
+      ? sensoryScrambler.map((id) =>
+          id === "hallucinations" ? "Hallucinations — visual and auditory distortions arise from accumulated trauma, bleeding the unreal into her perception"
+        : id === "phantom-pains"  ? "Phantom Pains — she feels intense injury sensations from wounds that don't physically exist, overwhelming her nervous system"
+        : id === "synesthesia"    ? "Synesthesia — her senses cross-wire under neural strain: she hears colours, tastes sounds, feels words as textures"
+        : id
+        ).join("; ")
+      : "none";
 
     return {
       hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
@@ -393,6 +402,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       powerDegradation: powerDegradation > 0 ? `${degradationLevel} (${powerDegradation}%)${powerDegradationDesc ? ` — ${powerDegradationDesc}` : ""}` : "none",
       traumaState: traumaDesc,
       sensoryOverride: sensoryDesc,
+      sensoryScrambler: scramblerDesc,
     };
   }
 
@@ -1059,6 +1069,93 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                     </button>
                   );
                 })}
+              </div>
+            )}
+          </div>
+
+          {/* ── SENSORY SCRAMBLER ── */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: `1px solid ${sensoryScrambler.length > 0 ? "rgba(0,200,180,0.3)" : "rgba(255,255,255,0.06)"}`, borderRadius: "16px", padding: "1.5rem", transition: "border-color 0.3s" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", marginBottom: "1.25rem" }}>
+              <div>
+                <div className="font-cinzel" style={{ fontSize: "0.7rem", color: sensoryScrambler.length > 0 ? "#00D0C0" : "rgba(0,200,180,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.2rem", transition: "color 0.3s" }}>
+                  🌀 Sensory Scrambler
+                </div>
+                <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif" }}>
+                  Randomise sensory input — distortions that blur the line between real and imagined
+                </div>
+              </div>
+              <span style={{ fontSize: "0.5rem", color: "rgba(200,200,220,0.22)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", whiteSpace: "nowrap", marginTop: "0.15rem" }}>OPTIONAL · MULTI-SELECT</span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.75rem" }}>
+              {([
+                {
+                  id: "hallucinations",
+                  icon: "👁",
+                  label: "Hallucinations",
+                  desc: "Visual and auditory distortions seeded by trauma — phantom figures, voices that don't exist, memories indistinguishable from the present",
+                  tags: ["Visual", "Auditory", "Trauma-based"],
+                  col: "#FF6080",
+                  bg: "rgba(200,0,60,0.14)",
+                  border: "rgba(255,80,100,0.5)",
+                },
+                {
+                  id: "phantom-pains",
+                  icon: "🩸",
+                  label: "Phantom Pains",
+                  desc: "Her nervous system fires signals of wounds that don't exist — burns she can't locate, broken bones she can't X-ray, agony with no source",
+                  tags: ["Nerve Override", "Non-existent", "Overwhelming"],
+                  col: "#FF9030",
+                  bg: "rgba(200,100,0,0.14)",
+                  border: "rgba(255,144,48,0.5)",
+                },
+                {
+                  id: "synesthesia",
+                  icon: "🎨",
+                  label: "Synesthesia",
+                  desc: "Cross-wired perception — she hears colours as music, tastes words as flavour, feels spoken commands as textures on her skin",
+                  tags: ["Cross-wired", "Perceptual", "Disorientating"],
+                  col: "#A060FF",
+                  bg: "rgba(120,40,200,0.14)",
+                  border: "rgba(160,96,255,0.5)",
+                },
+              ] as const).map((s) => {
+                const isSel = sensoryScrambler.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setSensoryScrambler((prev) =>
+                      prev.includes(s.id) ? prev.filter((x) => x !== s.id) : [...prev, s.id]
+                    )}
+                    style={{ background: isSel ? s.bg : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? s.border : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem", cursor: "pointer", textAlign: "left", transition: "all 0.25s", color: "inherit", position: "relative", boxShadow: isSel ? `0 0 20px ${s.col}28` : "none" }}
+                    onMouseEnter={(e) => { if (!isSel) { e.currentTarget.style.borderColor = s.border.replace("0.5", "0.22"); e.currentTarget.style.background = s.bg.replace("0.14", "0.06"); } }}
+                    onMouseLeave={(e) => { if (!isSel) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.4)"; } }}
+                  >
+                    {isSel && (
+                      <div style={{ position: "absolute", top: "0.6rem", right: "0.6rem", width: "18px", height: "18px", borderRadius: "50%", background: s.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", fontWeight: 700 }}>✓</div>
+                    )}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                      <span style={{ fontSize: "1.25rem", filter: isSel ? `drop-shadow(0 0 8px ${s.col})` : "none", transition: "filter 0.3s" }}>{s.icon}</span>
+                      <span className="font-cinzel" style={{ fontSize: "0.78rem", fontWeight: 700, color: isSel ? s.col : "#D0D0E8" }}>{s.label}</span>
+                    </div>
+                    <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.42)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, marginBottom: "0.6rem" }}>{s.desc}</div>
+                    <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
+                      {s.tags.map((t) => (
+                        <span key={t} style={{ padding: "0.15rem 0.45rem", background: isSel ? `rgba(${s.col === "#FF6080" ? "200,0,60" : s.col === "#FF9030" ? "200,100,0" : "120,40,200"},0.18)` : "rgba(255,255,255,0.04)", border: `1px solid ${isSel ? s.border.replace("0.5", "0.3") : "rgba(255,255,255,0.07)"}`, borderRadius: "3px", fontSize: "0.5rem", color: isSel ? s.col : "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "0.5px", transition: "all 0.25s" }}>{t}</span>
+                      ))}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active summary */}
+            {sensoryScrambler.length > 0 && (
+              <div style={{ marginTop: "0.875rem", padding: "0.65rem 1rem", background: "rgba(0,200,180,0.05)", border: "1px solid rgba(0,200,180,0.15)", borderRadius: "8px", display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                <span style={{ fontSize: "0.7rem" }}>🌀</span>
+                <span style={{ fontSize: "0.65rem", color: "rgba(0,220,200,0.7)", fontFamily: "'Raleway', sans-serif" }}>
+                  <span style={{ fontWeight: 700 }}>{sensoryScrambler.length}</span> scrambler{sensoryScrambler.length > 1 ? "s" : ""} active — the AI will weave these perceptual distortions throughout the story
+                </span>
               </div>
             )}
           </div>
