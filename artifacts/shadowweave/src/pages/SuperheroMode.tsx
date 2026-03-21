@@ -320,6 +320,13 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [sensoryMode, setSensoryMode] = useState<string>("");
   const [sensoryScrambler, setSensoryScrambler] = useState<string[]>([]);
 
+  // ── Captor Marketplace ──
+  const [marketplaceActive, setMarketplaceActive] = useState(false);
+  const [marketplaceCategories, setMarketplaceCategories] = useState<string[]>([]);
+  const [marketplaceHeroRole, setMarketplaceHeroRole] = useState<string>("");
+  const [marketplaceTech, setMarketplaceTech] = useState<string[]>([]);
+  const [marketplaceInfo, setMarketplaceInfo] = useState<string[]>([]);
+
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
@@ -403,6 +410,27 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       traumaState: traumaDesc,
       sensoryOverride: sensoryDesc,
       sensoryScrambler: scramblerDesc,
+      captorMarketplace: (() => {
+        if (!marketplaceActive || marketplaceCategories.length === 0) return "none";
+        const parts: string[] = [];
+        if (marketplaceCategories.includes("heroes")) {
+          const roleLabel = marketplaceHeroRole === "seller" ? "seller — the hero is being sold to the highest bidder"
+            : marketplaceHeroRole === "buyer"    ? "buyer — the villain is acquiring a new captured superhuman"
+            : marketplaceHeroRole === "auctioneer" ? "auctioneer — running the sale event, with multiple bidders present"
+            : marketplaceHeroRole === "broker"   ? "broker — acting as intermediary between seller and buyer"
+            : "participant";
+          parts.push(`Heroes Division (${roleLabel})`);
+        }
+        if (marketplaceCategories.includes("tech")) {
+          const techList = marketplaceTech.length > 0 ? marketplaceTech.join(", ") : "unspecified tech";
+          parts.push(`Tech Division — merchandise includes: ${techList}`);
+        }
+        if (marketplaceCategories.includes("information")) {
+          const infoList = marketplaceInfo.length > 0 ? marketplaceInfo.join(", ") : "unspecified intelligence";
+          parts.push(`Intelligence Division — traded assets include: ${infoList}`);
+        }
+        return `Black market scenario active — categories: ${parts.join(" | ")}`;
+      })(),
     };
   }
 
@@ -842,6 +870,147 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               })}
             </div>
           </div>
+
+          {/* ── CAPTOR MARKETPLACE ── */}
+          {(() => {
+            const HERO_ROLES = [
+              { id: "seller",     icon: "🔨", label: "Seller",     desc: "The villain auctions the hero to the highest bidder" },
+              { id: "buyer",      icon: "💰", label: "Buyer",      desc: "The villain is acquiring a captured superhuman" },
+              { id: "auctioneer", icon: "📣", label: "Auctioneer", desc: "Running the event — multiple bidders in the room" },
+              { id: "broker",     icon: "🤝", label: "Broker",     desc: "Intermediary dealing between seller and buyer" },
+            ];
+            const TECH_ITEMS = [
+              "Power-Dampening Collars", "Neural Override Devices", "Tracking Implants",
+              "Custom Restraint Systems", "Suppression Field Emitters", "Biometric Cuffs",
+              "Psionic Blockers", "Anti-Flight Harnesses",
+            ];
+            const INFO_ITEMS = [
+              "Secret Identity Files", "Faction Weakness Dossiers", "Hero Location Intel",
+              "Intercepted Comms", "Psychological Profiles", "Alliance Maps", "Safe-House Coordinates",
+            ];
+            const catToggle = (id: string) =>
+              setMarketplaceCategories((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+            const techToggle = (item: string) =>
+              setMarketplaceTech((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
+            const infoToggle = (item: string) =>
+              setMarketplaceInfo((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
+            const hasHeroes = marketplaceCategories.includes("heroes");
+            const hasTech   = marketplaceCategories.includes("tech");
+            const hasInfo   = marketplaceCategories.includes("information");
+
+            return (
+              <div style={{ background: marketplaceActive ? "rgba(20,8,0,0.6)" : "rgba(0,0,0,0.4)", border: `1px solid ${marketplaceActive ? "rgba(255,140,0,0.35)" : "rgba(255,255,255,0.06)"}`, borderRadius: "16px", padding: "1.5rem", transition: "all 0.3s" }}>
+                {/* Header row */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: marketplaceActive ? "1.5rem" : "0" }}>
+                  <div>
+                    <div className="font-cinzel" style={{ fontSize: "0.7rem", color: marketplaceActive ? "#FF9020" : "rgba(255,140,0,0.4)", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.2rem", transition: "color 0.3s" }}>
+                      🏴 Captor Marketplace
+                    </div>
+                    <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif" }}>
+                      A black market where captors trade heroes, tech &amp; intelligence
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setMarketplaceActive((v) => !v); if (marketplaceActive) { setMarketplaceCategories([]); setMarketplaceHeroRole(""); setMarketplaceTech([]); setMarketplaceInfo([]); } }}
+                    style={{ padding: "0.35rem 0.875rem", background: marketplaceActive ? "rgba(255,140,0,0.2)" : "rgba(255,255,255,0.05)", border: `1px solid ${marketplaceActive ? "rgba(255,140,0,0.5)" : "rgba(255,255,255,0.1)"}`, borderRadius: "20px", color: marketplaceActive ? "#FF9020" : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "1.5px", cursor: "pointer", transition: "all 0.25s", whiteSpace: "nowrap" }}
+                  >
+                    {marketplaceActive ? "✦ ACTIVE" : "ENABLE"}
+                  </button>
+                </div>
+
+                {marketplaceActive && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                    {/* ─ Category cards ─ */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.75rem" }}>
+                      {[
+                        { id: "heroes",      icon: "🦸",  label: "Heroes Division",   desc: "Sell, buy, or broker captured superhumans on the open market",          col: "#FF4060", bg: "rgba(200,0,50,0.14)",   border: "rgba(255,64,96,0.5)" },
+                        { id: "tech",        icon: "⚙️",  label: "Tech Division",      desc: "Acquire advanced restraints, power-dampeners, and containment systems", col: "#40B0FF", bg: "rgba(0,100,200,0.14)",  border: "rgba(64,176,255,0.5)" },
+                        { id: "information", icon: "📂",  label: "Intelligence Division", desc: "Trade secrets — identities, faction intel, and psychological profiles",  col: "#FFB800", bg: "rgba(200,140,0,0.14)", border: "rgba(255,184,0,0.5)" },
+                      ].map((cat) => {
+                        const isSel = marketplaceCategories.includes(cat.id);
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => catToggle(cat.id)}
+                            style={{ background: isSel ? cat.bg : "rgba(0,0,0,0.5)", border: `1px solid ${isSel ? cat.border : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem", cursor: "pointer", textAlign: "left", color: "inherit", transition: "all 0.25s", boxShadow: isSel ? `0 0 18px ${cat.col}20` : "none", position: "relative" }}
+                            onMouseEnter={(e) => { if (!isSel) { e.currentTarget.style.borderColor = cat.border.replace("0.5","0.2"); e.currentTarget.style.background = cat.bg.replace("0.14","0.06"); } }}
+                            onMouseLeave={(e) => { if (!isSel) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                          >
+                            {isSel && <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", width: "16px", height: "16px", borderRadius: "50%", background: cat.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.5rem", color: "#000", fontWeight: 700 }}>✓</div>}
+                            <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem", filter: isSel ? `drop-shadow(0 0 8px ${cat.col})` : "none", transition: "filter 0.3s" }}>{cat.icon}</div>
+                            <div className="font-cinzel" style={{ fontSize: "0.75rem", fontWeight: 700, color: isSel ? cat.col : "#D0D0E8", marginBottom: "0.3rem" }}>{cat.label}</div>
+                            <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.42)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6 }}>{cat.desc}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* ─ Heroes sub-panel ─ */}
+                    {hasHeroes && (
+                      <div style={{ background: "rgba(200,0,50,0.06)", border: "1px solid rgba(255,64,96,0.2)", borderRadius: "12px", padding: "1rem" }}>
+                        <div className="font-cinzel" style={{ fontSize: "0.62rem", color: "rgba(255,64,96,0.7)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "0.75rem" }}>🦸 Your Role in the Transaction</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                          {HERO_ROLES.map((r) => {
+                            const isSel = marketplaceHeroRole === r.id;
+                            return (
+                              <button key={r.id} onClick={() => setMarketplaceHeroRole(isSel ? "" : r.id)} style={{ padding: "0.5rem 1rem", background: isSel ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,64,96,0.55)" : "rgba(255,255,255,0.08)"}`, borderRadius: "20px", color: isSel ? "#FF4060" : "rgba(200,200,220,0.5)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", transition: "all 0.2s", textAlign: "left" }}>
+                                <span style={{ marginRight: "0.3rem" }}>{r.icon}</span>{r.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {marketplaceHeroRole && (
+                          <div style={{ marginTop: "0.625rem", fontSize: "0.63rem", color: "rgba(255,64,96,0.55)", fontFamily: "'Raleway', sans-serif" }}>
+                            {HERO_ROLES.find((r) => r.id === marketplaceHeroRole)?.desc}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ─ Tech sub-panel ─ */}
+                    {hasTech && (
+                      <div style={{ background: "rgba(0,100,200,0.06)", border: "1px solid rgba(64,176,255,0.2)", borderRadius: "12px", padding: "1rem" }}>
+                        <div className="font-cinzel" style={{ fontSize: "0.62rem", color: "rgba(64,176,255,0.7)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "0.75rem" }}>⚙️ Available Merchandise</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                          {TECH_ITEMS.map((item) => {
+                            const isSel = marketplaceTech.includes(item);
+                            return (
+                              <button key={item} onClick={() => techToggle(item)} style={{ padding: "0.4rem 0.875rem", background: isSel ? "rgba(0,100,200,0.22)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(64,176,255,0.55)" : "rgba(255,255,255,0.08)"}`, borderRadius: "20px", color: isSel ? "#40B0FF" : "rgba(200,200,220,0.45)", fontFamily: "'Montserrat', sans-serif", fontSize: "0.68rem", cursor: "pointer", transition: "all 0.2s" }}>{item}</button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ─ Information sub-panel ─ */}
+                    {hasInfo && (
+                      <div style={{ background: "rgba(200,140,0,0.06)", border: "1px solid rgba(255,184,0,0.2)", borderRadius: "12px", padding: "1rem" }}>
+                        <div className="font-cinzel" style={{ fontSize: "0.62rem", color: "rgba(255,184,0,0.7)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "0.75rem" }}>📂 Intelligence Assets Being Traded</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                          {INFO_ITEMS.map((item) => {
+                            const isSel = marketplaceInfo.includes(item);
+                            return (
+                              <button key={item} onClick={() => infoToggle(item)} style={{ padding: "0.4rem 0.875rem", background: isSel ? "rgba(200,140,0,0.22)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,184,0,0.55)" : "rgba(255,255,255,0.08)"}`, borderRadius: "20px", color: isSel ? "#FFB800" : "rgba(200,200,220,0.45)", fontFamily: "'Montserrat', sans-serif", fontSize: "0.68rem", cursor: "pointer", transition: "all 0.2s" }}>{item}</button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Active summary */}
+                    {marketplaceCategories.length > 0 && (
+                      <div style={{ padding: "0.65rem 1rem", background: "rgba(255,140,0,0.05)", border: "1px solid rgba(255,140,0,0.15)", borderRadius: "8px", display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                        <span style={{ fontSize: "0.7rem" }}>🏴</span>
+                        <span style={{ fontSize: "0.65rem", color: "rgba(255,160,0,0.7)", fontFamily: "'Raleway', sans-serif" }}>
+                          <span style={{ fontWeight: 700 }}>{marketplaceCategories.length}</span> division{marketplaceCategories.length > 1 ? "s" : ""} active — the AI will set the story in a black-market context with these transaction layers
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Villain's Capture Method */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>

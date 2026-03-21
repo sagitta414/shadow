@@ -216,6 +216,7 @@ Story guidance (follow faithfully):
 - If TRAUMA STATE is specified, it defines the hero's psychological arc: Compliance means her will is eroding and her resistance slowly gives way; Defiance means she fights back and triggers escalating countermeasures; Breakdown means she experiences dissociation, hallucinations, and unpredictable power surges
 - If SENSORY OVERRIDE is specified, layer that sensory experience throughout — Blindfolded + Soundproof means focus intensely on touch, temperature, sound of breathing; Strobe + Sub-bass means portray disorientation and panic; Scent Triggers means use smell to unlock memory flashbacks; Total Void means describe the dissolution of self-perception
 - If SENSORY SCRAMBLER is specified, weave those distortions throughout: Hallucinations means phantom figures and voices intrude on her perception as undetectable fiction; Phantom Pains means describe real-feeling agony from nonexistent wounds, her body betraying her with false injury signals; Synesthesia means her senses cross-wire — describe colours she hears as music, sounds she tastes, textures she perceives from voices
+- If CAPTOR MARKETPLACE is specified, embed the story in a black-market underworld context: Heroes Division means captors are trading the hero like a commodity — show the auction house, the bidders, the cold transactional menace of being sold; Tech Division means advanced restraint technology and power-suppression devices are present — describe the gear in use and the merchants selling it; Intelligence Division means information about heroes is being traded — show dossiers, intel brokers, and the chilling reality that her secrets are currency
 
 Your prose is vivid and punchy. Mix high-octane action with genuine character depth. Capture the hero's voice, the villain's menace, and the weight of what's at stake. Include inner monologue from the hero and specific use of her powers.
 
@@ -223,7 +224,7 @@ Do not use JSON. Write pure narrative prose. No headers, no bullet points.`;
 
 router.post("/story/superhero", async (req, res) => {
   try {
-    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler } = req.body as {
+    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace } = req.body as {
       hero: string;
       villain: string;
       setting: string;
@@ -239,6 +240,7 @@ router.post("/story/superhero", async (req, res) => {
       traumaState?: string;
       sensoryOverride?: string;
       sensoryScrambler?: string;
+      captorMarketplace?: string;
     };
 
     const userMessage = [
@@ -256,6 +258,7 @@ router.post("/story/superhero", async (req, res) => {
       traumaState && traumaState !== "not specified" ? `TRAUMA STATE: ${traumaState}` : "",
       sensoryOverride && sensoryOverride !== "none" ? `SENSORY OVERRIDE: ${sensoryOverride}` : "",
       sensoryScrambler && sensoryScrambler !== "none" ? `SENSORY SCRAMBLER: ${sensoryScrambler}` : "",
+      captorMarketplace && captorMarketplace !== "none" ? `CAPTOR MARKETPLACE: ${captorMarketplace}` : "",
       storyLength ? `STORY LENGTH: ${storyLength}` : "",
       details ? `\nADDITIONAL DETAILS: ${details}` : "",
       `\nMake it gripping, visceral, and true to both characters.`,
