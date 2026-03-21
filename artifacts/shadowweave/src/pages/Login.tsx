@@ -33,10 +33,8 @@ function GridOverlay() {
 }
 
 export default function Login({ onEnter }: LoginProps) {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [focused, setFocused] = useState<"email" | "pass" | null>(null);
+  const [focused, setFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
@@ -52,7 +50,7 @@ export default function Login({ onEnter }: LoginProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    if (!password.trim()) {
       setShake(true);
       setTimeout(() => setShake(false), 600);
       return;
@@ -61,21 +59,23 @@ export default function Login({ onEnter }: LoginProps) {
     setTimeout(() => { setLoading(false); onEnter(); }, 1400);
   }
 
-  const inputStyle = (which: "email" | "pass"): React.CSSProperties => ({
+  const passInputStyle: React.CSSProperties = {
     width: "100%",
-    background: focused === which ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
-    border: `1px solid ${focused === which ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
+    background: focused ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
+    border: `1px solid ${focused ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
     borderRadius: "10px",
     padding: "0.95rem 1rem 0.95rem 2.75rem",
-    color: "#F0F0FF",
+    color: "transparent",
+    textShadow: "0 0 8px rgba(220,200,255,0.7)",
     fontFamily: "'Raleway', sans-serif",
     fontSize: "0.93rem",
     outline: "none",
     transition: "all 0.3s ease",
     letterSpacing: "0.4px",
     boxSizing: "border-box",
-    boxShadow: focused === which ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
-  });
+    boxShadow: focused ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
+    caretColor: "rgba(184,134,11,0.8)",
+  };
 
   return (
     <div style={{ position: "fixed", inset: 0, display: "flex", overflow: "hidden", background: "#030008", zIndex: 10 }}>
@@ -242,7 +242,7 @@ export default function Login({ onEnter }: LoginProps) {
               Enter the Dark
             </h2>
             <p style={{ fontSize: "0.8rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif", letterSpacing: "0.5px" }}>
-              Sign in or continue as guest below
+              Enter your passphrase to proceed
             </p>
           </div>
 
@@ -252,62 +252,25 @@ export default function Login({ onEnter }: LoginProps) {
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
 
-            {/* Email */}
+            {/* Passphrase */}
             <div>
-              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused === "email" ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
-                Identity
-              </label>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused === "email" ? "rgba(184,134,11,0.7)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◈</span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setFocused("email")}
-                  onBlur={() => setFocused(null)}
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                  style={inputStyle("email")}
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused === "pass" ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
+              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
                 Passphrase
               </label>
               <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused === "pass" ? "rgba(139,0,0,0.8)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◆</span>
+                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused ? "rgba(139,0,0,0.8)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◆</span>
                 <input
-                  type={showPass ? "text" : "password"}
+                  type="text"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setFocused("pass")}
-                  onBlur={() => setFocused(null)}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
                   placeholder="••••••••••••"
-                  autoComplete="current-password"
-                  style={{ ...inputStyle("pass"), paddingRight: "3rem" }}
+                  autoComplete="off"
+                  spellCheck={false}
+                  style={passInputStyle}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  style={{ position: "absolute", right: "0.9rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: showPass ? "#B8860B" : "rgba(200,200,220,0.22)", fontSize: "0.9rem", padding: "0.25rem", transition: "color 0.2s", lineHeight: 1 }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#B8860B")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = showPass ? "#B8860B" : "rgba(200,200,220,0.22)")}
-                >
-                  {showPass ? "◉" : "○"}
-                </button>
               </div>
-            </div>
-
-            {/* Forgot */}
-            <div style={{ textAlign: "right", marginTop: "-0.4rem" }}>
-              <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.38)", fontFamily: "'Raleway', sans-serif", fontSize: "0.73rem", letterSpacing: "0.3px", transition: "color 0.2s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.8)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.38)")}>
-                Forgot passphrase?
-              </button>
             </div>
 
             {/* Enter button */}
@@ -360,57 +323,7 @@ export default function Login({ onEnter }: LoginProps) {
               ) : "Enter the Studio"}
             </button>
 
-            {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "0.25rem 0" }}>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.04)" }} />
-              <span className="font-montserrat" style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.18)", letterSpacing: "2px" }}>OR</span>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.04)" }} />
-            </div>
-
-            {/* Guest */}
-            <button
-              type="button"
-              onClick={onEnter}
-              style={{
-                width: "100%",
-                padding: "0.9rem",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.05)",
-                borderRadius: "11px",
-                color: "rgba(200,200,220,0.38)",
-                fontFamily: "'Cinzel', serif",
-                fontSize: "0.78rem",
-                letterSpacing: "3px",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                e.currentTarget.style.color = "rgba(200,200,220,0.65)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
-                e.currentTarget.style.color = "rgba(200,200,220,0.38)";
-              }}
-            >
-              Continue as Guest
-            </button>
           </form>
-
-          {/* Footer */}
-          <div style={{ marginTop: "1.75rem", textAlign: "center" }}>
-            <p className="font-montserrat" style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.16)", letterSpacing: "1.5px", textTransform: "uppercase" }}>
-              No account?{" "}
-              <button type="button" onClick={onEnter} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.42)", fontFamily: "inherit", fontSize: "inherit", letterSpacing: "inherit", textTransform: "inherit", transition: "color 0.2s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#B8860B")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.42)")}>
-                Create one
-              </button>
-            </p>
-          </div>
         </div>
       </div>
 
