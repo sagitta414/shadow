@@ -6,301 +6,399 @@ interface HomepageProps {
   onScenarioGenerator: () => void;
 }
 
-const features = [
+const tools = [
   {
-    icon: "🌑",
-    title: "Psychological Depths",
-    desc: "Craft characters with complex psychological profiles, trauma, and dark motivations that drive compelling narratives.",
-    accent: "rgba(139,0,0,0.4)",
-  },
-  {
-    icon: "⛓️",
-    title: "Dark Themes",
-    desc: "Explore taboo subjects, moral ambiguity, and the darkest corners of human nature in your storytelling.",
-    accent: "rgba(45,27,105,0.4)",
-  },
-  {
-    icon: "🩸",
-    title: "Professional Tools",
-    desc: "Advanced character builders, story editors, and narrative tools designed for serious dark fiction writers.",
-    accent: "rgba(61,10,74,0.4)",
-  },
-];
-
-const choices = [
-  {
-    id: "victim" as const,
+    id: "victim",
+    num: "01",
     icon: "🫀",
     title: "Victim Profile",
-    titleColor: "#B8860B",
-    desc: "Build your character's psychological makeup, background, trauma, and emotional vulnerabilities through 7 in-depth questions.",
-    borderDefault: "rgba(139,0,0,0.4)",
-    borderHover: "rgba(184,134,11,0.65)",
-    bgDefault: "rgba(10,0,21,0.65)",
-    bgHover: "rgba(139,0,0,0.22)",
-    shadowHover: "rgba(139,0,0,0.25)",
-    badge: { text: "7 Questions", bg: "rgba(139,0,0,0.2)", border: "rgba(139,0,0,0.5)", color: "#FF6666" },
-    sub: { text: "+ Story Editor", color: "rgba(184,134,11,0.7)" },
-    topBar: "rgba(184,134,11,0.8)",
+    subtitle: "Character Builder",
+    desc: "Craft a character's complete psychological makeup — their trauma, fears, vulnerabilities, and breaking points — through 7 deep configuration questions.",
+    cta: "Build Character",
+    accent: "#8B0000",
+    accentDim: "rgba(139,0,0,0.12)",
+    accentBorder: "rgba(139,0,0,0.35)",
+    accentHover: "rgba(139,0,0,0.22)",
+    accentGlow: "rgba(139,0,0,0.5)",
+    titleColor: "#D4AF37",
+    tag: "7 Questions + Story Editor",
+    tagColor: "rgba(212,175,55,0.8)",
   },
   {
-    id: "captor" as const,
+    id: "captor",
+    num: "02",
     icon: "🎭",
     title: "Captor Profile",
+    subtitle: "Antagonist System",
+    desc: "Define the antagonist's full operational profile — motive, methods, psychological approach, resources, and endgame — through 8 configuration questions.",
+    cta: "Configure Captor",
+    accent: "#2C3E50",
+    accentDim: "rgba(44,62,80,0.12)",
+    accentBorder: "rgba(44,62,80,0.4)",
+    accentHover: "rgba(44,62,80,0.22)",
+    accentGlow: "rgba(44,62,80,0.5)",
     titleColor: "#7F8C8D",
-    desc: "Define your antagonist's operational structure, motivation, methods, and endgame strategy through 8 configuration questions.",
-    borderDefault: "rgba(44,62,80,0.4)",
-    borderHover: "rgba(127,140,141,0.65)",
-    bgDefault: "rgba(10,0,21,0.65)",
-    bgHover: "rgba(44,62,80,0.22)",
-    shadowHover: "rgba(44,62,80,0.25)",
-    badge: { text: "8 Questions", bg: "rgba(44,62,80,0.3)", border: "rgba(44,62,80,0.6)", color: "#7F8C8D" },
-    sub: { text: "+ Full Summary", color: "rgba(127,140,141,0.7)" },
-    topBar: "rgba(127,140,141,0.8)",
+    tag: "8 Questions + Export",
+    tagColor: "rgba(127,140,141,0.8)",
   },
   {
-    id: "scenario" as const,
+    id: "scenario",
+    num: "03",
     icon: "⚡",
-    title: "Scenario Generator",
-    titleColor: "#00FF41",
-    desc: "Select your captor's motive, gear, violence level, and psychology to instantly generate targeted narrative questions for your scene.",
-    borderDefault: "rgba(0,255,65,0.2)",
-    borderHover: "rgba(0,255,65,0.5)",
-    bgDefault: "rgba(10,0,21,0.65)",
-    bgHover: "rgba(0,255,65,0.07)",
-    shadowHover: "rgba(0,200,50,0.2)",
-    badge: { text: "4 Inputs", bg: "rgba(0,255,65,0.1)", border: "rgba(0,255,65,0.3)", color: "#00FF41" },
-    sub: { text: "+ Instant Output", color: "rgba(0,255,65,0.6)" },
-    topBar: "rgba(0,255,65,0.7)",
+    title: "Scenario Engine",
+    subtitle: "Question Generator",
+    desc: "Select the captor's motive, control method, violence level, and psychology to generate 8 targeted narrative questions tailored to your exact scenario.",
+    cta: "Generate Questions",
+    accent: "#005500",
+    accentDim: "rgba(0,200,80,0.07)",
+    accentBorder: "rgba(0,200,80,0.25)",
+    accentHover: "rgba(0,200,80,0.1)",
+    accentGlow: "rgba(0,200,80,0.4)",
+    titleColor: "#00CC44",
+    tag: "4 Inputs · Instant Output",
+    tagColor: "rgba(0,200,80,0.7)",
   },
 ];
 
 export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator }: HomepageProps) {
-  const [showChoice, setShowChoice] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
 
-  function handleChoiceClick(id: string) {
+  function handleClick(id: string) {
     if (id === "victim")   onEnter();
     if (id === "captor")   onCaptorPortal();
     if (id === "scenario") onScenarioGenerator();
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        textAlign: "center",
-        padding: "3rem 2rem",
-      }}
-    >
-      {!showChoice ? (
-        <div className="fade-in" style={{ width: "100%", maxWidth: "1100px" }}>
-          <div style={{ marginBottom: "0.75rem" }}>
-            <span className="badge badge-crimson">Dark Narrative Studio</span>
-          </div>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-          <div className="logo-text" style={{ marginBottom: "1rem" }}>
-            SHADOWWEAVE
-          </div>
+      {/* ── Edge vignette ─────────────────────────────── */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 10,
+          background: `
+            radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%)
+          `,
+        }}
+      />
 
+      {/* ── Hero ──────────────────────────────────────── */}
+      <header
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "5rem 2rem 3rem",
+          textAlign: "center",
+          borderBottom: "1px solid rgba(255,255,255,0.04)",
+        }}
+      >
+        {/* Top label */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginBottom: "2rem",
+          }}
+        >
+          <div style={{ width: "40px", height: "1px", background: "rgba(184,134,11,0.5)" }} />
+          <span
+            className="font-montserrat"
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              color: "rgba(184,134,11,0.7)",
+              fontWeight: 600,
+            }}
+          >
+            Professional Dark Narrative Studio
+          </span>
+          <div style={{ width: "40px", height: "1px", background: "rgba(184,134,11,0.5)" }} />
+        </div>
+
+        {/* Logo */}
+        <h1 className="logo-text" style={{ lineHeight: 1, marginBottom: "1.5rem" }}>
+          SHADOWWEAVE
+        </h1>
+
+        {/* Tagline */}
+        <p
+          className="font-crimson"
+          style={{
+            fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
+            color: "rgba(220,220,240,0.55)",
+            fontStyle: "italic",
+            letterSpacing: "0.06em",
+            maxWidth: "500px",
+          }}
+        >
+          Where darkness becomes narrative
+        </p>
+
+        {/* Decorative bottom line */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "120px",
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.8), transparent)",
+          }}
+        />
+      </header>
+
+      {/* ── Tools Grid ────────────────────────────────── */}
+      <main style={{ flex: 1, padding: "3rem 2rem 4rem", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "2.5rem",
+          }}
+        >
           <p
-            className="font-crimson"
+            className="font-cinzel"
             style={{
-              fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)",
-              color: "rgba(200,200,220,0.75)",
-              marginBottom: "0.75rem",
-              fontStyle: "italic",
-              letterSpacing: "0.05em",
+              fontSize: "0.75rem",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              color: "rgba(200,200,220,0.3)",
             }}
           >
-            Where darkness becomes narrative
+            Select a module to begin
           </p>
+        </div>
 
-          <div className="divider" style={{ maxWidth: "400px", margin: "1.25rem auto 3rem" }}>
-            <span className="divider-symbol">✦</span>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "1.5rem",
-              marginBottom: "3.5rem",
-            }}
-          >
-            {features.map((card) => (
-              <div
-                key={card.title}
-                className="glass-card"
-                style={{ cursor: "default", textAlign: "left" }}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "1.5px",
+            background: "rgba(255,255,255,0.04)",
+            borderRadius: "20px",
+            overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.05)",
+          }}
+        >
+          {tools.map((tool) => {
+            const isHovered = hovered === tool.id;
+            return (
+              <button
+                key={tool.id}
+                onClick={() => handleClick(tool.id)}
+                onMouseEnter={() => setHovered(tool.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{
+                  background: isHovered ? tool.accentHover : "rgba(6,0,12,0.85)",
+                  backdropFilter: "blur(20px)",
+                  border: "none",
+                  padding: "2.5rem 2rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.4s cubic-bezier(0.23,1,0.32,1)",
+                  color: "inherit",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
               >
+                {/* Active left border */}
                 <div
                   style={{
-                    width: "56px",
-                    height: "56px",
-                    borderRadius: "14px",
-                    background: card.accent,
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.8rem",
-                    marginBottom: "1.25rem",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: "3px",
+                    background: tool.accent,
+                    opacity: isHovered ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                    boxShadow: `0 0 20px ${tool.accentGlow}`,
                   }}
-                >
-                  {card.icon}
-                </div>
+                />
+
+                {/* Top glow sweep */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "1px",
+                    background: `linear-gradient(90deg, transparent, ${tool.accent}, transparent)`,
+                    opacity: isHovered ? 0.9 : 0,
+                    transition: "opacity 0.4s ease",
+                  }}
+                />
+
+                {/* Hover glow circle */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-80px",
+                    right: "-80px",
+                    width: "200px",
+                    height: "200px",
+                    borderRadius: "50%",
+                    background: `radial-gradient(circle, ${tool.accentGlow} 0%, transparent 70%)`,
+                    opacity: isHovered ? 0.5 : 0,
+                    transition: "opacity 0.4s ease",
+                    pointerEvents: "none",
+                  }}
+                />
+
+                {/* Number */}
                 <div
                   className="font-cinzel"
-                  style={{ fontSize: "1.1rem", color: "#D4AF37", marginBottom: "0.75rem", fontWeight: 600 }}
+                  style={{
+                    fontSize: "0.7rem",
+                    letterSpacing: "3px",
+                    color: isHovered ? tool.titleColor : "rgba(200,200,220,0.2)",
+                    fontWeight: 700,
+                    marginBottom: "1.5rem",
+                    transition: "color 0.3s ease",
+                  }}
                 >
-                  {card.title}
+                  {tool.num}
                 </div>
-                <div style={{ fontSize: "0.9rem", lineHeight: "1.7", color: "rgba(200,200,220,0.75)" }}>
-                  {card.desc}
+
+                {/* Icon */}
+                <div
+                  style={{
+                    fontSize: "2.2rem",
+                    marginBottom: "1.25rem",
+                    filter: isHovered ? "drop-shadow(0 0 12px rgba(255,255,255,0.3))" : "none",
+                    transition: "filter 0.3s ease",
+                    lineHeight: 1,
+                  }}
+                >
+                  {tool.icon}
+                </div>
+
+                {/* Subtitle */}
+                <div
+                  className="font-montserrat"
+                  style={{
+                    fontSize: "0.7rem",
+                    letterSpacing: "3px",
+                    textTransform: "uppercase",
+                    color: "rgba(200,200,220,0.35)",
+                    marginBottom: "0.4rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  {tool.subtitle}
+                </div>
+
+                {/* Title */}
+                <div
+                  className="font-cinzel"
+                  style={{
+                    fontSize: "clamp(1.4rem, 2vw, 1.8rem)",
+                    color: isHovered ? tool.titleColor : "#E8E8F0",
+                    fontWeight: 700,
+                    marginBottom: "1rem",
+                    transition: "color 0.3s ease",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {tool.title}
+                </div>
+
+                {/* Description */}
+                <p
+                  style={{
+                    fontSize: "0.88rem",
+                    color: "rgba(200,200,220,0.6)",
+                    lineHeight: 1.75,
+                    marginBottom: "2rem",
+                    flex: 1,
+                  }}
+                >
+                  {tool.desc}
+                </p>
+
+                {/* CTA row */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      color: isHovered ? tool.tagColor : "rgba(200,200,220,0.25)",
+                      fontFamily: "'Montserrat', sans-serif",
+                      letterSpacing: "1px",
+                      transition: "color 0.3s ease",
+                    }}
+                  >
+                    {tool.tag}
+                  </span>
+                  <span
+                    className="font-cinzel"
+                    style={{
+                      fontSize: "0.8rem",
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: isHovered ? tool.titleColor : "rgba(200,200,220,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.4rem",
+                      transition: "all 0.3s ease",
+                      transform: isHovered ? "translateX(4px)" : "none",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {tool.cta} →
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Bottom metadata strip ───────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: "2.5rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
+            {[
+              { label: "Tools", value: "3" },
+              { label: "Questions", value: "15+" },
+              { label: "Export Formats", value: "JSON" },
+            ].map((stat) => (
+              <div key={stat.label} style={{ textAlign: "center" }}>
+                <div className="font-cinzel" style={{ fontSize: "1.1rem", color: "#D4AF37", fontWeight: 700 }}>
+                  {stat.value}
+                </div>
+                <div style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>
+                  {stat.label}
                 </div>
               </div>
             ))}
           </div>
-
-          <button className="enter-button" onClick={() => setShowChoice(true)}>
-            Enter the Studio
-          </button>
-
-          <p style={{ marginTop: "1.5rem", fontSize: "0.75rem", color: "rgba(192,192,192,0.35)", letterSpacing: "2px", textTransform: "uppercase" }}>
-            For adult dark fiction writers
+          <p style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.2)", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>
+            For adult dark fiction writers only
           </p>
         </div>
-      ) : (
-        <div className="slide-in" style={{ width: "100%", maxWidth: "1050px" }}>
-          <div className="logo-text" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>
-            SHADOWWEAVE
-          </div>
-
-          <div className="divider" style={{ maxWidth: "350px", margin: "0.75rem auto 0.5rem" }}>
-            <span className="divider-symbol">✦</span>
-          </div>
-
-          <p
-            className="font-cinzel"
-            style={{ fontSize: "clamp(0.9rem, 2vw, 1.2rem)", color: "rgba(184,134,11,0.9)", marginBottom: "0.4rem", letterSpacing: "2px" }}
-          >
-            Choose Your Tool
-          </p>
-          <p style={{ color: "rgba(200,200,220,0.55)", marginBottom: "2.5rem", fontSize: "0.95rem" }}>
-            Select a module to begin crafting your narrative
-          </p>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "1.25rem",
-              marginBottom: "2.5rem",
-            }}
-          >
-            {choices.map((c) => {
-              const isHovered = hovered === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => handleChoiceClick(c.id)}
-                  onMouseEnter={() => setHovered(c.id)}
-                  onMouseLeave={() => setHovered(null)}
-                  style={{
-                    background: isHovered ? c.bgHover : c.bgDefault,
-                    backdropFilter: "blur(20px)",
-                    border: `1px solid ${isHovered ? c.borderHover : c.borderDefault}`,
-                    borderRadius: "20px",
-                    padding: "2rem 1.75rem",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.35s cubic-bezier(0.23,1,0.32,1)",
-                    transform: isHovered ? "translateY(-6px)" : "none",
-                    boxShadow: isHovered
-                      ? `0 24px 50px rgba(0,0,0,0.6), 0 0 40px ${c.shadowHover}`
-                      : "0 8px 25px rgba(0,0,0,0.4)",
-                    color: "inherit",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: "2px",
-                      background: `linear-gradient(90deg, transparent, ${c.topBar}, transparent)`,
-                      opacity: isHovered ? 1 : 0,
-                      transition: "opacity 0.3s ease",
-                    }}
-                  />
-
-                  <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>{c.icon}</div>
-
-                  <div
-                    className="font-cinzel"
-                    style={{ fontSize: "1.3rem", color: c.titleColor, marginBottom: "0.75rem", fontWeight: 700 }}
-                  >
-                    {c.title}
-                  </div>
-
-                  <div style={{ fontSize: "0.88rem", color: "rgba(200,200,220,0.72)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
-                    {c.desc}
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        padding: "0.25rem 0.7rem",
-                        borderRadius: "50px",
-                        fontSize: "0.72rem",
-                        fontWeight: 600,
-                        fontFamily: "'Montserrat', sans-serif",
-                        letterSpacing: "1px",
-                        textTransform: "uppercase",
-                        background: c.badge.bg,
-                        border: `1px solid ${c.badge.border}`,
-                        color: c.badge.color,
-                      }}
-                    >
-                      {c.badge.text}
-                    </span>
-                    <span style={{ fontSize: "0.78rem", color: c.sub.color }}>
-                      {c.sub.text}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={() => setShowChoice(false)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "rgba(200,200,220,0.45)",
-              cursor: "pointer",
-              fontSize: "0.9rem",
-              letterSpacing: "1px",
-              transition: "color 0.2s ease",
-              padding: "0.5rem 1rem",
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(200,200,220,0.85)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(200,200,220,0.45)")}
-          >
-            ← Back
-          </button>
-        </div>
-      )}
+      </main>
     </div>
   );
 }
