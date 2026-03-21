@@ -5,6 +5,7 @@ import StoryEditor from "./pages/StoryEditor";
 import CaptorHomepage from "./pages/CaptorHomepage";
 import CaptorConfig from "./pages/CaptorConfig";
 import CaptorSummary from "./pages/CaptorSummary";
+import ScenarioGenerator from "./pages/ScenarioGenerator";
 
 type Page =
   | "home"
@@ -12,7 +13,8 @@ type Page =
   | "story-editor"
   | "captor-home"
   | "captor-config"
-  | "captor-summary";
+  | "captor-summary"
+  | "scenario-generator";
 
 function BackgroundEffects() {
   return (
@@ -75,6 +77,7 @@ export default function App() {
         <Homepage
           onEnter={() => navigate("character-params")}
           onCaptorPortal={() => navigate("captor-home")}
+          onScenarioGenerator={() => navigate("scenario-generator")}
         />
       )}
 
@@ -115,6 +118,10 @@ export default function App() {
           }}
           onBack={() => navigate("captor-home")}
         />
+      )}
+
+      {page === "scenario-generator" && (
+        <ScenarioGenerator onBack={() => navigate("home")} />
       )}
     </div>
   );
