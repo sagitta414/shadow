@@ -437,9 +437,16 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
   const [summary,  setSummary]  = useState("");
   const [generated, setGenerated] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
+  const [copyFlash, setCopyFlash] = useState(false);
 
   function setAnswer(key: string, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setQuestionAnswer(groupIdx: number, qIdx: number, value: string) {
+    const key = `${groupIdx}-${qIdx}`;
+    setQuestionAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
   function handleGenerate() {
@@ -449,6 +456,7 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
     setSummary(s);
     setTotalCount(g.reduce((acc, gr) => acc + gr.questions.length, 0));
     setGenerated(true);
+    setQuestionAnswers({});
     setTimeout(() => {
       document.getElementById("output-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -460,17 +468,52 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
     setSummary("");
     setGenerated(false);
     setTotalCount(0);
+    setQuestionAnswers({});
   }
 
   function handleCopyAll() {
     const lines: string[] = [];
     let n = 1;
-    groups.forEach((g) => {
+    groups.forEach((g, gi) => {
       lines.push(`── ${g.category} ──`);
-      g.questions.forEach((q) => { lines.push(`${n}. ${q}`); n++; });
+      g.questions.forEach((q, qi) => {
+        lines.push(`${n}. ${q}`);
+        const ans = questionAnswers[`${gi}-${qi}`];
+        if (ans?.trim()) lines.push(`   → ${ans.trim()}`);
+        n++;
+      });
       lines.push("");
     });
     navigator.clipboard.writeText(lines.join("\n")).catch(() => {});
+    setCopyFlash(true);
+    setTimeout(() => setCopyFlash(false), 1800);
+  }
+
+  function handleExport() {
+    const lines: string[] = [`SHADOWWEAVE — SCENARIO NOTES`, ``, summary, ``];
+    let n = 1;
+    groups.forEach((g, gi) => {
+      lines.push(`${"═".repeat(50)}`);
+      lines.push(`${g.icon}  ${g.category.toUpperCase()}`);
+      lines.push(`${"═".repeat(50)}`);
+      g.questions.forEach((q, qi) => {
+        lines.push(``);
+        lines.push(`${n}. ${q}`);
+        const ans = questionAnswers[`${gi}-${qi}`];
+        lines.push(ans?.trim() ? `\n   ${ans.trim()}` : `   [no answer]`);
+        n++;
+      });
+      lines.push(``);
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `shadowweave_scenario_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -568,12 +611,31 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
             </div>
           </div>
 
-          {/* Copy button */}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+          {/* Action buttons */}
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+            <button
+              onClick={handleExport}
+              style={{
+                background: "rgba(45,27,105,0.2)",
+                border: "1px solid rgba(45,27,105,0.45)",
+                borderRadius: "8px",
+                padding: "0.5rem 1.25rem",
+                color: "rgba(200,200,220,0.7)",
+                fontFamily: "'Cinzel', serif",
+                fontSize: "0.78rem",
+                cursor: "pointer",
+                letterSpacing: "1px",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(45,27,105,0.4)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(45,27,105,0.2)")}
+            >
+              Export Q&amp;A
+            </button>
             <button
               onClick={handleCopyAll}
               style={{
-                background: "rgba(184,134,11,0.12)",
+                background: copyFlash ? "rgba(184,134,11,0.35)" : "rgba(184,134,11,0.12)",
                 border: "1px solid rgba(184,134,11,0.35)",
                 borderRadius: "8px",
                 padding: "0.5rem 1.25rem",
@@ -585,15 +647,15 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.25)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(184,134,11,0.12)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = copyFlash ? "rgba(184,134,11,0.35)" : "rgba(184,134,11,0.12)")}
             >
-              Copy All Questions
+              {copyFlash ? "✓ Copied!" : "Copy All Q&A"}
             </button>
           </div>
 
           {/* Question Groups */}
           <div style={{ display: "grid", gap: "1.25rem" }}>
-            {groups.map((group) => (
+            {groups.map((group, gi) => (
               <div
                 key={group.category}
                 style={{
@@ -637,47 +699,89 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
 
                 {/* Questions */}
                 <div style={{ padding: "0.75rem" }}>
-                  {group.questions.map((q, qi) => (
-                    <div
-                      key={qi}
-                      style={{
-                        display: "flex",
-                        gap: "1rem",
-                        alignItems: "flex-start",
-                        padding: "0.875rem 1rem",
-                        borderRadius: "10px",
-                        transition: "background 0.2s ease",
-                        cursor: "default",
-                      }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.background = "rgba(184,134,11,0.05)")}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.background = "transparent")}
-                    >
-                      <span
-                        className="font-cinzel"
+                  {group.questions.map((q, qi) => {
+                    const ansKey = `${gi}-${qi}`;
+                    const ansVal = questionAnswers[ansKey] ?? "";
+                    const hasAnswer = ansVal.trim().length > 0;
+                    return (
+                      <div
+                        key={qi}
                         style={{
-                          fontSize: "0.7rem",
-                          color: "rgba(184,134,11,0.5)",
-                          fontWeight: 700,
-                          minWidth: "20px",
-                          paddingTop: "3px",
-                          letterSpacing: "1px",
+                          padding: "1rem 1rem 0.75rem",
+                          borderRadius: "10px",
+                          marginBottom: qi < group.questions.length - 1 ? "0.25rem" : 0,
+                          borderBottom: qi < group.questions.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
                         }}
                       >
-                        {String(qi + 1).padStart(2, "0")}
-                      </span>
-                      <p
-                        className="font-crimson"
-                        style={{
-                          fontSize: "1.05rem",
-                          color: "#E8E8F5",
-                          lineHeight: 1.65,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        {q}
-                      </p>
-                    </div>
-                  ))}
+                        {/* Question row */}
+                        <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start", marginBottom: "0.75rem" }}>
+                          <span
+                            className="font-cinzel"
+                            style={{
+                              fontSize: "0.7rem",
+                              color: hasAnswer ? "rgba(184,134,11,0.85)" : "rgba(184,134,11,0.45)",
+                              fontWeight: 700,
+                              minWidth: "20px",
+                              paddingTop: "3px",
+                              letterSpacing: "1px",
+                              flexShrink: 0,
+                              transition: "color 0.2s",
+                            }}
+                          >
+                            {String(qi + 1).padStart(2, "0")}
+                          </span>
+                          <p
+                            className="font-crimson"
+                            style={{
+                              fontSize: "1.05rem",
+                              color: "#E8E8F5",
+                              lineHeight: 1.65,
+                              fontStyle: "italic",
+                              margin: 0,
+                            }}
+                          >
+                            {q}
+                          </p>
+                        </div>
+
+                        {/* Answer textarea */}
+                        <div style={{ paddingLeft: "2rem" }}>
+                          <textarea
+                            value={ansVal}
+                            onChange={(e) => setQuestionAnswer(gi, qi, e.target.value)}
+                            placeholder="Write your answer here…"
+                            rows={2}
+                            style={{
+                              width: "100%",
+                              background: hasAnswer ? "rgba(184,134,11,0.06)" : "rgba(0,0,0,0.35)",
+                              border: `1px solid ${hasAnswer ? "rgba(184,134,11,0.3)" : "rgba(255,255,255,0.07)"}`,
+                              borderRadius: "8px",
+                              padding: "0.65rem 0.875rem",
+                              color: "#D8D8F0",
+                              fontFamily: "'Crimson Text', Georgia, serif",
+                              fontSize: "0.95rem",
+                              lineHeight: 1.6,
+                              resize: "vertical",
+                              outline: "none",
+                              transition: "border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease",
+                              boxSizing: "border-box",
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.borderColor = "rgba(184,134,11,0.6)";
+                              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(184,134,11,0.08)";
+                              e.currentTarget.style.background = "rgba(184,134,11,0.08)";
+                            }}
+                            onBlur={(e) => {
+                              const filled = e.currentTarget.value.trim().length > 0;
+                              e.currentTarget.style.borderColor = filled ? "rgba(184,134,11,0.3)" : "rgba(255,255,255,0.07)";
+                              e.currentTarget.style.boxShadow = "none";
+                              e.currentTarget.style.background = filled ? "rgba(184,134,11,0.06)" : "rgba(0,0,0,0.35)";
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
