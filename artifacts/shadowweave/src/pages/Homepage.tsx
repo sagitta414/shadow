@@ -6,6 +6,7 @@ interface HomepageProps {
   onScenarioGenerator: () => void;
   onCharacterMapper: () => void;
   onSoundingBoard: () => void;
+  onCaptorLogic: () => void;
 }
 
 const tools = [
@@ -111,19 +112,36 @@ const tools = [
     tag: "Streaming AI · Venice AI",
     tagColor: "rgba(0,200,130,0.8)",
   },
+  {
+    id: "captor-logic",
+    num: "07",
+    icon: "◈",
+    title: "Captor Logic",
+    subtitle: "Behaviour Simulator",
+    desc: "Input the captor's inviolable rules and goals. The AI engine acts as a captor behavioural simulator — suggesting consistent actions, risks, and psychological effects.",
+    cta: "Run Simulation",
+    accent: "#3C0050",
+    accentDim: "rgba(60,0,80,0.15)",
+    accentBorder: "rgba(160,0,200,0.3)",
+    accentHover: "rgba(60,0,80,0.25)",
+    accentGlow: "rgba(192,96,224,0.4)",
+    titleColor: "#C060E0",
+    tag: "Rules · Goals · AI Engine",
+    tagColor: "rgba(192,96,224,0.8)",
+  },
 ];
 
-export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator, onCharacterMapper, onSoundingBoard }: HomepageProps) {
+export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator, onCharacterMapper, onSoundingBoard, onCaptorLogic }: HomepageProps) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   function handleClick(id: string) {
-    if (id === "victim")   onEnter();
-    if (id === "captor")   onCaptorPortal();
-    if (id === "scenario") onScenarioGenerator();
-    if (id === "mapper")   onCharacterMapper();
-    if (id === "sounding") onSoundingBoard();
+    if (id === "victim")        onEnter();
+    if (id === "captor")        onCaptorPortal();
+    if (id === "scenario")      onScenarioGenerator();
+    if (id === "mapper")        onCharacterMapper();
+    if (id === "sounding")      onSoundingBoard();
+    if (id === "captor-logic")  onCaptorLogic();
     if (id === "themes") {
-      // Open theme switcher — click the theme button in bottom-right
       const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null;
       btn?.click();
     }
@@ -238,7 +256,7 @@ export default function Homepage({ onEnter, onCaptorPortal, onScenarioGenerator,
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.04)", flexWrap: "wrap", gap: "1rem" }}>
           <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
             {[
-              { label: "Modules", value: "6" },
+              { label: "Modules", value: "7" },
               { label: "Questions", value: "15+" },
               { label: "AI Modes", value: "2" },
               { label: "Themes", value: "4" },

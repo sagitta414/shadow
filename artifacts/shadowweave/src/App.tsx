@@ -12,6 +12,7 @@ import ScenarioGenerator from "./pages/ScenarioGenerator";
 import InteractiveStory from "./pages/InteractiveStory";
 import CharacterMapper from "./pages/CharacterMapper";
 import SoundingBoard from "./pages/SoundingBoard";
+import CaptorLogic from "./pages/CaptorLogic";
 
 type Page =
   | "login"
@@ -24,7 +25,8 @@ type Page =
   | "captor-summary"
   | "scenario-generator"
   | "character-mapper"
-  | "sounding-board";
+  | "sounding-board"
+  | "captor-logic";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -131,6 +133,7 @@ function AppInner() {
           onScenarioGenerator={() => navigate("scenario-generator")}
           onCharacterMapper={() => navigate("character-mapper")}
           onSoundingBoard={() => navigate("sounding-board")}
+          onCaptorLogic={() => navigate("captor-logic")}
         />
       )}
 
@@ -193,6 +196,10 @@ function AppInner() {
 
       {page === "sounding-board" && (
         <SoundingBoard onBack={() => navigate("home")} />
+      )}
+
+      {page === "captor-logic" && (
+        <CaptorLogic onBack={() => navigate("home")} />
       )}
     </div>
   );
