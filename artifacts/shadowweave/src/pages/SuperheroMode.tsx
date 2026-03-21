@@ -243,7 +243,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [search, setSearch] = useState("");
 
   // Selections
-  const [selectedHero, setSelectedHero] = useState<typeof MARVEL_HEROES[0] & { universe: string } | null>(null);
+  const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
   const [selectedVillain, setSelectedVillain] = useState<typeof VILLAINS[0] | null>(null);
   const [customVillain, setCustomVillain] = useState("");
   const [villainMode, setVillainMode] = useState<"pick" | "custom">("pick");
@@ -287,7 +287,14 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     setSelectedRestraints((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   }
 
-  function canProceedStep1() { return !!selectedHero; }
+  function toggleHero(hero: typeof allHeroes[0]) {
+    setSelectedHeroes((prev) =>
+      prev.some((h) => h.name === hero.name)
+        ? prev.filter((h) => h.name !== hero.name)
+        : [...prev, hero]
+    );
+  }
+  function canProceedStep1() { return selectedHeroes.length > 0; }
   function canProceedStep2() {
     return villainMode === "pick" ? !!selectedVillain : !!customVillain.trim();
   }
@@ -306,7 +313,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     const allRestraints = [...restraintLabels, ...(customRestraints.trim() ? [customRestraints.trim()] : [])];
 
     return {
-      hero: `${selectedHero?.name} (${selectedHero?.alias}) — Power: ${selectedHero?.power} — Universe: ${selectedHero?.universe}`,
+      hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
       villain: `${villain} — Scheme: ${villainScheme}`,
       setting: settingLabel,
       stakes: stakesLabel,
@@ -397,12 +404,14 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
   function exportStory() {
     const chapterText = chapters.map((c, i) => `${"═".repeat(50)}\nCHAPTER ${i + 1}\n${"═".repeat(50)}\n\n${c}`).join("\n\n");
-    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHERO: ${selectedHero?.name} (${selectedHero?.alias})\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${SETTINGS.find((s) => s.id === selectedSetting)?.label}\nSTAKES: ${STAKES.find((s) => s.id === selectedStakes)?.label}\nTONE: ${TONES.find((t) => t.id === storyTone)?.label ?? "standard"}\n\n${chapterText}`;
+    const heroNames = selectedHeroes.map((h) => `${h.name} (${h.alias})`).join(", ");
+    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHEROES: ${heroNames}\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${SETTINGS.find((s) => s.id === selectedSetting)?.label}\nSTAKES: ${STAKES.find((s) => s.id === selectedStakes)?.label}\nTONE: ${TONES.find((t) => t.id === storyTone)?.label ?? "standard"}\n\n${chapterText}`;
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `shadowweave_hero_${selectedHero?.name.replace(/\s+/g, "_")}_${Date.now()}.txt`;
+    const slugFirst = selectedHeroes[0]?.name.replace(/\s+/g, "_") ?? "story";
+    a.download = `shadowweave_hero_${slugFirst}_${Date.now()}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -501,16 +510,31 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>{filteredHeroes.length} heroines</span>
           </div>
 
-          {/* Selected preview */}
-          {selectedHero && (
-            <div style={{ marginBottom: "1.25rem", padding: "0.875rem 1.25rem", background: "linear-gradient(135deg, rgba(255,184,0,0.1), rgba(255,107,0,0.08))", border: "1px solid rgba(255,184,0,0.35)", borderRadius: "12px", display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "1.5rem" }}>{selectedHero.icon}</span>
-              <div>
-                <div className="font-cinzel" style={{ color: "#FFB800", fontWeight: 700, fontSize: "1rem" }}>{selectedHero.name}</div>
-                <div style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Montserrat', sans-serif" }}>{selectedHero.alias} · {selectedHero.power}</div>
+          {/* Selected heroines chips */}
+          {selectedHeroes.length > 0 && (
+            <div style={{ marginBottom: "1.25rem", padding: "0.875rem 1.25rem", background: "linear-gradient(135deg, rgba(255,184,0,0.07), rgba(255,107,0,0.05))", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "12px" }}>
+              <div className="font-montserrat" style={{ fontSize: "0.55rem", letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,184,0,0.55)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                {selectedHeroes.length} Heroine{selectedHeroes.length !== 1 ? "s" : ""} Selected
               </div>
-              <div style={{ marginLeft: "auto", padding: "0.25rem 0.625rem", background: selectedHero.universe === "MARVEL" ? "rgba(220,30,30,0.2)" : "rgba(0,100,220,0.2)", border: `1px solid ${selectedHero.universe === "MARVEL" ? "rgba(220,30,30,0.4)" : "rgba(0,100,220,0.4)"}`, borderRadius: "6px", fontSize: "0.62rem", color: selectedHero.universe === "MARVEL" ? "#FF6060" : "#60A0FF", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700 }}>
-                {selectedHero.universe}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {selectedHeroes.map((h) => {
+                  const isMarvel = h.universe === "MARVEL";
+                  const col = isMarvel ? "#FF6060" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : "rgba(0,100,220,0.18)";
+                  return (
+                    <button
+                      key={h.name}
+                      onClick={() => toggleHero(h)}
+                      title={`Remove ${h.name}`}
+                      style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.25rem 0.6rem 0.25rem 0.5rem", background: bg, border: `1px solid ${col}55`, borderRadius: "20px", cursor: "pointer", color: "inherit", transition: "all 0.2s" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = isMarvel ? "rgba(220,30,30,0.3)" : "rgba(0,100,220,0.3)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = bg; }}
+                    >
+                      <span style={{ fontSize: "0.7rem", color: col, fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{h.name}</span>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.45)", lineHeight: 1 }}>✕</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -519,13 +543,13 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
             {filteredHeroes.map((hero) => {
               const isMarvel = hero.universe === "MARVEL";
-              const isSelected = selectedHero?.name === hero.name;
+              const isSelected = selectedHeroes.some((h) => h.name === hero.name);
               const accentColor = isMarvel ? "#FF6060" : "#60A0FF";
               const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : "rgba(0,100,220,0.15)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
-                  onClick={() => setSelectedHero(hero)}
+                  onClick={() => toggleHero(hero)}
                   style={{
                     background: isSelected ? (isMarvel ? "rgba(220,30,30,0.2)" : "rgba(0,100,220,0.2)") : "rgba(0,0,0,0.5)",
                     backdropFilter: "blur(10px)",
@@ -838,9 +862,15 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,184,0,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
             <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: "0.58rem", color: "rgba(255,184,0,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>HERO</div>
-                <div className="font-cinzel" style={{ color: "#FFB800", fontWeight: 700, fontSize: "1rem" }}>{selectedHero?.name}</div>
-                <div style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Montserrat', sans-serif" }}>{selectedHero?.alias}</div>
+                <div style={{ fontSize: "0.58rem", color: "rgba(255,184,0,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>
+                  {selectedHeroes.length === 1 ? "HERO" : "HEROES"}
+                </div>
+                {selectedHeroes.map((h) => (
+                  <div key={h.name} style={{ marginBottom: "0.15rem" }}>
+                    <span className="font-cinzel" style={{ color: "#FFB800", fontWeight: 700, fontSize: "0.9rem" }}>{h.name}</span>
+                    <span style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", marginLeft: "0.4rem" }}>{h.alias}</span>
+                  </div>
+                ))}
               </div>
               <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
               <div>
