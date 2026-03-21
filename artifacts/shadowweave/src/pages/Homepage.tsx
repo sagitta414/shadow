@@ -158,7 +158,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         <div className="hp-nav-stats" style={{ display: "flex", gap: "1.75rem", alignItems: "center" }}>
-          {[["7", "Tools"], ["100+", "Heroines"], ["Venice AI", "Powered by"], ["4", "Themes"]].map(([v, l]) => (
+          {[["7", "Tools"], ["118+", "Heroines"], ["Venice AI", "Powered by"], ["4", "Themes"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "0.82rem", fontWeight: 900, color: "rgba(212,175,55,0.75)", lineHeight: 1 }}>{v}</div>
               <div className="font-montserrat" style={{ fontSize: "0.45rem", color: "rgba(200,200,220,0.22)", letterSpacing: "1.8px", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>
@@ -215,12 +215,12 @@ export default function Homepage(props: HomepageProps) {
             <div className="font-cinzel" style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.7rem)", fontWeight: 900, letterSpacing: "0.04em", background: "linear-gradient(90deg, #FFD700, #FF6090, #60A0FF, #FFD700)", backgroundSize: "300% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "heroShimmer 4s linear infinite" }}>
               HEROINE FORGE
             </div>
-            <div style={{ fontSize: "0.78rem", color: "rgba(200,195,230,0.5)", fontFamily: "'Raleway', sans-serif", marginTop: "0.2rem" }}>Choose from 100 heroines · select villain · forge a multi-chapter story</div>
+            <div style={{ fontSize: "0.78rem", color: "rgba(200,195,230,0.5)", fontFamily: "'Raleway', sans-serif", marginTop: "0.2rem" }}>Choose from 118+ heroines · select villain · forge a multi-chapter story</div>
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", position: "relative", zIndex: 1, flexShrink: 0 }}>
-          {[["100+", "Heroines"], ["30", "Villains"], ["AI", "Chapters"]].map(([v, l]) => (
+          {[["118+", "Heroines"], ["53", "Villains"], ["AI", "Chapters"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "1.1rem", fontWeight: 900, color: "rgba(255,210,60,0.85)", lineHeight: 1 }}>{v}</div>
               <div className="font-montserrat" style={{ fontSize: "0.48rem", color: "rgba(200,200,220,0.25)", letterSpacing: "1.5px", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>

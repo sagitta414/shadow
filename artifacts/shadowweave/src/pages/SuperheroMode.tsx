@@ -4,15 +4,21 @@ interface SuperheroModeProps {
   onBack: () => void;
 }
 
-function heroImg(name: string): string {
-  const slug = name
+function nameToSlug(name: string): string {
+  return name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-{2,}/g, "-")
     .replace(/^-|-$/g, "");
+}
+function heroImg(name: string): string {
+  const slug = nameToSlug(name);
   const jpgSlugs = ["ms-marvel", "mary-marvel", "cassandra-cain", "arrowette"];
   return `/heroes/${slug}.${jpgSlugs.includes(slug) ? "jpg" : "png"}`;
+}
+function villainImg(name: string): string {
+  return `/villains/${nameToSlug(name)}.png`;
 }
 
 // ── DATA ─────────────────────────────────────────────────────────
@@ -123,39 +129,86 @@ const DC_HEROES = [
   { name: "Lightning Lass",   alias: "Ayla Ranzz",        power: "Lightning bolt generation",           icon: "⚡" },
 ];
 
+const CW_HEROES = [
+  // Arrow
+  { name: "Sara Lance",       alias: "White Canary",       power: "League assassin & temporal agent",       icon: "🕊" },
+  { name: "Laurel Lance",     alias: "Black Canary",       power: "Canary Cry device & martial artist",     icon: "🎵" },
+  { name: "Thea Queen",       alias: "Speedy / Red Arrow", power: "Olympic archer & League-trained fighter", icon: "🏹" },
+  { name: "Nyssa al Ghul",    alias: "Heir to the Demon",  power: "League of Assassins grandmaster",        icon: "🗡" },
+  { name: "Dinah Drake",      alias: "Black Canary III",   power: "Metahuman Canary Cry & street fighter",  icon: "🎤" },
+  { name: "Emiko Queen",      alias: "Green Arrow II",     power: "Master archer & trained assassin",       icon: "🟢" },
+  // The Flash
+  { name: "Iris West-Allen",  alias: "The Flash's Heart",  power: "Speed Force conduit & journalist hero",  icon: "⚡" },
+  { name: "Caitlin Snow",     alias: "Killer Frost",       power: "Cryokinesis & frost generation",         icon: "❄" },
+  { name: "Jesse Quick",      alias: "Speed Force Hero",   power: "Speedster & genius intellect",           icon: "💛" },
+  { name: "Nora West-Allen",  alias: "XS",                 power: "Speedster from the future",              icon: "⚡" },
+  // Legends of Tomorrow
+  { name: "Zari Tomaz",       alias: "Totem Bearer",       power: "Air totem manipulation & hacking",       icon: "💨" },
+  { name: "Ava Sharpe",       alias: "Time Bureau Director",power: "Tactical genius & time agent",          icon: "⌚" },
+  { name: "Charlie",          alias: "Clotho / Legend",    power: "Shapeshifting & fate manipulation",      icon: "🎭" },
+  { name: "Astra Logue",      alias: "Hell's Emissary",    power: "Dark magic & demonic power",             icon: "🌑" },
+  // Supergirl
+  { name: "Alex Danvers",     alias: "DEO Director",       power: "Tactical genius & power-suit combat",    icon: "🛡" },
+  { name: "Lena Luthor",      alias: "Luthor Corp CEO",    power: "Genius inventor & Nth metal tech",       icon: "🔬" },
+  { name: "Nia Nal",          alias: "Dreamer",            power: "Precognitive dreams & energy blasts",    icon: "🌙" },
+  { name: "M'gann M'orzz",    alias: "Miss Martian",       power: "Martian shapeshifting & telepathy",      icon: "🟢" },
+];
+
 const VILLAINS = [
   // Marvel
-  { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",    icon: "💀" },
-  { name: "Doctor Doom",      universe: "Marvel", scheme: "Rule the world through dark science",       icon: "🤖" },
-  { name: "Magneto",          universe: "Marvel", scheme: "Forge a world where mutants rule",          icon: "🧲" },
-  { name: "Loki",             universe: "Marvel", scheme: "Claim the throne through divine trickery",  icon: "🐍" },
-  { name: "Ultron",           universe: "Marvel", scheme: "Eliminate organic life for machine order",  icon: "⚙" },
-  { name: "Kang the Conqueror",universe: "Marvel",scheme: "Dominate the entire timeline",              icon: "⏳" },
-  { name: "Galactus",         universe: "Marvel", scheme: "Devour worlds to sustain his existence",    icon: "🌌" },
-  { name: "Apocalypse",       universe: "Marvel", scheme: "Cull the weak and crown mutant supremacy",  icon: "☠" },
-  { name: "Mephisto",         universe: "Marvel", scheme: "Collect souls through damned bargains",     icon: "😈" },
-  { name: "Red Skull",        universe: "Marvel", scheme: "Forge a fascist world empire",              icon: "💀" },
-  { name: "Dormammu",         universe: "Marvel", scheme: "Merge Earth with the Dark Dimension",       icon: "🌀" },
-  { name: "Baron Zemo",       universe: "Marvel", scheme: "Dismantle every hero institution",          icon: "🗡" },
-  { name: "MODOK",            universe: "Marvel", scheme: "Rule through superior mechanical intellect", icon: "🧠" },
-  { name: "Green Goblin",     universe: "Marvel", scheme: "Destroy Spider-Man through psychological war",icon: "🎃" },
-  { name: "Venom / Carnage",  universe: "Marvel", scheme: "Unleash symbiote chaos on the world",      icon: "🖤" },
+  { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",           icon: "💀" },
+  { name: "Doctor Doom",      universe: "Marvel", scheme: "Rule the world through dark science",              icon: "🤖" },
+  { name: "Magneto",          universe: "Marvel", scheme: "Forge a world where mutants rule",                 icon: "🧲" },
+  { name: "Loki",             universe: "Marvel", scheme: "Claim the throne through divine trickery",         icon: "🐍" },
+  { name: "Ultron",           universe: "Marvel", scheme: "Eliminate organic life for machine order",         icon: "⚙" },
+  { name: "Kang the Conqueror",universe: "Marvel",scheme: "Dominate the entire timeline",                     icon: "⏳" },
+  { name: "Galactus",         universe: "Marvel", scheme: "Devour worlds to sustain his existence",           icon: "🌌" },
+  { name: "Apocalypse",       universe: "Marvel", scheme: "Cull the weak and crown mutant supremacy",         icon: "☠" },
+  { name: "Mephisto",         universe: "Marvel", scheme: "Collect souls through damned bargains",            icon: "😈" },
+  { name: "Red Skull",        universe: "Marvel", scheme: "Forge a fascist world empire",                     icon: "💀" },
+  { name: "Dormammu",         universe: "Marvel", scheme: "Merge Earth with the Dark Dimension",              icon: "🌀" },
+  { name: "Baron Zemo",       universe: "Marvel", scheme: "Dismantle every hero institution",                 icon: "🗡" },
+  { name: "MODOK",            universe: "Marvel", scheme: "Rule through superior mechanical intellect",        icon: "🧠" },
+  { name: "Green Goblin",     universe: "Marvel", scheme: "Destroy Spider-Man through psychological war",      icon: "🎃" },
+  { name: "Venom / Carnage",  universe: "Marvel", scheme: "Unleash symbiote chaos on the world",              icon: "🖤" },
+  { name: "Hela",             universe: "Marvel", scheme: "Seize Asgard and expand her death domain",         icon: "💀" },
+  { name: "Lady Deathstrike", universe: "Marvel", scheme: "Destroy Wolverine and claim mutant dominance",     icon: "🗡" },
+  { name: "Mystique",         universe: "Marvel", scheme: "Infiltrate and destabilize mutant enemies",        icon: "🔵" },
+  { name: "Morgan le Fay",    universe: "Marvel", scheme: "Rewrite reality with Arthurian dark sorcery",      icon: "🔮" },
+  { name: "The Enchantress",  universe: "Marvel", scheme: "Enslave heroes through magical seduction",         icon: "💚" },
   // DC
-  { name: "Darkseid",         universe: "DC",     scheme: "Discover the Anti-Life Equation",           icon: "💥" },
-  { name: "Lex Luthor",       universe: "DC",     scheme: "Prove humanity's superiority over gods",    icon: "💰" },
-  { name: "The Joker",        universe: "DC",     scheme: "Burn civilization into beautiful chaos",    icon: "🃏" },
-  { name: "Brainiac",         universe: "DC",     scheme: "Collect and miniaturize entire civilizations",icon: "🤖" },
-  { name: "General Zod",      universe: "DC",     scheme: "Rebuild Krypton through conquest of Earth", icon: "☀" },
-  { name: "Doomsday",         universe: "DC",     scheme: "Destroy all life through pure adaptive rage", icon: "💪" },
-  { name: "Ra's al Ghul",     universe: "DC",     scheme: "Purge humanity to restore ecological balance",icon: "🌿" },
-  { name: "Sinestro",         universe: "DC",     scheme: "Impose order through fear-based control",   icon: "💛" },
-  { name: "Cheetah",          universe: "DC",     scheme: "Destroy Wonder Woman and claim divine power",icon: "🐆" },
-  { name: "Circe",            universe: "DC",     scheme: "Wage divine war against all of humanity",   icon: "🔮" },
-  { name: "Trigon",           universe: "DC",     scheme: "Consume Earth as another conquered realm",  icon: "😈" },
-  { name: "Black Manta",      universe: "DC",     scheme: "Destroy Atlantis and Aquaman's legacy",     icon: "🔱" },
-  { name: "Reverse-Flash",    universe: "DC",     scheme: "Shatter the Flash's life across time",      icon: "⚡" },
-  { name: "Vandal Savage",    universe: "DC",     scheme: "Rule the world as its immortal king",       icon: "🗡" },
-  { name: "Deathstroke",      universe: "DC",     scheme: "Complete any contract with absolute precision",icon: "⚔" },
+  { name: "Darkseid",         universe: "DC",     scheme: "Discover the Anti-Life Equation",                  icon: "💥" },
+  { name: "Lex Luthor",       universe: "DC",     scheme: "Prove humanity's superiority over gods",           icon: "💰" },
+  { name: "The Joker",        universe: "DC",     scheme: "Burn civilization into beautiful chaos",           icon: "🃏" },
+  { name: "Brainiac",         universe: "DC",     scheme: "Collect and miniaturize entire civilizations",     icon: "🤖" },
+  { name: "General Zod",      universe: "DC",     scheme: "Rebuild Krypton through conquest of Earth",        icon: "☀" },
+  { name: "Doomsday",         universe: "DC",     scheme: "Destroy all life through pure adaptive rage",       icon: "💪" },
+  { name: "Ra's al Ghul",     universe: "DC",     scheme: "Purge humanity to restore ecological balance",     icon: "🌿" },
+  { name: "Sinestro",         universe: "DC",     scheme: "Impose order through fear-based control",          icon: "💛" },
+  { name: "Cheetah",          universe: "DC",     scheme: "Destroy Wonder Woman and claim divine power",      icon: "🐆" },
+  { name: "Circe",            universe: "DC",     scheme: "Wage divine war against all of humanity",          icon: "🔮" },
+  { name: "Trigon",           universe: "DC",     scheme: "Consume Earth as another conquered realm",         icon: "😈" },
+  { name: "Black Manta",      universe: "DC",     scheme: "Destroy Atlantis and Aquaman's legacy",            icon: "🔱" },
+  { name: "Reverse-Flash",    universe: "DC",     scheme: "Shatter the Flash's life across time",             icon: "⚡" },
+  { name: "Vandal Savage",    universe: "DC",     scheme: "Rule the world as its immortal king",              icon: "🗡" },
+  { name: "Deathstroke",      universe: "DC",     scheme: "Complete any contract with absolute precision",     icon: "⚔" },
+  { name: "Black Adam",       universe: "DC",     scheme: "Reclaim Kahndaq and punish the unworthy",          icon: "⚡" },
+  { name: "Amanda Waller",    universe: "DC",     scheme: "Control metahumans as weapons for the state",      icon: "🏛" },
+  { name: "Granny Goodness",  universe: "DC",     scheme: "Break heroes through endless torment",             icon: "👵" },
+  // CW / Arrowverse
+  { name: "Malcolm Merlyn",   universe: "CW",     scheme: "Destroy the Glades to purge Star City of sin",    icon: "🏹" },
+  { name: "Damien Darhk",     universe: "CW",     scheme: "Embrace Hive's death magic to raze the world",    icon: "💀" },
+  { name: "Prometheus",       universe: "CW",     scheme: "Break the Green Arrow by destroying everything he loves", icon: "🎯" },
+  { name: "Ricardo Diaz",     universe: "CW",     scheme: "Own an entire city through crime and corruption",  icon: "🐉" },
+  { name: "Zoom",             universe: "CW",     scheme: "Steal every speedster's speed and rule all Earths",icon: "⚡" },
+  { name: "Savitar",          universe: "CW",     scheme: "Become a god of speed by eliminating rivals",      icon: "⚡" },
+  { name: "Gorilla Grodd",    universe: "CW",     scheme: "Build a telepathic ape empire over humanity",      icon: "🦍" },
+  { name: "The Thinker",      universe: "CW",     scheme: "Absorb all metahuman powers to control the world", icon: "🧠" },
+  { name: "Eva McCulloch",    universe: "CW",     scheme: "Replace the real world with her mirror dimension",  icon: "🪞" },
+  { name: "Reign",            universe: "CW",     scheme: "Purge Earth of sin as World Killer",               icon: "☀" },
+  { name: "Non",              universe: "CW",     scheme: "Mind-control all humans into subservience",        icon: "🌀" },
+  { name: "Agent Liberty",    universe: "CW",     scheme: "Incite humanity to exterminate metahumans",        icon: "🗽" },
+  { name: "Mallus",           universe: "CW",     scheme: "Break free of his prison and devour all time",     icon: "😈" },
 ];
 
 const SETTINGS = [
@@ -234,12 +287,14 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW";
+type VillainFilter = "ALL" | "Marvel" | "DC" | "CW";
 
 // ── Component ─────────────────────────────────────────────────
 export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [step, setStep] = useState<Step>(1);
   const [universeFilter, setUniverseFilter] = useState<UniverseFilter>("ALL");
+  const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
   const [search, setSearch] = useState("");
 
   // Selections
@@ -272,6 +327,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const allHeroes = [
     ...MARVEL_HEROES.map((h) => ({ ...h, universe: "MARVEL" })),
     ...DC_HEROES.map((h) => ({ ...h, universe: "DC" })),
+    ...CW_HEROES.map((h) => ({ ...h, universe: "CW" })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -490,9 +546,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
-              {(["ALL", "MARVEL", "DC"] as UniverseFilter[]).map((u) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: u !== "DC" ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
-                  {u === "ALL" ? "All 100" : u === "MARVEL" ? "Marvel ✦" : "DC ✦"}
+              {(["ALL", "MARVEL", "DC", "CW"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : "CW ✦"}
                 </button>
               ))}
             </div>
@@ -519,15 +575,17 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 {selectedHeroes.map((h) => {
                   const isMarvel = h.universe === "MARVEL";
-                  const col = isMarvel ? "#FF6060" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : "rgba(0,100,220,0.18)";
+                  const isCW = h.universe === "CW";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
                       onClick={() => toggleHero(h)}
                       title={`Remove ${h.name}`}
                       style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.25rem 0.6rem 0.25rem 0.5rem", background: bg, border: `1px solid ${col}55`, borderRadius: "20px", cursor: "pointer", color: "inherit", transition: "all 0.2s" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = isMarvel ? "rgba(220,30,30,0.3)" : "rgba(0,100,220,0.3)"; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = bgHover; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = bg; }}
                     >
                       <span style={{ fontSize: "0.7rem", color: col, fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{h.name}</span>
@@ -543,15 +601,17 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
             {filteredHeroes.map((hero) => {
               const isMarvel = hero.universe === "MARVEL";
+              const isCW = hero.universe === "CW";
               const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : "rgba(0,100,220,0.15)";
+              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
+              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : "rgba(0,100,220,0.15)";
+              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : "rgba(0,100,220,0.2)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
                   onClick={() => toggleHero(hero)}
                   style={{
-                    background: isSelected ? (isMarvel ? "rgba(220,30,30,0.2)" : "rgba(0,100,220,0.2)") : "rgba(0,0,0,0.5)",
+                    background: isSelected ? selectedBg : "rgba(0,0,0,0.5)",
                     backdropFilter: "blur(10px)",
                     border: `1px solid ${isSelected ? accentColor : "rgba(255,255,255,0.06)"}`,
                     borderRadius: "12px",
@@ -616,28 +676,48 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
           {villainMode === "pick" ? (
             <>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.75rem", maxHeight: "480px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
-                {VILLAINS.map((villain) => {
+              {/* Villain universe filter */}
+              <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
+                  {(["ALL", "Marvel", "DC", "CW"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : "CW ✦"}
+                    </button>
+                  ))}
+                </div>
+                <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>
+                  {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).length} villains
+                </span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
+                {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).map((villain) => {
                   const isSelected = selectedVillain?.name === villain.name;
-                  const isMarvel = villain.universe === "Marvel";
-                  const accentColor = isMarvel ? "#FF6060" : "#60A0FF";
+                  const isMv = villain.universe === "Marvel";
+                  const isCW = villain.universe === "CW";
+                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
+                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : "rgba(0,100,220,0.18)";
                   return (
                     <button
                       key={villain.name}
                       onClick={() => setSelectedVillain(villain)}
-                      style={{ background: isSelected ? "rgba(200,0,50,0.18)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSelected ? "rgba(200,0,50,0.6)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", position: "relative", boxShadow: isSelected ? "0 0 16px rgba(200,0,50,0.3)" : "none" }}
-                      onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = "rgba(200,0,50,0.08)"; } }}
+                      style={{ background: isSelected ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSelected ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSelected ? "0 0 16px rgba(200,0,50,0.35)" : "none" }}
+                      onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
                       onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
                     >
-                      {isSelected && <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", width: "16px", height: "16px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff" }}>✓</div>}
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "0.5rem" }}>
-                        <span style={{ fontSize: "1.4rem" }}>{villain.icon}</span>
-                        <div>
-                          <div className="font-cinzel" style={{ fontSize: "0.85rem", color: isSelected ? "#FF4060" : "#E8E8F0", fontWeight: 700 }}>{villain.name}</div>
-                          <div style={{ fontSize: "0.58rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700 }}>{villain.universe.toUpperCase()}</div>
-                        </div>
+                      {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>✓</div>}
+                      {/* Portrait image */}
+                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(30,0,0,0.6)" }}>
+                        <img
+                          src={villainImg(villain.name)}
+                          alt={villain.name}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                        />
+                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? "rgba(200,0,50,0.45)" : "rgba(0,0,0,0.55)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{villain.universe}</div>
                       </div>
-                      <p style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.55)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5 }}>{villain.scheme}</p>
+                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? "#FF4060" : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{villain.name}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.48)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{villain.scheme}</div>
                     </button>
                   );
                 })}
