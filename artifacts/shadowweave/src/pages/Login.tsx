@@ -4,53 +4,50 @@ interface LoginProps {
   onEnter: () => void;
 }
 
-function Particles() {
-  const particles = Array.from({ length: 22 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    size: Math.random() * 3 + 1,
-    dur: Math.random() * 8 + 6,
-    delay: Math.random() * 8,
-    opacity: Math.random() * 0.4 + 0.08,
-    color: i % 3 === 0 ? "#8B0000" : i % 3 === 1 ? "#B8860B" : "#2D1B69",
-  }));
+const FEATURES = [
+  { icon: "◈", label: "7 Narrative Modules", sub: "Character builders, scenario engines & mappers" },
+  { icon: "✦", label: "AI Sounding Board", sub: "Streaming AI collaborator trained on your story" },
+  { icon: "⚡", label: "Superhero Story Forge", sub: "100 heroines, 30 villains, chapter continuation" },
+  { icon: "◎", label: "Character Relationship Map", sub: "Visual node canvas with drag-and-drop dynamics" },
+];
 
+function Orbs() {
   return (
-    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 0 }}>
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            position: "absolute",
-            left: p.left,
-            top: p.top,
-            width: p.size,
-            height: p.size,
-            borderRadius: "50%",
-            background: p.color,
-            opacity: p.opacity,
-            boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
-            animation: `orbFloat ${p.dur}s ${p.delay}s ease-in-out infinite`,
-          }}
-        />
-      ))}
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+      <div style={{ position: "absolute", width: "700px", height: "700px", top: "-20%", left: "-20%", background: "radial-gradient(circle, rgba(100,0,0,0.18) 0%, transparent 65%)", animation: "orbFloat 28s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", width: "500px", height: "500px", bottom: "-15%", right: "5%", background: "radial-gradient(circle, rgba(45,27,105,0.2) 0%, transparent 65%)", animation: "orbFloat 22s 5s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", width: "350px", height: "350px", top: "40%", left: "50%", background: "radial-gradient(circle, rgba(80,5,80,0.14) 0%, transparent 65%)", animation: "orbFloat 35s 10s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", width: "280px", height: "280px", top: "10%", right: "10%", background: "radial-gradient(circle, rgba(139,0,0,0.1) 0%, transparent 65%)", animation: "orbFloat 18s 3s ease-in-out infinite" }} />
     </div>
+  );
+}
+
+function GridOverlay() {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, pointerEvents: "none",
+      backgroundImage: "linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)",
+      backgroundSize: "80px 80px",
+    }} />
   );
 }
 
 export default function Login({ onEnter }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
+  const [showPass, setShowPass] = useState(false);
+  const [focused, setFocused] = useState<"email" | "pass" | null>(null);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
+  const [featureIndex, setFeatureIndex] = useState(-1);
 
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 60);
-    return () => clearTimeout(t);
+    const t0 = setTimeout(() => setMounted(true), 80);
+    const timers = FEATURES.map((_, i) =>
+      setTimeout(() => setFeatureIndex(i), 600 + i * 160)
+    );
+    return () => { clearTimeout(t0); timers.forEach(clearTimeout); };
   }, []);
 
   function handleSubmit(e: React.FormEvent) {
@@ -61,318 +58,291 @@ export default function Login({ onEnter }: LoginProps) {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onEnter();
-    }, 1400);
+    setTimeout(() => { setLoading(false); onEnter(); }, 1400);
   }
 
-  const inputBase: React.CSSProperties = {
+  const inputStyle = (which: "email" | "pass"): React.CSSProperties => ({
     width: "100%",
-    background: "rgba(0,0,0,0.55)",
-    border: "1px solid rgba(255,255,255,0.07)",
+    background: focused === which ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
+    border: `1px solid ${focused === which ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
     borderRadius: "10px",
-    padding: "0.95rem 1.1rem",
+    padding: "0.95rem 1rem 0.95rem 2.75rem",
     color: "#F0F0FF",
     fontFamily: "'Raleway', sans-serif",
-    fontSize: "0.95rem",
+    fontSize: "0.93rem",
     outline: "none",
-    transition: "all 0.3s cubic-bezier(0.23,1,0.32,1)",
-    letterSpacing: "0.5px",
+    transition: "all 0.3s ease",
+    letterSpacing: "0.4px",
     boxSizing: "border-box",
-  };
+    boxShadow: focused === which ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
+  });
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "#000000",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        zIndex: 10,
-      }}
-    >
-      {/* Background orbs */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none" }}>
-        <div style={{
-          position: "absolute", width: "700px", height: "700px",
-          top: "-15%", left: "-12%",
-          background: "radial-gradient(circle, rgba(139,0,0,0.14) 0%, transparent 65%)",
-          animation: "orbFloat 30s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", width: "550px", height: "550px",
-          bottom: "-10%", right: "-8%",
-          background: "radial-gradient(circle, rgba(45,27,105,0.18) 0%, transparent 65%)",
-          animation: "orbFloat 24s 6s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", width: "400px", height: "400px",
-          top: "40%", left: "55%",
-          background: "radial-gradient(circle, rgba(61,10,74,0.12) 0%, transparent 65%)",
-          animation: "orbFloat 38s 12s ease-in-out infinite",
-        }} />
-      </div>
+    <div style={{ position: "fixed", inset: 0, display: "flex", overflow: "hidden", background: "#030008", zIndex: 10 }}>
 
-      <Particles />
-
-      {/* Scanline overlay */}
-      <div style={{
-        position: "fixed", inset: 0, pointerEvents: "none",
-        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)",
-        zIndex: 1,
-      }} />
-
-      {/* Main card */}
+      {/* ════ LEFT PANEL — Branding ════ */}
       <div
+        className="login-left"
         style={{
           position: "relative",
-          zIndex: 2,
-          width: "100%",
-          maxWidth: "460px",
-          margin: "1.5rem",
+          flex: "0 0 56%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "3.5rem 4rem",
+          overflow: "hidden",
+          borderRight: "1px solid rgba(255,255,255,0.04)",
           opacity: mounted ? 1 : 0,
-          transform: mounted ? "translateY(0) scale(1)" : "translateY(28px) scale(0.97)",
-          transition: "opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1)",
+          transform: mounted ? "translateX(0)" : "translateX(-20px)",
+          transition: "opacity 0.9s cubic-bezier(0.23,1,0.32,1), transform 0.9s cubic-bezier(0.23,1,0.32,1)",
         }}
       >
-        {/* Card glow halo */}
-        <div style={{
-          position: "absolute", inset: -1,
-          borderRadius: "24px",
-          background: "linear-gradient(135deg, rgba(139,0,0,0.25) 0%, rgba(45,27,105,0.15) 50%, rgba(184,134,11,0.12) 100%)",
-          filter: "blur(12px)",
-          zIndex: -1,
-        }} />
+        <Orbs />
+        <GridOverlay />
+
+        {/* Diagonal accent strip */}
+        <div style={{ position: "absolute", top: 0, right: 0, width: "1px", bottom: 0, background: "linear-gradient(180deg, transparent 0%, rgba(139,0,0,0.3) 30%, rgba(184,134,11,0.2) 60%, transparent 100%)" }} />
+
+        {/* Corner ornaments */}
+        <div style={{ position: "absolute", top: "1.5rem", left: "1.5rem", width: "24px", height: "24px", borderTop: "1px solid rgba(184,134,11,0.4)", borderLeft: "1px solid rgba(184,134,11,0.4)" }} />
+        <div style={{ position: "absolute", bottom: "1.5rem", right: "1.5rem", width: "24px", height: "24px", borderBottom: "1px solid rgba(184,134,11,0.4)", borderRight: "1px solid rgba(184,134,11,0.4)" }} />
+
+        {/* Studio badge */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "4rem" }}>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8B0000", boxShadow: "0 0 10px rgba(139,0,0,0.8)" }} />
+            <span className="font-montserrat" style={{ fontSize: "0.58rem", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(184,134,11,0.55)", fontWeight: 700 }}>
+              Professional Dark Narrative Studio
+            </span>
+          </div>
+
+          {/* Main title */}
+          <div style={{ marginBottom: "2rem" }}>
+            <div style={{ position: "relative", lineHeight: 0.85 }}>
+              <h1 className="font-cinzel" style={{
+                fontSize: "clamp(4rem, 8vw, 7.5rem)",
+                fontWeight: 900,
+                letterSpacing: "0.04em",
+                color: "transparent",
+                WebkitTextStroke: "1px rgba(212,175,55,0.15)",
+                margin: 0, lineHeight: 0.9,
+                userSelect: "none",
+                position: "absolute",
+                top: "4px", left: "4px",
+              }}>SHADOW<br />WEAVE</h1>
+              <h1 className="font-cinzel" style={{
+                fontSize: "clamp(4rem, 8vw, 7.5rem)",
+                fontWeight: 900,
+                letterSpacing: "0.04em",
+                background: "linear-gradient(160deg, #F5E8C0 0%, #D4AF37 30%, #A07030 65%, #6B4F20 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                margin: 0, lineHeight: 0.9,
+                position: "relative",
+                filter: "drop-shadow(0 4px 40px rgba(212,175,55,0.2))",
+              }}>SHADOW<br />WEAVE</h1>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+            <div style={{ width: "40px", height: "1px", background: "rgba(139,0,0,0.6)" }} />
+            <p className="font-crimson" style={{ fontSize: "1.1rem", color: "rgba(220,210,240,0.4)", fontStyle: "italic", letterSpacing: "0.06em", margin: 0 }}>
+              Where darkness becomes narrative craft
+            </p>
+          </div>
+        </div>
+
+        {/* Feature list */}
+        <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.75rem" }}>
+            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, rgba(139,0,0,0.5), transparent)" }} />
+            <span className="font-montserrat" style={{ fontSize: "0.55rem", letterSpacing: "3.5px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Studio Capabilities</span>
+            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5))" }} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+            {FEATURES.map((f, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "1rem",
+                  opacity: featureIndex >= i ? 1 : 0,
+                  transform: featureIndex >= i ? "translateX(0)" : "translateX(-12px)",
+                  transition: "opacity 0.5s ease, transform 0.5s ease",
+                }}
+              >
+                <div style={{
+                  width: "36px", height: "36px", borderRadius: "9px", flexShrink: 0,
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(184,134,11,0.15)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1rem", color: "rgba(184,134,11,0.7)",
+                }}>
+                  {f.icon}
+                </div>
+                <div>
+                  <div className="font-cinzel" style={{ fontSize: "0.8rem", color: "rgba(220,215,240,0.75)", fontWeight: 700, marginBottom: "0.15rem", letterSpacing: "0.03em" }}>{f.label}</div>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5 }}>{f.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom stats row */}
+          <div style={{ display: "flex", gap: "2rem", marginTop: "2rem", paddingTop: "1.75rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+            {[["7", "Modules"], ["100+", "Heroines"], ["2", "AI Modes"], ["4", "Themes"]].map(([v, l]) => (
+              <div key={l}>
+                <div className="font-cinzel" style={{ fontSize: "1.3rem", fontWeight: 900, color: "#D4AF37", letterSpacing: "1px", lineHeight: 1 }}>{v}</div>
+                <div className="font-montserrat" style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.25)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "0.2rem" }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ════ RIGHT PANEL — Login ════ */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem",
+          position: "relative",
+          overflow: "hidden",
+          background: "rgba(2,0,6,0.6)",
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateX(0)" : "translateX(16px)",
+          transition: "opacity 0.9s 0.1s cubic-bezier(0.23,1,0.32,1), transform 0.9s 0.1s cubic-bezier(0.23,1,0.32,1)",
+        }}
+      >
+        {/* Subtle top glow */}
+        <div style={{ position: "absolute", top: "-80px", left: "50%", transform: "translateX(-50%)", width: "300px", height: "200px", background: "radial-gradient(ellipse, rgba(139,0,0,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
 
         <div
           style={{
-            background: "rgba(4,0,10,0.88)",
-            backdropFilter: "blur(28px)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: "22px",
-            padding: "3rem 2.75rem 2.5rem",
-            position: "relative",
-            overflow: "hidden",
+            width: "100%",
+            maxWidth: "380px",
             animation: shake ? "shakeCard 0.5s ease" : "none",
           }}
         >
-          {/* Top accent bar */}
-          <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: "2px",
-            background: "linear-gradient(90deg, transparent, #8B0000 30%, #B8860B 60%, transparent)",
-            borderRadius: "22px 22px 0 0",
-          }} />
-
-          {/* Inner highlight */}
-          <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: "90px",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 100%)",
-            borderRadius: "22px 22px 0 0",
-            pointerEvents: "none",
-          }} />
-
-          {/* Corner ornaments */}
-          <div style={{ position: "absolute", top: "1.25rem", left: "1.25rem", width: "18px", height: "18px", borderTop: "1px solid rgba(184,134,11,0.3)", borderLeft: "1px solid rgba(184,134,11,0.3)", borderRadius: "3px 0 0 0" }} />
-          <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", width: "18px", height: "18px", borderTop: "1px solid rgba(184,134,11,0.3)", borderRight: "1px solid rgba(184,134,11,0.3)", borderRadius: "0 3px 0 0" }} />
-          <div style={{ position: "absolute", bottom: "1.25rem", left: "1.25rem", width: "18px", height: "18px", borderBottom: "1px solid rgba(184,134,11,0.3)", borderLeft: "1px solid rgba(184,134,11,0.3)", borderRadius: "0 0 0 3px" }} />
-          <div style={{ position: "absolute", bottom: "1.25rem", right: "1.25rem", width: "18px", height: "18px", borderBottom: "1px solid rgba(184,134,11,0.3)", borderRight: "1px solid rgba(184,134,11,0.3)", borderRadius: "0 0 3px 0" }} />
-
-          {/* Logo */}
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <div style={{ marginBottom: "0.5rem" }}>
-              <span
-                className="font-cinzel"
-                style={{
-                  fontSize: "clamp(1.9rem, 5vw, 2.6rem)",
-                  fontWeight: 900,
-                  background: "linear-gradient(135deg, #8B0000 0%, #B8860B 40%, #D4AF37 60%, #8B0000 100%)",
-                  backgroundSize: "200% auto",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  letterSpacing: "6px",
-                  animation: "shimmer 4s linear infinite",
-                  display: "inline-block",
-                }}
-              >
-                SHADOWWEAVE
-              </span>
+          {/* Mini logo */}
+          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.4rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "30px", marginBottom: "1.5rem" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#8B0000", boxShadow: "0 0 8px rgba(139,0,0,0.9)" }} />
+              <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "rgba(200,200,220,0.4)" }}>SHADOWWEAVE</span>
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", justifyContent: "center", margin: "0.75rem 0" }}>
-              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(184,134,11,0.4))" }} />
-              <span style={{ fontSize: "0.6rem", color: "rgba(184,134,11,0.5)", letterSpacing: "3px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>
-                Enter the Dark
-              </span>
-              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(184,134,11,0.4), transparent)" }} />
-            </div>
-
-            <p className="font-crimson" style={{ fontSize: "0.95rem", color: "rgba(200,200,220,0.45)", fontStyle: "italic", letterSpacing: "0.3px" }}>
-              Professional Dark Narrative Studio
+            <h2 className="font-cinzel" style={{ fontSize: "1.5rem", fontWeight: 900, color: "#E8E8F5", letterSpacing: "0.06em", marginBottom: "0.4rem" }}>
+              Enter the Dark
+            </h2>
+            <p style={{ fontSize: "0.8rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif", letterSpacing: "0.5px" }}>
+              Sign in or continue as guest below
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {/* Top accent bar */}
+          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5) 30%, rgba(184,134,11,0.4) 60%, transparent)", marginBottom: "2rem" }} />
 
-            {/* Email field */}
-            <div style={{ position: "relative" }}>
-              <label
-                className="font-montserrat"
-                style={{
-                  display: "block",
-                  fontSize: "0.65rem",
-                  color: focusedField === "email" ? "#B8860B" : "rgba(200,200,220,0.3)",
-                  letterSpacing: "2.5px",
-                  textTransform: "uppercase",
-                  marginBottom: "0.45rem",
-                  transition: "color 0.3s ease",
-                }}
-              >
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+
+            {/* Email */}
+            <div>
+              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused === "email" ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
                 Identity
               </label>
               <div style={{ position: "relative" }}>
-                <span style={{
-                  position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)",
-                  fontSize: "0.9rem", opacity: focusedField === "email" ? 0.8 : 0.3,
-                  transition: "opacity 0.3s", pointerEvents: "none", color: "#B8860B",
-                }}>
-                  ◈
-                </span>
+                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused === "email" ? "rgba(184,134,11,0.7)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◈</span>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setFocusedField("email")}
-                  onBlur={() => setFocusedField(null)}
+                  onFocus={() => setFocused("email")}
+                  onBlur={() => setFocused(null)}
                   placeholder="your@email.com"
                   autoComplete="email"
-                  style={{
-                    ...inputBase,
-                    paddingLeft: "2.5rem",
-                    borderColor: focusedField === "email" ? "rgba(184,134,11,0.55)" : email ? "rgba(139,0,0,0.35)" : "rgba(255,255,255,0.07)",
-                    boxShadow: focusedField === "email" ? "0 0 0 3px rgba(184,134,11,0.09), inset 0 0 20px rgba(184,134,11,0.04)" : "none",
-                    background: focusedField === "email" ? "rgba(184,134,11,0.04)" : email ? "rgba(139,0,0,0.04)" : "rgba(0,0,0,0.55)",
-                  }}
+                  style={inputStyle("email")}
                 />
               </div>
             </div>
 
-            {/* Password field */}
-            <div style={{ position: "relative" }}>
-              <label
-                className="font-montserrat"
-                style={{
-                  display: "block",
-                  fontSize: "0.65rem",
-                  color: focusedField === "password" ? "#B8860B" : "rgba(200,200,220,0.3)",
-                  letterSpacing: "2.5px",
-                  textTransform: "uppercase",
-                  marginBottom: "0.45rem",
-                  transition: "color 0.3s ease",
-                }}
-              >
+            {/* Password */}
+            <div>
+              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused === "pass" ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
                 Passphrase
               </label>
               <div style={{ position: "relative" }}>
-                <span style={{
-                  position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)",
-                  fontSize: "0.9rem", opacity: focusedField === "password" ? 0.8 : 0.3,
-                  transition: "opacity 0.3s", pointerEvents: "none", color: "#8B0000",
-                }}>
-                  ◆
-                </span>
+                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused === "pass" ? "rgba(139,0,0,0.8)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◆</span>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPass ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setFocusedField("password")}
-                  onBlur={() => setFocusedField(null)}
+                  onFocus={() => setFocused("pass")}
+                  onBlur={() => setFocused(null)}
                   placeholder="••••••••••••"
                   autoComplete="current-password"
-                  style={{
-                    ...inputBase,
-                    paddingLeft: "2.5rem",
-                    paddingRight: "3rem",
-                    borderColor: focusedField === "password" ? "rgba(184,134,11,0.55)" : password ? "rgba(139,0,0,0.35)" : "rgba(255,255,255,0.07)",
-                    boxShadow: focusedField === "password" ? "0 0 0 3px rgba(184,134,11,0.09), inset 0 0 20px rgba(184,134,11,0.04)" : "none",
-                    background: focusedField === "password" ? "rgba(184,134,11,0.04)" : password ? "rgba(139,0,0,0.04)" : "rgba(0,0,0,0.55)",
-                  }}
+                  style={{ ...inputStyle("pass"), paddingRight: "3rem" }}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute", right: "0.9rem", top: "50%", transform: "translateY(-50%)",
-                    background: "none", border: "none", cursor: "pointer",
-                    color: showPassword ? "#B8860B" : "rgba(200,200,220,0.25)",
-                    fontSize: "0.85rem", padding: "0.25rem",
-                    transition: "color 0.2s",
-                    lineHeight: 1,
-                  }}
+                  onClick={() => setShowPass(!showPass)}
+                  style={{ position: "absolute", right: "0.9rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: showPass ? "#B8860B" : "rgba(200,200,220,0.22)", fontSize: "0.9rem", padding: "0.25rem", transition: "color 0.2s", lineHeight: 1 }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#B8860B")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = showPassword ? "#B8860B" : "rgba(200,200,220,0.25)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = showPass ? "#B8860B" : "rgba(200,200,220,0.22)")}
                 >
-                  {showPassword ? "◉" : "○"}
+                  {showPass ? "◉" : "○"}
                 </button>
               </div>
             </div>
 
             {/* Forgot */}
-            <div style={{ textAlign: "right", marginTop: "-0.25rem" }}>
-              <button
-                type="button"
-                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.4)", fontFamily: "'Raleway', sans-serif", fontSize: "0.75rem", letterSpacing: "0.5px", transition: "color 0.2s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.85)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.4)")}
-              >
+            <div style={{ textAlign: "right", marginTop: "-0.4rem" }}>
+              <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.38)", fontFamily: "'Raleway', sans-serif", fontSize: "0.73rem", letterSpacing: "0.3px", transition: "color 0.2s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.8)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.38)")}>
                 Forgot passphrase?
               </button>
             </div>
 
-            {/* Submit button */}
+            {/* Enter button */}
             <button
               type="submit"
               disabled={loading}
               style={{
-                marginTop: "0.5rem",
+                marginTop: "0.4rem",
                 width: "100%",
                 padding: "1.05rem",
-                background: loading
-                  ? "rgba(139,0,0,0.3)"
-                  : "linear-gradient(135deg, #6B0000 0%, #8B0000 40%, #6B0000 100%)",
+                background: loading ? "rgba(100,0,0,0.3)" : "linear-gradient(135deg, #5A0000 0%, #8B0000 50%, #5A0000 100%)",
                 backgroundSize: "200% auto",
-                border: "1px solid rgba(139,0,0,0.5)",
-                borderRadius: "12px",
-                color: loading ? "rgba(240,240,255,0.45)" : "#F0F0FF",
+                border: `1px solid ${loading ? "rgba(139,0,0,0.2)" : "rgba(139,0,0,0.55)"}`,
+                borderRadius: "11px",
+                color: loading ? "rgba(240,240,255,0.4)" : "#F5F0FF",
                 fontFamily: "'Cinzel', serif",
-                fontSize: "0.95rem",
+                fontSize: "0.88rem",
                 fontWeight: 700,
                 letterSpacing: "4px",
                 cursor: loading ? "not-allowed" : "pointer",
                 textTransform: "uppercase",
-                transition: "all 0.35s cubic-bezier(0.23,1,0.32,1)",
-                position: "relative",
-                overflow: "hidden",
-                boxShadow: loading ? "none" : "0 4px 20px rgba(139,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+                transition: "all 0.35s ease",
+                boxShadow: loading ? "none" : "0 4px 24px rgba(139,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)",
                 animation: loading ? "none" : "shimmer 3s linear infinite",
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 30px rgba(139,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)";
-                  e.currentTarget.style.borderColor = "rgba(184,134,11,0.5)";
+                  e.currentTarget.style.boxShadow = "0 10px 35px rgba(139,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)";
+                  e.currentTarget.style.borderColor = "rgba(184,134,11,0.45)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!loading) {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(139,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)";
-                  e.currentTarget.style.borderColor = "rgba(139,0,0,0.5)";
+                  e.currentTarget.style.boxShadow = "0 4px 24px rgba(139,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)";
+                  e.currentTarget.style.borderColor = "rgba(139,0,0,0.55)";
                 }
               }}
             >
@@ -389,13 +359,13 @@ export default function Login({ onEnter }: LoginProps) {
             </button>
 
             {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "0.5rem 0" }}>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.05)" }} />
-              <span style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif" }}>OR</span>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.05)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "0.25rem 0" }}>
+              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.04)" }} />
+              <span className="font-montserrat" style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.18)", letterSpacing: "2px" }}>OR</span>
+              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.04)" }} />
             </div>
 
-            {/* Guest entry */}
+            {/* Guest */}
             <button
               type="button"
               onClick={onEnter}
@@ -403,11 +373,11 @@ export default function Login({ onEnter }: LoginProps) {
                 width: "100%",
                 padding: "0.9rem",
                 background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: "12px",
-                color: "rgba(200,200,220,0.4)",
+                border: "1px solid rgba(255,255,255,0.05)",
+                borderRadius: "11px",
+                color: "rgba(200,200,220,0.38)",
                 fontFamily: "'Cinzel', serif",
-                fontSize: "0.82rem",
+                fontSize: "0.78rem",
                 letterSpacing: "3px",
                 textTransform: "uppercase",
                 cursor: "pointer",
@@ -415,13 +385,13 @@ export default function Login({ onEnter }: LoginProps) {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
-                e.currentTarget.style.color = "rgba(200,200,220,0.7)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                e.currentTarget.style.color = "rgba(200,200,220,0.65)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = "rgba(255,255,255,0.02)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
-                e.currentTarget.style.color = "rgba(200,200,220,0.4)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+                e.currentTarget.style.color = "rgba(200,200,220,0.38)";
               }}
             >
               Continue as Guest
@@ -429,28 +399,17 @@ export default function Login({ onEnter }: LoginProps) {
           </form>
 
           {/* Footer */}
-          <div style={{ marginTop: "2rem", textAlign: "center" }}>
-            <p style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.18)", letterSpacing: "1.5px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>
-              No account? &nbsp;
-              <button
-                type="button"
-                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.45)", fontFamily: "inherit", fontSize: "inherit", letterSpacing: "inherit", textTransform: "inherit", transition: "color 0.2s" }}
+          <div style={{ marginTop: "1.75rem", textAlign: "center" }}>
+            <p className="font-montserrat" style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.16)", letterSpacing: "1.5px", textTransform: "uppercase" }}>
+              No account?{" "}
+              <button type="button" onClick={onEnter} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(184,134,11,0.42)", fontFamily: "inherit", fontSize: "inherit", letterSpacing: "inherit", textTransform: "inherit", transition: "color 0.2s" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#B8860B")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.45)")}
-                onClick={onEnter}
-              >
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(184,134,11,0.42)")}>
                 Create one
               </button>
             </p>
           </div>
         </div>
-
-        {/* Bottom glow strip */}
-        <div style={{
-          position: "absolute", bottom: "-20px", left: "15%", right: "15%", height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.4) 30%, rgba(184,134,11,0.3) 60%, transparent)",
-          filter: "blur(4px)",
-        }} />
       </div>
 
       <style>{`
@@ -458,10 +417,13 @@ export default function Login({ onEnter }: LoginProps) {
           0%,100% { transform: translateX(0); }
           15% { transform: translateX(-8px); }
           30% { transform: translateX(8px); }
-          45% { transform: translateX(-6px); }
-          60% { transform: translateX(6px); }
+          45% { transform: translateX(-5px); }
+          60% { transform: translateX(5px); }
           75% { transform: translateX(-3px); }
           90% { transform: translateX(3px); }
+        }
+        @media (max-width: 720px) {
+          .login-left { display: none !important; }
         }
       `}</style>
     </div>
