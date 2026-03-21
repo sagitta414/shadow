@@ -205,6 +205,7 @@ export default function Login({ onEnter }: LoginProps) {
 
       {/* ════ RIGHT PANEL — Login ════ */}
       <div
+        className="login-right-panel"
         style={{
           flex: 1,
           display: "flex",
@@ -224,6 +225,7 @@ export default function Login({ onEnter }: LoginProps) {
         <div style={{ position: "absolute", top: "-80px", left: "50%", transform: "translateX(-50%)", width: "300px", height: "200px", background: "radial-gradient(ellipse, rgba(139,0,0,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
 
         <div
+          className="login-form-box"
           style={{
             width: "100%",
             maxWidth: "380px",
@@ -424,6 +426,15 @@ export default function Login({ onEnter }: LoginProps) {
         }
         @media (max-width: 720px) {
           .login-left { display: none !important; }
+          .login-right-panel {
+            padding: 1.5rem !important;
+            justify-content: flex-start !important;
+            padding-top: 3rem !important;
+          }
+          .login-form-box { max-width: 100% !important; }
+        }
+        @media (max-width: 420px) {
+          .login-right-panel { padding: 1.25rem !important; padding-top: 2.5rem !important; }
         }
       `}</style>
     </div>

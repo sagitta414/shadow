@@ -105,6 +105,42 @@ export default function Homepage(props: HomepageProps) {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "transparent" }}>
+      <style>{`
+        /* ── Tablet (≤ 900px) ── */
+        @media (max-width: 900px) {
+          .hp-nav-stats { display: none !important; }
+          .hp-grid-r1 { grid-template-columns: 1fr !important; }
+          .hp-grid-r2 { grid-template-columns: 1fr 1fr !important; }
+          .hp-grid-r3 { grid-template-columns: 1fr !important; }
+          .hp-hero-strip { padding: 2.5rem 1.5rem 1.5rem !important; }
+          .hp-main { padding: 0 1.5rem 3rem !important; }
+        }
+        /* ── Mobile (≤ 600px) ── */
+        @media (max-width: 600px) {
+          .hp-nav { padding: 0 1rem !important; height: 56px !important; }
+          .hp-hero-strip { padding: 2rem 1rem 1.25rem !important; }
+          .hp-main { padding: 0 1rem 3rem !important; }
+          .hp-grid-r1,
+          .hp-grid-r2,
+          .hp-grid-r3 { grid-template-columns: 1fr !important; }
+          .hp-feature-left {
+            flex-direction: row !important;
+            align-items: center !important;
+            min-width: unset !important;
+            padding: 1.25rem 1.25rem !important;
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+            gap: 1rem;
+          }
+          .hp-feature-right { padding: 1.25rem !important; }
+          .hp-banner-content {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 1.25rem !important;
+            gap: 1rem !important;
+          }
+        }
+      `}</style>
 
       {/* Ambient glow */}
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
@@ -115,7 +151,7 @@ export default function Homepage(props: HomepageProps) {
       {/* ══════════════════════════════════════════════════════
           TOP NAV BAR
       ══════════════════════════════════════════════════════ */}
-      <nav style={{
+      <nav className="hp-nav" style={{
         position: "relative",
         zIndex: 10,
         display: "flex",
@@ -140,7 +176,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         {/* Center stats */}
-        <div style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
+        <div className="hp-nav-stats" style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
           {[["7", "Modules"], ["15+", "Questions"], ["2", "AI Modes"], ["4", "Themes"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "0.9rem", fontWeight: 900, color: "rgba(212,175,55,0.8)", lineHeight: 1 }}>{v}</div>
@@ -164,7 +200,7 @@ export default function Homepage(props: HomepageProps) {
       {/* ══════════════════════════════════════════════════════
           HERO TITLE STRIP
       ══════════════════════════════════════════════════════ */}
-      <div style={{
+      <div className="hp-hero-strip" style={{
         position: "relative",
         zIndex: 2,
         padding: "3.5rem 2.5rem 2rem",
@@ -199,10 +235,10 @@ export default function Homepage(props: HomepageProps) {
       {/* ══════════════════════════════════════════════════════
           TOOL GRID
       ══════════════════════════════════════════════════════ */}
-      <main style={{ flex: 1, padding: "0 2.5rem 4rem", maxWidth: "1400px", margin: "0 auto", width: "100%", boxSizing: "border-box", position: "relative", zIndex: 2 }}>
+      <main className="hp-main" style={{ flex: 1, padding: "0 2.5rem 4rem", maxWidth: "1400px", margin: "0 auto", width: "100%", boxSizing: "border-box", position: "relative", zIndex: 2 }}>
 
         {/* Row 1 — 2:1 split (wide left, narrow right) */}
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "0.875rem", marginBottom: "0.875rem" }}>
+        <div className="hp-grid-r1" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "0.875rem", marginBottom: "0.875rem" }}>
           {row1.map((t, i) => (
             <ToolCard key={t.id} tool={t} hovered={hov === t.id} onHover={setHov} onClick={(id) => handleClick(id, props)}
               size={i === 0 ? "feature" : "tall"} index={i} mounted={mounted} />
@@ -210,7 +246,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         {/* Row 2 — equal thirds */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.875rem", marginBottom: "0.875rem" }}>
+        <div className="hp-grid-r2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.875rem", marginBottom: "0.875rem" }}>
           {row2.map((t, i) => (
             <ToolCard key={t.id} tool={t} hovered={hov === t.id} onHover={setHov} onClick={(id) => handleClick(id, props)}
               size="standard" index={i + 2} mounted={mounted} />
@@ -218,7 +254,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         {/* Row 3 — 1:2 split (narrow left, wide right — opposite of row 1) */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "0.875rem" }}>
+        <div className="hp-grid-r3" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "0.875rem" }}>
           {row3.map((t, i) => (
             <ToolCard key={t.id} tool={t} hovered={hov === t.id} onHover={setHov} onClick={(id) => handleClick(id, props)}
               size={i === 1 ? "feature" : "tall"} index={i + 5} mounted={mounted} />
@@ -334,7 +370,7 @@ function ToolCard({ tool, hovered, onHover, onClick, size, index, mounted }: {
           // ── Feature card inner layout (horizontal) ──
           <>
             {/* Left accent panel */}
-            <div style={{
+            <div className="hp-feature-left" style={{
               padding: "2rem 1.75rem",
               borderRight: `1px solid rgba(${rgb},${hovered ? 0.25 : 0.1})`,
               display: "flex",
@@ -342,8 +378,7 @@ function ToolCard({ tool, hovered, onHover, onClick, size, index, mounted }: {
               minWidth: "150px",
               transition: "border-color 0.4s",
               background: `rgba(${rgb},${hovered ? 0.08 : 0.03})`,
-              transition2: "background 0.4s",
-            } as React.CSSProperties}>
+            }}>
               <div className="font-cinzel" style={{ fontSize: "0.58rem", letterSpacing: "3px", color: hovered ? tool.titleColor : "rgba(200,200,220,0.3)", marginBottom: "auto", transition: "color 0.3s" }}>{tool.num}</div>
               <div style={{ fontSize: "2.5rem", lineHeight: 1, marginBottom: "0.875rem", filter: hovered ? `drop-shadow(0 0 14px rgba(${rgb},0.8))` : `drop-shadow(0 0 4px rgba(${rgb},0.3))`, transition: "filter 0.4s" }}>{tool.icon}</div>
               <div className="font-montserrat" style={{ fontSize: "0.55rem", letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(200,200,220,0.3)", marginBottom: "0.2rem" }}>{tool.subtitle}</div>
@@ -351,7 +386,7 @@ function ToolCard({ tool, hovered, onHover, onClick, size, index, mounted }: {
             </div>
 
             {/* Right content panel */}
-            <div style={{ flex: 1, padding: "2rem 2rem 1.75rem 2rem", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
+            <div className="hp-feature-right" style={{ flex: 1, padding: "2rem 2rem 1.75rem 2rem", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
               <div>
                 <h2 className="font-cinzel" style={{ fontSize: "clamp(1.3rem, 2vw, 2rem)", fontWeight: 900, color: hovered ? "#F5EED0" : "rgba(240,240,255,0.85)", marginBottom: "0.75rem", lineHeight: 1.2, letterSpacing: "0.03em", transition: "color 0.3s" }}>
                   {tool.title}
@@ -467,7 +502,7 @@ function SuperheroBanner({ onSuperheroMode, mounted }: { onSuperheroMode: () => 
         {/* Ghost text */}
         <div className="font-cinzel" style={{ position: "absolute", right: "1.5rem", top: "50%", transform: "translateY(-50%)", fontSize: "6rem", fontWeight: 900, letterSpacing: "-0.03em", color: hov ? "rgba(255,184,0,0.07)" : "rgba(255,255,255,0.02)", lineHeight: 1, userSelect: "none", transition: "color 0.4s", pointerEvents: "none" }}>HERO</div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "2rem", padding: "1.75rem 2.25rem", flexWrap: "wrap", position: "relative" }}>
+        <div className="hp-banner-content" style={{ display: "flex", alignItems: "center", gap: "2rem", padding: "1.75rem 2.25rem", flexWrap: "wrap", position: "relative" }}>
           {/* Icon badge */}
           <div style={{
             width: "52px", height: "52px", borderRadius: "12px", flexShrink: 0,
