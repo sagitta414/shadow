@@ -6,11 +6,13 @@ import CaptorHomepage from "./pages/CaptorHomepage";
 import CaptorConfig from "./pages/CaptorConfig";
 import CaptorSummary from "./pages/CaptorSummary";
 import ScenarioGenerator from "./pages/ScenarioGenerator";
+import InteractiveStory from "./pages/InteractiveStory";
 
 type Page =
   | "home"
   | "character-params"
   | "story-editor"
+  | "interactive-story"
   | "captor-home"
   | "captor-config"
   | "captor-summary"
@@ -63,6 +65,7 @@ function BackgroundEffects() {
 export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [captorAnswers, setCaptorAnswers] = useState<Record<number, string>>({});
+  const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
 
   function navigate(p: Page) {
     setPage(p);
@@ -84,7 +87,17 @@ export default function App() {
       {page === "character-params" && (
         <CharacterParameters
           onBack={() => navigate("home")}
-          onProceed={() => navigate("story-editor")}
+          onProceed={(answers) => {
+            setCharacterAnswers(answers);
+            navigate("interactive-story");
+          }}
+        />
+      )}
+
+      {page === "interactive-story" && (
+        <InteractiveStory
+          characterAnswers={characterAnswers}
+          onBack={() => navigate("character-params")}
         />
       )}
 
