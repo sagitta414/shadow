@@ -185,6 +185,16 @@ const VILLAINS = [
   { name: "Mystique",         universe: "Marvel", scheme: "Infiltrate and destabilize mutant enemies",        icon: "🔵" },
   { name: "Morgan le Fay",    universe: "Marvel", scheme: "Rewrite reality with Arthurian dark sorcery",      icon: "🔮" },
   { name: "The Enchantress",  universe: "Marvel", scheme: "Enslave heroes through magical seduction",         icon: "💚" },
+  { name: "Kingpin",          universe: "Marvel", scheme: "Build a criminal empire through iron will and ruthless business",  icon: "🏛" },
+  { name: "Taskmaster",       universe: "Marvel", scheme: "Mirror any hero's technique and sell that advantage to enemies", icon: "🎭" },
+  { name: "Bullseye",         universe: "Marvel", scheme: "Make any object a lethal weapon and never miss the mark",        icon: "🎯" },
+  { name: "Purple Man",       universe: "Marvel", scheme: "Bend any mind to absolute obedience through pheromone control",  icon: "🟣" },
+  { name: "Malekith",         universe: "Marvel", scheme: "Plunge all Nine Realms into eternal darkness for the Dark Elves",icon: "🌑" },
+  { name: "Gorr the God Butcher", universe: "Marvel", scheme: "Hunt and exterminate every god across every timeline",      icon: "⚔" },
+  { name: "Madame Hydra",     universe: "Marvel", scheme: "Spread HYDRA's serpentine dominion from the shadows",           icon: "🐍" },
+  { name: "Abomination",      universe: "Marvel", scheme: "Surpass the Hulk and crush all resistance in his path",         icon: "💀" },
+  { name: "Namor",            universe: "Marvel", scheme: "Force the surface world to bow to Atlantean supremacy",         icon: "🌊" },
+  { name: "Cassandra Nova",   universe: "Marvel", scheme: "Destroy the Xavier legacy from within using his own power",     icon: "🔮" },
   // DC
   { name: "Darkseid",         universe: "DC",     scheme: "Discover the Anti-Life Equation",                  icon: "💥" },
   { name: "Lex Luthor",       universe: "DC",     scheme: "Prove humanity's superiority over gods",           icon: "💰" },
@@ -204,6 +214,14 @@ const VILLAINS = [
   { name: "Black Adam",       universe: "DC",     scheme: "Reclaim Kahndaq and punish the unworthy",          icon: "⚡" },
   { name: "Amanda Waller",    universe: "DC",     scheme: "Control metahumans as weapons for the state",      icon: "🏛" },
   { name: "Granny Goodness",  universe: "DC",     scheme: "Break heroes through endless torment",             icon: "👵" },
+  { name: "Bane",            universe: "DC",     scheme: "Break Batman and seize Gotham as his conquered throne",              icon: "💪" },
+  { name: "Scarecrow",       universe: "DC",     scheme: "Drown the world in its own paralyzing fear and madness",             icon: "🌾" },
+  { name: "The Riddler",     universe: "DC",     scheme: "Prove superior intellect by destroying the greatest minds in Gotham", icon: "❓" },
+  { name: "Anti-Monitor",    universe: "DC",     scheme: "Annihilate the positive matter multiverse and replace it with anti-matter", icon: "💥" },
+  { name: "Parasite",        universe: "DC",     scheme: "Drain every hero's power and become an unstoppable living god",      icon: "🟣" },
+  { name: "Giganta",         universe: "DC",     scheme: "Crush obstacles at towering height and claim what she desires",      icon: "⬆" },
+  { name: "Queen of Fables", universe: "DC",     scheme: "Rewrite reality as her dark fairy tale kingdom of terror",           icon: "📖" },
+  { name: "Ocean Master",    universe: "DC",     scheme: "Declare war on the surface world in Atlantis's name",                icon: "🔱" },
   // CW / Arrowverse
   { name: "Malcolm Merlyn",   universe: "CW",     scheme: "Destroy the Glades to purge Star City of sin",    icon: "🏹" },
   { name: "Damien Darhk",     universe: "CW",     scheme: "Embrace Hive's death magic to raze the world",    icon: "💀" },
@@ -218,6 +236,9 @@ const VILLAINS = [
   { name: "Non",              universe: "CW",     scheme: "Mind-control all humans into subservience",        icon: "🌀" },
   { name: "Agent Liberty",    universe: "CW",     scheme: "Incite humanity to exterminate metahumans",        icon: "🗽" },
   { name: "Mallus",           universe: "CW",     scheme: "Break free of his prison and devour all time",     icon: "😈" },
+  { name: "Cicada",          universe: "CW",     scheme: "Systematically hunt and kill every metahuman alive on Earth",   icon: "🪲" },
+  { name: "Bloodwork",       universe: "CW",     scheme: "Weaponise blood control to achieve biological immortality",     icon: "🩸" },
+  { name: "Cayden James",    universe: "CW",     scheme: "Turn cyber-terrorism into world-ending leverage over Star City", icon: "💻" },
   // The Boys
   { name: "Homelander",       universe: "TB",     scheme: "Maintain iron control over Vought and all supes",   icon: "🔴" },
   { name: "Stormfront",       universe: "TB",     scheme: "Weaponize supes for ideological supremacy",         icon: "⚡" },
@@ -227,6 +248,9 @@ const VILLAINS = [
   { name: "Black Noir",       universe: "TB",     scheme: "Carry out Vought's kill-orders without hesitation", icon: "🖤" },
   { name: "Translucent",      universe: "TB",     scheme: "Infiltrate and expose enemies from the shadows",    icon: "👁" },
   { name: "Lamplighter",      universe: "TB",     scheme: "Burn any loose end Vought orders him to eliminate", icon: "🔥" },
+  { name: "Crimson Countess",universe: "TB",     scheme: "Exploit celebrity supe fame while hiding Payback's darkest atrocities", icon: "❤" },
+  { name: "Blue Hawk",       universe: "TB",     scheme: "Use Vought backing to enforce brutal vigilante justice with zero accountability", icon: "🦅" },
+  { name: "Gunpowder",       universe: "TB",     scheme: "Leverage gun-based powers and political connections to serve Vought's agenda", icon: "🔫" },
 ];
 
 // ── Weakness Catalog ──────────────────────────────────────────
