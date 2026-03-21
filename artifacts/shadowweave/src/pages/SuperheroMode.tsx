@@ -153,6 +153,15 @@ const CW_HEROES = [
   { name: "M'gann M'orzz",    alias: "Miss Martian",       power: "Martian shapeshifting & telepathy",      icon: "🟢" },
 ];
 
+const TB_HEROES = [
+  { name: "Starlight",        alias: "Annie January",      power: "Light energy blasts, flight & super strength", icon: "✨" },
+  { name: "Queen Maeve",      alias: "The Warrior Queen",  power: "Superhuman strength & near-invulnerability",   icon: "⚔" },
+  { name: "Kimiko",           alias: "Kimiko Miyashiro",   power: "Superhuman strength & rapid regeneration",     icon: "🩸" },
+  { name: "Firecracker",      alias: "Sheryl Braxton",     power: "Incendiary blasts & explosive manipulation",   icon: "🔥" },
+  { name: "Sister Sage",      alias: "The Smartest Person", power: "Superintelligence & neural manipulation",     icon: "🧠" },
+  { name: "Victoria Neuman",  alias: "The Nupe",           power: "Psychic head-explosion & political influence", icon: "💥" },
+];
+
 const VILLAINS = [
   // Marvel
   { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",           icon: "💀" },
@@ -208,6 +217,15 @@ const VILLAINS = [
   { name: "Non",              universe: "CW",     scheme: "Mind-control all humans into subservience",        icon: "🌀" },
   { name: "Agent Liberty",    universe: "CW",     scheme: "Incite humanity to exterminate metahumans",        icon: "🗽" },
   { name: "Mallus",           universe: "CW",     scheme: "Break free of his prison and devour all time",     icon: "😈" },
+  // The Boys
+  { name: "Homelander",       universe: "TB",     scheme: "Maintain iron control over Vought and all supes",   icon: "🔴" },
+  { name: "Stormfront",       universe: "TB",     scheme: "Weaponize supes for ideological supremacy",         icon: "⚡" },
+  { name: "Soldier Boy",      universe: "TB",     scheme: "Reclaim relevance through ruthless retribution",    icon: "🛡" },
+  { name: "The Deep",         universe: "TB",     scheme: "Claw back standing in The Seven by any means",      icon: "🌊" },
+  { name: "A-Train",          universe: "TB",     scheme: "Outrun his past and stay relevant at any cost",     icon: "💨" },
+  { name: "Black Noir",       universe: "TB",     scheme: "Carry out Vought's kill-orders without hesitation", icon: "🖤" },
+  { name: "Translucent",      universe: "TB",     scheme: "Infiltrate and expose enemies from the shadows",    icon: "👁" },
+  { name: "Lamplighter",      universe: "TB",     scheme: "Burn any loose end Vought orders him to eliminate", icon: "🔥" },
 ];
 
 const SETTINGS = [
@@ -286,8 +304,8 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW";
-type VillainFilter = "ALL" | "Marvel" | "DC" | "CW";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB";
+type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB";
 
 // ── Component ─────────────────────────────────────────────────
 export default function SuperheroMode({ onBack }: SuperheroModeProps) {
@@ -342,6 +360,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     ...MARVEL_HEROES.map((h) => ({ ...h, universe: "MARVEL" })),
     ...DC_HEROES.map((h) => ({ ...h, universe: "DC" })),
     ...CW_HEROES.map((h) => ({ ...h, universe: "CW" })),
+    ...TB_HEROES.map((h) => ({ ...h, universe: "TB" })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -609,9 +628,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
-              {(["ALL", "MARVEL", "DC", "CW"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : "CW ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -639,9 +658,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 {selectedHeroes.map((h) => {
                   const isMarvel = h.universe === "MARVEL";
                   const isCW = h.universe === "CW";
-                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : "rgba(0,100,220,0.18)";
-                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : "rgba(0,100,220,0.3)";
+                  const isTB = h.universe === "TB";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
@@ -665,10 +685,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             {filteredHeroes.map((hero) => {
               const isMarvel = hero.universe === "MARVEL";
               const isCW = hero.universe === "CW";
+              const isTB = hero.universe === "TB";
               const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : "rgba(0,100,220,0.15)";
-              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : "rgba(0,100,220,0.2)";
+              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
+              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : "rgba(0,100,220,0.15)";
+              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : "rgba(0,100,220,0.2)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
@@ -742,9 +763,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               {/* Villain universe filter */}
               <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
-                  {(["ALL", "Marvel", "DC", "CW"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
-                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : "CW ✦"}
+                  {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : "The Boys ✦"}
                     </button>
                   ))}
                 </div>
@@ -757,8 +778,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isSelected = selectedVillain?.name === villain.name;
                   const isMv = villain.universe === "Marvel";
                   const isCW = villain.universe === "CW";
-                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : "#60A0FF";
-                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : "rgba(0,100,220,0.18)";
+                  const isTB = villain.universe === "TB";
+                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
+                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
                   return (
                     <button
                       key={villain.name}
