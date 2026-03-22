@@ -176,6 +176,21 @@ const PR_HEROES = [
   { name: "Syd Drew",        alias: "Pink SPD Ranger",            power: "Pink SPD Morpher & matter-density manipulation",     icon: "💎" },
   { name: "Emma Goodall",    alias: "Pink Megaforce Ranger",      power: "Phoenix Zord & nature-based Megaforce powers",       icon: "🦋" },
   { name: "Shelby Watkins",  alias: "Pink Dino Charge Ranger",    power: "Pink Dino Charge Morpher & Triceratops summoning",   icon: "🦕" },
+  { name: "Aisha Campbell",  alias: "Yellow Mighty Morphin Ranger",power: "Sabertooth Tiger Dinozord & fierce martial arts",   icon: "🐯" },
+  { name: "Jen Scotts",      alias: "Pink Time Force Ranger",     power: "Pink Time Force Morpher & temporal law enforcement", icon: "⏳" },
+  { name: "Katie Walker",    alias: "Yellow Time Force Ranger",   power: "Yellow Time Force Morpher & superhuman strength",    icon: "💪" },
+  { name: "Kendrix Morgan",  alias: "Pink Lost Galaxy Ranger",    power: "Pink Quasar Saber & selfless cosmic sacrifice",      icon: "🌟" },
+  { name: "Maya",            alias: "Yellow Lost Galaxy Ranger",  power: "Yellow Quasar Saber & primal jungle instincts",      icon: "🌿" },
+  { name: "Vida Rocca",      alias: "Pink Mystic Force Ranger",   power: "Pink Mystic Morpher & magical wind transformation",  icon: "🌸" },
+  { name: "Madison Rocca",   alias: "Blue Mystic Force Ranger",   power: "Blue Mystic Morpher & water elemental sorcery",      icon: "💧" },
+  { name: "Summer Landsdown",alias: "Yellow RPM Ranger",          power: "Yellow RPM Morpher & desert combat expertise",       icon: "☀" },
+  { name: "Gemma",           alias: "Silver RPM Ranger",          power: "Silver RPM Morpher & Cloud Hatchet twin-blade combat",icon: "⚔" },
+  { name: "Mia Watanabe",    alias: "Pink Samurai Ranger",        power: "Sky Symbol Power & Sky Fan Folding Zord",            icon: "🌸" },
+  { name: "Emily",           alias: "Yellow Samurai Ranger",      power: "Earth Symbol Power & Earth Slicer disc weapon",      icon: "🌍" },
+  { name: "Gia Moran",       alias: "Yellow Megaforce Ranger",    power: "Tiger Zord & Super Megaforce combat mastery",        icon: "🐅" },
+  { name: "Kendall Morgan",  alias: "Purple Dino Charge Ranger",  power: "Purple Energem & Plesio Zord creation genius",       icon: "🔮" },
+  { name: "Amelia Jones",    alias: "Pink Dino Fury Ranger",      power: "Pink Dino Fury Morpher & Electro Zord channeling",   icon: "⚡" },
+  { name: "Izzy Garcia",     alias: "Green Dino Fury Ranger",     power: "Green Dino Fury Morpher & Mosa Razor Zord control",  icon: "🌿" },
 ];
 
 const VILLAINS = [
