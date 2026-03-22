@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "iHPE1tubD4I92S5VX7UI_"
+uri = "file://shadowweave-export.tar.gz"
+type = "unspecified"
+title = "SHADOWWEAVE — Full Source Export (118 files, 238 KB)"
