@@ -22,12 +22,12 @@ interface HomepageProps {
 }
 
 const DAILY_HEROINES = [
-  { name: "Black Widow",   color: "#FF6060" }, { name: "Scarlet Witch", color: "#FF6060" },
-  { name: "Wonder Woman",  color: "#60A0FF" }, { name: "Zatanna",       color: "#60A0FF" },
-  { name: "Black Canary",  color: "#40E090" }, { name: "Supergirl",     color: "#40E090" },
+  { name: "Black Widow",   color: "#F87171" }, { name: "Scarlet Witch", color: "#F87171" },
+  { name: "Wonder Woman",  color: "#60A5FA" }, { name: "Zatanna",       color: "#60A5FA" },
+  { name: "Black Canary",  color: "#34D399" }, { name: "Supergirl",     color: "#34D399" },
   { name: "Elsa",          color: "#C084FC" }, { name: "Megara",        color: "#C084FC" },
-  { name: "Mulan",         color: "#C084FC" }, { name: "Starlight",     color: "#FF3D00" },
-  { name: "Kimiko",        color: "#FF3D00" }, { name: "Pocahontas",    color: "#C084FC" },
+  { name: "Mulan",         color: "#C084FC" }, { name: "Starlight",     color: "#FB923C" },
+  { name: "Kimiko",        color: "#FB923C" }, { name: "Pocahontas",    color: "#C084FC" },
 ];
 const DAILY_VILLAINS = [
   "The Red Room Director","Baron Mordo","HYDRA Commander","Lex Luthor","Deathstroke","Circe",
@@ -59,7 +59,6 @@ function getDailyScenario() {
   return { heroine, villain, setting, title: t.replace("{heroine}", heroine.name).replace("{villain}", villain) };
 }
 
-// ─── PRIMARY CARD ──────────────────────────────────────────────────────────────
 function PrimaryCard({
   num, icon, iconImg, tagline, title, desc, stats, features, cta,
   accent, r, g, b, onClick,
@@ -79,81 +78,74 @@ function PrimaryCard({
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative",
-        background: `radial-gradient(ellipse at 30% 0%, rgba(${rgb},0.17) 0%, rgba(0,0,0,0) 55%), linear-gradient(175deg, rgba(6,2,14,1) 0%, rgba(10,4,22,1) 100%)`,
-        border: `1px solid ${hov ? `rgba(${rgb},0.5)` : `rgba(${rgb},0.1)`}`,
-        borderRadius: "14px",
-        padding: "1.75rem 1.6rem 1.5rem",
-        cursor: "pointer",
+        borderRadius: "18px",
         overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-        transition: "border-color 0.3s, box-shadow 0.35s, transform 0.25s",
+        cursor: "pointer",
+        height: "340px",
+        flexShrink: 0,
+        border: `1px solid ${hov ? `rgba(${rgb},0.7)` : `rgba(${rgb},0.18)` }`,
         boxShadow: hov
-          ? `0 16px 70px rgba(${rgb},0.2), 0 0 0 1px rgba(${rgb},0.05), inset 0 1px 0 rgba(${rgb},0.08)`
-          : `0 4px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.025)`,
-        transform: hov ? "translateY(-3px)" : "translateY(0)",
+          ? `0 0 0 1px rgba(${rgb},0.25), 0 24px 80px rgba(${rgb},0.35), 0 0 120px rgba(${rgb},0.1) inset`
+          : `0 4px 32px rgba(0,0,0,0.6), 0 0 0 0px rgba(${rgb},0)`,
+        transition: "box-shadow 0.35s, border-color 0.35s, transform 0.3s",
+        transform: hov ? "translateY(-5px) scale(1.01)" : "translateY(0) scale(1)",
       }}
     >
+      {/* Full-bleed background image */}
+      {iconImg && (
+        <img
+          src={iconImg}
+          alt={icon}
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover",
+            objectPosition: "center top",
+            opacity: hov ? 0.62 : 0.42,
+            transform: hov ? "scale(1.08)" : "scale(1)",
+            transition: "opacity 0.4s, transform 0.5s ease",
+          }}
+        />
+      )}
+
+      {/* Gradient overlays */}
+      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(4,1,12,0.98) 0%, rgba(4,1,12,0.75) 38%, rgba(4,1,12,0.15) 70%, transparent 100%)` }} />
+      <div style={{ position: "absolute", inset: 0, background: hov ? `radial-gradient(ellipse at 50% 0%, rgba(${rgb},0.18) 0%, transparent 65%)` : "none", transition: "opacity 0.4s" }} />
+
       {/* Top shimmer line */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.9) 40%, rgba(${rgb},1) 60%, transparent)` : `linear-gradient(90deg, transparent, rgba(${rgb},0.2) 50%, transparent)`, transition: "opacity 0.35s" }} />
-      {/* Light ray */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: `linear-gradient(140deg, rgba(${rgb},${hov ? 0.08 : 0.03}) 0%, transparent 50%)`, transition: "opacity 0.35s" }} />
-      {/* Watermark numeral */}
-      <div style={{ position: "absolute", bottom: "-0.5rem", right: "1rem", fontFamily: "'Cinzel', serif", fontSize: "6.5rem", fontWeight: 900, color: `rgba(${rgb},${hov ? 0.065 : 0.03})`, lineHeight: 1, pointerEvents: "none", transition: "color 0.35s", userSelect: "none" }}>{num}</div>
-      {/* Shimmer sweep */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: `linear-gradient(110deg, transparent 30%, rgba(${rgb},0.05) 50%, transparent 70%)`, backgroundSize: "200% 100%", animation: hov ? "shimmer 2.5s linear infinite" : "none" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${rgb},${hov ? 1 : 0.4}) 40%, rgba(${rgb},${hov ? 1 : 0.4}) 60%, transparent)`, transition: "opacity 0.4s" }} />
 
-      {/* Icon + tagline */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <div style={{ lineHeight: 1, filter: hov ? `drop-shadow(0 0 22px rgba(${rgb},1)) drop-shadow(0 0 50px rgba(${rgb},0.5))` : `drop-shadow(0 0 7px rgba(${rgb},0.45))`, transition: "filter 0.35s, transform 0.28s", transform: hov ? "scale(1.08) rotate(-3deg)" : "scale(1)", display: "inline-block", flexShrink: 0 }}>
-          {iconImg
-            ? <img src={iconImg} alt={icon} style={{ width: "58px", height: "58px", objectFit: "cover", borderRadius: "10px", display: "block" }} />
-            : <span style={{ fontSize: "2.25rem" }}>{icon}</span>
-          }
+      {/* Tagline badge top-right */}
+      <div style={{ position: "absolute", top: "1rem", right: "1rem", fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "3px", color: `rgba(${rgb},${hov ? 0.9 : 0.55})`, textTransform: "uppercase", background: `rgba(${rgb},0.1)`, border: `1px solid rgba(${rgb},0.2)`, borderRadius: "30px", padding: "3px 10px", backdropFilter: "blur(8px)", transition: "color 0.3s" }}>{tagline}</div>
+
+      {/* Roman numeral watermark */}
+      <div style={{ position: "absolute", top: "0.8rem", left: "1.1rem", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 900, color: `rgba(${rgb},${hov ? 0.55 : 0.28})`, letterSpacing: "2px", transition: "color 0.35s" }}>{num}</div>
+
+      {/* Bottom content */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.4rem 1.5rem 1.3rem" }}>
+        <h2 style={{ margin: "0 0 0.4rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.1rem, 2vw, 1.45rem)", fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.1, color: hov ? "#FFF" : `rgba(230,225,255,0.88)`, transition: "color 0.3s", textShadow: hov ? `0 0 40px rgba(${rgb},0.8)` : "none" }}>{title}</h2>
+        <p style={{ margin: "0 0 0.9rem", fontSize: "0.68rem", color: hov ? "rgba(220,215,240,0.55)" : "rgba(200,195,225,0.35)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.65, transition: "color 0.3s" }}>{desc}</p>
+
+        {/* Stats row */}
+        <div style={{ display: "flex", gap: "1.2rem", marginBottom: "0.9rem", paddingBottom: "0.75rem", borderBottom: `1px solid rgba(${rgb},${hov ? 0.2 : 0.08})`, transition: "border-color 0.3s" }}>
+          {stats.map(([v, l]) => (
+            <div key={l}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: hov ? accent : `rgba(${rgb},0.75)`, lineHeight: 1, transition: "color 0.3s", textShadow: hov ? `0 0 20px rgba(${rgb},0.9)` : "none" }}>{v}</div>
+              <div style={{ fontSize: "0.38rem", color: `rgba(${rgb},0.38)`, letterSpacing: "2px", textTransform: "uppercase", marginTop: "3px" }}>{l}</div>
+            </div>
+          ))}
         </div>
-        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.49rem", letterSpacing: "3.5px", color: `rgba(${rgb},${hov ? 0.7 : 0.3})`, transition: "color 0.3s", paddingTop: "0.2rem", textTransform: "uppercase" }}>{tagline}</div>
-      </div>
 
-      {/* Title + underline */}
-      <div>
-        <h2 style={{ margin: 0, fontFamily: "'Cinzel', serif", fontSize: "clamp(1.15rem, 2vw, 1.5rem)", fontWeight: 900, letterSpacing: "0.05em", lineHeight: 1.1, color: hov ? "#FFF" : "rgba(235,230,255,0.78)", transition: "color 0.3s" }}>{title}</h2>
-        <div style={{ marginTop: "0.5rem", width: hov ? "44px" : "18px", height: "1.5px", background: `rgba(${rgb},${hov ? 0.9 : 0.3})`, transition: "all 0.4s ease", borderRadius: "2px" }} />
-      </div>
-
-      {/* Desc */}
-      <p style={{ margin: 0, fontSize: "0.77rem", color: "rgba(200,195,225,0.38)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.72, flex: 1 }}>{desc}</p>
-
-      {/* Stats */}
-      <div style={{ display: "flex", gap: "1.5rem", paddingTop: "0.6rem", borderTop: `1px solid rgba(${rgb},0.07)` }}>
-        {stats.map(([v, l]) => (
-          <div key={l}>
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: hov ? accent : `rgba(${rgb},0.6)`, lineHeight: 1, transition: "color 0.3s" }}>{v}</div>
-            <div style={{ fontSize: "0.43rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "3px" }}>{l}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Features */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.28rem" }}>
-        {features.map((f) => (
-          <div key={f} style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
-            <div style={{ width: "4px", height: "1px", background: `rgba(${rgb},${hov ? 0.65 : 0.22})`, flexShrink: 0, transition: "background 0.3s" }} />
-            <span style={{ fontSize: "0.67rem", color: "rgba(200,195,230,0.32)", fontFamily: "'Raleway', sans-serif" }}>{f}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* CTA */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.78rem 1.2rem", background: hov ? `rgba(${rgb},0.11)` : `rgba(${rgb},0.04)`, border: `1px solid ${hov ? `rgba(${rgb},0.4)` : `rgba(${rgb},0.09)`}`, borderRadius: "9px", transition: "all 0.3s ease" }}>
-        <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.68rem", letterSpacing: "2.5px", textTransform: "uppercase", color: hov ? accent : `rgba(${rgb},0.45)`, transition: "color 0.3s", fontWeight: 700 }}>{cta}</span>
-        <span style={{ color: hov ? accent : `rgba(${rgb},0.22)`, transition: "all 0.3s", fontSize: "1rem", transform: hov ? "translateX(3px)" : "none", display: "inline-block" }}>→</span>
+        {/* CTA */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.62rem 1rem", background: hov ? `rgba(${rgb},0.18)` : `rgba(${rgb},0.07)`, border: `1px solid ${hov ? `rgba(${rgb},0.55)` : `rgba(${rgb},0.14)`}`, borderRadius: "10px", transition: "all 0.3s", backdropFilter: "blur(10px)" }}>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "2.5px", textTransform: "uppercase", color: hov ? accent : `rgba(${rgb},0.55)`, transition: "color 0.3s", fontWeight: 700, textShadow: hov ? `0 0 16px rgba(${rgb},1)` : "none" }}>{cta}</span>
+          <span style={{ color: hov ? accent : `rgba(${rgb},0.3)`, transition: "all 0.3s", fontSize: "0.9rem", transform: hov ? "translateX(4px)" : "none", display: "inline-block", textShadow: hov ? `0 0 12px rgba(${rgb},1)` : "none" }}>→</span>
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── SUB-MODE CARD (specialist / utility under a primary) ──────────────────────
 function SubCard({ icon, iconImg, title, desc, accent, r, g, b, badge, onClick }: {
   icon: string; iconImg?: string; title: string; desc: string; accent: string;
   r: number; g: number; b: number; badge?: string; onClick: () => void;
@@ -167,46 +159,42 @@ function SubCard({ icon, iconImg, title, desc, accent, r, g, b, badge, onClick }
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative",
-        background: hov ? `rgba(${rgb},0.07)` : "rgba(5,2,12,0.75)",
-        border: `1px solid ${hov ? `rgba(${rgb},0.38)` : `rgba(${rgb},0.09)`}`,
-        borderRadius: "10px",
-        padding: "0.9rem 1rem",
+        background: hov ? `rgba(${rgb},0.1)` : "rgba(8,3,18,0.7)",
+        border: `1px solid ${hov ? `rgba(${rgb},0.5)` : `rgba(${rgb},0.12)`}`,
+        borderRadius: "12px",
+        padding: "0.75rem 0.9rem",
         cursor: "pointer",
-        transition: "all 0.25s ease",
+        transition: "all 0.22s ease",
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
-        gap: "0.75rem",
-        boxShadow: hov ? `0 6px 30px rgba(${rgb},0.12)` : "none",
+        gap: "0.7rem",
+        boxShadow: hov ? `0 4px 24px rgba(${rgb},0.18), 0 0 0 1px rgba(${rgb},0.08)` : "none",
+        backdropFilter: "blur(8px)",
       }}
     >
-      {/* Top shimmer */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.7), transparent)` : `linear-gradient(90deg, transparent, rgba(${rgb},0.18), transparent)`, transition: "opacity 0.25s" }} />
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", background: hov ? `linear-gradient(to bottom, transparent, rgba(${rgb},0.9), transparent)` : `rgba(${rgb},0.2)`, transition: "all 0.25s", borderRadius: "12px 0 0 12px" }} />
 
-      {/* Icon box */}
-      <div style={{ width: "34px", height: "34px", borderRadius: "8px", background: `rgba(${rgb},${hov ? 0.18 : 0.07})`, border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.12})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 10px rgba(${rgb},0.7))` : "none", overflow: "hidden" }}>
+      <div style={{ width: "38px", height: "38px", borderRadius: "10px", overflow: "hidden", border: `1px solid rgba(${rgb},${hov ? 0.4 : 0.15})`, flexShrink: 0, transition: "border-color 0.25s, box-shadow 0.25s", boxShadow: hov ? `0 0 16px rgba(${rgb},0.5)` : "none" }}>
         {iconImg
-          ? <img src={iconImg} alt={icon} style={{ width: "34px", height: "34px", objectFit: "cover", display: "block" }} />
-          : icon
+          ? <img src={iconImg} alt={icon} style={{ width: "38px", height: "38px", objectFit: "cover", display: "block" }} />
+          : <div style={{ width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", background: `rgba(${rgb},0.1)` }}>{icon}</div>
         }
       </div>
 
-      {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", marginBottom: "0.18rem" }}>
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.73rem", fontWeight: 700, color: hov ? "#FFF" : `rgba(${rgb},0.72)`, transition: "color 0.25s", letterSpacing: "0.03em" }}>{title}</span>
-          {badge && <span style={{ fontSize: "0.38rem", letterSpacing: "1.5px", padding: "1px 5px", borderRadius: "3px", background: `rgba(${rgb},0.14)`, color: accent, fontFamily: "'Cinzel', serif", textTransform: "uppercase", flexShrink: 0 }}>{badge}</span>}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.14rem" }}>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.7rem", fontWeight: 700, color: hov ? "#FFF" : `rgba(225,220,245,0.72)`, transition: "color 0.22s", letterSpacing: "0.02em" }}>{title}</span>
+          {badge && <span style={{ fontSize: "0.36rem", letterSpacing: "1.5px", padding: "2px 6px", borderRadius: "4px", background: `rgba(${rgb},0.18)`, color: accent, fontFamily: "'Cinzel', serif", textTransform: "uppercase", flexShrink: 0, border: `1px solid rgba(${rgb},0.22)` }}>{badge}</span>}
         </div>
-        <div style={{ fontSize: "0.63rem", color: "rgba(200,195,225,0.27)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{desc}</div>
+        <div style={{ fontSize: "0.6rem", color: "rgba(200,195,225,0.3)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.45, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{desc}</div>
       </div>
 
-      {/* Arrow */}
-      <span style={{ fontSize: "0.75rem", color: hov ? `rgba(${rgb},0.7)` : "rgba(255,255,255,0.07)", transition: "all 0.25s", flexShrink: 0, transform: hov ? "translateX(2px)" : "none", display: "inline-block" }}>→</span>
+      <span style={{ fontSize: "0.7rem", color: hov ? accent : "rgba(255,255,255,0.1)", transition: "all 0.22s", flexShrink: 0, transform: hov ? "translateX(3px)" : "none", display: "inline-block", textShadow: hov ? `0 0 10px rgba(${rgb},1)` : "none" }}>→</span>
     </div>
   );
 }
 
-// ─── GENERAL TOOL TILE ─────────────────────────────────────────────────────────
 function ToolTile({ icon, title, desc, hex, r, g, b, onClick }: {
   icon: string; title: string; desc: string; hex: string;
   r: number; g: number; b: number; onClick: () => void;
@@ -218,16 +206,9 @@ function ToolTile({ icon, title, desc, hex, r, g, b, onClick }: {
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{
-        background: hov ? `rgba(${rgb},0.05)` : "rgba(8,4,18,0.7)",
-        border: `1px solid ${hov ? `rgba(${rgb},0.28)` : "rgba(255,255,255,0.04)"}`,
-        borderRadius: "10px", padding: "0.9rem 1rem",
-        cursor: "pointer", transition: "all 0.25s",
-        display: "flex", alignItems: "center", gap: "0.85rem",
-        position: "relative", overflow: "hidden",
-      }}
+      style={{ position: "relative", background: hov ? `rgba(${rgb},0.1)` : "rgba(6,2,14,0.6)", border: `1px solid ${hov ? `rgba(${rgb},0.4)` : `rgba(${rgb},0.1)`}`, borderRadius: "12px", padding: "0.85rem 1rem", cursor: "pointer", transition: "all 0.22s", display: "flex", alignItems: "center", gap: "0.7rem", overflow: "hidden", backdropFilter: "blur(8px)", boxShadow: hov ? `0 0 24px rgba(${rgb},0.15)` : "none" }}
     >
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "2px", background: hov ? hex : "transparent", transition: "background 0.25s", borderRadius: "2px 0 0 2px" }} />
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "2px", background: hov ? hex : "transparent", transition: "background 0.25s", borderRadius: "12px 0 0 12px" }} />
       <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: `rgba(${rgb},${hov ? 0.15 : 0.07})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 8px rgba(${rgb},0.7))` : "none" }}>{icon}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.7rem", fontWeight: 700, color: hov ? "#FFF" : "rgba(220,215,240,0.52)", letterSpacing: "0.03em", transition: "color 0.25s", marginBottom: "0.15rem" }}>{title}</div>
@@ -238,85 +219,86 @@ function ToolTile({ icon, title, desc, hex, r, g, b, onClick }: {
   );
 }
 
-// ─── DAILY DISPATCH ────────────────────────────────────────────────────────────
 function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, onChronicle }: {
   heroine: { name: string; color: string }; villain: string; setting: string;
   title: string; today: string; onGenerate: () => void; onChronicle: () => void;
 }) {
   const [hov, setHov] = useState(false);
   return (
-    <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", display: "flex" }}>
-      {/* Film strip edge */}
-      <div style={{ width: "30px", flexShrink: 0, background: "rgba(200,168,75,0.035)", borderRight: "1px solid rgba(200,168,75,0.07)", display: "flex", flexDirection: "column", alignItems: "center", gap: "5px", padding: "10px 0" }}>
-        {[...Array(12)].map((_, i) => (
-          <div key={i} style={{ width: "13px", height: "9px", borderRadius: "2px", border: "1px solid rgba(200,168,75,0.1)" }} />
-        ))}
-      </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <div
-          onClick={onGenerate}
-          onMouseEnter={() => setHov(true)}
-          onMouseLeave={() => setHov(false)}
-          style={{
-            padding: "1.2rem 1.6rem",
-            background: "rgba(6,2,16,0.95)",
-            borderTop: `1px solid ${hov ? "rgba(200,168,75,0.32)" : "rgba(200,168,75,0.09)"}`,
-            borderRight: `1px solid ${hov ? "rgba(200,168,75,0.32)" : "rgba(200,168,75,0.09)"}`,
-            borderBottom: `1px solid ${hov ? "rgba(200,168,75,0.32)" : "rgba(200,168,75,0.09)"}`,
-            borderLeft: "none",
-            cursor: "pointer", transition: "all 0.3s",
-            display: "flex", alignItems: "center", gap: "1.75rem", flexWrap: "wrap",
-            position: "relative", overflow: "hidden",
-            borderRadius: "0 10px 0 0",
-          }}
-        >
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 30%, rgba(200,168,75,0.025) 50%, transparent 70%)", backgroundSize: "200% 100%", animation: hov ? "shimmer 3s linear infinite" : "none", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "0.85rem", right: "1.25rem", fontSize: "0.42rem", letterSpacing: "3px", color: "rgba(200,168,75,0.28)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Daily Dark Scenario · {today}</div>
-          <div style={{ flexShrink: 0, paddingRight: "1.75rem", borderRight: "1px solid rgba(200,168,75,0.07)" }}>
-            <div style={{ fontSize: "0.43rem", letterSpacing: "4px", color: "rgba(200,168,75,0.38)", fontFamily: "'Cinzel', serif", marginBottom: "0.35rem", textTransform: "uppercase" }}>Today's Dispatch</div>
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(0.9rem, 1.8vw, 1.15rem)", fontWeight: 700, color: hov ? "#E8D898" : "rgba(220,205,150,0.72)", transition: "color 0.3s", maxWidth: "260px", lineHeight: 1.3 }}>{title}</div>
+    <div
+      onClick={onGenerate}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        position: "relative",
+        borderRadius: "16px",
+        overflow: "hidden",
+        border: `1px solid ${hov ? "rgba(251,191,36,0.45)" : "rgba(251,191,36,0.12)"}`,
+        background: hov ? "rgba(12,6,28,0.97)" : "rgba(8,3,18,0.95)",
+        cursor: "pointer",
+        transition: "all 0.3s",
+        boxShadow: hov ? "0 0 60px rgba(251,191,36,0.12), 0 8px 40px rgba(0,0,0,0.5)" : "0 4px 24px rgba(0,0,0,0.5)",
+        backdropFilter: "blur(20px)",
+      }}
+    >
+      {/* Top glow line */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: `linear-gradient(90deg, transparent, rgba(251,191,36,${hov ? 0.8 : 0.28}), rgba(251,191,36,${hov ? 0.8 : 0.28}), transparent)`, transition: "opacity 0.3s" }} />
+      {/* Shimmer */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 30%, rgba(251,191,36,0.025) 50%, transparent 70%)", backgroundSize: "200% 100%", animation: hov ? "shimmer 2.5s linear infinite" : "none", pointerEvents: "none" }} />
+
+      <div style={{ display: "flex", alignItems: "stretch" }}>
+        {/* Left accent strip */}
+        <div style={{ width: "4px", flexShrink: 0, background: hov ? "linear-gradient(to bottom, #F59E0B, #D97706)" : "rgba(251,191,36,0.2)", transition: "background 0.3s", borderRadius: "16px 0 0 16px" }} />
+
+        <div style={{ flex: 1, padding: "1.1rem 1.5rem", display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
+          {/* Label + title */}
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ fontSize: "0.4rem", letterSpacing: "4px", color: "rgba(251,191,36,0.45)", fontFamily: "'Cinzel', serif", marginBottom: "0.3rem", textTransform: "uppercase" }}>Today's Dispatch · {today}</div>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(0.85rem, 1.6vw, 1.1rem)", fontWeight: 700, color: hov ? "#FCD34D" : "rgba(251,191,36,0.8)", transition: "color 0.3s", maxWidth: "280px", lineHeight: 1.3, textShadow: hov ? "0 0 30px rgba(251,191,36,0.5)" : "none" }}>{title}</div>
           </div>
-          <div style={{ display: "flex", gap: "1.5rem", alignItems: "center", flexWrap: "wrap" }}>
+
+          {/* Divider */}
+          <div style={{ width: "1px", height: "2.5rem", background: "rgba(251,191,36,0.1)", flexShrink: 0 }} />
+
+          {/* Meta chips */}
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: "0.42rem", color: "rgba(200,168,75,0.28)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Heroine</div>
-              <div style={{ fontSize: "0.8rem", color: heroine.color, fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{heroine.name}</div>
+              <div style={{ fontSize: "0.38rem", color: "rgba(251,191,36,0.35)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Heroine</div>
+              <div style={{ fontSize: "0.78rem", color: heroine.color, fontFamily: "'Cinzel', serif", fontWeight: 700, textShadow: `0 0 16px ${heroine.color}88` }}>{heroine.name}</div>
             </div>
-            <div style={{ fontSize: "0.7rem", color: "rgba(200,168,75,0.18)" }}>✕</div>
+            <div style={{ fontSize: "0.65rem", color: "rgba(251,191,36,0.2)" }}>✕</div>
             <div>
-              <div style={{ fontSize: "0.42rem", color: "rgba(200,168,75,0.28)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Villain</div>
-              <div style={{ fontSize: "0.8rem", color: "rgba(200,195,225,0.48)", fontFamily: "'Cinzel', serif" }}>{villain}</div>
+              <div style={{ fontSize: "0.38rem", color: "rgba(251,191,36,0.35)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Villain</div>
+              <div style={{ fontSize: "0.78rem", color: "rgba(210,200,240,0.7)", fontFamily: "'Cinzel', serif" }}>{villain}</div>
             </div>
-            <div style={{ width: "1px", height: "2.2rem", background: "rgba(255,255,255,0.04)" }} />
+            <div style={{ width: "1px", height: "2rem", background: "rgba(255,255,255,0.05)", flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: "0.42rem", color: "rgba(200,168,75,0.28)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Setting</div>
-              <div style={{ fontSize: "0.69rem", color: "rgba(200,195,220,0.33)", fontFamily: "'Raleway', sans-serif", maxWidth: "200px", lineHeight: 1.35 }}>{setting}</div>
+              <div style={{ fontSize: "0.38rem", color: "rgba(251,191,36,0.35)", letterSpacing: "2.5px", marginBottom: "0.2rem", textTransform: "uppercase" }}>Setting</div>
+              <div style={{ fontSize: "0.66rem", color: "rgba(200,195,220,0.45)", fontFamily: "'Raleway', sans-serif", maxWidth: "200px", lineHeight: 1.35 }}>{setting}</div>
             </div>
           </div>
-          <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: "0.45rem", color: hov ? "rgba(200,168,75,0.92)" : "rgba(200,168,75,0.28)", transition: "color 0.3s", fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "1.5px" }}>
-            ◆ Generate Today's Story →
+
+          {/* CTA */}
+          <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: "0.5rem", color: hov ? "#FCD34D" : "rgba(251,191,36,0.4)", transition: "all 0.3s", fontFamily: "'Cinzel', serif", fontSize: "0.6rem", letterSpacing: "1.5px", textShadow: hov ? "0 0 20px rgba(251,191,36,0.7)" : "none" }}>
+            ◆ Generate Today's Story
+            <button onClick={(e) => { e.stopPropagation(); onChronicle(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(251,191,36,0.28)", fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "1.5px", padding: "0 0 0 1rem", transition: "color 0.2s", borderLeft: "1px solid rgba(251,191,36,0.12)" }} onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(251,191,36,0.72)"; }} onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(251,191,36,0.28)"; }}>Chronicle →</button>
           </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.5rem 1.4rem", background: "rgba(4,2,10,0.96)", borderRight: "1px solid rgba(200,168,75,0.06)", borderBottom: "1px solid rgba(200,168,75,0.06)", borderTop: "none", borderLeft: "none", borderRadius: "0 0 10px 0" }}>
-          <span style={{ fontSize: "0.45rem", color: "rgba(200,168,75,0.18)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>One story generated and saved each day automatically</span>
-          <button onClick={(e) => { e.stopPropagation(); onChronicle(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(200,168,75,0.32)", fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "1.5px", padding: "0", transition: "color 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(200,168,75,0.78)"; }} onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,168,75,0.32)"; }}>View Chronicle →</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── SECTION DIVIDER ──────────────────────────────────────────────────────────
 function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number; b: number }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.65rem", marginTop: "0.25rem" }}>
-      <div style={{ width: "16px", height: "1px", background: `rgba(${r},${g},${b},0.3)` }} />
-      <span style={{ fontSize: "0.42rem", letterSpacing: "4px", textTransform: "uppercase", color: `rgba(${r},${g},${b},0.35)`, fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>{label}</span>
-      <div style={{ flex: 1, height: "1px", background: `linear-gradient(90deg, rgba(${r},${g},${b},0.15), transparent)` }} />
+    <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", margin: "0.4rem 0 0.5rem" }}>
+      <div style={{ width: "20px", height: "1px", background: `rgba(${r},${g},${b},0.4)` }} />
+      <span style={{ fontSize: "0.4rem", letterSpacing: "4px", textTransform: "uppercase", color: `rgba(${r},${g},${b},0.5)`, fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>{label}</span>
+      <div style={{ flex: 1, height: "1px", background: `linear-gradient(90deg, rgba(${r},${g},${b},0.22), transparent)` }} />
     </div>
   );
 }
 
-// ─── HOMEPAGE ──────────────────────────────────────────────────────────────────
 export default function Homepage(props: HomepageProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
@@ -327,132 +309,141 @@ export default function Homepage(props: HomepageProps) {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "transparent" }}>
       <style>{`
         @keyframes shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
-        @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.6); } }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.65); } }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes hdrShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+        @keyframes floatOrb { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-18px); } }
         @media (max-width: 900px) {
           .hp-cols { grid-template-columns: 1fr !important; }
           .hp-nav-stats { display: none !important; }
           .hp-nav { padding: 0 1rem !important; }
           .hp-pad { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
         }
-        @media (max-width: 560px) {
-          .hp-general { grid-template-columns: 1fr !important; }
-        }
+        @media (max-width: 560px) { .hp-general { grid-template-columns: 1fr !important; } }
       `}</style>
 
-      {/* Ambient glows */}
+      {/* Vivid ambient glows */}
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{ position: "absolute", top: "-15%", left: "8%",  width: "800px", height: "700px", background: "radial-gradient(ellipse, rgba(80,0,160,0.07) 0%, transparent 65%)" }} />
-        <div style={{ position: "absolute", top: "20%", right: "-8%", width: "600px", height: "600px", background: "radial-gradient(ellipse, rgba(150,80,0,0.06) 0%, transparent 60%)" }} />
-        <div style={{ position: "absolute", bottom: "0%", left: "30%", width: "700px", height: "400px", background: "radial-gradient(ellipse, rgba(100,0,0,0.05) 0%, transparent 60%)" }} />
+        <div style={{ position: "absolute", top: "-20%", left: "-5%",  width: "900px", height: "800px", background: "radial-gradient(ellipse, rgba(120,0,220,0.14) 0%, transparent 60%)", animation: "floatOrb 14s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", top: "10%",  right: "-10%", width: "700px", height: "700px", background: "radial-gradient(ellipse, rgba(220,50,100,0.11) 0%, transparent 60%)", animation: "floatOrb 18s ease-in-out infinite reverse" }} />
+        <div style={{ position: "absolute", bottom: "-5%", left: "25%",  width: "800px", height: "500px", background: "radial-gradient(ellipse, rgba(60,20,160,0.1) 0%, transparent 60%)", animation: "floatOrb 22s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", top: "40%",  left: "35%",   width: "500px", height: "500px", background: "radial-gradient(ellipse, rgba(200,100,20,0.06) 0%, transparent 60%)" }} />
       </div>
 
       {/* ─── NAV ─── */}
-      <nav className="hp-nav" style={{ position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "54px", flexShrink: 0, background: "rgba(3,0,8,0.93)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.03)", boxShadow: "0 1px 0 rgba(139,0,0,0.14)" }}>
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5) 20%, rgba(184,134,11,0.35) 50%, rgba(139,0,0,0.5) 80%, transparent)" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8B0000", boxShadow: "0 0 12px #8B0000", animation: "pulseDot 3s ease-in-out infinite" }} />
-          <span style={{ fontSize: "0.9rem", fontWeight: 900, letterSpacing: "5px", background: "linear-gradient(135deg, #E8D08A 0%, #C8A830 50%, #A07030 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", fontFamily: "'Cinzel', serif" }}>SHADOWWEAVE</span>
+      <nav className="hp-nav" style={{ position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "56px", flexShrink: 0, background: "rgba(4,1,10,0.9)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.6) 20%, rgba(251,191,36,0.5) 50%, rgba(239,68,68,0.6) 80%, transparent)" }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+          <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 14px #A855F7, 0 0 30px rgba(168,85,247,0.4)", animation: "pulseDot 2.5s ease-in-out infinite" }} />
+          <span style={{ fontSize: "0.92rem", fontWeight: 900, letterSpacing: "5.5px", background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 35%, #D4A017 55%, #E8C840 75%, #F5D67A 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", fontFamily: "'Cinzel', serif", animation: "hdrShimmer 5s linear infinite" }}>SHADOWWEAVE</span>
         </div>
-        <div className="hp-nav-stats" style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
-          {[["7", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
+
+        <div className="hp-nav-stats" style={{ display: "flex", gap: "2.2rem", alignItems: "center" }}>
+          {[["9", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 900, color: "rgba(212,175,55,0.62)", lineHeight: 1, fontFamily: "'Cinzel', serif" }}>{v}</div>
-              <div style={{ fontSize: "0.41rem", color: "rgba(200,200,220,0.17)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "2px", fontFamily: "'Montserrat', sans-serif" }}>{l}</div>
+              <div style={{ fontSize: "0.82rem", fontWeight: 900, color: "rgba(230,190,60,0.82)", lineHeight: 1, fontFamily: "'Cinzel', serif" }}>{v}</div>
+              <div style={{ fontSize: "0.4rem", color: "rgba(200,200,220,0.3)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "2px", fontFamily: "'Montserrat', sans-serif" }}>{l}</div>
             </div>
           ))}
         </div>
-        <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.45rem", padding: "0.38rem 0.9rem", background: "rgba(20,5,40,0.9)", border: "1px solid rgba(106,173,228,0.17)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(106,173,228,0.42)"; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(106,173,228,0.17)"; }}>
-          <span style={{ fontSize: "0.65rem" }}>◈</span>
-          <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(106,173,228,0.62)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
+
+        <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.42rem 1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s", boxShadow: "0 0 0 0 rgba(168,85,247,0)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(168,85,247,0.25)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.1)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.3)"; e.currentTarget.style.boxShadow = "none"; }}>
+          <span style={{ fontSize: "0.65rem", color: "rgba(192,132,252,0.85)" }}>◈</span>
+          <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
         </button>
       </nav>
 
+      {/* ─── HERO HEADER ─── */}
+      <div className="hp-pad" style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "2.5rem 2rem 1.5rem", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s ease both" : "none" }}>
+        <div style={{ fontSize: "0.46rem", letterSpacing: "8px", color: "rgba(168,85,247,0.55)", fontFamily: "'Cinzel', serif", marginBottom: "0.8rem", textTransform: "uppercase" }}>Professional Dark Narrative Studio</div>
+        <h1 style={{ margin: "0 0 0.6rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.8rem, 5vw, 3.2rem)", fontWeight: 900, letterSpacing: "0.12em", background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 30%, #FFFFFF 50%, #E8B830 70%, #F5D67A 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "hdrShimmer 6s linear infinite", lineHeight: 1.1 }}>CHOOSE YOUR MODE</h1>
+        <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(200,195,240,0.4)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2px" }}>Each mode generates a fully uncensored AI-written dark narrative</p>
+        <div style={{ marginTop: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+          <div style={{ flex: 1, maxWidth: "160px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.4))" }} />
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 10px #A855F7" }} />
+          <div style={{ flex: 1, maxWidth: "160px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.4), transparent)" }} />
+        </div>
+      </div>
+
       {/* ─── DAILY DISPATCH ─── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
+      <div className="hp-pad" style={{ padding: "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
         <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
       </div>
 
-      {/* ─── HERO HEADER ─── */}
-      <div className="hp-pad" style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "1.5rem 2rem 2rem", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s ease both" : "none" }}>
-        <div style={{ fontSize: "0.48rem", letterSpacing: "7px", color: "rgba(200,168,75,0.32)", fontFamily: "'Cinzel', serif", marginBottom: "0.7rem", textTransform: "uppercase" }}>Professional Dark Narrative Studio</div>
-        <h1 style={{ margin: "0 0 0.5rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.4rem, 4vw, 2.5rem)", fontWeight: 900, letterSpacing: "0.1em", background: "linear-gradient(135deg, #E8D08A 0%, #C8A830 40%, #A07030 65%, #C8A830 85%, #E8D08A 100%)", backgroundSize: "250% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "shimmer 6s linear infinite" }}>CHOOSE YOUR MODE</h1>
-        <p style={{ margin: 0, fontSize: "0.78rem", color: "rgba(200,195,220,0.25)", fontFamily: "'Raleway', sans-serif", letterSpacing: "1.5px" }}>Each mode generates a fully uncensored AI-written dark narrative</p>
-      </div>
-
       {/* ─── THREE COLUMNS ─── */}
-      <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.15rem", padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
+      <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.4rem", padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.14s ease both" : "none" }}>
 
         {/* ══ COL 1: HEROINE FORGE ══ */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
           <PrimaryCard
             num="I" icon="🔱" iconImg="/icons/heroine-forge.png" tagline="Superhero Universe" title="HEROINE FORGE"
             desc="181+ heroines across Marvel, DC, CW, The Boys, Power Rangers, Animated, Star Wars, and TV universes. Choose your villain and generate a multi-chapter dark thriller."
             stats={[["181+", "Heroines"], ["67", "Villains"], ["8", "Universes"]]}
             features={["Marvel · DC · CW · The Boys", "Power Rangers · Animated · Star Wars", "Multi-chapter AI story engine"]}
-            cta="Enter the Forge" accent="#B084FC" r={155} g={89} b={255}
+            cta="Enter the Forge" accent="#C084FC" r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
           />
-          <SectionLabel label="Specialist Modes" r={155} g={89} b={255} />
+          <SectionLabel label="Specialist Modes" r={168} g={85} b={247} />
           <SubCard icon="🌀" iconImg="/icons/mind-break.png" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking of her will." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
-          <SubCard icon="⛓" iconImg="/icons/two-heroines.png" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#40E090" r={64} g={224} b={144} badge="Duo" onClick={props.onDualCapture} />
-          <SubCard icon="🕸" iconImg="/icons/rescue-gone-wrong.png" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FF9640" r={255} g={150} b={64} badge="Trap" onClick={props.onRescueGoneWrong} />
-          <SubCard icon="⚡" iconImg="/icons/power-drain.png" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A0FF" r={96} g={160} b={255} badge="Meter" onClick={props.onPowerDrain} />
-          <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#FF6060" r={255} g={60} b={60} badge="Group" onClick={props.onMassCapture} />
-          <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#FF69B4" r={255} g={105} b={180} badge="Arc" onClick={props.onCorruptionArc} />
+          <SubCard icon="⛓" iconImg="/icons/two-heroines.png" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#34D399" r={52} g={211} b={153} badge="Duo" onClick={props.onDualCapture} />
+          <SubCard icon="🕸" iconImg="/icons/rescue-gone-wrong.png" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FB923C" r={251} g={146} b={60} badge="Trap" onClick={props.onRescueGoneWrong} />
+          <SubCard icon="⚡" iconImg="/icons/power-drain.png" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A5FA" r={96} g={165} b={250} badge="Meter" onClick={props.onPowerDrain} />
+          <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
+          <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
           <PrimaryCard
             num="II" icon="👁" iconImg="/icons/celebrity-captive.png" tagline="Real World Mode" title="CELEBRITY CAPTIVE"
             desc="100 real-world actresses. Build a captor or captor team — 6 archetypes or fully custom. Set the encounter, tone, and scene. Generate an uncensored dark thriller."
             stats={[["100+", "Actresses"], ["6", "Archetypes"], ["8", "Encounters"]]}
             features={["Solo or team captors", "10 settings · 6 tones", "Streaming chapter continuation"]}
-            cta="Enter the Room" accent="#E8C870" r={200} g={168} b={75}
+            cta="Enter the Room" accent="#FCD34D" r={234} g={179} b={8}
             onClick={props.onCelebrityMode}
           />
-          <SectionLabel label="Scene Tools" r={200} g={168} b={75} />
-          <SubCard icon="🔦" iconImg="/icons/interrogation-room.png" title="Interrogation Room" desc="Live captor-vs-celebrity dialogue, AI-escalated in real time." accent="#E8C870" r={200} g={168} b={75} badge="Live" onClick={props.onInterrogationRoom} />
-          <SubCard icon="🎭" iconImg="/icons/captor-config.png" title="Captor Configuration" desc="Full antagonist profiling — motive, methods, endgame goals." accent="#C8A84B" r={180} g={130} b={40} badge="Profile" onClick={props.onCaptorPortal} />
-          <SubCard icon="♟" iconImg="/icons/captor-logic.png" title="Captor Logic Sim" desc="Set rules and goals. AI simulates captor behaviour and consequences." accent="#B89030" r={160} g={110} b={20} badge="Sim" onClick={props.onCaptorLogic} />
+          <SectionLabel label="Scene Tools" r={234} g={179} b={8} />
+          <SubCard icon="🔦" iconImg="/icons/interrogation-room.png" title="Interrogation Room" desc="Live captor-vs-celebrity dialogue, AI-escalated in real time." accent="#FCD34D" r={234} g={179} b={8} badge="Live" onClick={props.onInterrogationRoom} />
+          <SubCard icon="🎭" iconImg="/icons/captor-config.png" title="Captor Configuration" desc="Full antagonist profiling — motive, methods, endgame goals." accent="#FBBF24" r={251} g={191} b={36} badge="Profile" onClick={props.onCaptorPortal} />
+          <SubCard icon="♟" iconImg="/icons/captor-logic.png" title="Captor Logic Sim" desc="Set rules and goals. AI simulates captor behaviour and consequences." accent="#F59E0B" r={245} g={158} b={11} badge="Sim" onClick={props.onCaptorLogic} />
         </div>
 
         {/* ══ COL 3: CUSTOM SCENARIO ══ */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
           <PrimaryCard
             num="III" icon="🔮" iconImg="/icons/custom-scenario.png" tagline="Build From Scratch" title="CUSTOM SCENARIO"
             desc="Create your own heroine — psychology, traumas, breaking points. Profile a captor with 8 configuration questions. Set the scene and let the AI write your story."
             stats={[["7", "Heroine Q's"], ["8", "Captor Q's"], ["∞", "Outcomes"]]}
             features={["Full character builder", "Captor profiler", "AI-powered story engine"]}
-            cta="Start Building" accent="#FF6060" r={200} g={40} b={40}
+            cta="Start Building" accent="#F87171" r={239} g={68} b={68}
             onClick={props.onEnter}
           />
-          <SectionLabel label="Writing Tools" r={200} g={40} b={40} />
-          <SubCard icon="⚙" iconImg="/icons/scenario-engine.png" title="Scenario Engine" desc="Generate 8 tailored narrative questions from 4 config inputs." accent="#FF6060" r={200} g={40} b={40} badge="Questions" onClick={props.onScenarioGenerator} />
-          <SubCard icon="🗺" iconImg="/icons/relationship-map.png" title="Relationship Map" desc="Visual node map of characters and their dynamics." accent="#CC4444" r={180} g={30} b={30} badge="Visual" onClick={props.onCharacterMapper} />
-          <SubCard icon="💬" iconImg="/icons/sounding-board.png" title="Sounding Board" desc="Chat with an AI co-writer. Break blocks, get twists, ask anything." accent="#AA3333" r={160} g={20} b={20} badge="AI Chat" onClick={props.onSoundingBoard} />
+          <SectionLabel label="Writing Tools" r={239} g={68} b={68} />
+          <SubCard icon="⚙" iconImg="/icons/scenario-engine.png" title="Scenario Engine" desc="Generate 8 tailored narrative questions from 4 config inputs." accent="#F87171" r={239} g={68} b={68} badge="Questions" onClick={props.onScenarioGenerator} />
+          <SubCard icon="🗺" iconImg="/icons/relationship-map.png" title="Relationship Map" desc="Visual node map of characters and their dynamics." accent="#FC8181" r={252} g={129} b={129} badge="Visual" onClick={props.onCharacterMapper} />
+          <SubCard icon="💬" iconImg="/icons/sounding-board.png" title="Sounding Board" desc="Chat with an AI co-writer. Break blocks, get twists, ask anything." accent="#FCA5A5" r={252} g={165} b={165} badge="AI Chat" onClick={props.onSoundingBoard} />
         </div>
       </div>
 
-      {/* ─── GENERAL TOOLS ─── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 3rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.26s ease both" : "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "0.9rem" }}>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(139,0,0,0.22), rgba(184,134,11,0.1) 60%, transparent)" }} />
-          <span style={{ fontSize: "0.43rem", letterSpacing: "5px", textTransform: "uppercase", color: "rgba(184,134,11,0.25)", fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>Studio Tools</span>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(184,134,11,0.1) 40%, rgba(139,0,0,0.22))" }} />
+      {/* ─── STUDIO TOOLS ─── */}
+      <div className="hp-pad" style={{ padding: "0 2rem 3rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.22s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginBottom: "0.85rem" }}>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.25) 60%, transparent)" }} />
+          <span style={{ fontSize: "0.4rem", letterSpacing: "5px", textTransform: "uppercase", color: "rgba(168,85,247,0.4)", fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>Studio Tools</span>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.25) 60%, transparent)" }} />
         </div>
-        <div className="hp-general" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.65rem" }}>
-          <ToolTile icon="🕯" title="Mood Lighting" desc="Switch atmosphere: Void, Isolation, Candlelight, Glitch." hex="#B7770D" r={180} g={120} b={0} onClick={() => { const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null; btn?.click(); }} />
-          <ToolTile icon="📜" title="Story Archive" desc="Browse, tag, favourite, and export every story you've saved." hex="#2C5F8A" r={44} g={95} b={138} onClick={props.onStoryArchive} />
-          <ToolTile icon="🌙" title="Daily Chronicle" desc="The full collection of past daily dark scenarios." hex="#8A6A20" r={138} g={106} b={32} onClick={props.onDailyChronicle} />
+        <div className="hp-general" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.7rem" }}>
+          <ToolTile icon="🕯" title="Mood Lighting" desc="Switch atmosphere: Void, Isolation, Candlelight, Glitch." hex="#D97706" r={217} g={119} b={6} onClick={() => { const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null; btn?.click(); }} />
+          <ToolTile icon="📜" title="Story Archive" desc="Browse, tag, favourite, and export every story you've saved." hex="#3B82F6" r={59} g={130} b={246} onClick={props.onStoryArchive} />
+          <ToolTile icon="🌙" title="Daily Chronicle" desc="The full collection of past daily dark scenarios." hex="#8B5CF6" r={139} g={92} b={246} onClick={props.onDailyChronicle} />
         </div>
       </div>
 
       {/* Footer */}
-      <div className="hp-pad" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", padding: "0.9rem 2rem", borderTop: "1px solid rgba(255,255,255,0.025)", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.4s ease both" : "none", position: "relative", zIndex: 2 }}>
-        <span style={{ fontSize: "0.44rem", color: "rgba(200,200,220,0.09)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>For adult dark fiction writers only</span>
-        <span style={{ fontSize: "0.44rem", color: "rgba(200,200,220,0.09)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Venice AI · venice-uncensored-role-play · Uncensored</span>
+      <div className="hp-pad" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", padding: "0.85rem 2rem", borderTop: "1px solid rgba(168,85,247,0.08)", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.38s ease both" : "none", position: "relative", zIndex: 2 }}>
+        <span style={{ fontSize: "0.43rem", color: "rgba(200,200,220,0.14)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>For adult dark fiction writers only</span>
+        <span style={{ fontSize: "0.43rem", color: "rgba(200,200,220,0.14)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Venice AI · venice-uncensored-role-play · Uncensored</span>
       </div>
     </div>
   );
