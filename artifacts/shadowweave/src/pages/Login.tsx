@@ -32,12 +32,15 @@ function GridOverlay() {
   );
 }
 
+const CORRECT_PASS = "shadow";
+
 export default function Login({ onEnter }: LoginProps) {
   const [password, setPassword] = useState("");
   const [focused, setFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
+  const [denied, setDenied] = useState(false);
   const [featureIndex, setFeatureIndex] = useState(-1);
 
   useEffect(() => {
@@ -55,14 +58,22 @@ export default function Login({ onEnter }: LoginProps) {
       setTimeout(() => setShake(false), 600);
       return;
     }
+    if (password.trim().toLowerCase() !== CORRECT_PASS) {
+      setShake(true);
+      setDenied(true);
+      setTimeout(() => setShake(false), 600);
+      setTimeout(() => setDenied(false), 3000);
+      setPassword("");
+      return;
+    }
     setLoading(true);
     setTimeout(() => { setLoading(false); onEnter(); }, 1400);
   }
 
   const passInputStyle: React.CSSProperties = {
     width: "100%",
-    background: focused ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
-    border: `1px solid ${focused ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
+    background: denied ? "rgba(80,0,0,0.25)" : focused ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
+    border: `1px solid ${denied ? "rgba(200,0,0,0.45)" : focused ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
     borderRadius: "10px",
     padding: "0.95rem 1rem 0.95rem 2.75rem",
     color: "transparent",
@@ -73,7 +84,7 @@ export default function Login({ onEnter }: LoginProps) {
     transition: "all 0.3s ease",
     letterSpacing: "0.4px",
     boxSizing: "border-box",
-    boxShadow: focused ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
+    boxShadow: denied ? "0 0 0 3px rgba(180,0,0,0.1)" : focused ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
     caretColor: "rgba(184,134,11,0.8)",
   };
 
@@ -249,6 +260,41 @@ export default function Login({ onEnter }: LoginProps) {
           {/* Top accent bar */}
           <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5) 30%, rgba(184,134,11,0.4) 60%, transparent)", marginBottom: "2rem" }} />
 
+          {/* ACCESS DENIED banner */}
+          <div style={{
+            overflow: "hidden",
+            maxHeight: denied ? "90px" : "0px",
+            opacity: denied ? 1 : 0,
+            marginBottom: denied ? "1.2rem" : "0",
+            transition: "max-height 0.3s cubic-bezier(0.23,1,0.32,1), opacity 0.25s ease, margin-bottom 0.3s ease",
+          }}>
+            <div style={{
+              position: "relative",
+              padding: "0.85rem 1.1rem",
+              background: "rgba(90,0,0,0.55)",
+              border: "1px solid rgba(200,0,0,0.55)",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.9rem",
+              overflow: "hidden",
+              boxShadow: "0 0 30px rgba(180,0,0,0.25), inset 0 1px 0 rgba(255,100,100,0.08)",
+            }}>
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(180,0,0,0.12) 0%, transparent 60%)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,60,60,0.7) 40%, transparent)", animation: "shimmer 1.8s linear infinite" }} />
+              <div style={{
+                width: "32px", height: "32px", borderRadius: "8px", flexShrink: 0,
+                background: "rgba(180,0,0,0.35)", border: "1px solid rgba(255,60,60,0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "1rem", animation: "deniedPulse 1s ease-in-out infinite",
+              }}>🚫</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.82rem", fontWeight: 900, color: "#FF6060", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "0.18rem" }}>Access Denied</div>
+                <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: "0.67rem", color: "rgba(255,150,150,0.5)", letterSpacing: "0.5px" }}>Invalid passphrase. The dark does not yield.</div>
+              </div>
+            </div>
+          </div>
+
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
 
@@ -336,6 +382,10 @@ export default function Login({ onEnter }: LoginProps) {
           60% { transform: translateX(5px); }
           75% { transform: translateX(-3px); }
           90% { transform: translateX(3px); }
+        }
+        @keyframes deniedPulse {
+          0%,100% { box-shadow: 0 0 0 0 rgba(255,60,60,0); opacity: 1; }
+          50% { box-shadow: 0 0 14px 4px rgba(255,40,40,0.35); opacity: 0.75; }
         }
         @media (max-width: 720px) {
           .login-left { display: none !important; }
