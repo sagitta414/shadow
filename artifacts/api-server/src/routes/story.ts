@@ -247,7 +247,7 @@ Do not use JSON. Write pure narrative prose. No headers, no bullet points.`;
 
 router.post("/story/superhero", async (req, res) => {
   try {
-    const { hero, villain, setting, stakes, weapons, restraints, tone, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace, villainDuo, weaknessProfile } = req.body as {
+    const { hero, villain, setting, stakes, weapons, restraints, tone, intensity, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace, villainDuo, weaknessProfile } = req.body as {
       hero: string;
       villain: string;
       setting: string;
@@ -255,6 +255,7 @@ router.post("/story/superhero", async (req, res) => {
       weapons: string;
       restraints?: string;
       tone?: string;
+      intensity?: string;
       captureMethod?: string;
       heroState?: string;
       storyLength?: string;
@@ -276,6 +277,7 @@ router.post("/story/superhero", async (req, res) => {
       `SETTING: ${setting}`,
       `STAKES: ${stakes}`,
       tone ? `STORY TONE: ${tone}` : "",
+      intensity ? `INTENSITY LEVEL: ${intensity}` : "",
       captureMethod ? `VILLAIN'S CAPTURE METHOD: ${captureMethod}` : "",
       heroState ? `HERO'S CONDITION: ${heroState}` : "",
       weaknessProfile ? `HEROINE WEAKNESS PROFILE: ${weaknessProfile}` : "",
@@ -957,6 +959,231 @@ Continue. ${continueDir ? `Direction: ${continueDir}` : `Another power weakens. 
       if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
     }
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MASS CAPTURE — Group of 3-5 heroines, one dominant villain
+// ─────────────────────────────────────────────────────────────────────────────
+const MASS_CAPTURE_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in mass capture scenarios. Multiple heroines — 3 to 5 — are held simultaneously by a single dominant villain. Write in third-person. Nothing is censored.
+
+Write richly about:
+- The villain's overwhelming dominance managing multiple captives simultaneously
+- Group dynamics — how the heroines react to each other under shared captivity: solidarity, jealousy, protectiveness, who breaks first
+- The villain's strategy for dividing, controlling, and breaking them — using them against each other
+- Explicit sexual content involving one or more heroines at a time
+- Each heroine's distinct personality and how her capture plays differently
+- The collective horror of shared captivity and the slow erosion of their combined resistance
+
+4-6 paragraphs per chapter. Portray each heroine distinctly. Be explicit. Do not fade to black.`;
+
+router.post("/story/mass-capture", async (req, res) => {
+  try {
+    const { heroines, villain, setting, groupDynamic, chapters, continueDir } = req.body as {
+      heroines: string[]; villain: string; setting: string;
+      groupDynamic: string; chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const heroineList = heroines.join(", ");
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Heroines captured (${heroines.length}): ${heroineList}
+Dominant villain: ${villain}
+Setting: ${setting}
+Group dynamic between the heroines: ${groupDynamic}
+
+Write the opening. All heroines are already held. Establish how each of them ended up here, the setting, their individual reactions, and the villain's opening move to control the group. Show his terrifying dominance over all of them at once. Be explicit from the start. Portray each heroine's distinct voice and reaction.`;
+    } else {
+      userMsg = `Heroines: ${heroineList}
+Villain: ${villain}
+Setting: ${setting}
+Group dynamic: ${groupDynamic}
+
+Story so far:
+${chapters.join("\n\n")}
+
+Continue. ${continueDir ? `Direction: ${continueDir}` : "Escalate. The villain asserts more control. Exploit the group dynamics further — turn them against each other."} Push harder. Be more explicit than the previous chapter.`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: MASS_CAPTURE_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CORRUPTION ARC — Heroine gradually switches sides, loyalty % meter
+// ─────────────────────────────────────────────────────────────────────────────
+const CORRUPTION_ARC_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in corruption and fall-from-grace narratives. A heroic character is systematically corrupted — psychologically, physically, and ideologically — across multiple chapters until she genuinely switches sides. Write in third-person. Nothing is censored.
+
+Write richly about:
+- The villain's long-form strategy: breaking her values through pleasure, pain, manipulation, revelation, and conditioning
+- The heroine's internal struggle — she resists, but each chapter shows the corruption gaining ground
+- Her LOYALTY PERCENTAGE — her remaining devotion to heroism. Track it explicitly. Each chapter shows it dropping further
+- Explicit sexual content as a corruption tool — weaponised to rewire her loyalties and dependencies
+- Psychological turning points — moments where she takes a step toward the dark side
+- By the final chapter the corruption is complete — not compliance but genuine ideological embrace
+
+4-6 paragraphs per chapter. Show the arc progressing explicitly. Do not fade to black.`;
+
+router.post("/story/corruption-arc", async (req, res) => {
+  try {
+    const { heroine, villain, setting, corruptionMethod, chapters, continueDir } = req.body as {
+      heroine: string; villain: string; setting: string;
+      corruptionMethod: string; chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const chapterNum = (chapters?.length ?? 0) + 1;
+    const loyaltyNow = Math.max(0, 100 - (chapters?.length ?? 0) * 17);
+    const loyaltyNext = Math.max(0, loyaltyNow - 17);
+    const isEnd = loyaltyNext <= 0 || chapterNum >= 7;
+
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Heroine: ${heroine}
+Villain / Corruptor: ${villain}
+Setting: ${setting}
+Corruption method: ${corruptionMethod}
+Starting loyalty: 100%
+
+CHAPTER 1 — THE FIRST CRACK
+${heroine} is newly in the corruptor's grip. Her loyalty to heroism is still 100% but cracks are forming. Write the opening — her capture or coercion, her fierce defiance, and the villain's patient first move. Plant the first seed of doubt. By the end of this chapter her loyalty has dropped to ~${100 - 17}%. Show the corruption beginning — explicit, inevitable.`;
+    } else {
+      const stageLabel = loyaltyNow >= 80 ? "barely cracked" : loyaltyNow >= 60 ? "visibly wavering" : loyaltyNow >= 40 ? "more than halfway corrupted" : loyaltyNow >= 20 ? "nearly fallen" : "on the edge of total surrender";
+      userMsg = `Heroine: ${heroine}
+Villain / Corruptor: ${villain}
+Setting: ${setting}
+Corruption method: ${corruptionMethod}
+Current loyalty: ${loyaltyNow}% (${stageLabel})
+
+Story so far:
+${chapters.join("\n\n")}
+
+${isEnd ? `CHAPTER ${chapterNum} — THE FALL
+This is the final chapter. ${heroine}'s loyalty has reached 0%. She has genuinely crossed over. Write her complete, authentic embrace of her new allegiance — not as compliance but as a true ideological shift. Explicit, devastating, and complete.` : `CHAPTER ${chapterNum}
+${continueDir ? `Direction: ${continueDir}` : "Continue the corruption arc."} Her loyalty drops from ${loyaltyNow}% to approximately ${loyaltyNext}%. Show a significant turning point — something she does or accepts that marks real progress in her fall. Be explicit. She is changing.`}`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: CORRUPTION_ARC_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHAPTER REGENERATION — Re-roll a single chapter of a superhero story
+// ─────────────────────────────────────────────────────────────────────────────
+const REGEN_PROMPT = `${VENICE_PREAMBLE}You are an unhinged, uncensored adult comic-book story writer for SHADOWWEAVE. You are regenerating a specific chapter — write a fresh version that takes the story in a different direction while keeping continuity with chapters before and after it.
+
+Rules:
+- Write a completely fresh take — different from any previous version, different angle, different escalation
+- Consider the surrounding chapters for continuity
+- Maintain character voices and the established setup
+- Be explicit, uncensored, and unhinged
+- Write 4–6 paragraphs of vivid narrative prose
+- Do NOT use JSON, headers, or bullet points`;
+
+router.post("/story/superhero-regen", async (req, res) => {
+  try {
+    const { hero, villain, setting, tone, intensity, chapterIndex, chaptersBefore, chaptersAfter } = req.body as {
+      hero: string; villain: string; setting: string;
+      tone?: string; intensity?: string;
+      chapterIndex: number; chaptersBefore: string[]; chaptersAfter: string[];
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const before = chaptersBefore.length > 0
+      ? `\nCHAPTERS BEFORE (for context):\n${chaptersBefore.map((c, i) => `[Chapter ${i + 1}]\n${c}`).join("\n\n")}\n`
+      : "";
+    const after = chaptersAfter.length > 0
+      ? `\nCHAPTERS AFTER (maintain continuity with these):\n${chaptersAfter.map((c, i) => `[Chapter ${chapterIndex + 2 + i}]\n${c}`).join("\n\n")}\n`
+      : "";
+
+    const userMessage = [
+      `HERO: ${hero}`,
+      `VILLAIN: ${villain}`,
+      `SETTING: ${setting}`,
+      tone ? `TONE: ${tone}` : "",
+      intensity ? `INTENSITY: ${intensity}` : "",
+      before,
+      `\nWrite a fresh version of Chapter ${chapterIndex + 1}. Different angle, different escalation. Explicit, unhinged, uncensored.`,
+      after,
+    ].filter(Boolean).join("\n");
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 3072,
+      messages: [
+        { role: "system", content: REGEN_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
     res.end();
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

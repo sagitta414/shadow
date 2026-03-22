@@ -743,6 +743,22 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [customHeroesList, setCustomHeroesList] = useState<CustomHeroine[]>(getCustomHeroines);
   const [showCustomModal, setShowCustomModal] = useState(false);
 
+  // ── New Features ──
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("sw_favorites_v1") ?? "[]"); } catch { return []; }
+  });
+  const [loreHero, setLoreHero] = useState<{ name: string; alias: string; power: string; icon: string; universe: string } | null>(null);
+  const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
+  const [regenChapIdx, setRegenChapIdx] = useState<number | null>(null);
+
+  function toggleFavorite(name: string) {
+    setFavorites(prev => {
+      const next = prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name];
+      localStorage.setItem("sw_favorites_v1", JSON.stringify(next));
+      return next;
+    });
+  }
+
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -773,11 +789,17 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     })),
   ];
 
-  const filteredHeroes = allHeroes.filter((h) => {
-    const matchUniverse = universeFilter === "ALL" || h.universe === universeFilter;
-    const matchSearch = !search || h.name.toLowerCase().includes(search.toLowerCase()) || h.alias.toLowerCase().includes(search.toLowerCase());
-    return matchUniverse && matchSearch;
-  });
+  const filteredHeroes = allHeroes
+    .filter((h) => {
+      const matchUniverse = universeFilter === "ALL" || h.universe === universeFilter;
+      const matchSearch = !search || h.name.toLowerCase().includes(search.toLowerCase()) || h.alias.toLowerCase().includes(search.toLowerCase());
+      return matchUniverse && matchSearch;
+    })
+    .sort((a, b) => {
+      const aFav = favorites.includes(a.name) ? 0 : 1;
+      const bFav = favorites.includes(b.name) ? 0 : 1;
+      return aFav - bFav;
+    });
 
   function toggleWeapon(w: string) {
     setSelectedWeapons((prev) => prev.includes(w) ? prev.filter((x) => x !== w) : [...prev, w]);
@@ -837,6 +859,8 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       : villainDynamic === "dominant" ? "Dominant/Submissive — one villain leads, the other defers but has their own agenda"
       : "";
 
+    const intensityLabel = intensity === 1 ? "Tense — charged atmosphere, psychological dominance, power exchange; minimal graphic content" : intensity === 3 ? "Brutal — absolute maximum depravity, no limits, extreme explicit detail, full degradation" : "Explicit — graphic sexual content and domination, full explicit detail";
+
     return {
       hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
       villain: `${villain} — Scheme: ${villainScheme}${customVillainDetail ? ` | ${customVillainDetail}` : ""}`,
@@ -847,6 +871,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
       weapons: selectedWeapons.join(", ") || "standard powers",
       restraints: allRestraints.join(", ") || "none specified",
       tone: toneLabel || "action-packed",
+      intensity: intensityLabel,
       captureMethod: captureLabel || "direct confrontation",
       heroState: heroStateLabel || "at full strength",
       storyLength: lengthLabel,
@@ -951,6 +976,29 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     } finally {
       setContinuing(false);
       setStreamingText("");
+    }
+  }
+
+  async function regenChapter(idx: number) {
+    setRegenChapIdx(idx);
+    setError("");
+    const prompt = buildPrompt();
+    try {
+      const fresh = await streamRequest("/api/story/superhero-regen", {
+        hero: prompt.hero,
+        villain: prompt.villain,
+        setting: prompt.setting,
+        tone: prompt.tone,
+        intensity: prompt.intensity,
+        chapterIndex: idx,
+        chaptersBefore: chapters.slice(0, idx),
+        chaptersAfter: chapters.slice(idx + 1),
+      }, () => {});
+      setChapters(prev => { const next = [...prev]; next[idx] = fresh; return next; });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Regeneration failed");
+    } finally {
+      setRegenChapIdx(null);
     }
   }
 
@@ -1198,7 +1246,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                       <div style={{ fontSize: "0.56rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hero.alias}</div>
                       <span style={{ fontSize: "0.46rem", background: accentBg, color: accentColor, padding: "0.12rem 0.4rem", borderRadius: "4px", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase" as const }}>{hero.universe}</span>
                     </div>
-                    {isSelected && <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexShrink: 0 }}>
+                      <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore card" style={{ background: "none", border: "none", color: `${accentColor}77`, fontSize: "0.8rem", cursor: "pointer", padding: "0.15rem", lineHeight: 1 }}>ℹ</button>
+                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Unfavorite" : "Favorite"} style={{ background: favorites.includes(hero.name) ? "rgba(255,184,0,0.2)" : "rgba(0,0,0,0.4)", border: "none", borderRadius: "50%", width: "22px", height: "22px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", color: favorites.includes(hero.name) ? "#FFB800" : "rgba(200,200,220,0.3)", transition: "all 0.2s" }}>{favorites.includes(hero.name) ? "★" : "☆"}</button>
+                      {isSelected && <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", fontWeight: 700 }}>✓</div>}
+                    </div>
                   </button>
                 );
               })}
@@ -1238,12 +1290,18 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                     onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
                   >
                     {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", zIndex: 2, fontWeight: 700 }}>✓</div>}
+                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Remove from favorites" : "Add to favorites"} style={{ position: "absolute", top: "0.4rem", left: "0.4rem", width: "22px", height: "22px", borderRadius: "50%", background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.6)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", zIndex: 2, transition: "all 0.2s", backdropFilter: "blur(4px)" }}>
+                      {favorites.includes(hero.name) ? "★" : "☆"}
+                    </button>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)" }}>
                       <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
                       <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
                     </div>
-                    <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{hero.name}</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.15rem" }}>
+                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, lineHeight: 1.3 }}>{hero.name}</div>
+                      <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore card" style={{ background: "none", border: "none", color: `${accentColor}88`, fontSize: "0.75rem", cursor: "pointer", padding: "0 0.1rem", lineHeight: 1, flexShrink: 0 }}>ℹ</button>
+                    </div>
                     <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>{hero.alias}</div>
                     <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
                   </button>
@@ -1517,6 +1575,28 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   >
                     <div style={{ fontSize: "1.3rem", marginBottom: "0.4rem" }}>{s.icon}</div>
                     <div className="font-cinzel" style={{ fontSize: "0.75rem", color: isSel ? "#FF4060" : "#E8E8F0", fontWeight: 700 }}>{s.label}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Intensity Slider */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Intensity Level</div>
+            <div style={{ display: "flex", gap: "0.625rem" }}>
+              {([
+                { val: 1 as const, label: "Tense", icon: "🌩", desc: "Charged atmosphere, power exchange, psychological dominance" },
+                { val: 2 as const, label: "Explicit", icon: "🔥", desc: "Graphic sexual content, domination, full explicit detail" },
+                { val: 3 as const, label: "Brutal", icon: "💀", desc: "No limits, maximum depravity, extreme degradation" },
+              ] as const).map(({ val, label, icon, desc }) => {
+                const isSel = intensity === val;
+                const col = val === 1 ? "#60A0FF" : val === 2 ? "#FF8030" : "#FF2020";
+                return (
+                  <button key={val} onClick={() => setIntensity(val)} style={{ flex: 1, background: isSel ? `${col}22` : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? `${col}88` : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? `0 0 16px ${col}30` : "none" }}>
+                    <div style={{ fontSize: "1.4rem", marginBottom: "0.4rem" }}>{icon}</div>
+                    <div className="font-cinzel" style={{ fontSize: "0.78rem", color: isSel ? col : "#E8E8F0", fontWeight: 700, marginBottom: "0.25rem" }}>{label}</div>
+                    <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", lineHeight: 1.4 }}>{desc}</div>
                   </button>
                 );
               })}
@@ -2173,13 +2253,28 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.4), transparent)" }} />
                   <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "#FFB800", textTransform: "uppercase" }}>Chapter {i + 1}</span>
                   <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.4))" }} />
+                  <button
+                    onClick={() => regenChapter(i)}
+                    disabled={regenChapIdx !== null || loading || continuing}
+                    title="Re-roll this chapter"
+                    style={{ padding: "0.25rem 0.65rem", background: regenChapIdx === i ? "rgba(192,96,224,0.3)" : "rgba(0,0,0,0.5)", border: "1px solid rgba(192,96,224,0.35)", borderRadius: "14px", color: regenChapIdx === i ? "#C060E0" : "rgba(200,200,220,0.4)", fontSize: "0.58rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", whiteSpace: "nowrap", transition: "all 0.2s" }}
+                  >
+                    {regenChapIdx === i ? "↻ Re-rolling…" : "↻ Re-roll"}
+                  </button>
                 </div>
               )}
-              <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: i === 0 ? "linear-gradient(90deg, transparent, #FF4060 20%, #FFB800 50%, #C060E0 80%, transparent)" : "linear-gradient(90deg, transparent, #C060E0 30%, #FFB800 70%, transparent)" }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.2), transparent)" }} />
-                <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>{ch}</div>
-              </div>
+              {regenChapIdx === i ? (
+                <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(192,96,224,0.3)", borderRadius: "20px", padding: "2.5rem", textAlign: "center" }}>
+                  <div style={{ fontSize: "1.5rem", marginBottom: "0.75rem", animation: "orbFloat 1.5s ease-in-out infinite" }}>↻</div>
+                  <div className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.8rem", letterSpacing: "2px" }}>Re-rolling Chapter {i + 1}…</div>
+                </div>
+              ) : (
+                <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: i === 0 ? "linear-gradient(90deg, transparent, #FF4060 20%, #FFB800 50%, #C060E0 80%, transparent)" : "linear-gradient(90deg, transparent, #C060E0 30%, #FFB800 70%, transparent)" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.2), transparent)" }} />
+                  <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>{ch}</div>
+                </div>
+              )}
             </div>
           ))}
 
@@ -2278,6 +2373,54 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           onDeleted={(id) => setCustomHeroesList(prev => prev.filter(h => h.id !== id))}
         />
       )}
+
+      {/* Lore Card Modal */}
+      {loreHero && (() => {
+        const isMarvel = loreHero.universe === "MARVEL";
+        const isCW = loreHero.universe === "CW";
+        const isTB = loreHero.universe === "TB";
+        const isPR = loreHero.universe === "PR";
+        const isAnim = loreHero.universe === "ANIMATED";
+        const isSW = loreHero.universe === "SW";
+        const isTV = loreHero.universe === "TV";
+        const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : loreHero.universe === "CUSTOM" ? "#C8A84B" : "#60A0FF";
+        const universeBg = isMarvel ? "rgba(220,30,30,0.08)" : isCW ? "rgba(0,180,100,0.08)" : isTB ? "rgba(200,30,0,0.08)" : isPR ? "rgba(220,0,150,0.08)" : isAnim ? "rgba(160,0,255,0.08)" : isSW ? "rgba(0,180,255,0.08)" : isTV ? "rgba(255,150,60,0.08)" : "rgba(0,100,220,0.08)";
+        const heroWeaknesses = HERO_WEAKNESS_CATALOG[loreHero.name as keyof typeof HERO_WEAKNESS_CATALOG];
+        const isFav = favorites.includes(loreHero.name);
+        return (
+          <div onClick={() => setLoreHero(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem", backdropFilter: "blur(6px)" }}>
+            <div onClick={(e) => e.stopPropagation()} style={{ background: "#0A0810", border: `1px solid ${accentColor}44`, borderRadius: "20px", padding: "2rem", maxWidth: "480px", width: "100%", position: "relative", overflow: "hidden", boxShadow: `0 0 60px ${accentColor}22` }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
+              <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+                <div style={{ width: "80px", height: "107px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)", border: `1px solid ${accentColor}33` }}>
+                  <img src={heroImg(loreHero.name)} alt={loreHero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "0.55rem", color: `${accentColor}88`, letterSpacing: "2.5px", fontFamily: "'Cinzel', serif", marginBottom: "0.3rem", textTransform: "uppercase" }}>{loreHero.universe}</div>
+                  <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.25rem", color: accentColor, margin: "0 0 0.3rem", lineHeight: 1.2 }}>{loreHero.name}</h2>
+                  <div style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", fontStyle: "italic", marginBottom: "0.75rem" }}>{loreHero.alias}</div>
+                  <button onClick={() => toggleFavorite(loreHero.name)} style={{ padding: "0.3rem 0.85rem", background: isFav ? "rgba(255,184,0,0.2)" : "rgba(255,255,255,0.05)", border: `1px solid ${isFav ? "rgba(255,184,0,0.5)" : "rgba(255,255,255,0.1)"}`, borderRadius: "20px", color: isFav ? "#FFB800" : "rgba(200,200,220,0.4)", fontSize: "0.65rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>
+                    {isFav ? "★ Favorited" : "☆ Add to Favorites"}
+                  </button>
+                </div>
+              </div>
+              <div style={{ background: universeBg, border: `1px solid ${accentColor}22`, borderRadius: "12px", padding: "1rem", marginBottom: "1rem" }}>
+                <div style={{ fontSize: "0.5rem", color: `${accentColor}99`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>POWER SET</div>
+                <div style={{ fontSize: "0.78rem", color: "rgba(220,215,245,0.85)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6 }}>{loreHero.power}</div>
+              </div>
+              {heroWeaknesses && heroWeaknesses.length > 0 && (
+                <div style={{ background: "rgba(255,40,40,0.06)", border: "1px solid rgba(255,40,40,0.15)", borderRadius: "12px", padding: "1rem", marginBottom: "1rem" }}>
+                  <div style={{ fontSize: "0.5rem", color: "rgba(255,100,100,0.7)", letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>KNOWN VULNERABILITIES</div>
+                  <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                    {heroWeaknesses.map((w, i) => <li key={i} style={{ fontSize: "0.72rem", color: "rgba(220,200,200,0.7)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, paddingLeft: "0.75rem", borderLeft: "2px solid rgba(255,60,60,0.3)", marginBottom: "0.35rem" }}>{w}</li>)}
+                  </ul>
+                </div>
+              )}
+              <button onClick={() => setLoreHero(null)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", color: "rgba(200,200,220,0.4)", fontSize: "1.1rem", cursor: "pointer", lineHeight: 1 }}>✕</button>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

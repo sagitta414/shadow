@@ -24,6 +24,8 @@ import MindBreakMode from "./pages/MindBreakMode";
 import DualCaptureMode from "./pages/DualCaptureMode";
 import RescueGoneWrongMode from "./pages/RescueGoneWrongMode";
 import PowerDrainMode from "./pages/PowerDrainMode";
+import MassCaptureMode from "./pages/MassCaptureMode";
+import CorruptionArcMode from "./pages/CorruptionArcMode";
 
 type Page =
   | "login"
@@ -48,7 +50,9 @@ type Page =
   | "mind-break"
   | "dual-capture"
   | "rescue-gone-wrong"
-  | "power-drain";
+  | "power-drain"
+  | "mass-capture"
+  | "corruption-arc";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -178,6 +182,8 @@ function AppInner() {
           onDualCapture={() => navigate("dual-capture")}
           onRescueGoneWrong={() => navigate("rescue-gone-wrong")}
           onPowerDrain={() => navigate("power-drain")}
+          onMassCapture={() => navigate("mass-capture")}
+          onCorruptionArc={() => navigate("corruption-arc")}
         />
       )}
 
@@ -287,6 +293,14 @@ function AppInner() {
 
       {page === "power-drain" && (
         <PowerDrainMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "mass-capture" && (
+        <MassCaptureMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "corruption-arc" && (
+        <CorruptionArcMode onBack={() => navigate("home")} />
       )}
     </div>
   );

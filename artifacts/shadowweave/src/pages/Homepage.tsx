@@ -17,6 +17,8 @@ interface HomepageProps {
   onDualCapture: () => void;
   onRescueGoneWrong: () => void;
   onPowerDrain: () => void;
+  onMassCapture: () => void;
+  onCorruptionArc: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -381,6 +383,8 @@ export default function Homepage(props: HomepageProps) {
           <SubCard icon="⊕" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#40E090" r={64} g={224} b={144} badge="Duo" onClick={props.onDualCapture} />
           <SubCard icon="✗" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FF9640" r={255} g={150} b={64} badge="Trap" onClick={props.onRescueGoneWrong} />
           <SubCard icon="↓" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A0FF" r={96} g={160} b={255} badge="Meter" onClick={props.onPowerDrain} />
+          <SubCard icon="≡" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#FF6060" r={255} g={60} b={60} badge="Group" onClick={props.onMassCapture} />
+          <SubCard icon="↘" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#FF69B4" r={255} g={105} b={180} badge="Arc" onClick={props.onCorruptionArc} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}

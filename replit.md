@@ -1,6 +1,6 @@
 # SHADOWWEAVE — Dark Narrative Studio
 
-## Story Modes (7 total)
+## Story Modes (9 total)
 - **Heroine Forge** — 181+ heroines (Marvel/DC/CW/The Boys/PR/Animated/Star Wars/TV), 67 villains, 4-step wizard, multi-chapter AI story
 - **Celebrity Captive** — 100 actresses, captor builder, streaming AI story
 - **Custom Scenario** — Full character builder + captor profiler
@@ -9,16 +9,22 @@
 - **Two Heroines, One Cell** — Dual captive scenario with dynamic between them
 - **Rescue Gone Wrong** — Second heroine attempts rescue and fails; both captured
 - **Power Drain Mode** — Systematic stripping of powers with live drain % meter
+- **Mass Capture Mode** — 3–5 heroines, one dominant villain, group dynamics, collective breaking
+- **Corruption Arc** — 7-chapter arc tracking heroine's loyalty from 100% → 0%; she genuinely switches sides
 
 ## Utility Tools
 - Interrogation Room, Captor Logic Sim, Sounding Board, Scenario Engine, Character Mapper, Captor Configuration, Story Archive
 
 ## Key Features
 - **Custom Heroine Builder** — Create your own heroines saved to localStorage, appear in Heroine Forge picker (CUSTOM tab)
+- **Favorite Heroines** — Star any heroine in Heroine Forge; favorites sorted first in grid, persisted to `sw_favorites_v1` localStorage key
+- **Heroine Lore Cards** — Click ℹ on any hero card to see a modal with powers, alias, universe, known vulnerabilities, and favorite toggle
+- **Intensity Slider** — Tense / Explicit / Brutal 3-level control in Heroine Forge Step 3; bakes into system prompt
+- **Chapter Regeneration** — ↻ Re-roll button on each chapter in Heroine Forge; calls `/story/superhero-regen` with context
 - **Random Picker** — One-click randomize heroine + villain in Heroine Forge
 - **Export TXT/PDF** — All story modes support export; PDF is print-ready with Cinzel/Garamond fonts
 - **Story Archive** — localStorage archive with search, tags, favourites, sort, and export
-- **Venice AI** — `venice-uncensored-role-play` model for all 9 story endpoints; `lustify-v7` for portraits; zero safety restrictions
+- **Venice AI** — `venice-uncensored-role-play` model for all 11 story endpoints; `lustify-v7` for portraits; zero safety restrictions
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
 
 # Workspace
