@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { saveStoryToArchive } from "../lib/archive";
 
 interface CelebrityModeProps { onBack: () => void; }
 
@@ -208,6 +209,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [chapters, setChapters] = useState<string[]>([]);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [continueDir, setContinueDir] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -346,7 +348,23 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   function resetAll() {
     setStep(1); setStory(""); setChapters([]); setSelectedActresses([]);
     setCaptors([defaultCaptor()]); setSelectedSetting(""); setSelectedEncounter("");
-    setSelectedTone(""); setExtraDetails(""); setError("");
+    setSelectedTone(""); setExtraDetails(""); setError(""); setSavedId(null);
+  }
+
+  function saveToArchive() {
+    if (!chapters.length) return;
+    const actressNames = selectedActresses.map((a) => a.name);
+    const captorNames = captors.map((c) => c.name || "Unknown Captor");
+    const id = saveStoryToArchive({
+      title: actressNames.length === 1
+        ? `${actressNames[0]} — Celebrity Captive`
+        : `${actressNames.join(" & ")} — Celebrity Captive`,
+      universe: "Celebrity",
+      tool: "Celebrity Captive",
+      characters: [...actressNames, ...captorNames],
+      chapters,
+    });
+    setSavedId(id);
   }
 
   const gold = "#C8A84B";
@@ -714,6 +732,13 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
               />
               <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
                 <button onClick={continueStory} style={{ ...btnStyle }}>Continue Story →</button>
+                <button
+                  onClick={saveToArchive}
+                  disabled={!!savedId}
+                  style={{ ...btnStyle, background: savedId ? "rgba(68,210,110,0.1)" : "rgba(44,95,138,0.12)", border: `1px solid ${savedId ? "rgba(68,210,110,0.35)" : "rgba(106,173,228,0.35)"}`, color: savedId ? "#44D26E" : "#6AADE4", cursor: savedId ? "default" : "pointer" }}
+                >
+                  {savedId ? "✓ Saved" : "Save to Archive"}
+                </button>
                 <button onClick={resetAll} style={{ ...btnStyle, background: "rgba(0,0,0,0.4)", border: `1px solid ${border}`, color: goldDim }}>New Session</button>
               </div>
             </div>

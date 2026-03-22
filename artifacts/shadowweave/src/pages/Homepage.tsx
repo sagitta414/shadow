@@ -10,6 +10,7 @@ interface HomepageProps {
   onSuperheroMode: () => void;
   onInterrogationRoom: () => void;
   onCelebrityMode: () => void;
+  onStoryArchive: () => void;
 }
 
 const TOOLS = [
@@ -94,6 +95,15 @@ const TOOLS = [
     features: ["100 Actresses", "Captor Builder", "Scenario Engine"],
     hex: "#7B5E2A", light: "#C8A84B", r: 123, g: 94, b: 42,
   },
+  {
+    id: "archive",       num: "10",
+    icon: "◈",
+    title: "Story Archive",
+    subtitle: "Narrative Library",
+    desc: "Every story you save, collected in one place. Browse, search, tag, favourite, and export as formatted PDF or plain text.",
+    features: ["Browse & Search", "Tags & Favourites", "PDF / TXT Export"],
+    hex: "#2C5F8A", light: "#6AADE4", r: 44, g: 95, b: 138,
+  },
 ];
 
 function handleClick(id: string, fns: HomepageProps) {
@@ -105,10 +115,134 @@ function handleClick(id: string, fns: HomepageProps) {
   if (id === "captor-logic")  fns.onCaptorLogic();
   if (id === "interrogation") fns.onInterrogationRoom();
   if (id === "celebrity")     fns.onCelebrityMode();
+  if (id === "archive")       fns.onStoryArchive();
   if (id === "themes") {
     const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null;
     btn?.click();
   }
+}
+
+// ─── Daily Dark Scenario ──────────────────────────────────────────────────────
+const DAILY_HEROINES = [
+  { name: "Black Widow",    universe: "MARVEL", color: "#FF6060" },
+  { name: "Scarlet Witch",  universe: "MARVEL", color: "#FF6060" },
+  { name: "Wonder Woman",   universe: "DC",     color: "#60A0FF" },
+  { name: "Zatanna",        universe: "DC",     color: "#60A0FF" },
+  { name: "Black Canary",   universe: "CW",     color: "#40E090" },
+  { name: "Supergirl",      universe: "CW",     color: "#40E090" },
+  { name: "Elsa",           universe: "ANIMATED", color: "#C084FC" },
+  { name: "Megara",         universe: "ANIMATED", color: "#C084FC" },
+  { name: "Mulan",          universe: "ANIMATED", color: "#C084FC" },
+  { name: "Starlight",      universe: "TB",     color: "#FF3D00" },
+  { name: "Kimiko",         universe: "TB",     color: "#FF3D00" },
+  { name: "Trini Kwan",     universe: "PR",     color: "#FF69B4" },
+];
+
+const DAILY_VILLAINS = [
+  "The Red Room Director", "Baron Mordo", "Graviton", "HYDRA Commander",
+  "Lex Luthor", "The Riddler", "Deathstroke", "Circe",
+  "Malcolm Merlyn", "Prometheus", "Damien Darhk",
+  "Maleficent", "Ursula", "Hades", "Mother Gothel",
+  "Homelander", "Black Noir", "The Deep",
+];
+
+const DAILY_SETTINGS = [
+  "A subterranean black site — no signals in or out",
+  "An abandoned cathedral at midnight",
+  "A luxury penthouse with no exits",
+  "A classified research vessel mid-ocean",
+  "A forest compound deep in winter",
+  "A disused Cold War bunker",
+  "A remote mountain stronghold above the clouds",
+  "A decommissioned satellite station",
+  "The ruins of a fallen empire palace",
+  "A silent manor surrounded by fog",
+];
+
+const TITLE_TEMPLATES = [
+  "{villain} Claims {heroine}",
+  "The Last Night — {villain} vs {heroine}",
+  "{heroine} at Zero Hour",
+  "No Escape: {heroine} & {villain}",
+  "{villain}'s Trophy",
+  "Into the Dark — {heroine} Falls",
+  "The Hour of {villain}",
+  "{heroine} Undone",
+  "Shattered: {heroine} & {villain}",
+  "The Reckoning — {heroine}",
+];
+
+function seededRand(seed: number) {
+  const x = Math.sin(seed + 1) * 10000;
+  return x - Math.floor(x);
+}
+
+function dailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+function getDailyScenario() {
+  const seed = dailySeed();
+  const heroine = DAILY_HEROINES[Math.floor(seededRand(seed) * DAILY_HEROINES.length)];
+  const villain = DAILY_VILLAINS[Math.floor(seededRand(seed + 3) * DAILY_VILLAINS.length)];
+  const setting = DAILY_SETTINGS[Math.floor(seededRand(seed + 7) * DAILY_SETTINGS.length)];
+  const template = TITLE_TEMPLATES[Math.floor(seededRand(seed + 11) * TITLE_TEMPLATES.length)];
+  const title = template
+    .replace("{heroine}", heroine.name)
+    .replace("{villain}", villain);
+  return { heroine, villain, setting, title };
+}
+
+function DailyScenario({ onSuperheroMode }: { onSuperheroMode: () => void }) {
+  const { heroine, villain, setting, title } = getDailyScenario();
+  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const [hov, setHov] = useState(false);
+
+  return (
+    <div
+      onClick={onSuperheroMode}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        margin: "1.25rem 2.5rem 0",
+        padding: "1.5rem 2rem",
+        background: "linear-gradient(130deg, rgba(6,0,18,0.96) 0%, rgba(16,4,36,0.94) 100%)",
+        border: `1px solid ${hov ? "rgba(200,168,75,0.4)" : "rgba(200,168,75,0.14)"}`,
+        borderLeft: `3px solid rgba(200,168,75,${hov ? 0.8 : 0.45})`,
+        borderRadius: "10px",
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+        boxShadow: hov ? "0 4px 40px rgba(200,168,75,0.06)" : "none",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 30%, rgba(200,168,75,0.025) 50%, transparent 70%)", backgroundSize: "200% 100%", animation: "shimmer 5s linear infinite", pointerEvents: "none" }} />
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem", position: "relative", zIndex: 1, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: "260px" }}>
+          <div style={{ fontSize: "0.55rem", letterSpacing: "4px", color: "rgba(200,168,75,0.5)", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem", textTransform: "uppercase" }}>
+            Daily Dark Scenario · {today}
+          </div>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(1rem, 2.5vw, 1.4rem)", fontWeight: 700, color: "#E8D898", marginBottom: "0.75rem", letterSpacing: "0.03em", lineHeight: 1.3 }}>
+            {title}
+          </div>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontSize: "0.72rem", color: heroine.color, fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>{heroine.name}</span>
+            <span style={{ color: "rgba(200,168,75,0.3)", fontSize: "0.7rem" }}>vs</span>
+            <span style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.55)", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>{villain}</span>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flexShrink: 0 }}>
+          <div style={{ fontSize: "0.65rem", color: "rgba(200,168,75,0.45)", letterSpacing: "0.5px", fontFamily: "'Cinzel', serif" }}>SETTING</div>
+          <div style={{ fontSize: "0.78rem", color: "rgba(200,195,220,0.5)", fontFamily: "'Raleway', sans-serif", maxWidth: "220px", lineHeight: 1.5 }}>{setting}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.25rem", color: hov ? "rgba(200,168,75,0.8)" : "rgba(200,168,75,0.4)", transition: "color 0.2s", fontFamily: "'Cinzel', serif", fontSize: "0.68rem", letterSpacing: "1.5px" }}>
+            Open in Hero Forge →
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Homepage(props: HomepageProps) {
@@ -187,7 +321,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         <div className="hp-nav-stats" style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
-          {[["7", "Tools"], ["118+", "Heroines"], ["Venice AI", "Powered by"], ["4", "Themes"]].map(([v, l]) => (
+          {[["10", "Tools"], ["118+", "Heroines"], ["Venice AI", "Powered by"], ["4", "Themes"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "0.8rem", fontWeight: 900, color: "rgba(212,175,55,0.7)", lineHeight: 1 }}>{v}</div>
               <div className="font-montserrat" style={{ fontSize: "0.42rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>
@@ -259,6 +393,9 @@ export default function Homepage(props: HomepageProps) {
           </div>
         </div>
       </div>
+
+      {/* ══════════════ DAILY DARK SCENARIO ══════════════ */}
+      <DailyScenario onSuperheroMode={onSuperheroMode} />
 
       {/* ══════════════ EDITORIAL TOOL LIST ══════════════ */}
       <main style={{ flex: 1, position: "relative", zIndex: 2, paddingBottom: "3rem" }}>

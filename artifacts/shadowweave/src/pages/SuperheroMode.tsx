@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { saveStoryToArchive } from "../lib/archive";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -572,6 +573,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [continuing, setContinuing] = useState(false);
@@ -785,6 +787,22 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  function saveToArchive() {
+    if (!chapters.length) return;
+    const villainName = villainMode === "pick" ? (selectedVillain?.name ?? "Unknown") : customVillain;
+    const heroNames = selectedHeroes.map((h) => h.name);
+    const id = saveStoryToArchive({
+      title: heroNames.length === 1
+        ? `${heroNames[0]} vs ${villainName}`
+        : `${heroNames.join(" & ")} vs ${villainName}`,
+      universe: selectedHeroes[0]?.universe ?? "Unknown",
+      tool: "Heroine Forge",
+      characters: [...heroNames, villainName],
+      chapters,
+    });
+    setSavedId(id);
   }
 
   const stepLabels = ["Choose Hero", "Choose Villain", "Scenario", "Story"];
@@ -1979,7 +1997,14 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               {chapters.length > 0 && (
                 <>
                   <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>Export {chapters.length > 1 ? `(${chapters.length} ch.)` : ""}</button>
-                  <button onClick={() => { setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
+                  <button
+                    onClick={saveToArchive}
+                    disabled={!!savedId}
+                    style={{ padding: "0.75rem 1.25rem", background: savedId ? "rgba(68,210,110,0.1)" : "rgba(44,95,138,0.12)", border: `1px solid ${savedId ? "rgba(68,210,110,0.35)" : "rgba(106,173,228,0.35)"}`, borderRadius: "10px", color: savedId ? "#44D26E" : "#6AADE4", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: savedId ? "default" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+                  >
+                    {savedId ? "✓ Saved" : "Save to Archive"}
+                  </button>
+                  <button onClick={() => { setSavedId(null); setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
                 </>
               )}
             </div>

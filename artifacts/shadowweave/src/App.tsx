@@ -16,9 +16,12 @@ import CaptorLogic from "./pages/CaptorLogic";
 import SuperheroMode from "./pages/SuperheroMode";
 import InterrogationRoom from "./pages/InterrogationRoom";
 import CelebrityMode from "./pages/CelebrityMode";
+import IntroSequence from "./pages/IntroSequence";
+import StoryArchive from "./pages/StoryArchive";
 
 type Page =
   | "login"
+  | "intro"
   | "home"
   | "character-params"
   | "story-editor"
@@ -32,7 +35,8 @@ type Page =
   | "captor-logic"
   | "superhero-mode"
   | "interrogation-room"
-  | "celebrity-mode";
+  | "celebrity-mode"
+  | "story-archive";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -120,7 +124,19 @@ function AppInner() {
   return (
     <div style={{ minHeight: "100vh", background: bgColor, color: textColor, transition: "background 0.6s ease, color 0.6s ease" }}>
       {page === "login" && (
-        <Login onEnter={() => navigate("home")} />
+        <Login onEnter={() => {
+          const played = sessionStorage.getItem("sw_intro_played");
+          if (!played) {
+            sessionStorage.setItem("sw_intro_played", "1");
+            navigate("intro");
+          } else {
+            navigate("home");
+          }
+        }} />
+      )}
+
+      {page === "intro" && (
+        <IntroSequence onComplete={() => navigate("home")} />
       )}
 
       {page !== "login" && (
@@ -143,7 +159,12 @@ function AppInner() {
           onSuperheroMode={() => navigate("superhero-mode")}
           onInterrogationRoom={() => navigate("interrogation-room")}
           onCelebrityMode={() => navigate("celebrity-mode")}
+          onStoryArchive={() => navigate("story-archive")}
         />
+      )}
+
+      {page === "story-archive" && (
+        <StoryArchive onBack={() => navigate("home")} />
       )}
 
       {page === "character-params" && (
