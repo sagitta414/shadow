@@ -10,6 +10,7 @@ import {
 
 interface Props {
   onBack: () => void;
+  onRemix?: (heroName: string) => void;
 }
 
 const UNIVERSE_COLORS: Record<string, string> = {
@@ -44,7 +45,7 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export default function StoryArchive({ onBack }: Props) {
+export default function StoryArchive({ onBack, onRemix }: Props) {
   const [stories, setStories] = useState<ArchivedStory[]>([]);
   const [search, setSearch] = useState("");
   const [filterFav, setFilterFav] = useState(false);
@@ -261,6 +262,19 @@ export default function StoryArchive({ onBack }: Props) {
                 >
                   ↓ PDF
                 </button>
+                {onRemix && s.characters?.length > 0 && (
+                  <button
+                    onClick={() => onRemix(s.characters[0])}
+                    style={{
+                      padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                      fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                      background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)",
+                      color: "rgba(192,132,252,0.8)",
+                    }}
+                  >
+                    ⟳ Reimagine
+                  </button>
+                )}
               </div>
               {confirmDelete === s.id ? (
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>

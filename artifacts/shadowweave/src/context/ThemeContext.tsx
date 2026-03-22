@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
-export type ThemeName = "void" | "cold-blue" | "candlelight" | "glitch";
+export type ThemeName = "void" | "cold-blue" | "candlelight" | "glitch" | "crimson" | "emerald";
 
 export interface Theme {
   name: ThemeName;
@@ -32,6 +32,50 @@ export const THEMES: Theme[] = [
       "--t-orb1": "rgba(139,0,0,0.18)",
       "--t-orb2": "rgba(45,27,105,0.2)",
       "--t-filter": "none",
+    },
+  },
+  {
+    name: "crimson",
+    label: "Crimson",
+    icon: "🩸",
+    desc: "Blood & dominance",
+    bodyClass: "theme-crimson",
+    vars: {
+      "--t-bg": "#070001",
+      "--t-surface": "rgba(18,2,4,0.94)",
+      "--t-border": "rgba(200,0,30,0.14)",
+      "--t-accent1": "#8B0015",
+      "--t-accent2": "#DC143C",
+      "--t-accent3": "#400010",
+      "--t-text": "#f0c8cc",
+      "--t-text-dim": "rgba(240,150,160,0.45)",
+      "--t-glow1": "rgba(180,0,30,0.5)",
+      "--t-glow2": "rgba(220,20,60,0.3)",
+      "--t-orb1": "rgba(160,0,20,0.28)",
+      "--t-orb2": "rgba(80,0,10,0.2)",
+      "--t-filter": "hue-rotate(-10deg) saturate(1.3) brightness(0.88)",
+    },
+  },
+  {
+    name: "emerald",
+    label: "Emerald",
+    icon: "◈",
+    desc: "Hunter in the dark",
+    bodyClass: "theme-emerald",
+    vars: {
+      "--t-bg": "#000a02",
+      "--t-surface": "rgba(0,12,4,0.94)",
+      "--t-border": "rgba(16,185,129,0.12)",
+      "--t-accent1": "#065f46",
+      "--t-accent2": "#10b981",
+      "--t-accent3": "#022c22",
+      "--t-text": "#a7f3d0",
+      "--t-text-dim": "rgba(110,231,183,0.45)",
+      "--t-glow1": "rgba(6,78,59,0.55)",
+      "--t-glow2": "rgba(16,185,129,0.3)",
+      "--t-orb1": "rgba(4,60,38,0.25)",
+      "--t-orb2": "rgba(2,30,18,0.2)",
+      "--t-filter": "hue-rotate(130deg) saturate(0.7) brightness(0.9)",
     },
   },
   {
@@ -105,11 +149,15 @@ export const THEMES: Theme[] = [
 interface ThemeContextValue {
   theme: Theme;
   setTheme: (name: ThemeName) => void;
+  typewriterMode: boolean;
+  toggleTypewriter: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: THEMES[0],
   setTheme: () => {},
+  typewriterMode: false,
+  toggleTypewriter: () => {},
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -117,20 +165,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return (localStorage.getItem("sw-theme") as ThemeName) || "void";
   });
 
+  const [typewriterMode, setTypewriterMode] = useState(() => {
+    return localStorage.getItem("sw_typewriter") === "1";
+  });
+
   const theme = THEMES.find((t) => t.name === themeName) ?? THEMES[0];
 
   useEffect(() => {
     localStorage.setItem("sw-theme", themeName);
-    // Apply body class for theme-specific CSS
     document.body.className = theme.bodyClass;
-    // Apply CSS variables to root
     Object.entries(theme.vars).forEach(([k, v]) => {
       document.documentElement.style.setProperty(k, v);
     });
   }, [theme]);
 
+  function toggleTypewriter() {
+    const next = !typewriterMode;
+    setTypewriterMode(next);
+    localStorage.setItem("sw_typewriter", next ? "1" : "0");
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: setThemeName }}>
+    <ThemeContext.Provider value={{ theme, setTheme: setThemeName, typewriterMode, toggleTypewriter }}>
       {children}
     </ThemeContext.Provider>
   );

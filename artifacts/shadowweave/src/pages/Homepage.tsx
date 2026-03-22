@@ -19,6 +19,7 @@ interface HomepageProps {
   onPowerDrain: () => void;
   onMassCapture: () => void;
   onCorruptionArc: () => void;
+  onSurpriseMe: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -76,6 +77,7 @@ function PrimaryCard({
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      className="hp-primary-card"
       style={{
         position: "relative",
         borderRadius: "18px",
@@ -301,6 +303,7 @@ function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number;
 
 export default function Homepage(props: HomepageProps) {
   const [mounted, setMounted] = useState(false);
+  const [surpriseHov, setSurpriseHov] = useState(false);
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -313,13 +316,24 @@ export default function Homepage(props: HomepageProps) {
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
         @keyframes hdrShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
         @keyframes floatOrb { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-18px); } }
+        @keyframes surpriseGlow { 0%,100% { box-shadow: 0 0 20px rgba(168,85,247,0.35), 0 0 60px rgba(168,85,247,0.08); } 50% { box-shadow: 0 0 35px rgba(168,85,247,0.65), 0 0 80px rgba(168,85,247,0.18); } }
         @media (max-width: 900px) {
           .hp-cols { grid-template-columns: 1fr !important; }
+          .hp-primary-card { height: auto !important; min-height: 280px !important; }
           .hp-nav-stats { display: none !important; }
           .hp-nav { padding: 0 1rem !important; }
-          .hp-pad { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+          .hp-pad { padding-left: 1rem !important; padding-right: 1rem !important; }
+          .hp-surprise { flex-direction: column !important; gap: 0.5rem !important; text-align: center !important; }
+          .hp-daily { flex-direction: column !important; gap: 0.75rem !important; }
+          .hp-daily-meta { flex-wrap: wrap !important; gap: 0.6rem !important; }
         }
-        @media (max-width: 560px) { .hp-general { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) {
+          .hp-general { grid-template-columns: 1fr !important; }
+          .hp-cols { gap: 1rem !important; }
+        }
+        @media (max-width: 480px) {
+          .hp-pad { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+        }
       `}</style>
 
       {/* Vivid ambient glows */}
@@ -363,6 +377,37 @@ export default function Homepage(props: HomepageProps) {
           <div style={{ flex: 1, maxWidth: "160px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.4))" }} />
           <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 10px #A855F7" }} />
           <div style={{ flex: 1, maxWidth: "160px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.4), transparent)" }} />
+        </div>
+
+        {/* ── SURPRISE ME ── */}
+        <div style={{ marginTop: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem" }} className="hp-surprise">
+          <div style={{ flex: 1, maxWidth: "120px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.2))" }} />
+          <button
+            onClick={props.onSurpriseMe}
+            onMouseEnter={() => setSurpriseHov(true)}
+            onMouseLeave={() => setSurpriseHov(false)}
+            style={{
+              display: "flex", alignItems: "center", gap: "0.7rem",
+              padding: "0.75rem 2rem",
+              background: surpriseHov
+                ? "linear-gradient(135deg, rgba(109,40,217,0.55), rgba(147,51,234,0.55))"
+                : "linear-gradient(135deg, rgba(109,40,217,0.25), rgba(147,51,234,0.25))",
+              border: `1px solid ${surpriseHov ? "rgba(168,85,247,0.75)" : "rgba(168,85,247,0.35)"}`,
+              borderRadius: "50px",
+              cursor: "pointer",
+              transition: "all 0.3s",
+              animation: "surpriseGlow 3s ease-in-out infinite",
+              boxShadow: surpriseHov
+                ? "0 8px 32px rgba(109,40,217,0.45), 0 0 60px rgba(168,85,247,0.15)"
+                : "0 0 20px rgba(168,85,247,0.2)",
+              transform: surpriseHov ? "translateY(-2px) scale(1.04)" : "none",
+            }}
+          >
+            <span style={{ fontSize: "1rem", filter: surpriseHov ? "drop-shadow(0 0 8px rgba(168,85,247,1))" : "none", transition: "filter 0.3s" }}>⚡</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: surpriseHov ? "#E9D5FF" : "rgba(192,132,252,0.8)", transition: "color 0.3s", textShadow: surpriseHov ? "0 0 20px rgba(168,85,247,0.9)" : "none" }}>Surprise Me</span>
+            <span style={{ fontSize: "0.65rem", color: surpriseHov ? "rgba(192,132,252,0.7)" : "rgba(168,85,247,0.3)", transition: "color 0.3s", letterSpacing: "1px", fontFamily: "'Montserrat', sans-serif" }}>Random Story</span>
+          </button>
+          <div style={{ flex: 1, maxWidth: "120px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.2), transparent)" }} />
         </div>
       </div>
 

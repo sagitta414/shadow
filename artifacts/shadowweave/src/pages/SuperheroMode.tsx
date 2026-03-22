@@ -1,11 +1,17 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { saveStoryToArchive, exportStoryAsPDF } from "../lib/archive";
 import { getCustomHeroines, CustomHeroine } from "../lib/customHeroines";
 import CustomHeroineModal from "../components/CustomHeroineModal";
+import { getPreset, savePreset } from "../lib/presets";
+import { useTheme } from "../context/ThemeContext";
 
 interface SuperheroModeProps {
   onBack: () => void;
+  surprise?: boolean;
+  reimagineHero?: string | null;
+  onSurpriseUsed?: () => void;
+  onReimagineDone?: () => void;
 }
 
 function nameToSlug(name: string): string {
@@ -687,8 +693,9 @@ type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" 
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
-export default function SuperheroMode({ onBack }: SuperheroModeProps) {
+export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpriseUsed, onReimagineDone }: SuperheroModeProps) {
   const isMobile = useIsMobile();
+  const { typewriterMode } = useTheme();
   const [step, setStep] = useState<Step>(1);
   const [universeFilter, setUniverseFilter] = useState<UniverseFilter>("ALL");
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
@@ -712,7 +719,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [storyTone, setStoryTone] = useState<string>("");
   const [captureMethod, setCaptureMethod] = useState<string>("");
   const [heroState, setHeroState] = useState<string>("");
-  const [storyLength, setStoryLength] = useState<string>("medium");
+  const [storyLength, setStoryLength] = useState<string>(() => getPreset("superhero-mode")?.storyLength ?? "medium");
   const [extraDetails, setExtraDetails] = useState("");
 
   // ── Advanced Systems ──
@@ -748,8 +755,54 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     try { return JSON.parse(localStorage.getItem("sw_favorites_v1") ?? "[]"); } catch { return []; }
   });
   const [loreHero, setLoreHero] = useState<{ name: string; alias: string; power: string; icon: string; universe: string } | null>(null);
-  const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
+  const [intensity, setIntensity] = useState<1 | 2 | 3>(() => {
+    const p = getPreset("superhero-mode");
+    return (p?.intensity ?? 2) as 1 | 2 | 3;
+  });
   const [regenChapIdx, setRegenChapIdx] = useState<number | null>(null);
+  const [typewriterText, setTypewriterText] = useState("");
+  const [typewriterDone, setTypewriterDone] = useState(false);
+  const typewriterRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Persist presets when intensity or storyLength changes ────
+  useEffect(() => {
+    savePreset("superhero-mode", { intensity, storyLength });
+  }, [intensity, storyLength]);
+
+  // ── Surprise mode: random hero + random settings → go generate ──
+  useEffect(() => {
+    if (!surprise) return;
+    const allHeroes = [
+      ...MARVEL_HEROES.map(h => ({ ...h, universe: "MARVEL" })),
+      ...DC_HEROES.map(h => ({ ...h, universe: "DC" })),
+    ];
+    const picked = allHeroes[Math.floor(Math.random() * allHeroes.length)];
+    setSelectedHeroes([picked]);
+    const rnd = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+    setSelectedSetting(rnd(SETTINGS).id);
+    setSelectedStakes(rnd(STAKES).id);
+    setCaptureMethod(rnd(CAPTURE_METHODS).id);
+    setHeroState(rnd(HERO_STATES).id);
+    setStoryLength(rnd(STORY_LENGTHS).id);
+    setIntensity(rnd([1, 2, 3] as const));
+    setStep(4);
+    onSurpriseUsed?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surprise]);
+
+  // ── Reimagine: pre-select hero by name → go to step 1 ─────
+  useEffect(() => {
+    if (!reimagineHero) return;
+    const allHeroes = [
+      ...MARVEL_HEROES.map(h => ({ ...h, universe: "MARVEL" })),
+      ...DC_HEROES.map(h => ({ ...h, universe: "DC" })),
+    ];
+    const match = allHeroes.find(h => h.name.toLowerCase() === reimagineHero.toLowerCase());
+    if (match) setSelectedHeroes([match]);
+    setStep(1);
+    onReimagineDone?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reimagineHero]);
 
   function toggleFavorite(name: string) {
     setFavorites(prev => {
@@ -770,6 +823,33 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const story = chapters.join("\n\n");
+
+  // ── Typewriter: animate last chapter when chapters change ────
+  useEffect(() => {
+    if (!typewriterMode || chapters.length === 0) {
+      setTypewriterText("");
+      setTypewriterDone(true);
+      return;
+    }
+    const lastChapter = chapters[chapters.length - 1];
+    setTypewriterText("");
+    setTypewriterDone(false);
+    if (typewriterRef.current) clearTimeout(typewriterRef.current);
+    let i = 0;
+    const speed = 12;
+    function tick() {
+      i++;
+      setTypewriterText(lastChapter.slice(0, i));
+      if (i < lastChapter.length) {
+        typewriterRef.current = setTimeout(tick, speed);
+      } else {
+        setTypewriterDone(true);
+      }
+    }
+    typewriterRef.current = setTimeout(tick, speed);
+    return () => { if (typewriterRef.current) clearTimeout(typewriterRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapters, typewriterMode]);
 
   const allHeroes = [
     ...MARVEL_HEROES.map((h) => ({ ...h, universe: "MARVEL" })),
@@ -2272,7 +2352,12 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: i === 0 ? "linear-gradient(90deg, transparent, #FF4060 20%, #FFB800 50%, #C060E0 80%, transparent)" : "linear-gradient(90deg, transparent, #C060E0 30%, #FFB800 70%, transparent)" }} />
                   <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.2), transparent)" }} />
-                  <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>{ch}</div>
+                  <div className="font-crimson" style={{ fontSize: "1.1rem", color: "#F0F0FF", lineHeight: 2, whiteSpace: "pre-wrap", letterSpacing: "0.3px" }}>
+                    {typewriterMode && i === chapters.length - 1 ? typewriterText : ch}
+                    {typewriterMode && i === chapters.length - 1 && !typewriterDone && (
+                      <span style={{ display: "inline-block", width: "2px", height: "1.1em", background: "#FFB800", marginLeft: "2px", verticalAlign: "text-bottom", animation: "progressGlow 0.8s ease-in-out infinite" }} />
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -2385,7 +2470,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
         const isTV = loreHero.universe === "TV";
         const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : loreHero.universe === "CUSTOM" ? "#C8A84B" : "#60A0FF";
         const universeBg = isMarvel ? "rgba(220,30,30,0.08)" : isCW ? "rgba(0,180,100,0.08)" : isTB ? "rgba(200,30,0,0.08)" : isPR ? "rgba(220,0,150,0.08)" : isAnim ? "rgba(160,0,255,0.08)" : isSW ? "rgba(0,180,255,0.08)" : isTV ? "rgba(255,150,60,0.08)" : "rgba(0,100,220,0.08)";
-        const heroWeaknesses = HERO_WEAKNESS_CATALOG[loreHero.name as keyof typeof HERO_WEAKNESS_CATALOG];
+        const heroWeaknesses = WEAKNESS_CATALOG[loreHero.name as keyof typeof WEAKNESS_CATALOG];
         const isFav = favorites.includes(loreHero.name);
         return (
           <div onClick={() => setLoreHero(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem", backdropFilter: "blur(6px)" }}>
@@ -2412,7 +2497,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 <div style={{ background: "rgba(255,40,40,0.06)", border: "1px solid rgba(255,40,40,0.15)", borderRadius: "12px", padding: "1rem", marginBottom: "1rem" }}>
                   <div style={{ fontSize: "0.5rem", color: "rgba(255,100,100,0.7)", letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>KNOWN VULNERABILITIES</div>
                   <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-                    {heroWeaknesses.map((w, i) => <li key={i} style={{ fontSize: "0.72rem", color: "rgba(220,200,200,0.7)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, paddingLeft: "0.75rem", borderLeft: "2px solid rgba(255,60,60,0.3)", marginBottom: "0.35rem" }}>{w}</li>)}
+                    {heroWeaknesses.map((w: string, i: number) => <li key={i} style={{ fontSize: "0.72rem", color: "rgba(220,200,200,0.7)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, paddingLeft: "0.75rem", borderLeft: "2px solid rgba(255,60,60,0.3)", marginBottom: "0.35rem" }}>{w}</li>)}
                   </ul>
                 </div>
               )}

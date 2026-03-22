@@ -128,6 +128,8 @@ function AppInner() {
   const [page, setPage] = useState<Page>("login");
   const [captorAnswers, setCaptorAnswers] = useState<Record<number, string>>({});
   const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
+  const [surpriseActive, setSurpriseActive] = useState(false);
+  const [reimagineHero, setReimaginHero] = useState<string | null>(null);
 
   function navigate(p: Page) {
     setPage(p);
@@ -184,11 +186,15 @@ function AppInner() {
           onPowerDrain={() => navigate("power-drain")}
           onMassCapture={() => navigate("mass-capture")}
           onCorruptionArc={() => navigate("corruption-arc")}
+          onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
         />
       )}
 
       {page === "story-archive" && (
-        <StoryArchive onBack={() => navigate("home")} />
+        <StoryArchive
+          onBack={() => navigate("home")}
+          onRemix={(heroName) => { setReimaginHero(heroName); setSurpriseActive(false); navigate("superhero-mode"); }}
+        />
       )}
 
       {page === "daily-scenario" && (
@@ -268,7 +274,13 @@ function AppInner() {
       )}
 
       {page === "superhero-mode" && (
-        <SuperheroMode onBack={() => navigate("home")} />
+        <SuperheroMode
+          onBack={() => { setSurpriseActive(false); setReimaginHero(null); navigate("home"); }}
+          surprise={surpriseActive}
+          reimagineHero={reimagineHero}
+          onSurpriseUsed={() => setSurpriseActive(false)}
+          onReimagineDone={() => setReimaginHero(null)}
+        />
       )}
 
       {page === "interrogation-room" && (
