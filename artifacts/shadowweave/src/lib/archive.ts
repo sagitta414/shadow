@@ -1,3 +1,5 @@
+import { recordStoryDay } from "./streak";
+
 export interface ArchivedStory {
   id: string;
   title: string;
@@ -35,6 +37,7 @@ export function saveStoryToArchive(
   };
   const existing = getArchive();
   localStorage.setItem(KEY, JSON.stringify([full, ...existing]));
+  recordStoryDay();
   return id;
 }
 

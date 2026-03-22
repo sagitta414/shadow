@@ -26,6 +26,11 @@ import RescueGoneWrongMode from "./pages/RescueGoneWrongMode";
 import PowerDrainMode from "./pages/PowerDrainMode";
 import MassCaptureMode from "./pages/MassCaptureMode";
 import CorruptionArcMode from "./pages/CorruptionArcMode";
+import StoryArcs from "./pages/StoryArcs";
+import HeroineDossier from "./pages/HeroineDossier";
+import VillainBuilder from "./pages/VillainBuilder";
+import RelationshipMap from "./pages/RelationshipMap";
+import { recordStoryDay } from "./lib/streak";
 
 type Page =
   | "login"
@@ -52,7 +57,12 @@ type Page =
   | "rescue-gone-wrong"
   | "power-drain"
   | "mass-capture"
-  | "corruption-arc";
+  | "corruption-arc"
+  | "story-arcs"
+  | "heroine-dossier"
+  | "villain-builder"
+  | "relationship-map";
+
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -187,6 +197,10 @@ function AppInner() {
           onMassCapture={() => navigate("mass-capture")}
           onCorruptionArc={() => navigate("corruption-arc")}
           onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
+          onStoryArcs={() => navigate("story-arcs")}
+          onHeroineDossier={() => navigate("heroine-dossier")}
+          onVillainBuilder={() => navigate("villain-builder")}
+          onRelationshipMap={() => navigate("relationship-map")}
         />
       )}
 
@@ -313,6 +327,22 @@ function AppInner() {
 
       {page === "corruption-arc" && (
         <CorruptionArcMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "story-arcs" && (
+        <StoryArcs onBack={() => navigate("home")} />
+      )}
+
+      {page === "heroine-dossier" && (
+        <HeroineDossier onBack={() => navigate("home")} />
+      )}
+
+      {page === "villain-builder" && (
+        <VillainBuilder onBack={() => navigate("home")} />
+      )}
+
+      {page === "relationship-map" && (
+        <RelationshipMap onBack={() => navigate("home")} />
       )}
     </div>
   );

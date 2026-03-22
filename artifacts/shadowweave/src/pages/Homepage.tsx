@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import StoryDice from "../components/StoryDice";
+import { getStreak } from "../lib/streak";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -20,6 +22,10 @@ interface HomepageProps {
   onMassCapture: () => void;
   onCorruptionArc: () => void;
   onSurpriseMe: () => void;
+  onStoryArcs: () => void;
+  onHeroineDossier: () => void;
+  onVillainBuilder: () => void;
+  onRelationshipMap: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -304,12 +310,15 @@ function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number;
 export default function Homepage(props: HomepageProps) {
   const [mounted, setMounted] = useState(false);
   const [surpriseHov, setSurpriseHov] = useState(false);
+  const [showDice, setShowDice] = useState(false);
+  const [streak] = useState(() => getStreak());
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "transparent" }}>
+      {showDice && <StoryDice onClose={() => setShowDice(false)} />}
       <style>{`
         @keyframes shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
         @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.65); } }
@@ -362,10 +371,18 @@ export default function Homepage(props: HomepageProps) {
           ))}
         </div>
 
-        <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.42rem 1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s", boxShadow: "0 0 0 0 rgba(168,85,247,0)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(168,85,247,0.25)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.1)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.3)"; e.currentTarget.style.boxShadow = "none"; }}>
-          <span style={{ fontSize: "0.65rem", color: "rgba(192,132,252,0.85)" }}>◈</span>
-          <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          {streak.count >= 2 && (
+            <div title={`${streak.count}-day streak · Best: ${streak.best}`} style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.75rem", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: "20px", cursor: "default" }}>
+              <span style={{ fontSize: "0.8rem" }}>🔥</span>
+              <span style={{ fontSize: "0.58rem", fontFamily: "'Cinzel', serif", letterSpacing: "1px", color: "rgba(253,186,69,0.85)", fontWeight: 700 }}>{streak.count}</span>
+            </div>
+          )}
+          <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.42rem 1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s", boxShadow: "0 0 0 0 rgba(168,85,247,0)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(168,85,247,0.25)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.1)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.3)"; e.currentTarget.style.boxShadow = "none"; }}>
+            <span style={{ fontSize: "0.65rem", color: "rgba(192,132,252,0.85)" }}>◈</span>
+            <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
+          </button>
+        </div>
       </nav>
 
       {/* ─── HERO HEADER ─── */}
@@ -379,9 +396,9 @@ export default function Homepage(props: HomepageProps) {
           <div style={{ flex: 1, maxWidth: "160px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.4), transparent)" }} />
         </div>
 
-        {/* ── SURPRISE ME ── */}
-        <div style={{ marginTop: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem" }} className="hp-surprise">
-          <div style={{ flex: 1, maxWidth: "120px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.2))" }} />
+        {/* ── SURPRISE ME + STORY DICE ── */}
+        <div style={{ marginTop: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.85rem", flexWrap: "wrap" }} className="hp-surprise">
+          <div style={{ flex: 1, maxWidth: "80px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.2))" }} />
           <button
             onClick={props.onSurpriseMe}
             onMouseEnter={() => setSurpriseHov(true)}
@@ -407,7 +424,23 @@ export default function Homepage(props: HomepageProps) {
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: surpriseHov ? "#E9D5FF" : "rgba(192,132,252,0.8)", transition: "color 0.3s", textShadow: surpriseHov ? "0 0 20px rgba(168,85,247,0.9)" : "none" }}>Surprise Me</span>
             <span style={{ fontSize: "0.65rem", color: surpriseHov ? "rgba(192,132,252,0.7)" : "rgba(168,85,247,0.3)", transition: "color 0.3s", letterSpacing: "1px", fontFamily: "'Montserrat', sans-serif" }}>Random Story</span>
           </button>
-          <div style={{ flex: 1, maxWidth: "120px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.2), transparent)" }} />
+          <button
+            onClick={() => setShowDice(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: "0.6rem",
+              padding: "0.75rem 1.6rem",
+              background: "linear-gradient(135deg, rgba(30,40,90,0.35), rgba(50,30,90,0.35))",
+              border: "1px solid rgba(99,120,220,0.35)",
+              borderRadius: "50px", cursor: "pointer", transition: "all 0.3s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "linear-gradient(135deg, rgba(30,40,90,0.6), rgba(50,30,90,0.6))"; e.currentTarget.style.borderColor = "rgba(99,120,220,0.7)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "linear-gradient(135deg, rgba(30,40,90,0.35), rgba(50,30,90,0.35))"; e.currentTarget.style.borderColor = "rgba(99,120,220,0.35)"; }}
+          >
+            <span style={{ fontSize: "0.95rem" }}>⚄</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: "rgba(147,175,255,0.8)" }}>Story Dice</span>
+            <span style={{ fontSize: "0.6rem", color: "rgba(120,140,220,0.4)", letterSpacing: "1px", fontFamily: "'Montserrat', sans-serif" }}>Idea Fuel</span>
+          </button>
+          <div style={{ flex: 1, maxWidth: "80px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.2), transparent)" }} />
         </div>
       </div>
 
@@ -482,6 +515,10 @@ export default function Homepage(props: HomepageProps) {
           <ToolTile icon="🕯" title="Mood Lighting" desc="Switch atmosphere: Void, Isolation, Candlelight, Glitch." hex="#D97706" r={217} g={119} b={6} onClick={() => { const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null; btn?.click(); }} />
           <ToolTile icon="📜" title="Story Archive" desc="Browse, tag, favourite, and export every story you've saved." hex="#3B82F6" r={59} g={130} b={246} onClick={props.onStoryArchive} />
           <ToolTile icon="🌙" title="Daily Chronicle" desc="The full collection of past daily dark scenarios." hex="#8B5CF6" r={139} g={92} b={246} onClick={props.onDailyChronicle} />
+          <ToolTile icon="⛓" title="Story Arcs" desc="Group stories into named arcs and series — Black Widow Saga, Chapter 1, 2, 3…" hex="#A855F7" r={168} g={85} b={247} onClick={props.onStoryArcs} />
+          <ToolTile icon="🗂" title="Heroine Dossier" desc="Per-heroine stats: stories, villains faced, words written, private notes." hex="#EC4899" r={236} g={72} b={153} onClick={props.onHeroineDossier} />
+          <ToolTile icon="☠" title="Villain Builder" desc="Create custom villains with powers, faction, personality — they appear in all modes." hex="#EF4444" r={239} g={68} b={68} onClick={props.onVillainBuilder} />
+          <ToolTile icon="🕸" title="Character Web" desc="Visual SVG map: which heroines and villains have crossed paths across your archive." hex="#14B8A6" r={20} g={184} b={166} onClick={props.onRelationshipMap} />
         </div>
       </div>
 
