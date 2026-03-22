@@ -468,11 +468,16 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
             const active = step === n;
             const done = step > n;
             return (
-              <div key={label} style={{ flex: 1, padding: "0.875rem", textAlign: "center", background: active ? goldBg : done ? "rgba(200,168,75,0.05)" : "transparent", borderRight: i < 3 ? `1px solid ${border}` : "none", transition: "all 0.2s", cursor: done ? "pointer" : "default" }}
-                onClick={() => done && setStep(n as Step)}>
+              <div key={label}
+                style={{ flex: 1, padding: "0.875rem", textAlign: "center", background: active ? goldBg : done ? "rgba(200,168,75,0.05)" : "transparent", borderRight: i < 3 ? `1px solid ${border}` : "none", transition: "all 0.2s", cursor: done ? "pointer" : "default" }}
+                onClick={() => done && setStep(n as Step)}
+                onMouseEnter={e => { if (done) (e.currentTarget as HTMLDivElement).style.background = "rgba(200,168,75,0.11)"; }}
+                onMouseLeave={e => { if (done) (e.currentTarget as HTMLDivElement).style.background = "rgba(200,168,75,0.05)"; }}
+                title={done ? `Go back to ${label}` : undefined}
+              >
                 <div style={{ fontSize: "0.55rem", color: active ? gold : done ? goldDim : "rgba(200,200,220,0.25)", letterSpacing: "2px", fontFamily: "'Cinzel', serif" }}>{`0${i + 1}`}</div>
                 <div style={{ fontSize: isMobile ? "0.6rem" : "0.7rem", color: active ? gold : done ? goldDim : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", marginTop: "2px" }}>{label}</div>
-                {done && <div style={{ fontSize: "0.55rem", color: "rgba(200,168,75,0.4)", marginTop: "2px" }}>✓</div>}
+                {done && <div style={{ fontSize: "0.55rem", color: "rgba(200,168,75,0.4)", marginTop: "2px" }}>✓ edit</div>}
               </div>
             );
           })}
@@ -842,7 +847,19 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
           <div style={{ background: "rgba(200,168,75,0.05)", border: `1px solid ${border}`, borderRadius: "12px", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <div style={{ fontSize: "0.55rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.25rem" }}>Story Setup</div>
             {selectedActresses.map(a => <div key={a.name} style={{ fontSize: "0.75rem", color: gold, fontFamily: "'Cinzel', serif" }}>◈ {a.name}</div>)}
-            {captors.map((c, i) => <div key={i} style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Montserrat', sans-serif" }}>⬦ {c.name || "Unnamed captor"}</div>)}
+            {captors.map((c, i) => (
+              <div
+                key={i}
+                onClick={() => setStep(2)}
+                title="Click to edit captor"
+                style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.55)", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.5rem", borderRadius: "6px", transition: "all 0.18s", marginLeft: "-0.5rem" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(200,168,75,0.09)"; (e.currentTarget as HTMLDivElement).style.color = gold; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "transparent"; (e.currentTarget as HTMLDivElement).style.color = "rgba(200,200,220,0.55)"; }}
+              >
+                <span>⬦ {c.name || "Unnamed captor"}</span>
+                <span style={{ fontSize: "0.55rem", color: "rgba(200,168,75,0.35)", letterSpacing: "1px", fontFamily: "'Cinzel', serif" }}>✎ edit</span>
+              </div>
+            ))}
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
