@@ -111,6 +111,85 @@ const QUESTIONS = [
       { value: "spectacle",   label: "Spectacle — A public reveal or broadcast event" },
     ],
   },
+  {
+    key: "victim_awareness",
+    label: "Victim's Knowledge of the Why",
+    icon: "🪞",
+    description: "Does the victim understand the reason they were taken?",
+    options: [
+      { value: "knew_from_start",  label: "Known — Victim understood immediately why this happened" },
+      { value: "gradually_revealed", label: "Revealed — Truth emerges slowly, deliberately or by accident" },
+      { value: "disinformation",   label: "Deceived — Given a false reason that serves the captor" },
+      { value: "never_told",       label: "Denied — No explanation, left in deliberate ignorance" },
+      { value: "self_constructed", label: "Self-Constructed — Victim invented their own explanation to survive" },
+    ],
+  },
+  {
+    key: "prior_relationship",
+    label: "Captor–Victim Prior Connection",
+    icon: "🔗",
+    description: "What, if any, relationship existed before this began?",
+    options: [
+      { value: "strangers",        label: "Strangers — No prior contact; victim was selected at a distance" },
+      { value: "acquaintances",    label: "Acquaintances — Known to each other by circumstance or community" },
+      { value: "trusted_betrayal", label: "Intimate Betrayal — Someone the victim trusted completely" },
+      { value: "professional",     label: "Professional — Work, authority, or institutional connection" },
+      { value: "unseen_obsession", label: "Unseen Contact — Stalking or one-sided fixation the victim was unaware of" },
+    ],
+  },
+  {
+    key: "victim_profile",
+    label: "Victim's Resilience Profile",
+    icon: "🫀",
+    description: "What psychological and emotional resources does the victim bring into this?",
+    options: [
+      { value: "trained",        label: "Trained — Military, law enforcement, or survival preparation" },
+      { value: "trauma_survivor", label: "Survivor — Has endured previous hardship; has a coping framework" },
+      { value: "sheltered",      label: "Sheltered — No template for this; every moment is unprecedented" },
+      { value: "fragile",        label: "Fragile — Pre-existing vulnerabilities the captor may be aware of" },
+      { value: "calculating",    label: "Calculating — Composed, strategic, already mapping the situation" },
+    ],
+  },
+  {
+    key: "outside_world",
+    label: "Outside World's Awareness",
+    icon: "🌐",
+    description: "What does the world outside know about this situation?",
+    options: [
+      { value: "active_search",   label: "Hot Search — Authorities actively looking; pressure building" },
+      { value: "cold_case",       label: "Fading Search — Reported missing but leads dried up" },
+      { value: "no_one_knows",    label: "Total Silence — No one knows they are gone" },
+      { value: "covered_up",      label: "Covered Up — Captor planted false information to misdirect" },
+      { value: "suspect_nearby",  label: "Suspected — One person suspects but has not acted yet" },
+    ],
+  },
+  {
+    key: "captor_state",
+    label: "Captor's Current Emotional State",
+    icon: "🜏",
+    description: "What is happening inside the captor right now, beneath the surface?",
+    options: [
+      { value: "in_control",   label: "In Control — Calm, executing the plan without emotional noise" },
+      { value: "conflicted",   label: "Conflicted — Beginning to feel something they did not anticipate" },
+      { value: "deteriorating", label: "Deteriorating — Stress or doubt is producing visible cracks" },
+      { value: "escalating",   label: "Escalating — Growing darker or more obsessive as time passes" },
+      { value: "satisfied",    label: "Satisfied — Content; the situation is unfolding exactly as desired" },
+    ],
+  },
+  {
+    key: "story_pivot",
+    label: "Narrative Turning Point",
+    icon: "⚖️",
+    description: "What event or revelation anchors the story's critical shift?",
+    options: [
+      { value: "external_breach",   label: "External Intrusion — Something from outside disrupts the situation" },
+      { value: "captor_slip",       label: "Captor's Mistake — An error creates real opportunity for the victim" },
+      { value: "victim_action",     label: "Victim's Move — The victim does something that shifts the dynamic" },
+      { value: "revelation",        label: "Revelation — A secret surfaces that changes everything" },
+      { value: "unexpected_ally",   label: "Unexpected Help — A third party appears and complicates everything" },
+      { value: "internal_collapse", label: "Internal Break — Either the captor or victim reaches a psychological limit" },
+    ],
+  },
 ];
 
 // ─── Question Generation Logic ─────────────────────
@@ -325,6 +404,160 @@ function generateGroups(answers: Answers): QuestionGroup[] {
     endgameQs.push("What is the captor staging, and how much of it depends on the victim's performance or cooperation?");
   }
   if (endgameQs.length) groups.push({ category: "Endgame & Resolution", icon: "🚪", questions: endgameQs });
+
+  // Victim Awareness
+  const awarenessQs: string[] = [];
+  if (answers.victim_awareness === "knew_from_start") {
+    awarenessQs.push("How does knowing the reason change the victim's strategy — does understanding the 'why' give them any leverage?");
+    awarenessQs.push("Does the clarity of knowing make acceptance easier, or does full comprehension make everything worse?");
+    awarenessQs.push("Is the captor's motive something the victim believes they can address or negotiate — or is it beyond logic?");
+  } else if (answers.victim_awareness === "gradually_revealed") {
+    awarenessQs.push("What piece of information arrives first — and how does it reframe everything the victim believed up to that point?");
+    awarenessQs.push("Does each revelation feel like something the captor intended to release, or do some truths slip out accidentally?");
+    awarenessQs.push("At what point does the victim stop wanting to know more — when does knowledge become more dangerous than ignorance?");
+  } else if (answers.victim_awareness === "disinformation") {
+    awarenessQs.push("What false reason has the victim been given, and how deeply have they accepted it as real?");
+    awarenessQs.push("What is the captor's strategic purpose in the deception — does it keep the victim compliant, confused, or emotionally manipulable?");
+    awarenessQs.push("When the lie begins to crack, what specific detail is the first thing that does not add up — and what does the victim do with that?");
+  } else if (answers.victim_awareness === "never_told") {
+    awarenessQs.push("How does having no explanation shape the victim's inner narrative — what story do they tell themselves to make sense of this?");
+    awarenessQs.push("Is the silence a deliberate weapon the captor uses — and if so, what does withholding the 'why' accomplish for them?");
+    awarenessQs.push("Does the absence of a reason make the situation feel more random and hopeless, or does it leave room for theories that give false hope?");
+  } else if (answers.victim_awareness === "self_constructed") {
+    awarenessQs.push("What explanation has the victim built for themselves — and how does it shape their behavior and their relationship with the captor?");
+    awarenessQs.push("Is the victim's constructed narrative closer to the truth or further from it — and which outcome is more dangerous for them?");
+    awarenessQs.push("What happens psychologically if and when the invented explanation is shattered by actual fact?");
+  }
+  if (awarenessQs.length) groups.push({ category: "Victim's Knowledge", icon: "🪞", questions: awarenessQs });
+
+  // Prior Relationship
+  const relationshipQs: string[] = [];
+  if (answers.prior_relationship === "strangers") {
+    relationshipQs.push("How did the captor select this specific victim from the outside — what made them the target rather than someone else?");
+    relationshipQs.push("Does the absence of any prior connection make the captor more or less human to the victim — a random force or a deliberate one?");
+    relationshipQs.push("Is there any moment where the victim's lack of history with the captor becomes an advantage — no assumed understanding, no projected relationship?");
+  } else if (answers.prior_relationship === "acquaintances") {
+    relationshipQs.push("What specific aspect of their prior connection does the captor weaponize — familiarity, shared knowledge, mutual contacts?");
+    relationshipQs.push("Does the victim search their memory of this person for warning signs they missed — and do they find them?");
+    relationshipQs.push("How does the shared history complicate the victim's ability to fully hate or fear the captor — are there memories that create unwanted ambivalence?");
+  } else if (answers.prior_relationship === "trusted_betrayal") {
+    relationshipQs.push("What specific act of trust did the victim extend that made this betrayal possible — what door did they open?");
+    relationshipQs.push("How does the captor use their prior knowledge of the victim — their fears, routines, relationships, and weaknesses?");
+    relationshipQs.push("Is there a version of the captor the victim still mourns — the person they believed existed before this — and does that grief make things harder?");
+  } else if (answers.prior_relationship === "professional") {
+    relationshipQs.push("What did the professional relationship allow the captor to learn or access that a stranger could never have known?");
+    relationshipQs.push("Has the power asymmetry of their original dynamic been replicated, inverted, or irrelevant in this new context?");
+    relationshipQs.push("Does the victim feel a residual reflex toward the captor's former role — deference, professionalism, protocol — that they now have to consciously override?");
+  } else if (answers.prior_relationship === "unseen_obsession") {
+    relationshipQs.push("How long was the captor watching or tracking before acting — and what finally triggered the transition from observation to action?");
+    relationshipQs.push("Does the captor speak or behave as though they know the victim intimately — and how does that false familiarity feel to the victim?");
+    relationshipQs.push("Looking back through what the captor knows, are there moments from the victim's ordinary life that now feel contaminated — observed, catalogued, violated?");
+  }
+  if (relationshipQs.length) groups.push({ category: "Prior Relationship", icon: "🔗", questions: relationshipQs });
+
+  // Victim Profile
+  const profileQs: string[] = [];
+  if (answers.victim_profile === "trained") {
+    profileQs.push("What specific skills or protocols is the victim drawing on — SERE training, interrogation resistance, threat assessment — and how well do they hold up here?");
+    profileQs.push("Is the captor aware the victim has training — and if so, have they prepared countermeasures or do they underestimate what that training means?");
+    profileQs.push("Where does the training fail? What aspect of this situation falls completely outside what the victim was prepared for?");
+  } else if (answers.victim_profile === "trauma_survivor") {
+    profileQs.push("What previous experience shaped the victim's resilience — and does this situation echo it in ways that feel disturbingly familiar?");
+    profileQs.push("Is the prior trauma a source of quiet strength, or does this situation rip open wounds that had only barely healed?");
+    profileQs.push("What coping mechanism has the victim used before — and does it work here, or does this situation demand something they do not yet have?");
+  } else if (answers.victim_profile === "sheltered") {
+    profileQs.push("What is the hardest single truth about captivity that the victim has had to accept — and how long did the denial last?");
+    profileQs.push("Where does untested courage come from in a person who has never needed it — what does the victim surprise themselves by doing or enduring?");
+    profileQs.push("Is inexperience a form of protection, in some ways — no trained expectations, no anticipated failure modes, no pre-built dread?");
+  } else if (answers.victim_profile === "fragile") {
+    profileQs.push("What specific vulnerability is the captor aware of and targeting — a past trauma, a phobia, a relationship, an identity?");
+    profileQs.push("Is there something in the victim's fragility that actually protects them — a threshold they hit earlier that others would push through into worse territory?");
+    profileQs.push("What does the victim hold onto — an image, a belief, a person — that the captor has not yet found and destroyed?");
+  } else if (answers.victim_profile === "calculating") {
+    profileQs.push("What has the victim already mapped about their captor in the time they have had — what intelligence have they quietly gathered?");
+    profileQs.push("Where does calculation break down? What emotion, fear, or physical reality keeps overriding the victim's strategic thinking?");
+    profileQs.push("Is the captor aware the victim is calculating — and if so, how do they account for it or try to disrupt it?");
+  }
+  if (profileQs.length) groups.push({ category: "Victim's Inner Resources", icon: "🫀", questions: profileQs });
+
+  // Outside World
+  const outsideQs: string[] = [];
+  if (answers.outside_world === "active_search") {
+    outsideQs.push("Does the victim know a search is underway — and does hope become its own form of torture when rescue doesn't come?");
+    outsideQs.push("Is the active search a threat the captor is genuinely worried about — does it change their timeline or their behavior?");
+    outsideQs.push("What would the victim sacrifice right now to send a single signal to the outside world — and do they have anything to sacrifice?");
+  } else if (answers.outside_world === "cold_case") {
+    outsideQs.push("At what point did the victim stop believing rescue was coming — and what did that moment feel like?");
+    outsideQs.push("Does the captor know the search has faded — and how does that knowledge change their confidence or their behavior toward the victim?");
+    outsideQs.push("Who specifically gave up, and who specifically has not — is there one person still looking that the victim holds onto?");
+  } else if (answers.outside_world === "no_one_knows") {
+    outsideQs.push("How did the captor arrange for the victim to simply vanish — what was covered, disposed of, or carefully left ambiguous?");
+    outsideQs.push("What does it do to a person's sense of self when the world has no idea they are missing — when they are an absence that hasn't been noticed?");
+    outsideQs.push("Is there a single person who would eventually notice — and how long does the victim estimate before they do?");
+  } else if (answers.outside_world === "covered_up") {
+    outsideQs.push("What false narrative has the captor planted — where is the victim supposed to be, and does anyone believe it fully?");
+    outsideQs.push("Is the cover story starting to fray at the edges — and is there any chance someone is noticing the inconsistencies?");
+    outsideQs.push("Does the victim know what lie is being told about them — and does that knowledge make them feel further from rescue or give them information to work with?");
+  } else if (answers.outside_world === "suspect_nearby") {
+    outsideQs.push("Who is the one person who suspects — and what has made them suspicious when everyone else believes the cover story?");
+    outsideQs.push("What is stopping this person from acting — doubt, fear, authority, or something the captor has done to neutralize them?");
+    outsideQs.push("Does the victim know this person exists — and if not, what would it mean to them to know they haven't been entirely forgotten?");
+  }
+  if (outsideQs.length) groups.push({ category: "Outside World", icon: "🌐", questions: outsideQs });
+
+  // Captor's Emotional State
+  const captorStateQs: string[] = [];
+  if (answers.captor_state === "in_control") {
+    captorStateQs.push("What does the captor's composure cost them — is the control real, or is something being suppressed that will eventually surface?");
+    captorStateQs.push("Is there anything the victim has done that has come closest to disturbing that calm — what almost cracked it?");
+    captorStateQs.push("Does the captor's control feel mechanical and cold, or is there something deliberate and even pleasurable in it — and which is more threatening?");
+  } else if (answers.captor_state === "conflicted") {
+    captorStateQs.push("What specifically has made the captor begin to feel something they did not plan for — what did the victim do, say, or become that they weren't prepared for?");
+    captorStateQs.push("Is the captor's conflict something the victim has noticed and could exploit — or is it still fully hidden?");
+    captorStateQs.push("What would the captor do if they acted on their conflict — what is the best case scenario the victim could hope for, and the worst?");
+  } else if (answers.captor_state === "deteriorating") {
+    captorStateQs.push("What external or internal pressure is cracking the captor — time running out, a threat from outside, something the victim did, or doubt about their own choices?");
+    captorStateQs.push("Is a deteriorating captor more or less dangerous to the victim — does instability mean opportunity or escalation?");
+    captorStateQs.push("What does the captor do to try to recenter or regain their sense of control — and does it work?");
+  } else if (answers.captor_state === "escalating") {
+    captorStateQs.push("What is driving the escalation — appetite growing, frustration with the victim's resistance, or an external timeline creating pressure?");
+    captorStateQs.push("Are there still boundaries the escalating captor has not crossed — and are those limits shrinking?");
+    captorStateQs.push("Does the victim see the escalation coming before each incident, or is it arriving without warning — and which is more destabilizing?");
+  } else if (answers.captor_state === "satisfied") {
+    captorStateQs.push("What exactly is the captor satisfied with — the victim's behavior, the situation's progress, or simply that they have proven something to themselves?");
+    captorStateQs.push("Is the satisfaction sustainable, or does it contain the seed of its own end — what would disrupt it?");
+    captorStateQs.push("How does the victim relate to a captor who seems content — does it feel safer or more final?");
+  }
+  if (captorStateQs.length) groups.push({ category: "Captor's Inner State", icon: "🜏", questions: captorStateQs });
+
+  // Narrative Pivot
+  const pivotQs: string[] = [];
+  if (answers.story_pivot === "external_breach") {
+    pivotQs.push("What is the nature of the intrusion — a person, an event, a discovery — and does it help the victim, threaten both of them, or make everything worse?");
+    pivotQs.push("How does the captor respond to the breach — do they tighten control, panic, or make a decision they cannot undo?");
+    pivotQs.push("Does the external intrusion give the victim a window — and how narrow is it, and what does using it cost them?");
+  } else if (answers.story_pivot === "captor_slip") {
+    pivotQs.push("What is the nature of the mistake — a lapse in surveillance, an unlocked door, a piece of information accidentally shared, a moment of emotional vulnerability?");
+    pivotQs.push("Does the victim recognize the opportunity in real time, or only realize it afterward — and does that delay matter?");
+    pivotQs.push("What is the cost of acting on the captor's mistake — what does the victim risk if they are caught trying?");
+  } else if (answers.story_pivot === "victim_action") {
+    pivotQs.push("What does the victim do — a deliberate act of defiance, an appeal that lands differently than expected, a deception, a physical attempt?");
+    pivotQs.push("Was it planned, or did the victim act on instinct — and do they believe it was the right choice in the moment after?");
+    pivotQs.push("How does the captor respond — and does the victim's action make their situation measurably better, measurably worse, or simply different?");
+  } else if (answers.story_pivot === "revelation") {
+    pivotQs.push("What is revealed — about the captor's identity, their true motive, their past, or something about the victim themselves they did not know?");
+    pivotQs.push("Who learns the revelation first — and does knowing it give them power, or remove a protection they didn't know they had?");
+    pivotQs.push("Is the revelation something both parties now have to live with together — and what does shared knowledge do to the dynamic between them?");
+  } else if (answers.story_pivot === "unexpected_ally") {
+    pivotQs.push("Who is the third party — someone sent to help, someone stumbling in accidentally, or someone with their own agenda that happens to intersect with the victim's survival?");
+    pivotQs.push("Can the victim trust this person — and what would the cost of misplaced trust be in this situation?");
+    pivotQs.push("How does the captor react to this new variable — do they absorb it, escalate, or does it expose a vulnerability they didn't have before?");
+  } else if (answers.story_pivot === "internal_collapse") {
+    pivotQs.push("Who breaks first — the captor or the victim — and what does 'breaking' actually look like for each of them in this specific situation?");
+    pivotQs.push("Is the collapse the end of something, or the beginning — does it close a chapter or tear one open?");
+    pivotQs.push("What survives the collapse — in the person who broke, and in the person who watched it happen?");
+  }
+  if (pivotQs.length) groups.push({ category: "Narrative Turning Point", icon: "⚖️", questions: pivotQs });
 
   return groups;
 }
