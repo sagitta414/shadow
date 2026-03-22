@@ -44,7 +44,7 @@ router.post("/story/soundboard", async (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
 
     const stream = await venice.chat.completions.create({
-      model: "llama-3.3-70b",
+      model: "venice-uncensored",
       max_tokens: 1024,
       messages,
       stream: true,
