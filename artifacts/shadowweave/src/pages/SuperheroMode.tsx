@@ -688,6 +688,32 @@ const STORY_LENGTHS = [
   { id: "epic",   label: "Epic Saga",     desc: "9–10 paragraphs",       icon: "📜" },
 ];
 
+const MISSION_CONTEXTS = [
+  { id: "patrol",     icon: "🌃", label: "On Patrol",           desc: "Routine sweep of the city when ambushed" },
+  { id: "respond",    icon: "🚨", label: "Emergency Response",  desc: "Racing to stop a disaster — walked into a trap" },
+  { id: "infiltrate", icon: "🕵️", label: "Infiltrating the Lair", desc: "Deep inside enemy territory when caught" },
+  { id: "rescue",     icon: "🫂", label: "Rescue Mission",      desc: "Saving civilians used as bait" },
+  { id: "off_guard",  icon: "😴", label: "Off Duty / Unmasked", desc: "Caught out of costume — no powers at the ready" },
+  { id: "ally",       icon: "🤝", label: "Betrayed by an Ally", desc: "Someone she trusted handed her over" },
+  { id: "pursue",     icon: "🏃", label: "In Hot Pursuit",      desc: "Chasing the villain — overextended and cornered" },
+  { id: "prisoner",   icon: "⛓",  label: "Already a Prisoner",  desc: "Wakes up already captured — no memory of how" },
+];
+
+const CHAPTER_FOCUS_TAGS = [
+  { id: "interrogation",  icon: "🎙", label: "Interrogation" },
+  { id: "escape_attempt", icon: "🏃", label: "Escape Attempt" },
+  { id: "breaking_point", icon: "💔", label: "Breaking Point" },
+  { id: "monologue",      icon: "🎭", label: "Villain Monologue" },
+  { id: "power_play",     icon: "⚡", label: "Power Play" },
+  { id: "allies_arrive",  icon: "🫂", label: "Allies Arrive" },
+  { id: "negotiation",    icon: "🤝", label: "Deal / Negotiation" },
+  { id: "reveal",         icon: "🔍", label: "Reveal / Twist" },
+  { id: "humiliation",    icon: "🩸", label: "Humiliation" },
+  { id: "psych_warfare",  icon: "🧠", label: "Psychological Warfare" },
+  { id: "slow_burn",      icon: "🕯", label: "Slow Burn / Tension" },
+  { id: "aftermath",      icon: "🌑", label: "Aftermath" },
+];
+
 type Step = 1 | 2 | 3 | 4;
 type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "CUSTOM";
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
@@ -717,6 +743,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [selectedRestraints, setSelectedRestraints] = useState<string[]>([]);
   const [customRestraints, setCustomRestraints] = useState("");
   const [storyTones, setStoryTones] = useState<string[]>([]);
+  const [missionContext, setMissionContext] = useState<string>("");
+  const [chapterFocusTags, setChapterFocusTags] = useState<string[]>([]);
   const [captureMethod, setCaptureMethod] = useState<string>("");
   const [heroState, setHeroState] = useState<string>("");
   const [storyLength, setStoryLength] = useState<string>(() => getPreset("superhero-mode")?.storyLength ?? "medium");
@@ -961,6 +989,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       tone: toneLabel || "action-packed",
       intensity: intensityLabel,
       captureMethod: captureLabel || "direct confrontation",
+      missionContext: missionContext ? (MISSION_CONTEXTS.find(m => m.id === missionContext)?.label ?? missionContext) : undefined,
       heroState: heroStateLabel || "at full strength",
       storyLength: lengthLabel,
       details: extraDetails,
@@ -1062,17 +1091,22 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     setError("");
     let accumulated = "";
     try {
+      const focusPart = chapterFocusTags.length > 0
+        ? `Focus this chapter on: ${chapterFocusTags.map(id => CHAPTER_FOCUS_TAGS.find(t => t.id === id)?.label ?? id).join(", ")}`
+        : "";
+      const combinedDirection = [focusPart, continuePrompt.trim()].filter(Boolean).join(". ");
       const full = await streamRequest("/api/story/superhero-continue", {
         ...buildPrompt(),
         previousStory: story,
         chapterNumber: chapters.length + 1,
-        continueDirection: continuePrompt.trim() || "",
+        continueDirection: combinedDirection || "",
       }, (c) => {
         accumulated += c;
         setStreamingText(accumulated);
       }, ctrl.signal);
       setChapters((prev) => [...prev, full]);
       setContinuePrompt("");
+      setChapterFocusTags([]);
     } catch (e) {
       if (isAbort(e)) {
         if (accumulated.trim()) setChapters((prev) => [...prev, accumulated]);
@@ -1924,6 +1958,28 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             </div>
           </div>
 
+          {/* Mission Context */}
+          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What Was She Doing When Captured <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
+              {MISSION_CONTEXTS.map((mc) => {
+                const isSel = missionContext === mc.id;
+                return (
+                  <button key={mc.id} onClick={() => setMissionContext(isSel ? "" : mc.id)} style={{ background: isSel ? "rgba(96,160,255,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(96,160,255,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(96,160,255,0.18)" : "none" }}
+                    onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(96,160,255,0.3)"; }}
+                    onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
+                      <span style={{ fontSize: "1.1rem" }}>{mc.icon}</span>
+                      <div className="font-cinzel" style={{ fontSize: "0.75rem", color: isSel ? "#60A0FF" : "#E8E8F0", fontWeight: 700 }}>{mc.label}</div>
+                    </div>
+                    <div style={{ fontSize: "0.63rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif" }}>{mc.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Restraints & Equipment */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(160,0,80,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#E040A0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.375rem" }}>Restraints &amp; Containment Gear <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional — pick any)</span></div>
@@ -2543,6 +2599,24 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.2)", borderRadius: "16px", padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
               <div className="font-cinzel" style={{ fontSize: "0.65rem", color: "#C060E0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.75rem" }}>
                 ✦ Continue the Story — Chapter {chapters.length + 1}
+              </div>
+              {/* Chapter Focus Tags */}
+              <div style={{ marginBottom: "0.75rem" }}>
+                <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "0.5rem" }}>Chapter Focus <span style={{ opacity: 0.5 }}>(pick any)</span></div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                  {CHAPTER_FOCUS_TAGS.map((tag) => {
+                    const isSel = chapterFocusTags.includes(tag.id);
+                    return (
+                      <button key={tag.id} onClick={() => setChapterFocusTags(prev => prev.includes(tag.id) ? prev.filter(x => x !== tag.id) : [...prev, tag.id])}
+                        style={{ padding: "0.3rem 0.75rem", background: isSel ? "rgba(192,96,224,0.2)" : "rgba(0,0,0,0.35)", border: `1px solid ${isSel ? "rgba(192,96,224,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "20px", color: isSel ? "#C060E0" : "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "0.3rem" }}
+                        onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(192,96,224,0.3)"; }}
+                        onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                      >
+                        <span>{tag.icon}</span>{tag.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end" }}>
                 <input

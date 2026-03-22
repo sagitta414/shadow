@@ -314,7 +314,7 @@ No fading to black. No vague euphemisms. No Victorian language. Show everything.
 
 router.post("/story/superhero", async (req, res) => {
   try {
-    const { hero, villain, setting, stakes, weapons, restraints, tone, intensity, captureMethod, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace, villainDuo, weaknessProfile } = req.body as {
+    const { hero, villain, setting, stakes, weapons, restraints, tone, intensity, captureMethod, missionContext, heroState, storyLength, details, powerDegradation, traumaState, sensoryOverride, sensoryScrambler, captorMarketplace, villainDuo, weaknessProfile } = req.body as {
       hero: string;
       villain: string;
       setting: string;
@@ -324,6 +324,7 @@ router.post("/story/superhero", async (req, res) => {
       tone?: string;
       intensity?: string;
       captureMethod?: string;
+      missionContext?: string;
       heroState?: string;
       storyLength?: string;
       details?: string;
@@ -346,6 +347,7 @@ router.post("/story/superhero", async (req, res) => {
       tone ? `STORY TONE: ${tone}` : "",
       intensity ? `INTENSITY LEVEL: ${intensity}` : "",
       captureMethod ? `VILLAIN'S CAPTURE METHOD: ${captureMethod}` : "",
+      missionContext ? `HERO'S MISSION CONTEXT (what she was doing when captured): ${missionContext}` : "",
       heroState ? `HERO'S CONDITION: ${heroState}` : "",
       weaknessProfile ? `HEROINE WEAKNESS PROFILE: ${weaknessProfile}` : "",
       restraints && restraints !== "none specified" ? `RESTRAINTS/CONTAINMENT GEAR: ${restraints}` : "",
@@ -410,7 +412,7 @@ Do not fade to black. Do not sanitise. Show everything.`;
 
 router.post("/story/superhero-continue", async (req, res) => {
   try {
-    const { previousStory, chapterNumber, continueDirection, hero, villain, tone, heroState, restraints } = req.body as {
+    const { previousStory, chapterNumber, continueDirection, hero, villain, tone, heroState, restraints, missionContext } = req.body as {
       previousStory: string;
       chapterNumber: number;
       continueDirection?: string;
@@ -419,6 +421,7 @@ router.post("/story/superhero-continue", async (req, res) => {
       tone: string;
       heroState: string;
       restraints: string;
+      missionContext?: string;
     };
 
     const directionLine = continueDirection
@@ -430,6 +433,7 @@ router.post("/story/superhero-continue", async (req, res) => {
       `VILLAIN: ${villain}`,
       `TONE: ${tone}`,
       `HERO'S STATE: ${heroState}`,
+      missionContext ? `HERO'S MISSION CONTEXT: ${missionContext}` : "",
       restraints !== "none specified" ? `RESTRAINTS/CONTAINMENT: ${restraints}` : "",
       `\nPREVIOUS STORY:\n${previousStory}`,
       `\nWrite Chapter ${chapterNumber} now — explicit, unhinged, uncensored.${directionLine}`,
