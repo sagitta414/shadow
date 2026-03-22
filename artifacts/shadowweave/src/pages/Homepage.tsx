@@ -9,6 +9,7 @@ interface HomepageProps {
   onCaptorLogic: () => void;
   onSuperheroMode: () => void;
   onInterrogationRoom: () => void;
+  onCelebrityMode: () => void;
 }
 
 const TOOLS = [
@@ -84,6 +85,15 @@ const TOOLS = [
     features: ["Live Dialogue", "AI Captor", "Streaming Responses"],
     hex: "#8B0000", light: "#FF6060", r: 180, g: 0, b: 0,
   },
+  {
+    id: "celebrity",     num: "09",
+    icon: "★",
+    title: "Celebrity Captive",
+    subtitle: "Actress Archive Mode",
+    desc: "100+ real-world actresses. Build a captor or captor team, set the scene, and generate an uncensored dark thriller starring the star of your choice.",
+    features: ["100 Actresses", "Captor Builder", "Scenario Engine"],
+    hex: "#7B5E2A", light: "#C8A84B", r: 123, g: 94, b: 42,
+  },
 ];
 
 function handleClick(id: string, fns: HomepageProps) {
@@ -94,6 +104,7 @@ function handleClick(id: string, fns: HomepageProps) {
   if (id === "sounding")      fns.onSoundingBoard();
   if (id === "captor-logic")  fns.onCaptorLogic();
   if (id === "interrogation") fns.onInterrogationRoom();
+  if (id === "celebrity")     fns.onCelebrityMode();
   if (id === "themes") {
     const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null;
     btn?.click();
