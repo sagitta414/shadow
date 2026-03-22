@@ -822,6 +822,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [error, setError] = useState("");
   const [rerollOpenIdx, setRerollOpenIdx] = useState<number | null>(null);
   const [rerollNotes, setRerollNotes] = useState<Record<number, string>>({});
+  const [quickNotesIdx, setQuickNotesIdx] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const story = chapters.join("\n\n");
@@ -2333,14 +2334,32 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Chapters */}
           {chapters.map((ch, i) => (
             <div key={i} style={{ marginBottom: "1.5rem", position: "relative" }}>
-              {/* Chapter header — shown for multi-chapter stories */}
-              {chapters.length > 1 && (
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.875rem" }}>
-                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.4), transparent)" }} />
-                  <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "#FFB800", textTransform: "uppercase" }}>Chapter {i + 1}</span>
-                  <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.4))" }} />
-                </div>
-              )}
+              {/* Chapter header row — label + reroll buttons always visible */}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.875rem" }}>
+                <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.4), transparent)" }} />
+                <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "#FFB800", textTransform: "uppercase", whiteSpace: "nowrap" }}>Chapter {i + 1}</span>
+                <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.4))" }} />
+                {regenChapIdx !== i && rerollOpenIdx !== i && (
+                  <>
+                    <button
+                      onClick={() => regenChapter(i)}
+                      disabled={regenChapIdx !== null || loading || continuing}
+                      title="Reroll this chapter"
+                      style={{ padding: "0.25rem 0.7rem", background: "rgba(192,96,224,0.14)", border: "1px solid rgba(192,96,224,0.55)", borderRadius: "14px", color: "#C060E0", fontSize: "0.6rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", whiteSpace: "nowrap", opacity: regenChapIdx !== null || loading || continuing ? 0.4 : 1 }}
+                    >
+                      ↻ Reroll
+                    </button>
+                    <button
+                      onClick={() => setRerollOpenIdx(i)}
+                      disabled={regenChapIdx !== null || loading || continuing}
+                      title="Reroll with director's notes"
+                      style={{ padding: "0.25rem 0.7rem", background: "rgba(255,184,0,0.1)", border: "1px solid rgba(255,184,0,0.55)", borderRadius: "14px", color: "#FFB800", fontSize: "0.6rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", whiteSpace: "nowrap", opacity: regenChapIdx !== null || loading || continuing ? 0.4 : 1 }}
+                    >
+                      ✏ Notes
+                    </button>
+                  </>
+                )}
+              </div>
 
               {regenChapIdx === i ? (
                 <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(192,96,224,0.3)", borderRadius: "20px", padding: "2.5rem", textAlign: "center" }}>
@@ -2363,55 +2382,34 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 </div>
               )}
 
-              {/* Reroll panel — available for every chapter once generated */}
-              {regenChapIdx !== i && (
-                <div style={{ marginTop: "0.6rem" }}>
-                  {rerollOpenIdx !== i ? (
-                    <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-                      <button
-                        onClick={() => regenChapter(i)}
-                        disabled={regenChapIdx !== null || loading || continuing}
-                        style={{ padding: "0.25rem 0.75rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.3)", borderRadius: "14px", color: "rgba(192,96,224,0.6)", fontSize: "0.58rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s" }}
-                      >
-                        ↻ Reroll
-                      </button>
-                      <button
-                        onClick={() => setRerollOpenIdx(i)}
-                        disabled={regenChapIdx !== null || loading || continuing}
-                        style={{ padding: "0.25rem 0.75rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,184,0,0.25)", borderRadius: "14px", color: "rgba(255,184,0,0.55)", fontSize: "0.58rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s" }}
-                      >
-                        ✏ Reroll with notes
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,184,0,0.2)", borderRadius: "16px", padding: "1rem 1.25rem" }}>
-                      <div className="font-cinzel" style={{ fontSize: "0.6rem", letterSpacing: "2px", color: "rgba(255,184,0,0.6)", marginBottom: "0.6rem", textTransform: "uppercase" }}>
-                        Director's Notes — Chapter {i + 1}
-                      </div>
-                      <textarea
-                        value={rerollNotes[i] ?? ""}
-                        onChange={e => setRerollNotes(prev => ({ ...prev, [i]: e.target.value }))}
-                        placeholder="What should change? e.g. 'Make the villain more patient', 'Focus on her internal panic', 'Slow down the approach — more atmosphere'…"
-                        rows={3}
-                        style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "10px", color: "#F0F0FF", fontSize: "0.82rem", fontFamily: "'Crimson Text', serif", lineHeight: 1.6, padding: "0.65rem 0.85rem", resize: "vertical", outline: "none", boxSizing: "border-box" }}
-                      />
-                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.6rem", justifyContent: "flex-end" }}>
-                        <button
-                          onClick={() => setRerollOpenIdx(null)}
-                          style={{ padding: "0.25rem 0.75rem", background: "transparent", border: "1px solid rgba(200,200,220,0.15)", borderRadius: "12px", color: "rgba(200,200,220,0.35)", fontSize: "0.58rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => regenChapter(i, rerollNotes[i])}
-                          disabled={regenChapIdx !== null || loading || continuing}
-                          style={{ padding: "0.25rem 0.9rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.4)", borderRadius: "12px", color: "#FFB800", fontSize: "0.58rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s" }}
-                        >
-                          ↻ Reroll with these notes
-                        </button>
-                      </div>
-                    </div>
-                  )}
+              {/* Director's Notes panel — expands when Notes button clicked */}
+              {regenChapIdx !== i && rerollOpenIdx === i && (
+                <div style={{ marginTop: "0.75rem", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,184,0,0.2)", borderRadius: "16px", padding: "1rem 1.25rem" }}>
+                  <div className="font-cinzel" style={{ fontSize: "0.6rem", letterSpacing: "2px", color: "rgba(255,184,0,0.6)", marginBottom: "0.6rem", textTransform: "uppercase" }}>
+                    Director's Notes — Chapter {i + 1}
+                  </div>
+                  <textarea
+                    value={rerollNotes[i] ?? ""}
+                    onChange={e => setRerollNotes(prev => ({ ...prev, [i]: e.target.value }))}
+                    placeholder="What should change? e.g. 'Make the villain more patient', 'Focus on her internal panic', 'Slow down the approach — more atmosphere'…"
+                    rows={3}
+                    style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "10px", color: "#F0F0FF", fontSize: "0.82rem", fontFamily: "'Crimson Text', serif", lineHeight: 1.6, padding: "0.65rem 0.85rem", resize: "vertical", outline: "none", boxSizing: "border-box" }}
+                  />
+                  <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.6rem", justifyContent: "flex-end" }}>
+                    <button
+                      onClick={() => setRerollOpenIdx(null)}
+                      style={{ padding: "0.25rem 0.75rem", background: "transparent", border: "1px solid rgba(200,200,220,0.15)", borderRadius: "12px", color: "rgba(200,200,220,0.35)", fontSize: "0.58rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => regenChapter(i, rerollNotes[i])}
+                      disabled={regenChapIdx !== null || loading || continuing}
+                      style={{ padding: "0.25rem 0.9rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.4)", borderRadius: "12px", color: "#FFB800", fontSize: "0.58rem", cursor: regenChapIdx !== null || loading || continuing ? "not-allowed" : "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s" }}
+                    >
+                      ↻ Reroll with these notes
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -2441,6 +2439,66 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {error && (
             <div style={{ background: "rgba(139,0,0,0.15)", border: "1px solid rgba(139,0,0,0.4)", borderRadius: "12px", padding: "1rem 1.5rem", marginBottom: "1.5rem", color: "#FF6666", fontSize: "0.9rem" }}>
               ⚠ {error}
+            </div>
+          )}
+
+          {/* Quick reroll panel — always at the bottom, fully self-contained */}
+          {chapters.length > 0 && !loading && !continuing && regenChapIdx === null && (
+            <div style={{ marginBottom: "1rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.18)", borderRadius: "14px", overflow: "hidden" }}>
+              {/* Chapter row */}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", padding: "0.65rem 1rem" }}>
+                <span className="font-cinzel" style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(192,96,224,0.5)", textTransform: "uppercase" }}>↻ Reroll chapter</span>
+                {chapters.map((_, i) => (
+                  <div key={i} style={{ display: "flex", gap: "0.25rem" }}>
+                    <button
+                      onClick={() => regenChapter(i)}
+                      title={`Instant reroll Chapter ${i + 1}`}
+                      style={{ padding: "0.22rem 0.55rem", background: "rgba(192,96,224,0.12)", border: "1px solid rgba(192,96,224,0.45)", borderRadius: "8px 0 0 8px", color: "#C060E0", fontSize: "0.6rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px", borderRight: "none" }}
+                    >
+                      {i + 1}
+                    </button>
+                    <button
+                      onClick={() => setQuickNotesIdx(quickNotesIdx === i ? null : i)}
+                      title={`Reroll Chapter ${i + 1} with notes`}
+                      style={{ padding: "0.22rem 0.4rem", background: quickNotesIdx === i ? "rgba(255,184,0,0.18)" : "rgba(255,184,0,0.07)", border: "1px solid rgba(255,184,0,0.4)", borderRadius: "0 8px 8px 0", color: "#FFB800", fontSize: "0.6rem", cursor: "pointer", letterSpacing: "0" }}
+                    >
+                      ✏
+                    </button>
+                  </div>
+                ))}
+                <span style={{ marginLeft: "auto", fontSize: "0.5rem", color: "rgba(255,255,255,0.18)", fontStyle: "italic" }}>number = instant · ✏ = with notes</span>
+              </div>
+              {/* Notes panel — inline, right here */}
+              {quickNotesIdx !== null && (
+                <div style={{ borderTop: "1px solid rgba(255,184,0,0.15)", padding: "0.85rem 1rem 1rem" }}>
+                  <div className="font-cinzel" style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(255,184,0,0.55)", marginBottom: "0.5rem", textTransform: "uppercase" }}>
+                    Director's Notes — Chapter {quickNotesIdx + 1}
+                  </div>
+                  <textarea
+                    autoFocus
+                    value={rerollNotes[quickNotesIdx] ?? ""}
+                    onChange={e => setRerollNotes(prev => ({ ...prev, [quickNotesIdx!]: e.target.value }))}
+                    placeholder="What should change? e.g. 'More tension before the capture', 'Slow down — more atmosphere', 'Make the villain patient and deliberate'…"
+                    rows={3}
+                    style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,184,0,0.2)", borderRadius: "8px", color: "#F0F0FF", fontSize: "0.82rem", fontFamily: "'Crimson Text', serif", lineHeight: 1.6, padding: "0.6rem 0.85rem", resize: "vertical", outline: "none", boxSizing: "border-box" }}
+                  />
+                  <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", justifyContent: "flex-end" }}>
+                    <button
+                      onClick={() => setQuickNotesIdx(null)}
+                      style={{ padding: "0.3rem 0.8rem", background: "transparent", border: "1px solid rgba(200,200,220,0.15)", borderRadius: "8px", color: "rgba(200,200,220,0.4)", fontSize: "0.6rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => { regenChapter(quickNotesIdx, rerollNotes[quickNotesIdx]); setQuickNotesIdx(null); }}
+                      disabled={regenChapIdx !== null}
+                      style={{ padding: "0.3rem 1rem", background: "rgba(255,184,0,0.14)", border: "1px solid rgba(255,184,0,0.5)", borderRadius: "8px", color: "#FFB800", fontSize: "0.6rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}
+                    >
+                      ↻ Reroll Ch.{quickNotesIdx + 1} with these notes
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
