@@ -711,12 +711,12 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [customVillainPersonality, setCustomVillainPersonality] = useState<string[]>([]);
   const [customVillainFranchise, setCustomVillainFranchise] = useState("");
   const [villainMode, setVillainMode] = useState<"pick" | "custom">("pick");
-  const [selectedSetting, setSelectedSetting] = useState<string>("");
-  const [selectedStakes, setSelectedStakes] = useState<string>("");
+  const [selectedSettings, setSelectedSettings] = useState<string[]>([]);
+  const [selectedStakes, setSelectedStakes] = useState<string[]>([]);
   const [selectedWeapons, setSelectedWeapons] = useState<string[]>([]);
   const [selectedRestraints, setSelectedRestraints] = useState<string[]>([]);
   const [customRestraints, setCustomRestraints] = useState("");
-  const [storyTone, setStoryTone] = useState<string>("");
+  const [storyTones, setStoryTones] = useState<string[]>([]);
   const [captureMethod, setCaptureMethod] = useState<string>("");
   const [heroState, setHeroState] = useState<string>("");
   const [storyLength, setStoryLength] = useState<string>(() => getPreset("superhero-mode")?.storyLength ?? "medium");
@@ -779,8 +779,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     const picked = allHeroes[Math.floor(Math.random() * allHeroes.length)];
     setSelectedHeroes([picked]);
     const rnd = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-    setSelectedSetting(rnd(SETTINGS).id);
-    setSelectedStakes(rnd(STAKES).id);
+    setSelectedSettings([rnd(SETTINGS).id]);
+    setSelectedStakes([rnd(STAKES).id]);
     setCaptureMethod(rnd(CAPTURE_METHODS).id);
     setHeroState(rnd(HERO_STATES).id);
     setStoryLength(rnd(STORY_LENGTHS).id);
@@ -910,7 +910,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     if (isVillainDuo) return !!selectedVillain2 && !!villainDynamic;
     return true;
   }
-  function canProceedStep3() { return !!selectedSetting && !!selectedStakes; }
+  function canProceedStep3() { return selectedSettings.length > 0 && selectedStakes.length > 0; }
 
   function buildPrompt() {
     const villain = villainMode === "pick" ? selectedVillain?.name : customVillain;
@@ -921,9 +921,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       customVillainPowers.trim() ? `POWERS: ${customVillainPowers.trim()}` : "",
       customVillainPersonality.length > 0 ? `PERSONALITY: ${customVillainPersonality.join(", ")}` : "",
     ].filter(Boolean).join(" | ") : "";
-    const settingLabel = SETTINGS.find((s) => s.id === selectedSetting)?.label ?? selectedSetting;
-    const stakesLabel = STAKES.find((s) => s.id === selectedStakes)?.label ?? selectedStakes;
-    const toneLabel = TONES.find((t) => t.id === storyTone)?.label ?? "";
+    const settingLabel = selectedSettings.map(id => SETTINGS.find(s => s.id === id)?.label ?? id).join(" + ");
+    const stakesLabel = selectedStakes.map(id => STAKES.find(s => s.id === id)?.label ?? id).join(" + ");
+    const toneLabel = storyTones.map(id => TONES.find(t => t.id === id)?.label ?? id).join(", ");
     const captureLabel = CAPTURE_METHODS.find((c) => c.id === captureMethod)?.label ?? "";
     const heroStateLabel = HERO_STATES.find((h) => h.id === heroState)?.label ?? "";
     const lengthLabel = STORY_LENGTHS.find((l) => l.id === storyLength)?.label ?? "Standard";
@@ -1125,7 +1125,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   function exportStory() {
     const chapterText = chapters.map((c, i) => `${"═".repeat(50)}\nCHAPTER ${i + 1}\n${"═".repeat(50)}\n\n${c}`).join("\n\n");
     const heroNames = selectedHeroes.map((h) => `${h.name} (${h.alias})`).join(", ");
-    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHEROES: ${heroNames}\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${SETTINGS.find((s) => s.id === selectedSetting)?.label}\nSTAKES: ${STAKES.find((s) => s.id === selectedStakes)?.label}\nTONE: ${TONES.find((t) => t.id === storyTone)?.label ?? "standard"}\n\n${chapterText}`;
+    const text = `SHADOWWEAVE — SUPERHERO STORY\n${"═".repeat(50)}\n\nHEROES: ${heroNames}\nVILLAIN: ${villainMode === "pick" ? selectedVillain?.name : customVillain}\nSETTING: ${selectedSettings.map(id => SETTINGS.find(s => s.id === id)?.label ?? id).join(" + ")}\nSTAKES: ${selectedStakes.map(id => STAKES.find(s => s.id === id)?.label ?? id).join(" + ")}\nTONE: ${storyTones.map(id => TONES.find(t => t.id === id)?.label ?? id).join(", ") || "standard"}\n\n${chapterText}`;
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1667,9 +1667,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Battle Setting</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {SETTINGS.map((s) => {
-                const isSel = selectedSetting === s.id;
+                const isSel = selectedSettings.includes(s.id);
                 return (
-                  <button key={s.id} onClick={() => setSelectedSetting(s.id)} style={{ background: isSel ? "rgba(255,184,0,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,184,0,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem 0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(255,184,0,0.2)" : "none" }}
+                  <button key={s.id} onClick={() => setSelectedSettings(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])} style={{ background: isSel ? "rgba(255,184,0,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(255,184,0,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "1rem 0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(255,184,0,0.2)" : "none" }}
                     onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,184,0,0.3)"; }}
                     onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
                   >
@@ -1687,9 +1687,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What's at Stake</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {STAKES.map((s) => {
-                const isSel = selectedStakes === s.id;
+                const isSel = selectedStakes.includes(s.id);
                 return (
-                  <button key={s.id} onClick={() => setSelectedStakes(s.id)} style={{ background: isSel ? "rgba(200,0,50,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(200,0,50,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(200,0,50,0.2)" : "none" }}
+                  <button key={s.id} onClick={() => setSelectedStakes(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])} style={{ background: isSel ? "rgba(200,0,50,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(200,0,50,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(200,0,50,0.2)" : "none" }}
                     onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(200,0,50,0.3)"; }}
                     onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
                   >
@@ -1728,9 +1728,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Tone <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {TONES.map((t) => {
-                const isSel = storyTone === t.id;
+                const isSel = storyTones.includes(t.id);
                 return (
-                  <button key={t.id} onClick={() => setStoryTone(isSel ? "" : t.id)} style={{ background: isSel ? "rgba(96,160,255,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(96,160,255,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(96,160,255,0.2)" : "none" }}
+                  <button key={t.id} onClick={() => setStoryTones(prev => prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id])} style={{ background: isSel ? "rgba(96,160,255,0.18)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(96,160,255,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSel ? "0 0 14px rgba(96,160,255,0.2)" : "none" }}
                     onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(96,160,255,0.3)"; }}
                     onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
                   >
@@ -2344,7 +2344,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
               <div>
                 <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.3)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>SETTING</div>
-                <div className="font-cinzel" style={{ color: "#E8E8F0", fontSize: "0.9rem" }}>{SETTINGS.find((s) => s.id === selectedSetting)?.label}</div>
+                <div className="font-cinzel" style={{ color: "#E8E8F0", fontSize: "0.9rem" }}>{selectedSettings.map(id => SETTINGS.find(s => s.id === id)?.label ?? id).join(" + ") || "—"}</div>
               </div>
               <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
               <div>
