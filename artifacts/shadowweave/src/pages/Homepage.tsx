@@ -358,8 +358,13 @@ export default function Homepage(props: HomepageProps) {
         </button>
       </nav>
 
+      {/* ─── DAILY DISPATCH ─── */}
+      <div className="hp-pad" style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
+        <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
+      </div>
+
       {/* ─── HERO HEADER ─── */}
-      <div className="hp-pad" style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "3.5rem 2rem 2rem", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s ease both" : "none" }}>
+      <div className="hp-pad" style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "1.5rem 2rem 2rem", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s ease both" : "none" }}>
         <div style={{ fontSize: "0.48rem", letterSpacing: "7px", color: "rgba(200,168,75,0.32)", fontFamily: "'Cinzel', serif", marginBottom: "0.7rem", textTransform: "uppercase" }}>Professional Dark Narrative Studio</div>
         <h1 style={{ margin: "0 0 0.5rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.4rem, 4vw, 2.5rem)", fontWeight: 900, letterSpacing: "0.1em", background: "linear-gradient(135deg, #E8D08A 0%, #C8A830 40%, #A07030 65%, #C8A830 85%, #E8D08A 100%)", backgroundSize: "250% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "shimmer 6s linear infinite" }}>CHOOSE YOUR MODE</h1>
         <p style={{ margin: 0, fontSize: "0.78rem", color: "rgba(200,195,220,0.25)", fontFamily: "'Raleway', sans-serif", letterSpacing: "1.5px" }}>Each mode generates a fully uncensored AI-written dark narrative</p>
@@ -418,11 +423,6 @@ export default function Homepage(props: HomepageProps) {
           <SubCard icon="🗺" title="Relationship Map" desc="Visual node map of characters and their dynamics." accent="#CC4444" r={180} g={30} b={30} badge="Visual" onClick={props.onCharacterMapper} />
           <SubCard icon="💬" title="Sounding Board" desc="Chat with an AI co-writer. Break blocks, get twists, ask anything." accent="#AA3333" r={160} g={20} b={20} badge="AI Chat" onClick={props.onSoundingBoard} />
         </div>
-      </div>
-
-      {/* ─── DAILY DISPATCH ─── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.18s ease both" : "none" }}>
-        <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
       </div>
 
       {/* ─── GENERAL TOOLS ─── */}
