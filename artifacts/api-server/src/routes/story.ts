@@ -1179,10 +1179,11 @@ Rules:
 
 router.post("/story/superhero-regen", async (req, res) => {
   try {
-    const { hero, villain, setting, tone, intensity, chapterIndex, chaptersBefore, chaptersAfter } = req.body as {
+    const { hero, villain, setting, tone, intensity, chapterIndex, chaptersBefore, chaptersAfter, rerollInstructions } = req.body as {
       hero: string; villain: string; setting: string;
       tone?: string; intensity?: string;
       chapterIndex: number; chaptersBefore: string[]; chaptersAfter: string[];
+      rerollInstructions?: string;
     };
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -1204,6 +1205,9 @@ router.post("/story/superhero-regen", async (req, res) => {
       tone ? `TONE: ${tone}` : "",
       intensity ? `INTENSITY: ${intensity}` : "",
       before,
+      rerollInstructions?.trim()
+        ? `\nREROLL INSTRUCTIONS FROM THE AUTHOR — follow these exactly:\n${rerollInstructions.trim()}\n`
+        : "",
       `\nWrite a fresh version of Chapter ${chapterIndex + 1}. Different angle, different escalation. Explicit, unhinged, uncensored.`,
       after,
     ].filter(Boolean).join("\n");
