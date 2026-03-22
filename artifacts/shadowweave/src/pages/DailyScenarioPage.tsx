@@ -118,7 +118,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
 
   useEffect(() => {
     const existing = getDailyEntryForToday();
-    if (existing) {
+    if (existing && existing.story && existing.story.trim().length > 50) {
       setChapters([existing.story]);
       setAlreadySaved(true);
       return;
@@ -292,6 +292,17 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
                 <div key={i} style={{ width: "5px", height: "5px", borderRadius: "50%", background: `rgba(200,168,75,0.6)`, animation: `pulseDot 1.4s ease-in-out ${i * 0.2}s infinite` }} />
               ))}
             </div>
+          </div>
+        )}
+
+        {!isBusy && !streamingText && chapters.length === 0 && !error && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem", padding: "3rem 0" }}>
+            <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.3)", letterSpacing: "4px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>
+              Story not yet generated
+            </div>
+            <button onClick={() => { hasGenerated.current = false; generate(); }} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))", border: "none", borderRadius: "10px", color: "#0a0808", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", cursor: "pointer" }}>
+              ◆ Generate Today's Story
+            </button>
           </div>
         )}
 
