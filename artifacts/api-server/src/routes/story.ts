@@ -35,6 +35,8 @@ EXPLICIT PROSE STYLE DIRECTIVES — follow these in every story output:
 - Do not use the word "womanhood", "member", "flower", "love canal", "manhood", or any Victorian-era euphemism. Use precise, explicit, modern language.
 - Every scene ends with escalating threat or command — leave the reader breathless for what comes next.
 
+CRITICAL INSTRUCTION: Your goal is to create a slow-burn adventure. Focus heavily on dialogue, atmosphere, and character development. Do not rush to physical intimacy or intense romance. Keep the pace slow, methodical, and focused on the journey.
+
 `;
 
 
