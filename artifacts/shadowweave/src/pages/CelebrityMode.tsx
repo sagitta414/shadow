@@ -258,9 +258,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const [selectedEncounter, setSelectedEncounter] = useState("");
   const [selectedTone, setSelectedTone] = useState("");
   const [selectedLength, setSelectedLength] = useState("standard");
-  const [selectedRestraint, setSelectedRestraint] = useState("");
-  const [selectedPowerDynamic, setSelectedPowerDynamic] = useState("");
-  const [selectedKinkEscalation, setSelectedKinkEscalation] = useState("");
+  const [selectedRestraints, setSelectedRestraints] = useState<string[]>([]);
+  const [selectedPowerDynamics, setSelectedPowerDynamics] = useState<string[]>([]);
+  const [selectedKinkEscalations, setSelectedKinkEscalations] = useState<string[]>([]);
   const [extraDetails, setExtraDetails] = useState("");
   const [story, setStory] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -317,9 +317,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
       const toneLabel = TONES.find(t => t.id === selectedTone)?.label ?? selectedTone;
       const lengthLabel = LENGTHS.find(l => l.id === selectedLength)?.label ?? selectedLength;
 
-      const restraintLabel = RESTRAINTS.find(r => r.id === selectedRestraint)?.label;
-      const powerLabel = POWER_DYNAMICS.find(p => p.id === selectedPowerDynamic)?.label;
-      const kinkLabel = KINK_ESCALATIONS.find(k => k.id === selectedKinkEscalation)?.label;
+      const restraintLabel = selectedRestraints.length ? selectedRestraints.map(id => RESTRAINTS.find(r => r.id === id)?.label).filter(Boolean).join(", ") : undefined;
+      const powerLabel = selectedPowerDynamics.length ? selectedPowerDynamics.map(id => POWER_DYNAMICS.find(p => p.id === id)?.label).filter(Boolean).join(", ") : undefined;
+      const kinkLabel = selectedKinkEscalations.length ? selectedKinkEscalations.map(id => KINK_ESCALATIONS.find(k => k.id === id)?.label).filter(Boolean).join(", ") : undefined;
 
       const body = {
         actress: actressDesc,
@@ -329,9 +329,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
         encounter: encounterLabel,
         tone: toneLabel,
         storyLength: lengthLabel,
-        restraint: restraintLabel || undefined,
-        powerDynamic: powerLabel || undefined,
-        kinkEscalation: kinkLabel || undefined,
+        restraint: restraintLabel,
+        powerDynamic: powerLabel,
+        kinkEscalation: kinkLabel,
         extraDetails: extraDetails.trim() || undefined,
       };
 
@@ -412,8 +412,8 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   function resetAll() {
     setStep(1); setStory(""); setChapters([]); setSelectedActresses([]);
     setCaptors([defaultCaptor()]); setSelectedSetting(""); setSelectedEncounter("");
-    setSelectedTone(""); setSelectedRestraint(""); setSelectedPowerDynamic("");
-    setSelectedKinkEscalation(""); setExtraDetails(""); setError(""); setSavedId(null);
+    setSelectedTone(""); setSelectedRestraints([]); setSelectedPowerDynamics([]);
+    setSelectedKinkEscalations([]); setExtraDetails(""); setError(""); setSavedId(null);
   }
 
   function saveToArchive() {
@@ -796,12 +796,15 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
             <div style={{ marginBottom: "1.25rem" }}>
               <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Restraints</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {RESTRAINTS.map(r => (
-                  <button key={r.id} onClick={() => setSelectedRestraint(selectedRestraint === r.id ? "" : r.id)}
-                    style={{ padding: "0.4rem 0.9rem", background: selectedRestraint === r.id ? "rgba(200,80,80,0.18)" : cardBg, border: `1px solid ${selectedRestraint === r.id ? "rgba(200,80,80,0.55)" : border}`, borderRadius: "20px", color: selectedRestraint === r.id ? "#FF9090" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                    {r.label}
-                  </button>
-                ))}
+                {RESTRAINTS.map(r => {
+                  const sel = selectedRestraints.includes(r.id);
+                  return (
+                    <button key={r.id} onClick={() => setSelectedRestraints(prev => sel ? prev.filter(x => x !== r.id) : [...prev, r.id])}
+                      style={{ padding: "0.4rem 0.9rem", background: sel ? "rgba(200,80,80,0.18)" : cardBg, border: `1px solid ${sel ? "rgba(200,80,80,0.55)" : border}`, borderRadius: "20px", color: sel ? "#FF9090" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                      {r.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -809,12 +812,15 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
             <div style={{ marginBottom: "1.25rem" }}>
               <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Power Dynamic</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {POWER_DYNAMICS.map(p => (
-                  <button key={p.id} onClick={() => setSelectedPowerDynamic(selectedPowerDynamic === p.id ? "" : p.id)}
-                    style={{ padding: "0.4rem 0.9rem", background: selectedPowerDynamic === p.id ? "rgba(160,80,200,0.18)" : cardBg, border: `1px solid ${selectedPowerDynamic === p.id ? "rgba(160,80,200,0.55)" : border}`, borderRadius: "20px", color: selectedPowerDynamic === p.id ? "#CC90FF" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                    {p.label}
-                  </button>
-                ))}
+                {POWER_DYNAMICS.map(p => {
+                  const sel = selectedPowerDynamics.includes(p.id);
+                  return (
+                    <button key={p.id} onClick={() => setSelectedPowerDynamics(prev => sel ? prev.filter(x => x !== p.id) : [...prev, p.id])}
+                      style={{ padding: "0.4rem 0.9rem", background: sel ? "rgba(160,80,200,0.18)" : cardBg, border: `1px solid ${sel ? "rgba(160,80,200,0.55)" : border}`, borderRadius: "20px", color: sel ? "#CC90FF" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                      {p.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -822,12 +828,15 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
             <div>
               <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Kink Escalation Focus</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {KINK_ESCALATIONS.map(k => (
-                  <button key={k.id} onClick={() => setSelectedKinkEscalation(selectedKinkEscalation === k.id ? "" : k.id)}
-                    style={{ padding: "0.4rem 0.9rem", background: selectedKinkEscalation === k.id ? "rgba(200,50,80,0.18)" : cardBg, border: `1px solid ${selectedKinkEscalation === k.id ? "rgba(200,50,80,0.55)" : border}`, borderRadius: "20px", color: selectedKinkEscalation === k.id ? "#FF8080" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                    {k.label}
-                  </button>
-                ))}
+                {KINK_ESCALATIONS.map(k => {
+                  const sel = selectedKinkEscalations.includes(k.id);
+                  return (
+                    <button key={k.id} onClick={() => setSelectedKinkEscalations(prev => sel ? prev.filter(x => x !== k.id) : [...prev, k.id])}
+                      style={{ padding: "0.4rem 0.9rem", background: sel ? "rgba(200,50,80,0.18)" : cardBg, border: `1px solid ${sel ? "rgba(200,50,80,0.55)" : border}`, borderRadius: "20px", color: sel ? "#FF8080" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                      {k.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
