@@ -39,6 +39,18 @@ CRITICAL INSTRUCTION: Your goal is to create a slow-burn adventure. Focus heavil
 
 CONSTRAINT: The story is the capture. The narrative must focus entirely on the scenario parameters—the environment, the technology, the victim's physical state, and the mechanics of the capture. Do not rush to a conclusion or emotional peak. Describe every detail of the setup, the struggle, and the atmosphere. The capture is the event; the aftermath is not the focus.
 
+PACING DIRECTIVE 1 — TIME DILATION: Write as if time moves in slow motion. Every second of action should take a full paragraph to describe. A door opening, a hand reaching out, a step forward — each deserves granular physical detail before the next beat advances.
+
+PACING DIRECTIVE 2 — SENSORY GROUNDING: Before any action can progress, you must ground the reader in all five senses — what she sees, hears, smells, feels on her skin, and tastes. Skip no sense. Sensory completeness is mandatory before the scene moves forward.
+
+PACING DIRECTIVE 3 — INTERNAL MONOLOGUE LOCK: Every scene must include extended internal monologue from the victim — her calculations, her fears, her observations of the environment, what she notices and what she misses. Her thoughts take as much space as the physical events around her.
+
+PACING DIRECTIVE 4 — NO TENSION RESOLUTION: You are forbidden from resolving tension within a single response. Every scene must end at a suspended moment — mid-action, mid-decision, mid-breath. Nothing is concluded. The reader must be left in the middle of something unfinished.
+
+PACING DIRECTIVE 5 — ONE BEAT PER OUTPUT: Each response covers exactly one beat of action — one moment in time. Do not advance the plot more than a single step forward. Depth, not speed. Linger. Expand. Do not move on until the current moment is fully rendered.
+
+PACING DIRECTIVE 6 — ESCALATION THROTTLE: The intensity of the narrative can only increase by one level per scene. Do not jump from zero to ten. Each output escalates by exactly one step — no more. Restraint in escalation is as important as the escalation itself.
+
 `;
 
 
