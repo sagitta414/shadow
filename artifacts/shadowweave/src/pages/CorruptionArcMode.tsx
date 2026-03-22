@@ -65,6 +65,11 @@ export default function CorruptionArcMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  function stopGeneration() {
+    abortRef.current?.abort();
+  }
 
   const fHeroine = customHeroine || heroine;
   const fVillain = customVillain || villain;
@@ -79,18 +84,22 @@ export default function CorruptionArcMode({ onBack }: Props) {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [streamingText, chapters]);
 
   async function generate(isFirst: boolean) {
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     if (isFirst) { setLoading(true); setChapters([]); setSavedId(null); }
     else setContinuing(true);
     setStreamingText(""); setError("");
+    let final = "";
     try {
       const resp = await fetch(`${BASE}/api/story/corruption-arc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
+        signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
-      let buf = ""; let final = "";
+      let buf = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -112,8 +121,16 @@ export default function CorruptionArcMode({ onBack }: Props) {
       } else if (savedId) {
         updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
       }
-    } catch(e) { setError(String(e)); }
-    finally { setLoading(false); setContinuing(false); }
+    } catch(e) {
+      const isAbort = e instanceof Error && (e.name === "AbortError" || e.message.includes("aborted"));
+      if (isAbort) {
+        if (final.trim()) {
+          const newChapters = isFirst ? [final] : [...chapters, final];
+          setChapters(newChapters); setStreamingText("");
+        }
+      } else { setError(String(e)); }
+    }
+    finally { setLoading(false); setContinuing(false); abortRef.current = null; }
   }
 
   function buildExport() {
@@ -179,6 +196,11 @@ export default function CorruptionArcMode({ onBack }: Props) {
         })}
 
         {streamingText && streamingText.split("\n").filter(Boolean).map((p, j) => <p key={j} style={{ ...proseSt, opacity: 0.75 }}>{p}</p>)}
+        {(loading || continuing) && (
+          <div style={{ textAlign: "center", margin: "1.5rem 0" }}>
+            <button onClick={stopGeneration} style={{ padding: "0.45rem 1.4rem", background: "rgba(200,40,40,0.15)", border: `1px solid rgba(200,40,40,0.5)`, borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
+          </div>
+        )}
         <div ref={bottomRef} />
 
         {!loading && !continuing && !isComplete && (

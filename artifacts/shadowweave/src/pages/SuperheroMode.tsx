@@ -824,6 +824,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [rerollNotes, setRerollNotes] = useState<Record<number, string>>({});
   const [quickNotesIdx, setQuickNotesIdx] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  function stopGeneration() {
+    abortRef.current?.abort();
+  }
 
   const story = chapters.join("\n\n");
 
@@ -987,11 +992,12 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     };
   }
 
-  async function streamRequest(endpoint: string, body: object, onChunk: (c: string) => void): Promise<string> {
+  async function streamRequest(endpoint: string, body: object, onChunk: (c: string) => void, signal?: AbortSignal): Promise<string> {
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal,
     });
     if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
@@ -1016,7 +1022,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     return full;
   }
 
+  function isAbort(e: unknown) {
+    return e instanceof Error && (e.name === "AbortError" || e.message.includes("aborted"));
+  }
+
   async function generateStory() {
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setLoading(true);
     setChapters([]);
     setStreamingText("");
@@ -1026,18 +1038,25 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       const full = await streamRequest("/api/story/superhero", buildPrompt(), (c) => {
         accumulated += c;
         setStreamingText(accumulated);
-      });
+      }, ctrl.signal);
       setChapters([full]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Story generation failed");
+      if (isAbort(e)) {
+        if (accumulated.trim()) setChapters([accumulated]);
+      } else {
+        setError(e instanceof Error ? e.message : "Story generation failed");
+      }
     } finally {
       setLoading(false);
       setStreamingText("");
+      abortRef.current = null;
     }
   }
 
   async function continueStory() {
     if (chapters.length === 0) return;
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setContinuing(true);
     setStreamingText("");
     setError("");
@@ -1051,22 +1070,30 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       }, (c) => {
         accumulated += c;
         setStreamingText(accumulated);
-      });
+      }, ctrl.signal);
       setChapters((prev) => [...prev, full]);
       setContinuePrompt("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Continuation failed");
+      if (isAbort(e)) {
+        if (accumulated.trim()) setChapters((prev) => [...prev, accumulated]);
+      } else {
+        setError(e instanceof Error ? e.message : "Continuation failed");
+      }
     } finally {
       setContinuing(false);
       setStreamingText("");
+      abortRef.current = null;
     }
   }
 
   async function regenChapter(idx: number, instructions?: string) {
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setRegenChapIdx(idx);
     setRerollOpenIdx(null);
     setError("");
     const prompt = buildPrompt();
+    let accumulated = "";
     try {
       const fresh = await streamRequest("/api/story/superhero-regen", {
         hero: prompt.hero,
@@ -1078,13 +1105,20 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         chaptersBefore: chapters.slice(0, idx),
         chaptersAfter: chapters.slice(idx + 1),
         rerollInstructions: instructions ?? "",
-      }, () => {});
+      }, (c) => { accumulated += c; }, ctrl.signal);
       setChapters(prev => { const next = [...prev]; next[idx] = fresh; return next; });
       setRerollNotes(prev => { const next = { ...prev }; delete next[idx]; return next; });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Regeneration failed");
+      if (isAbort(e)) {
+        if (accumulated.trim()) {
+          setChapters(prev => { const next = [...prev]; next[idx] = accumulated; return next; });
+        }
+      } else {
+        setError(e instanceof Error ? e.message : "Regeneration failed");
+      }
     } finally {
       setRegenChapIdx(null);
+      abortRef.current = null;
     }
   }
 
@@ -2325,9 +2359,10 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div style={{ textAlign: "center", padding: "3rem 2rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,184,0,0.1)", borderRadius: "20px", marginBottom: "1.5rem" }}>
               <div style={{ fontSize: "2rem", marginBottom: "1rem", animation: "orbFloat 2s ease-in-out infinite" }}>⚡</div>
               <p className="font-cinzel" style={{ color: "#FFB800", fontSize: "0.9rem", letterSpacing: "2px", marginBottom: "0.5rem" }}>Forging your story…</p>
-              <div style={{ display: "flex", gap: "6px", justifyContent: "center", marginTop: "1rem" }}>
+              <div style={{ display: "flex", gap: "6px", justifyContent: "center", marginTop: "1rem", marginBottom: "1.25rem" }}>
                 {[0,1,2,3].map((i) => <div key={i} style={{ width: "6px", height: "6px", borderRadius: "50%", background: i % 2 === 0 ? "#FFB800" : "#FF4060", animation: `progressGlow 1s ${i*0.2}s ease-in-out infinite` }} />)}
               </div>
+              <button onClick={stopGeneration} style={{ padding: "0.4rem 1.25rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
             </div>
           )}
 
@@ -2364,10 +2399,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               {regenChapIdx === i ? (
                 <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(192,96,224,0.3)", borderRadius: "20px", padding: "2.5rem", textAlign: "center" }}>
                   <div style={{ fontSize: "1.5rem", marginBottom: "0.75rem", animation: "orbFloat 1.5s ease-in-out infinite" }}>↻</div>
-                  <div className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.8rem", letterSpacing: "2px" }}>Re-rolling Chapter {i + 1}…</div>
+                  <div className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.8rem", letterSpacing: "2px", marginBottom: "0.75rem" }}>Re-rolling Chapter {i + 1}…</div>
                   {rerollNotes[i] && (
-                    <div style={{ marginTop: "0.75rem", color: "rgba(200,180,255,0.5)", fontSize: "0.72rem", fontStyle: "italic" }}>"{rerollNotes[i]}"</div>
+                    <div style={{ marginBottom: "0.75rem", color: "rgba(200,180,255,0.5)", fontSize: "0.72rem", fontStyle: "italic" }}>"{rerollNotes[i]}"</div>
                   )}
+                  <button onClick={stopGeneration} style={{ padding: "0.3rem 1rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
                 </div>
               ) : (
                 <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,184,0,0.15)", borderRadius: "20px", padding: "2.5rem", position: "relative", overflow: "hidden" }}>
@@ -2533,7 +2569,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Continuing spinner */}
           {continuing && (
             <div style={{ textAlign: "center", padding: "1.5rem", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(192,96,224,0.15)", borderRadius: "12px", marginBottom: "1.5rem" }}>
-              <p className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.85rem", letterSpacing: "2px" }}>Writing Chapter {chapters.length + 1}…</p>
+              <p className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.85rem", letterSpacing: "2px", marginBottom: "0.75rem" }}>Writing Chapter {chapters.length + 1}…</p>
+              <button onClick={stopGeneration} style={{ padding: "0.35rem 1.1rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
             </div>
           )}
 
