@@ -4,35 +4,32 @@ interface LoginProps {
   onEnter: () => void;
 }
 
-const FEATURES = [
-  { icon: "◈", label: "7 Narrative Modules", sub: "Character builders, scenario engines & mappers" },
-  { icon: "✦", label: "AI Sounding Board", sub: "Streaming AI collaborator trained on your story" },
-  { icon: "⚡", label: "Superhero Story Forge", sub: "100 heroines, 30 villains, chapter continuation" },
-  { icon: "◎", label: "Character Relationship Map", sub: "Visual node canvas with drag-and-drop dynamics" },
+const CORRECT_PASS = "shadow";
+
+const ICONS = [
+  "/icons/heroine-forge.png",
+  "/icons/celebrity-captive.png",
+  "/icons/custom-scenario.png",
+  "/icons/mind-break.png",
+  "/icons/two-heroines.png",
+  "/icons/rescue-gone-wrong.png",
+  "/icons/power-drain.png",
+  "/icons/mass-capture.png",
+  "/icons/corruption-arc.png",
+  "/icons/interrogation-room.png",
+  "/icons/captor-config.png",
+  "/icons/captor-logic.png",
+  "/icons/scenario-engine.png",
+  "/icons/relationship-map.png",
+  "/icons/sounding-board.png",
 ];
 
-function Orbs() {
-  return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
-      <div style={{ position: "absolute", width: "700px", height: "700px", top: "-20%", left: "-20%", background: "radial-gradient(circle, rgba(100,0,0,0.18) 0%, transparent 65%)", animation: "orbFloat 28s ease-in-out infinite" }} />
-      <div style={{ position: "absolute", width: "500px", height: "500px", bottom: "-15%", right: "5%", background: "radial-gradient(circle, rgba(45,27,105,0.2) 0%, transparent 65%)", animation: "orbFloat 22s 5s ease-in-out infinite" }} />
-      <div style={{ position: "absolute", width: "350px", height: "350px", top: "40%", left: "50%", background: "radial-gradient(circle, rgba(80,5,80,0.14) 0%, transparent 65%)", animation: "orbFloat 35s 10s ease-in-out infinite" }} />
-      <div style={{ position: "absolute", width: "280px", height: "280px", top: "10%", right: "10%", background: "radial-gradient(circle, rgba(139,0,0,0.1) 0%, transparent 65%)", animation: "orbFloat 18s 3s ease-in-out infinite" }} />
-    </div>
-  );
-}
-
-function GridOverlay() {
-  return (
-    <div style={{
-      position: "absolute", inset: 0, pointerEvents: "none",
-      backgroundImage: "linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)",
-      backgroundSize: "80px 80px",
-    }} />
-  );
-}
-
-const CORRECT_PASS = "shadow";
+const STATS = [
+  ["9", "Story Modes"],
+  ["181+", "Heroines"],
+  ["Venice AI", "Engine"],
+  ["Uncensored", "Model"],
+];
 
 export default function Login({ onEnter }: LoginProps) {
   const [password, setPassword] = useState("");
@@ -41,14 +38,10 @@ export default function Login({ onEnter }: LoginProps) {
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
   const [denied, setDenied] = useState(false);
-  const [featureIndex, setFeatureIndex] = useState(-1);
 
   useEffect(() => {
-    const t0 = setTimeout(() => setMounted(true), 80);
-    const timers = FEATURES.map((_, i) =>
-      setTimeout(() => setFeatureIndex(i), 600 + i * 160)
-    );
-    return () => { clearTimeout(t0); timers.forEach(clearTimeout); };
+    const t = setTimeout(() => setMounted(true), 60);
+    return () => clearTimeout(t);
   }, []);
 
   function handleSubmit(e: React.FormEvent) {
@@ -67,198 +60,123 @@ export default function Login({ onEnter }: LoginProps) {
       return;
     }
     setLoading(true);
-    setTimeout(() => { setLoading(false); onEnter(); }, 1400);
+    setTimeout(() => { setLoading(false); onEnter(); }, 1200);
   }
 
-  const passInputStyle: React.CSSProperties = {
-    width: "100%",
-    background: denied ? "rgba(80,0,0,0.25)" : focused ? "rgba(184,134,11,0.04)" : "rgba(0,0,0,0.5)",
-    border: `1px solid ${denied ? "rgba(200,0,0,0.45)" : focused ? "rgba(184,134,11,0.5)" : "rgba(255,255,255,0.07)"}`,
-    borderRadius: "10px",
-    padding: "0.95rem 1rem 0.95rem 2.75rem",
-    color: "transparent",
-    textShadow: "0 0 8px rgba(220,200,255,0.7)",
-    fontFamily: "'Raleway', sans-serif",
-    fontSize: "0.93rem",
-    outline: "none",
-    transition: "all 0.3s ease",
-    letterSpacing: "0.4px",
-    boxSizing: "border-box",
-    boxShadow: denied ? "0 0 0 3px rgba(180,0,0,0.1)" : focused ? "0 0 0 3px rgba(184,134,11,0.08)" : "none",
-    caretColor: "rgba(184,134,11,0.8)",
-  };
-
   return (
-    <div style={{ position: "fixed", inset: 0, display: "flex", overflow: "hidden", background: "#030008", zIndex: 10 }}>
+    <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#020008", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <style>{`
+        @keyframes shimmerSlide { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+        @keyframes floatA { 0%,100% { transform: translateY(0) translateX(0); } 33% { transform: translateY(-22px) translateX(10px); } 66% { transform: translateY(12px) translateX(-8px); } }
+        @keyframes floatB { 0%,100% { transform: translateY(0) translateX(0); } 50% { transform: translateY(18px) translateX(-14px); } }
+        @keyframes floatC { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+        @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.45; transform:scale(0.6); } }
+        @keyframes shakeCard { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-9px)} 30%{transform:translateX(9px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 75%{transform:translateX(-3px)} 90%{transform:translateX(3px)} }
+        @keyframes deniedPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,60,60,0);} 50%{box-shadow:0 0 14px 4px rgba(255,40,40,0.35);} }
+        @keyframes iconReveal { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
+        @keyframes cardRise { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes progressGlow { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+        @keyframes borderRotate { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+      `}</style>
 
-      {/* ════ LEFT PANEL — Branding ════ */}
-      <div
-        className="login-left"
-        style={{
-          position: "relative",
-          flex: "0 0 56%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "3.5rem 4rem",
-          overflow: "hidden",
-          borderRight: "1px solid rgba(255,255,255,0.04)",
-          opacity: mounted ? 1 : 0,
-          transform: mounted ? "translateX(0)" : "translateX(-20px)",
-          transition: "opacity 0.9s cubic-bezier(0.23,1,0.32,1), transform 0.9s cubic-bezier(0.23,1,0.32,1)",
-        }}
-      >
-        <Orbs />
-        <GridOverlay />
-
-        {/* Diagonal accent strip */}
-        <div style={{ position: "absolute", top: 0, right: 0, width: "1px", bottom: 0, background: "linear-gradient(180deg, transparent 0%, rgba(139,0,0,0.3) 30%, rgba(184,134,11,0.2) 60%, transparent 100%)" }} />
-
-        {/* Corner ornaments */}
-        <div style={{ position: "absolute", top: "1.5rem", left: "1.5rem", width: "24px", height: "24px", borderTop: "1px solid rgba(184,134,11,0.4)", borderLeft: "1px solid rgba(184,134,11,0.4)" }} />
-        <div style={{ position: "absolute", bottom: "1.5rem", right: "1.5rem", width: "24px", height: "24px", borderBottom: "1px solid rgba(184,134,11,0.4)", borderRight: "1px solid rgba(184,134,11,0.4)" }} />
-
-        {/* Studio badge */}
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "4rem" }}>
-            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8B0000", boxShadow: "0 0 10px rgba(139,0,0,0.8)" }} />
-            <span className="font-montserrat" style={{ fontSize: "0.58rem", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(184,134,11,0.55)", fontWeight: 700 }}>
-              Professional Dark Narrative Studio
-            </span>
+      {/* ── ICON MOSAIC BACKDROP ── */}
+      <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gridTemplateRows: "repeat(3, 1fr)", gap: 0, pointerEvents: "none" }}>
+        {ICONS.map((src, i) => (
+          <div
+            key={i}
+            style={{
+              overflow: "hidden",
+              opacity: mounted ? 0.14 : 0,
+              transition: `opacity 1.2s ${0.05 * i}s ease`,
+              filter: "saturate(0.6) brightness(0.7)",
+              animation: mounted ? `iconReveal 1.2s ${0.04 * i}s ease both` : "none",
+            }}
+          >
+            <img
+              src={src}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
           </div>
+        ))}
+      </div>
 
-          {/* Main title */}
-          <div style={{ marginBottom: "2rem" }}>
-            <div style={{ position: "relative", lineHeight: 0.85 }}>
-              <h1 className="font-cinzel" style={{
-                fontSize: "clamp(4rem, 8vw, 7.5rem)",
-                fontWeight: 900,
-                letterSpacing: "0.04em",
-                color: "transparent",
-                WebkitTextStroke: "1px rgba(212,175,55,0.15)",
-                margin: 0, lineHeight: 0.9,
-                userSelect: "none",
-                position: "absolute",
-                top: "4px", left: "4px",
-              }}>SHADOW<br />WEAVE</h1>
-              <h1 className="font-cinzel" style={{
-                fontSize: "clamp(4rem, 8vw, 7.5rem)",
-                fontWeight: 900,
-                letterSpacing: "0.04em",
-                background: "linear-gradient(160deg, #F5E8C0 0%, #D4AF37 30%, #A07030 65%, #6B4F20 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                margin: 0, lineHeight: 0.9,
-                position: "relative",
-                filter: "drop-shadow(0 4px 40px rgba(212,175,55,0.2))",
-              }}>SHADOW<br />WEAVE</h1>
-            </div>
-          </div>
+      {/* ── DARK VIGNETTE OVER MOSAIC ── */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 50%, rgba(2,0,8,0.55) 0%, rgba(2,0,8,0.92) 70%)", pointerEvents: "none" }} />
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-            <div style={{ width: "40px", height: "1px", background: "rgba(139,0,0,0.6)" }} />
-            <p className="font-crimson" style={{ fontSize: "1.1rem", color: "rgba(220,210,240,0.4)", fontStyle: "italic", letterSpacing: "0.06em", margin: 0 }}>
-              Where darkness becomes narrative craft
-            </p>
-          </div>
+      {/* ── VIVID ANIMATED GLOWS ── */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", width: "900px", height: "900px", top: "-30%", left: "-15%", background: "radial-gradient(circle, rgba(120,0,220,0.22) 0%, transparent 60%)", animation: "floatA 20s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", width: "700px", height: "700px", bottom: "-20%", right: "-10%", background: "radial-gradient(circle, rgba(220,50,100,0.18) 0%, transparent 60%)", animation: "floatB 26s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", width: "500px", height: "500px", top: "30%", right: "5%", background: "radial-gradient(circle, rgba(240,140,0,0.12) 0%, transparent 60%)", animation: "floatC 16s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", width: "600px", height: "300px", bottom: "0%", left: "25%", background: "radial-gradient(ellipse, rgba(60,10,180,0.14) 0%, transparent 70%)", animation: "floatC 30s 5s ease-in-out infinite" }} />
+      </div>
+
+      {/* ── TOP NAV STRIP ── */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "54px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", zIndex: 10, background: "rgba(4,1,10,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.5) 25%, rgba(251,191,36,0.4) 50%, rgba(239,68,68,0.5) 75%, transparent)" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+          <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 14px #A855F7, 0 0 30px rgba(168,85,247,0.4)", animation: "pulseDot 2.5s ease-in-out infinite" }} />
+          <span style={{ fontSize: "0.9rem", fontWeight: 900, letterSpacing: "5px", background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 35%, #D4A017 55%, #E8C840 75%, #F5D67A 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", fontFamily: "'Cinzel', serif", animation: "shimmerSlide 5s linear infinite" }}>SHADOWWEAVE</span>
         </div>
-
-        {/* Feature list */}
-        <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "1rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.75rem" }}>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, rgba(139,0,0,0.5), transparent)" }} />
-            <span className="font-montserrat" style={{ fontSize: "0.55rem", letterSpacing: "3.5px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Studio Capabilities</span>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5))" }} />
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-            {FEATURES.map((f, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "1rem",
-                  opacity: featureIndex >= i ? 1 : 0,
-                  transform: featureIndex >= i ? "translateX(0)" : "translateX(-12px)",
-                  transition: "opacity 0.5s ease, transform 0.5s ease",
-                }}
-              >
-                <div style={{
-                  width: "36px", height: "36px", borderRadius: "9px", flexShrink: 0,
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(184,134,11,0.15)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "1rem", color: "rgba(184,134,11,0.7)",
-                }}>
-                  {f.icon}
-                </div>
-                <div>
-                  <div className="font-cinzel" style={{ fontSize: "0.8rem", color: "rgba(220,215,240,0.75)", fontWeight: 700, marginBottom: "0.15rem", letterSpacing: "0.03em" }}>{f.label}</div>
-                  <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5 }}>{f.sub}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom stats row */}
-          <div style={{ display: "flex", gap: "2rem", marginTop: "2rem", paddingTop: "1.75rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-            {[["7", "Modules"], ["100+", "Heroines"], ["2", "AI Modes"], ["4", "Themes"]].map(([v, l]) => (
-              <div key={l}>
-                <div className="font-cinzel" style={{ fontSize: "1.3rem", fontWeight: 900, color: "#D4AF37", letterSpacing: "1px", lineHeight: 1 }}>{v}</div>
-                <div className="font-montserrat" style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.25)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "0.2rem" }}>{l}</div>
-              </div>
-            ))}
-          </div>
+        <div style={{ display: "flex", gap: "2rem" }}>
+          {STATS.map(([v, l]) => (
+            <div key={l} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 900, color: "rgba(230,190,60,0.75)", lineHeight: 1, fontFamily: "'Cinzel', serif" }}>{v}</div>
+              <div style={{ fontSize: "0.38rem", color: "rgba(200,200,220,0.28)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "2px", fontFamily: "'Montserrat', sans-serif" }}>{l}</div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ════ RIGHT PANEL — Login ════ */}
+      {/* ── CENTER LOGIN CARD ── */}
       <div
-        className="login-right-panel"
         style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "2rem",
           position: "relative",
-          overflow: "hidden",
-          background: "rgba(2,0,6,0.6)",
-          opacity: mounted ? 1 : 0,
-          transform: mounted ? "translateX(0)" : "translateX(16px)",
-          transition: "opacity 0.9s 0.1s cubic-bezier(0.23,1,0.32,1), transform 0.9s 0.1s cubic-bezier(0.23,1,0.32,1)",
+          zIndex: 20,
+          width: "100%",
+          maxWidth: "420px",
+          padding: "0 1.5rem",
+          animation: mounted ? "cardRise 0.8s 0.15s cubic-bezier(0.23,1,0.32,1) both" : "none",
         }}
       >
-        {/* Subtle top glow */}
-        <div style={{ position: "absolute", top: "-80px", left: "50%", transform: "translateX(-50%)", width: "300px", height: "200px", background: "radial-gradient(ellipse, rgba(139,0,0,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-
         <div
-          className="login-form-box"
           style={{
-            width: "100%",
-            maxWidth: "380px",
+            position: "relative",
+            background: "rgba(6,2,18,0.88)",
+            backdropFilter: "blur(30px)",
+            borderRadius: "20px",
+            border: "1px solid rgba(168,85,247,0.35)",
+            boxShadow: denied
+              ? "0 0 0 2px rgba(239,68,68,0.35), 0 32px 80px rgba(0,0,0,0.7), 0 0 80px rgba(168,85,247,0.08)"
+              : "0 32px 80px rgba(0,0,0,0.7), 0 0 80px rgba(168,85,247,0.12), 0 0 0 1px rgba(168,85,247,0.08)",
+            padding: "2.5rem 2.25rem 2.25rem",
+            transition: "box-shadow 0.3s",
             animation: shake ? "shakeCard 0.5s ease" : "none",
           }}
         >
-          {/* Mini logo */}
-          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.4rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "30px", marginBottom: "1.5rem" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#8B0000", boxShadow: "0 0 8px rgba(139,0,0,0.9)" }} />
-              <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "3px", color: "rgba(200,200,220,0.4)" }}>SHADOWWEAVE</span>
+          {/* Top shimmer line */}
+          <div style={{ position: "absolute", top: 0, left: "10%", right: "10%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.9) 30%, rgba(251,191,36,0.9) 70%, transparent)", borderRadius: "1px" }} />
+          {/* Inner top glow */}
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "120px", background: "radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.12) 0%, transparent 70%)", borderRadius: "20px 20px 0 0", pointerEvents: "none" }} />
+
+          {/* Logo badge */}
+          <div style={{ textAlign: "center", marginBottom: "2rem", position: "relative" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.38rem 1.1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.28)", borderRadius: "30px", marginBottom: "1.6rem" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 10px #A855F7, 0 0 20px rgba(168,85,247,0.5)", animation: "pulseDot 2.5s ease-in-out infinite" }} />
+              <span style={{ fontSize: "0.6rem", letterSpacing: "3.5px", color: "rgba(192,132,252,0.8)", fontFamily: "'Cinzel', serif", fontWeight: 700 }}>SHADOWWEAVE</span>
             </div>
-            <h2 className="font-cinzel" style={{ fontSize: "1.5rem", fontWeight: 900, color: "#E8E8F5", letterSpacing: "0.06em", marginBottom: "0.4rem" }}>
+
+            <h2 style={{ margin: "0 0 0.4rem", fontFamily: "'Cinzel', serif", fontSize: "2rem", fontWeight: 900, letterSpacing: "0.06em", background: "linear-gradient(135deg, #F5D67A 0%, #FFFFFF 45%, #F5D67A 80%, #E8B830 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "shimmerSlide 5s linear infinite", lineHeight: 1.15 }}>
               Enter the Dark
             </h2>
-            <p style={{ fontSize: "0.8rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif", letterSpacing: "0.5px" }}>
+            <p style={{ margin: 0, fontSize: "0.75rem", color: "rgba(200,195,240,0.38)", fontFamily: "'Raleway', sans-serif", letterSpacing: "1px" }}>
               Enter your passphrase to proceed
             </p>
           </div>
 
-          {/* Top accent bar */}
-          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(139,0,0,0.5) 30%, rgba(184,134,11,0.4) 60%, transparent)", marginBottom: "2rem" }} />
+          {/* Divider */}
+          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.3) 30%, rgba(251,191,36,0.25) 70%, transparent)", marginBottom: "1.8rem" }} />
 
           {/* ACCESS DENIED banner */}
           <div style={{
@@ -271,40 +189,32 @@ export default function Login({ onEnter }: LoginProps) {
             <div style={{
               position: "relative",
               padding: "0.85rem 1.1rem",
-              background: "rgba(90,0,0,0.55)",
-              border: "1px solid rgba(200,0,0,0.55)",
-              borderRadius: "10px",
+              background: "rgba(90,0,0,0.6)",
+              border: "1px solid rgba(239,68,68,0.5)",
+              borderRadius: "12px",
               display: "flex",
               alignItems: "center",
-              gap: "0.9rem",
+              gap: "0.85rem",
               overflow: "hidden",
-              boxShadow: "0 0 30px rgba(180,0,0,0.25), inset 0 1px 0 rgba(255,100,100,0.08)",
+              boxShadow: "0 0 30px rgba(180,0,0,0.2)",
             }}>
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(180,0,0,0.12) 0%, transparent 60%)", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,60,60,0.7) 40%, transparent)", animation: "shimmer 1.8s linear infinite" }} />
-              <div style={{
-                width: "32px", height: "32px", borderRadius: "8px", flexShrink: 0,
-                background: "rgba(180,0,0,0.35)", border: "1px solid rgba(255,60,60,0.4)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "1rem", animation: "deniedPulse 1s ease-in-out infinite",
-              }}>🚫</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.82rem", fontWeight: 900, color: "#FF6060", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "0.18rem" }}>Access Denied</div>
-                <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: "0.67rem", color: "rgba(255,150,150,0.5)", letterSpacing: "0.5px" }}>Invalid passphrase. The dark does not yield.</div>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,60,60,0.8) 40%, transparent)" }} />
+              <div style={{ width: "32px", height: "32px", borderRadius: "8px", flexShrink: 0, background: "rgba(180,0,0,0.4)", border: "1px solid rgba(255,60,60,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", animation: "deniedPulse 1s ease-in-out infinite" }}>🚫</div>
+              <div>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 900, color: "#F87171", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "0.15rem" }}>Access Denied</div>
+                <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: "0.65rem", color: "rgba(255,150,150,0.5)", letterSpacing: "0.5px" }}>Invalid passphrase. The dark does not yield.</div>
               </div>
             </div>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-
-            {/* Passphrase */}
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div>
-              <label className="font-montserrat" style={{ display: "block", fontSize: "0.6rem", letterSpacing: "2.5px", textTransform: "uppercase", color: focused ? "rgba(184,134,11,0.8)" : "rgba(200,200,220,0.28)", marginBottom: "0.45rem", transition: "color 0.25s" }}>
+              <label style={{ display: "block", fontSize: "0.56rem", letterSpacing: "3px", textTransform: "uppercase", color: focused ? "rgba(192,132,252,0.9)" : "rgba(200,195,240,0.3)", marginBottom: "0.5rem", transition: "color 0.25s", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>
                 Passphrase
               </label>
               <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused ? "rgba(139,0,0,0.8)" : "rgba(200,200,220,0.2)", fontSize: "0.85rem", pointerEvents: "none", transition: "color 0.25s" }}>◆</span>
+                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: focused ? "#A855F7" : "rgba(200,195,240,0.2)", fontSize: "0.8rem", pointerEvents: "none", transition: "color 0.25s", textShadow: focused ? "0 0 12px rgba(168,85,247,0.8)" : "none" }}>◆</span>
                 <input
                   type="text"
                   value={password}
@@ -314,92 +224,108 @@ export default function Login({ onEnter }: LoginProps) {
                   placeholder="••••••••••••"
                   autoComplete="off"
                   spellCheck={false}
-                  style={passInputStyle}
+                  style={{
+                    width: "100%",
+                    background: denied ? "rgba(80,0,0,0.3)" : focused ? "rgba(168,85,247,0.06)" : "rgba(0,0,0,0.45)",
+                    border: `1px solid ${denied ? "rgba(239,68,68,0.5)" : focused ? "rgba(168,85,247,0.55)" : "rgba(168,85,247,0.15)"}`,
+                    borderRadius: "12px",
+                    padding: "0.95rem 1rem 0.95rem 2.75rem",
+                    color: "transparent",
+                    textShadow: "0 0 8px rgba(220,200,255,0.8)",
+                    fontFamily: "'Raleway', sans-serif",
+                    fontSize: "0.95rem",
+                    outline: "none",
+                    transition: "all 0.3s ease",
+                    boxSizing: "border-box",
+                    boxShadow: denied
+                      ? "0 0 0 3px rgba(239,68,68,0.1)"
+                      : focused
+                      ? "0 0 0 3px rgba(168,85,247,0.12), 0 0 20px rgba(168,85,247,0.08)"
+                      : "none",
+                    caretColor: "#A855F7",
+                  }}
                 />
               </div>
             </div>
 
-            {/* Enter button */}
+            {/* Submit button */}
             <button
               type="submit"
               disabled={loading}
               style={{
-                marginTop: "0.4rem",
+                marginTop: "0.3rem",
                 width: "100%",
                 padding: "1.05rem",
-                background: loading ? "rgba(100,0,0,0.3)" : "linear-gradient(135deg, #5A0000 0%, #8B0000 50%, #5A0000 100%)",
+                background: loading
+                  ? "rgba(80,40,120,0.3)"
+                  : "linear-gradient(135deg, #6D28D9 0%, #9333EA 40%, #7C3AED 70%, #6D28D9 100%)",
                 backgroundSize: "200% auto",
-                border: `1px solid ${loading ? "rgba(139,0,0,0.2)" : "rgba(139,0,0,0.55)"}`,
-                borderRadius: "11px",
-                color: loading ? "rgba(240,240,255,0.4)" : "#F5F0FF",
+                border: `1px solid ${loading ? "rgba(168,85,247,0.15)" : "rgba(168,85,247,0.6)"}`,
+                borderRadius: "13px",
+                color: loading ? "rgba(200,180,255,0.4)" : "#F5F0FF",
                 fontFamily: "'Cinzel', serif",
                 fontSize: "0.88rem",
                 fontWeight: 700,
                 letterSpacing: "4px",
                 cursor: loading ? "not-allowed" : "pointer",
                 textTransform: "uppercase",
-                transition: "all 0.35s ease",
-                boxShadow: loading ? "none" : "0 4px 24px rgba(139,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)",
-                animation: loading ? "none" : "shimmer 3s linear infinite",
+                transition: "all 0.3s ease",
+                boxShadow: loading
+                  ? "none"
+                  : "0 6px 30px rgba(109,40,217,0.45), 0 0 0 0 rgba(168,85,247,0), inset 0 1px 0 rgba(255,255,255,0.12)",
+                animation: loading ? "none" : "shimmerSlide 3s linear infinite",
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 10px 35px rgba(139,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)";
-                  e.currentTarget.style.borderColor = "rgba(184,134,11,0.45)";
+                  e.currentTarget.style.boxShadow = "0 12px 40px rgba(109,40,217,0.6), 0 0 60px rgba(168,85,247,0.2), inset 0 1px 0 rgba(255,255,255,0.12)";
+                  e.currentTarget.style.borderColor = "rgba(192,132,252,0.8)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!loading) {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 24px rgba(139,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)";
-                  e.currentTarget.style.borderColor = "rgba(139,0,0,0.55)";
+                  e.currentTarget.style.boxShadow = "0 6px 30px rgba(109,40,217,0.45), inset 0 1px 0 rgba(255,255,255,0.12)";
+                  e.currentTarget.style.borderColor = "rgba(168,85,247,0.6)";
                 }
               }}
             >
               {loading ? (
                 <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem" }}>
-                  <span style={{ display: "flex", gap: "4px" }}>
-                    {[0,1,2].map((i) => (
-                      <span key={i} style={{ display: "inline-block", width: "5px", height: "5px", borderRadius: "50%", background: "#B8860B", animation: `progressGlow 0.9s ${i * 0.2}s ease-in-out infinite` }} />
+                  <span style={{ display: "flex", gap: "5px" }}>
+                    {[0, 1, 2].map((i) => (
+                      <span key={i} style={{ display: "inline-block", width: "5px", height: "5px", borderRadius: "50%", background: "#C084FC", animation: `progressGlow 0.9s ${i * 0.2}s ease-in-out infinite` }} />
                     ))}
                   </span>
                   Entering the Dark…
                 </span>
               ) : "Enter the Studio"}
             </button>
-
           </form>
+
+          {/* Bottom card footer */}
+          <div style={{ marginTop: "1.6rem", paddingTop: "1.25rem", borderTop: "1px solid rgba(168,85,247,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "0.52rem", color: "rgba(200,195,240,0.18)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Venice AI · Uncensored</span>
+            <span style={{ fontSize: "0.52rem", color: "rgba(200,195,240,0.18)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Adults Only</span>
+          </div>
         </div>
+
+        {/* Below-card tagline */}
+        <p style={{ textAlign: "center", marginTop: "1.4rem", fontSize: "0.7rem", color: "rgba(200,195,240,0.22)", fontFamily: "'Crimson Text', Georgia, serif", fontStyle: "italic", letterSpacing: "0.06em" }}>
+          Where darkness becomes narrative craft
+        </p>
       </div>
 
-      <style>{`
-        @keyframes shakeCard {
-          0%,100% { transform: translateX(0); }
-          15% { transform: translateX(-8px); }
-          30% { transform: translateX(8px); }
-          45% { transform: translateX(-5px); }
-          60% { transform: translateX(5px); }
-          75% { transform: translateX(-3px); }
-          90% { transform: translateX(3px); }
-        }
-        @keyframes deniedPulse {
-          0%,100% { box-shadow: 0 0 0 0 rgba(255,60,60,0); opacity: 1; }
-          50% { box-shadow: 0 0 14px 4px rgba(255,40,40,0.35); opacity: 0.75; }
-        }
-        @media (max-width: 720px) {
-          .login-left { display: none !important; }
-          .login-right-panel {
-            padding: 1.5rem !important;
-            justify-content: flex-start !important;
-            padding-top: 3rem !important;
-          }
-          .login-form-box { max-width: 100% !important; }
-        }
-        @media (max-width: 420px) {
-          .login-right-panel { padding: 1.25rem !important; padding-top: 2.5rem !important; }
-        }
-      `}</style>
+      {/* ── BOTTOM MODE PREVIEW STRIP ── */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "68px", display: "flex", alignItems: "stretch", overflow: "hidden", opacity: mounted ? 1 : 0, transition: "opacity 1.2s 0.5s ease" }}>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent, rgba(4,1,12,0.96))", pointerEvents: "none", zIndex: 1 }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.2) 30%, rgba(251,191,36,0.15) 70%, transparent)" }} />
+        {ICONS.slice(0, 15).map((src, i) => (
+          <div key={i} style={{ flex: 1, overflow: "hidden", filter: "saturate(0.5) brightness(0.5)" }}>
+            <img src={src} alt="" style={{ width: "100%", height: "68px", objectFit: "cover", display: "block" }} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
