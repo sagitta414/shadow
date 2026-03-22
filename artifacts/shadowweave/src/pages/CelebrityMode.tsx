@@ -250,6 +250,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const isMobile = useIsMobile();
   const [step, setStep] = useState<Step>(1);
   const [search, setSearch] = useState("");
+  const [actressViewMode, setActressViewMode] = useState<"grid" | "list">("grid");
   const [selectedActresses, setSelectedActresses] = useState<typeof ACTRESSES>([]);
   const [captorMode, setCaptorMode] = useState<"solo" | "team">("solo");
   const [captors, setCaptors] = useState<CaptorState[]>([defaultCaptor()]);
@@ -499,44 +500,72 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
             </div>
           )}
 
-          {/* Search */}
-          <div style={{ position: "relative", marginBottom: "1.25rem" }}>
-            <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: goldDim, fontSize: "0.9rem", pointerEvents: "none" }}>⌕</span>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or known for…"
-              style={{ width: "100%", background: cardBg, border: `1px solid ${border}`, borderRadius: "10px", padding: "0.75rem 1rem 0.75rem 2.5rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }}
-              onFocus={e => e.currentTarget.style.borderColor = borderHov}
-              onBlur={e => e.currentTarget.style.borderColor = border}
-            />
+          {/* Search + view toggle */}
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", alignItems: "center" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: goldDim, fontSize: "0.9rem", pointerEvents: "none" }}>⌕</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or known for…"
+                style={{ width: "100%", background: cardBg, border: `1px solid ${border}`, borderRadius: "10px", padding: "0.75rem 1rem 0.75rem 2.5rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }}
+                onFocus={e => e.currentTarget.style.borderColor = borderHov}
+                onBlur={e => e.currentTarget.style.borderColor = border}
+              />
+            </div>
+            <div style={{ display: "flex", background: cardBg, border: `1px solid ${border}`, borderRadius: "8px", overflow: "hidden", flexShrink: 0 }}>
+              {(["grid", "list"] as const).map((m) => (
+                <button key={m} onClick={() => setActressViewMode(m)} title={m === "grid" ? "Card view" : "List view"} style={{ padding: "0.65rem 0.75rem", background: actressViewMode === m ? goldBg : "transparent", border: "none", borderRight: m === "grid" ? `1px solid ${border}` : "none", color: actressViewMode === m ? gold : "rgba(200,168,75,0.3)", fontSize: "0.85rem", cursor: "pointer", transition: "all 0.2s", lineHeight: 1 }}>
+                  {m === "grid" ? "⊞" : "≡"}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "130px" : "175px"}, 1fr))`, gap: "0.625rem", maxHeight: "560px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: `rgba(200,168,75,0.25) transparent` }}>
-            {filtered.map(actress => {
-              const isSelected = selectedActresses.some(x => x.name === actress.name);
-              const slug = nameToSlug(actress.name);
-              return (
-                <button key={actress.name} onClick={() => toggleActress(actress)}
-                  style={{ background: isSelected ? "rgba(200,168,75,0.18)" : cardBg, border: `1px solid ${isSelected ? gold + "88" : border}`, borderRadius: "14px", padding: "0", overflow: "hidden", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSelected ? `0 0 18px rgba(200,168,75,0.3)` : "none" }}
-                  onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = borderHov; e.currentTarget.style.background = goldBg; } }}
-                  onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = cardBg; } }}>
-                  {/* Portrait */}
-                  <div style={{ width: "100%", aspectRatio: "3/4", background: "rgba(0,0,0,0.6)", overflow: "hidden", position: "relative" }}>
-                    <img src={`/celebrities/${slug}.png`} alt={actress.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      onError={e => { e.currentTarget.style.display = "none"; }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 55%)" }} />
-                    {isSelected && (
-                      <div style={{ position: "absolute", top: "8px", right: "8px", width: "22px", height: "22px", background: gold, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", color: "#000", fontWeight: 700 }}>✓</div>
-                    )}
-                  </div>
-                  <div style={{ padding: "0.625rem" }}>
-                    <div style={{ fontSize: isMobile ? "0.65rem" : "0.7rem", fontFamily: "'Cinzel', serif", color: isSelected ? gold : "#E8E8F5", fontWeight: 600, lineHeight: 1.3, marginBottom: "0.25rem" }}>{actress.name}</div>
-                    <div style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.35)", lineHeight: 1.4, fontFamily: "'Montserrat', sans-serif" }}>{actress.known.split(",")[0]}</div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          {/* Grid / List */}
+          {actressViewMode === "list" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", maxHeight: "560px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: `rgba(200,168,75,0.25) transparent` }}>
+              {filtered.map(actress => {
+                const isSelected = selectedActresses.some(x => x.name === actress.name);
+                const slug = nameToSlug(actress.name);
+                return (
+                  <button key={actress.name + "-list"} onClick={() => toggleActress(actress)}
+                    style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: isSelected ? "rgba(200,168,75,0.16)" : cardBg, border: `1px solid ${isSelected ? gold + "88" : border}`, borderRadius: "10px", padding: "0.5rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", minHeight: "58px", boxShadow: isSelected ? `0 0 10px rgba(200,168,75,0.25)` : "none" }}
+                    onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = borderHov; e.currentTarget.style.background = goldBg; } }}
+                    onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = cardBg; } }}>
+                    <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)" }}>
+                      <img src={`/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: isMobile ? "0.78rem" : "0.75rem", fontFamily: "'Cinzel', serif", color: isSelected ? gold : "#E8E8F5", fontWeight: 600, marginBottom: "0.15rem", lineHeight: 1.2 }}>{actress.name}</div>
+                      <div style={{ fontSize: "0.56rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{actress.known}</div>
+                    </div>
+                    {isSelected && <div style={{ width: "20px", height: "20px", background: gold, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "130px" : "175px"}, 1fr))`, gap: "0.625rem", maxHeight: "560px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: `rgba(200,168,75,0.25) transparent` }}>
+              {filtered.map(actress => {
+                const isSelected = selectedActresses.some(x => x.name === actress.name);
+                const slug = nameToSlug(actress.name);
+                return (
+                  <button key={actress.name} onClick={() => toggleActress(actress)}
+                    style={{ background: isSelected ? "rgba(200,168,75,0.18)" : cardBg, border: `1px solid ${isSelected ? gold + "88" : border}`, borderRadius: "14px", padding: "0", overflow: "hidden", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", boxShadow: isSelected ? `0 0 18px rgba(200,168,75,0.3)` : "none" }}
+                    onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = borderHov; e.currentTarget.style.background = goldBg; } }}
+                    onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = cardBg; } }}>
+                    <div style={{ width: "100%", aspectRatio: "3/4", background: "rgba(0,0,0,0.6)", overflow: "hidden", position: "relative" }}>
+                      <img src={`/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 55%)" }} />
+                      {isSelected && <div style={{ position: "absolute", top: "8px", right: "8px", width: "22px", height: "22px", background: gold, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", color: "#000", fontWeight: 700 }}>✓</div>}
+                    </div>
+                    <div style={{ padding: "0.625rem" }}>
+                      <div style={{ fontSize: isMobile ? "0.65rem" : "0.7rem", fontFamily: "'Cinzel', serif", color: isSelected ? gold : "#E8E8F5", fontWeight: 600, lineHeight: 1.3, marginBottom: "0.25rem" }}>{actress.name}</div>
+                      <div style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.35)", lineHeight: 1.4, fontFamily: "'Montserrat', sans-serif" }}>{actress.known.split(",")[0]}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end" }}>
             <button onClick={() => setStep(2)} disabled={!canProceed1()} style={{ ...btnStyle, opacity: canProceed1() ? 1 : 0.35, cursor: canProceed1() ? "pointer" : "not-allowed" }}>

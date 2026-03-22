@@ -691,6 +691,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [universeFilter, setUniverseFilter] = useState<UniverseFilter>("ALL");
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
   const [search, setSearch] = useState("");
+  const [heroViewMode, setHeroViewMode] = useState<"grid" | "list">("grid");
 
   // Selections
   const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
@@ -1075,7 +1076,16 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
               />
             </div>
-            <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>{filteredHeroes.length} heroines</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginLeft: "auto" }}>
+              <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>{filteredHeroes.length}</span>
+              <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", overflow: "hidden" }}>
+                {(["grid", "list"] as const).map((m) => (
+                  <button key={m} onClick={() => setHeroViewMode(m)} title={m === "grid" ? "Card view" : "List view"} style={{ padding: "0.45rem 0.65rem", background: heroViewMode === m ? "rgba(255,184,0,0.15)" : "transparent", border: "none", borderRight: m === "grid" ? "1px solid rgba(255,255,255,0.05)" : "none", color: heroViewMode === m ? "#FFB800" : "rgba(200,200,220,0.3)", fontSize: "0.85rem", cursor: "pointer", transition: "all 0.2s", lineHeight: 1 }}>
+                    {m === "grid" ? "⊞" : "≡"}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Selected heroines chips */}
@@ -1114,59 +1124,90 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             </div>
           )}
 
-          {/* Hero grid */}
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
-            {filteredHeroes.map((hero) => {
-              const isMarvel = hero.universe === "MARVEL";
-              const isCW = hero.universe === "CW";
-              const isTB = hero.universe === "TB";
-              const isPR = hero.universe === "PR";
-              const isAnim = hero.universe === "ANIMATED";
-              const isSW = hero.universe === "SW";
-              const isTV = hero.universe === "TV";
-              const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : "rgba(0,100,220,0.15)";
-              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : "rgba(0,100,220,0.2)";
-              return (
-                <button
-                  key={`${hero.universe}-${hero.name}`}
-                  onClick={() => toggleHero(hero)}
-                  style={{
-                    background: isSelected ? selectedBg : "rgba(0,0,0,0.5)",
-                    backdropFilter: "blur(10px)",
-                    border: `1px solid ${isSelected ? accentColor : "rgba(255,255,255,0.06)"}`,
-                    borderRadius: "12px",
-                    padding: "0.875rem",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.2s ease",
-                    color: "inherit",
-                    position: "relative",
-                    boxShadow: isSelected ? `0 0 16px ${accentColor}44` : "none",
-                  }}
-                  onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}60`; e.currentTarget.style.background = accentBg; } }}
-                  onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
-                >
-                  {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", zIndex: 2, fontWeight: 700 }}>✓</div>}
-                  {/* Portrait image tile */}
-                  <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)" }}>
-                    <img
-                      src={heroImg(hero.name)}
-                      alt={hero.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                    />
-                    <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
-                    <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
-                  </div>
-                  <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{hero.name}</div>
-                  <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>{hero.alias}</div>
-                  <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
-                </button>
-              );
-            })}
-          </div>
+          {/* Hero grid / list */}
+          {heroViewMode === "list" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
+              {filteredHeroes.map((hero) => {
+                const isMarvel = hero.universe === "MARVEL";
+                const isCW = hero.universe === "CW";
+                const isTB = hero.universe === "TB";
+                const isPR = hero.universe === "PR";
+                const isAnim = hero.universe === "ANIMATED";
+                const isSW = hero.universe === "SW";
+                const isTV = hero.universe === "TV";
+                const isSelected = selectedHeroes.some((h) => h.name === hero.name);
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.12)" : isCW ? "rgba(0,180,100,0.1)" : isTB ? "rgba(200,30,0,0.12)" : isPR ? "rgba(220,0,150,0.1)" : isAnim ? "rgba(160,0,255,0.1)" : isSW ? "rgba(0,180,255,0.1)" : isTV ? "rgba(255,150,60,0.1)" : "rgba(0,100,220,0.12)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.16)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.16)" : isTV ? "rgba(255,150,60,0.16)" : "rgba(0,100,220,0.18)";
+                return (
+                  <button
+                    key={`${hero.universe}-${hero.name}-list`}
+                    onClick={() => toggleHero(hero)}
+                    style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: isSelected ? selectedBg : "rgba(0,0,0,0.4)", border: `1px solid ${isSelected ? accentColor + "88" : "rgba(255,255,255,0.05)"}`, borderRadius: "10px", padding: "0.5rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s", color: "inherit", minHeight: "58px", boxShadow: isSelected ? `0 0 10px ${accentColor}30` : "none" }}
+                    onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}44`; e.currentTarget.style.background = accentBg; } }}
+                    onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.background = "rgba(0,0,0,0.4)"; } }}
+                  >
+                    <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)" }}>
+                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="font-cinzel" style={{ fontSize: isMobile ? "0.78rem" : "0.75rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.1rem", lineHeight: 1.2 }}>{hero.name}</div>
+                      <div style={{ fontSize: "0.56rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hero.alias}</div>
+                      <span style={{ fontSize: "0.46rem", background: accentBg, color: accentColor, padding: "0.12rem 0.4rem", borderRadius: "4px", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase" as const }}>{hero.universe}</span>
+                    </div>
+                    {isSelected && <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
+              {filteredHeroes.map((hero) => {
+                const isMarvel = hero.universe === "MARVEL";
+                const isCW = hero.universe === "CW";
+                const isTB = hero.universe === "TB";
+                const isPR = hero.universe === "PR";
+                const isAnim = hero.universe === "ANIMATED";
+                const isSW = hero.universe === "SW";
+                const isTV = hero.universe === "TV";
+                const isSelected = selectedHeroes.some((h) => h.name === hero.name);
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : "rgba(0,100,220,0.15)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : "rgba(0,100,220,0.2)";
+                return (
+                  <button
+                    key={`${hero.universe}-${hero.name}`}
+                    onClick={() => toggleHero(hero)}
+                    style={{
+                      background: isSelected ? selectedBg : "rgba(0,0,0,0.5)",
+                      backdropFilter: "blur(10px)",
+                      border: `1px solid ${isSelected ? accentColor : "rgba(255,255,255,0.06)"}`,
+                      borderRadius: "12px",
+                      padding: "0.875rem",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.2s ease",
+                      color: "inherit",
+                      position: "relative",
+                      boxShadow: isSelected ? `0 0 16px ${accentColor}44` : "none",
+                    }}
+                    onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}60`; e.currentTarget.style.background = accentBg; } }}
+                    onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                  >
+                    {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", zIndex: 2, fontWeight: 700 }}>✓</div>}
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)" }}>
+                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
+                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
+                    </div>
+                    <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{hero.name}</div>
+                    <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>{hero.alias}</div>
+                    <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
             <button
