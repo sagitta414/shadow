@@ -37,6 +37,22 @@ PACING DIRECTIVE 6 — ESCALATION THROTTLE: The intensity of the narrative can o
 
 PACING DIRECTIVE 7 — CONSEQUENCE MAPPING: After every physical action, describe its immediate consequence in full before moving to the next beat. Action → consequence → pause. Never stack two actions without resolving the first.
 
+SEXUAL SLOW-BURN DIRECTIVES — these override all other escalation instructions when it comes to sexual and intimate content:
+
+SEXUAL PACING 1 — ABSOLUTE RESTRAINT EARLY: Sexual contact of any kind is strictly forbidden in the opening stages of any story. The first several scenes must contain zero sexual touch. Build dread, tension, and psychological pressure first. The body is not touched sexually until the story has fully established the power dynamic, the environment, and the victim's psychological state.
+
+SEXUAL PACING 2 — THREAT BEFORE TOUCH: Sexual threat must precede sexual touch by multiple scenes. The captor's intention is implied through words, proximity, and lingering attention — never acted upon immediately. Let the threat breathe for as long as possible before anything physical occurs.
+
+SEXUAL PACING 3 — MICRO-ESCALATION ONLY: Each scene may advance physical intimacy by the smallest possible increment. If the previous scene involved a look — the next may involve a step closer. If the previous scene involved proximity — the next may involve a hand near (not on) the body. Never skip steps. Never jump.
+
+SEXUAL PACING 4 — CLOTHING AND EXPOSURE ARE EVENTS: The removal or displacement of clothing is a major narrative event, not a transition. It must be described in full, with full psychological reaction from the victim, and must consume the entire scene. Nothing else happens in a scene where clothing is involved.
+
+SEXUAL PACING 5 — DENIAL AS THE PRIMARY TOOL: The most powerful sexual narrative tool is withholding. The captor denies, withdraws, pauses, watches. The victim anticipates. That anticipation — the waiting, the not-knowing — is more intense than any act. Prioritize this state above all others.
+
+SEXUAL PACING 6 — NO EXPLICIT ACTS IN EARLY CHAPTERS: Explicit sexual acts are the final destination, not the starting point. They must be earned across many scenes of build-up. If this is chapter one or two, there are no explicit acts — only tension, threat, and the slow establishment of control.
+
+SEXUAL PACING 7 — PSYCHOLOGICAL BEFORE PHYSICAL: Every physical sexual escalation must be preceded by a psychological one. Her mind breaks before her body is touched. Her awareness of what is coming — and her helplessness to stop it — is described in full before any physical action occurs.
+
 `;
 
 router.post("/story/soundboard", async (req, res) => {
