@@ -163,6 +163,21 @@ const TB_HEROES = [
   { name: "Victoria Neuman",  alias: "The Nupe",           power: "Psychic head-explosion & political influence", icon: "💥" },
 ];
 
+const PR_HEROES = [
+  { name: "Kimberly Hart",   alias: "Pink Mighty Morphin Ranger", power: "Pterodactyl Dinozord & expert gymnastics",           icon: "🦅" },
+  { name: "Trini Kwan",      alias: "Yellow Mighty Morphin Ranger",power: "Sabertooth Tiger Dinozord & martial arts mastery",   icon: "🐯" },
+  { name: "Kat Pallister",   alias: "Pink Zeo Ranger",            power: "Pink Zeo Crystal & enhanced feline agility",         icon: "🐱" },
+  { name: "Cassie Chan",     alias: "Pink Space Ranger",          power: "Pink Astro Morpher & Mega Voyager piloting",         icon: "🚀" },
+  { name: "Ashley Hammond",  alias: "Yellow Space Ranger",        power: "Yellow Space Power & mechanical engineering genius",  icon: "⚡" },
+  { name: "Dana Mitchell",   alias: "Pink Lightspeed Ranger",     power: "Pink Lightspeed Morpher & combat medic skills",      icon: "🏥" },
+  { name: "Karone",          alias: "Pink Lost Galaxy Ranger",    power: "Pink Galaxy Power & redemption of Astronema",        icon: "💫" },
+  { name: "Tori Hanson",     alias: "Blue Wind Ranger",           power: "Blue Wind Morpher & water-based ninjutsu",           icon: "🌊" },
+  { name: "Z Delgado",       alias: "Yellow SPD Ranger",          power: "Yellow SPD Morpher & biomolecular replication",      icon: "🔬" },
+  { name: "Syd Drew",        alias: "Pink SPD Ranger",            power: "Pink SPD Morpher & matter-density manipulation",     icon: "💎" },
+  { name: "Emma Goodall",    alias: "Pink Megaforce Ranger",      power: "Phoenix Zord & nature-based Megaforce powers",       icon: "🦋" },
+  { name: "Shelby Watkins",  alias: "Pink Dino Charge Ranger",    power: "Pink Dino Charge Morpher & Triceratops summoning",   icon: "🦕" },
+];
+
 const VILLAINS = [
   // Marvel
   { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",           icon: "💀" },
@@ -195,6 +210,8 @@ const VILLAINS = [
   { name: "Abomination",      universe: "Marvel", scheme: "Surpass the Hulk and crush all resistance in his path",         icon: "💀" },
   { name: "Namor",            universe: "Marvel", scheme: "Force the surface world to bow to Atlantean supremacy",         icon: "🌊" },
   { name: "Cassandra Nova",   universe: "Marvel", scheme: "Destroy the Xavier legacy from within using his own power",     icon: "🔮" },
+  { name: "Crossbones",       universe: "Marvel", scheme: "Carry out Hydra's bloodiest wetwork and topple Captain America's legacy", icon: "💀" },
+  { name: "Whiplash",         universe: "Marvel", scheme: "Weaponise arc-reactor tech to destroy the Stark empire and legacy",        icon: "⚡" },
   // DC
   { name: "Darkseid",         universe: "DC",     scheme: "Discover the Anti-Life Equation",                  icon: "💥" },
   { name: "Lex Luthor",       universe: "DC",     scheme: "Prove humanity's superiority over gods",           icon: "💰" },
@@ -222,6 +239,8 @@ const VILLAINS = [
   { name: "Giganta",         universe: "DC",     scheme: "Crush obstacles at towering height and claim what she desires",      icon: "⬆" },
   { name: "Queen of Fables", universe: "DC",     scheme: "Rewrite reality as her dark fairy tale kingdom of terror",           icon: "📖" },
   { name: "Ocean Master",    universe: "DC",     scheme: "Declare war on the surface world in Atlantis's name",                icon: "🔱" },
+  { name: "Mr. Freeze",      universe: "DC",     scheme: "Freeze Gotham and hold it ransom until his wife Nora can be saved",     icon: "❄️" },
+  { name: "Hush",            universe: "DC",     scheme: "Dismantle every relationship Batman holds dear and expose his secret",   icon: "🤐" },
   // CW / Arrowverse
   { name: "Malcolm Merlyn",   universe: "CW",     scheme: "Destroy the Glades to purge Star City of sin",    icon: "🏹" },
   { name: "Damien Darhk",     universe: "CW",     scheme: "Embrace Hive's death magic to raze the world",    icon: "💀" },
@@ -251,6 +270,15 @@ const VILLAINS = [
   { name: "Crimson Countess",universe: "TB",     scheme: "Exploit celebrity supe fame while hiding Payback's darkest atrocities", icon: "❤" },
   { name: "Blue Hawk",       universe: "TB",     scheme: "Use Vought backing to enforce brutal vigilante justice with zero accountability", icon: "🦅" },
   { name: "Gunpowder",       universe: "TB",     scheme: "Leverage gun-based powers and political connections to serve Vought's agenda", icon: "🔫" },
+  // Power Rangers
+  { name: "Rita Repulsa",    universe: "PR",     scheme: "Conquer Earth and destroy the Power Rangers once and for all",                 icon: "🧙" },
+  { name: "Lord Zedd",       universe: "PR",     scheme: "Reclaim dominion as Emperor of Evil across the entire universe",              icon: "👑" },
+  { name: "Astronema",       universe: "PR",     scheme: "Serve Dark Specter and obliterate the Space Rangers utterly",                 icon: "🌑" },
+  { name: "Divatox",         universe: "PR",     scheme: "Plunder the galaxy and eliminate Zordon's lasting legacy",                   icon: "🏴‍☠️" },
+  { name: "Ransik",          universe: "PR",     scheme: "Dominate the past and reshape the future entirely for mutantkind",           icon: "🧬" },
+  { name: "Mesogog",         universe: "PR",     scheme: "De-evolve humanity back to the prehistoric age of dinosaurs",                icon: "🦖" },
+  { name: "Master Xandred",  universe: "PR",     scheme: "Flood the Sanzu River into the human world and rule it in darkness",        icon: "🌊" },
+  { name: "Trakeena",        universe: "PR",     scheme: "Destroy everything Kendrix Morgan sacrificed herself to protect",            icon: "🦂" },
 ];
 
 // ── Weakness Catalog ──────────────────────────────────────────
@@ -421,8 +449,8 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB";
-type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR";
+type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR";
 
 // ── Component ─────────────────────────────────────────────────
 export default function SuperheroMode({ onBack }: SuperheroModeProps) {
@@ -436,6 +464,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
   const [selectedVillain, setSelectedVillain] = useState<typeof VILLAINS[0] | null>(null);
   const [customVillain, setCustomVillain] = useState("");
+  const [customVillainScheme, setCustomVillainScheme] = useState("");
+  const [customVillainPowers, setCustomVillainPowers] = useState("");
+  const [customVillainPersonality, setCustomVillainPersonality] = useState<string[]>([]);
+  const [customVillainFranchise, setCustomVillainFranchise] = useState("");
   const [villainMode, setVillainMode] = useState<"pick" | "custom">("pick");
   const [selectedSetting, setSelectedSetting] = useState<string>("");
   const [selectedStakes, setSelectedStakes] = useState<string>("");
@@ -488,6 +520,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     ...DC_HEROES.map((h) => ({ ...h, universe: "DC" })),
     ...CW_HEROES.map((h) => ({ ...h, universe: "CW" })),
     ...TB_HEROES.map((h) => ({ ...h, universe: "TB" })),
+    ...PR_HEROES.map((h) => ({ ...h, universe: "PR" })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -521,7 +554,13 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
   function buildPrompt() {
     const villain = villainMode === "pick" ? selectedVillain?.name : customVillain;
-    const villainScheme = villainMode === "pick" ? selectedVillain?.scheme : "achieve their sinister goal";
+    const villainScheme = villainMode === "pick"
+      ? selectedVillain?.scheme
+      : [customVillainScheme.trim() || "achieve their sinister goal", customVillainFranchise.trim() ? `(from: ${customVillainFranchise.trim()})` : ""].filter(Boolean).join(" ");
+    const customVillainDetail = villainMode === "custom" ? [
+      customVillainPowers.trim() ? `POWERS: ${customVillainPowers.trim()}` : "",
+      customVillainPersonality.length > 0 ? `PERSONALITY: ${customVillainPersonality.join(", ")}` : "",
+    ].filter(Boolean).join(" | ") : "";
     const settingLabel = SETTINGS.find((s) => s.id === selectedSetting)?.label ?? selectedSetting;
     const stakesLabel = STAKES.find((s) => s.id === selectedStakes)?.label ?? selectedStakes;
     const toneLabel = TONES.find((t) => t.id === storyTone)?.label ?? "";
@@ -550,7 +589,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
     return {
       hero: selectedHeroes.map((h) => `${h.name} (${h.alias}) — Power: ${h.power} — Universe: ${h.universe}`).join(" | "),
-      villain: `${villain} — Scheme: ${villainScheme}`,
+      villain: `${villain} — Scheme: ${villainScheme}${customVillainDetail ? ` | ${customVillainDetail}` : ""}`,
       villainDuo: isVillainDuo && selectedVillain2 ? `SECOND VILLAIN: ${selectedVillain2.name} — Scheme: ${selectedVillain2.scheme} | DYNAMIC: ${dynamicLabel}` : undefined,
       weaknessProfile: selectedWeaknesses.length > 0 ? selectedWeaknesses.join("; ") : undefined,
       setting: settingLabel,
@@ -767,9 +806,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -798,9 +837,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isMarvel = h.universe === "MARVEL";
                   const isCW = h.universe === "CW";
                   const isTB = h.universe === "TB";
-                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
-                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : "rgba(0,100,220,0.3)";
+                  const isPR = h.universe === "PR";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
@@ -825,10 +865,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               const isMarvel = hero.universe === "MARVEL";
               const isCW = hero.universe === "CW";
               const isTB = hero.universe === "TB";
+              const isPR = hero.universe === "PR";
               const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : "rgba(0,100,220,0.15)";
-              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : "rgba(0,100,220,0.2)";
+              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : "#60A0FF";
+              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : "rgba(0,100,220,0.15)";
+              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : "rgba(0,100,220,0.2)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
@@ -916,9 +957,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               {/* Villain 1 universe filter */}
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", alignItems: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined }}>
-                  {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : "The Boys ✦"}
+                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : "The Boys ✦"}
                     </button>
                   ))}
                 </div>
@@ -932,8 +973,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isMv = villain.universe === "Marvel";
                   const isCW = villain.universe === "CW";
                   const isTB = villain.universe === "TB";
-                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
-                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
+                  const isPR = villain.universe === "PR";
+                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : "#60A0FF";
+                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.15)" : "rgba(0,100,220,0.18)";
                   const isV2Taken = selectedVillain2?.name === villain.name;
                   return (
                     <button
@@ -957,13 +999,66 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               </div>
             </>
           ) : (
-            <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(200,0,50,0.2)", borderRadius: "16px", padding: "1.5rem" }}>
-              <label style={{ fontSize: "0.65rem", color: "rgba(200,0,50,0.6)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.5rem" }}>Villain Name</label>
-              <input value={customVillain} onChange={(e) => setCustomVillain(e.target.value)} placeholder="e.g. The Shadow Architect, Malachite, Ares, Emperor Zero…" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.75rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.95rem", outline: "none", boxSizing: "border-box", marginBottom: "0.5rem" }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.5)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
-              />
-              <p style={{ fontSize: "0.75rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>The AI will develop their scheme and personality from the scenario you build.</p>
+            <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(200,0,50,0.2)", borderRadius: "16px", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <div style={{ fontSize: "0.55rem", color: "rgba(200,0,50,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", fontWeight: 700, borderBottom: "1px solid rgba(200,0,50,0.12)", paddingBottom: "0.75rem" }}>◈ Custom Villain Builder</div>
+
+              {/* Name */}
+              <div>
+                <label style={{ fontSize: "0.6rem", color: "rgba(200,0,50,0.55)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>Villain Name <span style={{ color: "#FF4060" }}>*</span></label>
+                <input value={customVillain} onChange={(e) => setCustomVillain(e.target.value)} placeholder="e.g. The Shadow Architect, Malachite, Emperor Zero…"
+                  style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 0.875rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.5)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                />
+              </div>
+
+              {/* Franchise / Universe */}
+              <div>
+                <label style={{ fontSize: "0.6rem", color: "rgba(200,0,50,0.55)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>Franchise / Universe</label>
+                <input value={customVillainFranchise} onChange={(e) => setCustomVillainFranchise(e.target.value)} placeholder="e.g. Original, Star Wars, Doctor Who, Anime, Fantasy…"
+                  style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 0.875rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.4)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                />
+              </div>
+
+              {/* Scheme / Motivation */}
+              <div>
+                <label style={{ fontSize: "0.6rem", color: "rgba(200,0,50,0.55)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>Scheme / Motivation</label>
+                <textarea value={customVillainScheme} onChange={(e) => setCustomVillainScheme(e.target.value)} placeholder="What does this villain want? What is their ultimate goal?"
+                  rows={2}
+                  style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 0.875rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.4)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                />
+              </div>
+
+              {/* Powers */}
+              <div>
+                <label style={{ fontSize: "0.6rem", color: "rgba(200,0,50,0.55)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.4rem" }}>Powers / Abilities</label>
+                <textarea value={customVillainPowers} onChange={(e) => setCustomVillainPowers(e.target.value)} placeholder="e.g. reality manipulation, telepathy, enhanced strength, advanced technology…"
+                  rows={2}
+                  style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 0.875rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.4)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                />
+              </div>
+
+              {/* Personality chips */}
+              <div>
+                <label style={{ fontSize: "0.6rem", color: "rgba(200,0,50,0.55)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.5rem" }}>Personality Traits</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                  {["Cold & Calculating", "Charismatic", "Manipulative", "Sadistic", "Theatrical", "Obsessive", "Honorable", "Ruthless", "Cunning", "Wrathful", "Philosophical", "Unpredictable"].map((trait) => {
+                    const sel = customVillainPersonality.includes(trait);
+                    return (
+                      <button key={trait} onClick={() => setCustomVillainPersonality((prev) => sel ? prev.filter((t) => t !== trait) : [...prev, trait])}
+                        style={{ padding: "0.3rem 0.7rem", background: sel ? "rgba(200,0,50,0.25)" : "rgba(0,0,0,0.4)", border: `1px solid ${sel ? "rgba(200,0,50,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "20px", color: sel ? "#FF4060" : "rgba(200,200,220,0.4)", fontSize: "0.65rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                        {trait}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
 
@@ -973,9 +1068,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               <div style={{ fontSize: "0.6rem", color: "#FF6060", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>▸ Villain 2</div>
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.875rem", alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden" }}>
-                  {(["ALL", "Marvel", "DC", "CW", "TB"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter2(v)} style={{ padding: isMobile ? "0.45rem 0.6rem" : "0.5rem 1rem", background: villainFilter2 === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter2 === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.58rem" : "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : "The Boys ✦"}
+                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter2(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter2 === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter2 === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : "The Boys ✦"}
                     </button>
                   ))}
                 </div>
@@ -983,9 +1078,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "280px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
                 {VILLAINS.filter((v) => (villainFilter2 === "ALL" || v.universe === villainFilter2) && v.name !== selectedVillain?.name).map((villain) => {
                   const isSel2 = selectedVillain2?.name === villain.name;
-                  const isMv = villain.universe === "Marvel"; const isCW = villain.universe === "CW"; const isTB = villain.universe === "TB";
-                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : "#60A0FF";
-                  const accentBg = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : "rgba(0,100,220,0.18)";
+                  const isMv = villain.universe === "Marvel"; const isCW = villain.universe === "CW"; const isTB = villain.universe === "TB"; const isPR2 = villain.universe === "PR";
+                  const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR2 ? "#FF69B4" : "#60A0FF";
+                  const accentBg = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : isPR2 ? "rgba(220,0,150,0.15)" : "rgba(0,100,220,0.18)";
                   return (
                     <button key={villain.name} onClick={() => setSelectedVillain2(villain)}
                       style={{ background: isSel2 ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSel2 ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSel2 ? "0 0 16px rgba(200,0,50,0.35)" : "none" }}
