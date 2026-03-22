@@ -21,6 +21,7 @@ const UNIVERSE_COLORS: Record<string, string> = {
   ANIMATED: "#C084FC",
   Celebrity: "#C8A84B",
   SW: "#4DC8FF",
+  TV: "#FF9640",
   Daily: "#E8D08A",
 };
 

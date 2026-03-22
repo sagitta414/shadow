@@ -23,8 +23,8 @@ const PRIMARY_MODES = [
     num: "I",
     title: "HEROINE FORGE",
     tagline: "Superhero Universe",
-    desc: "131+ heroines across Marvel, DC, CW, The Boys, Power Rangers, Animated, and Star Wars universes. Pick your heroine, choose your villain, and generate a multi-chapter dark thriller.",
-    stats: [["131+", "Heroines"], ["67", "Villains"], ["7", "Universes"]] as [string,string][],
+    desc: "181+ heroines across Marvel, DC, CW, The Boys, Power Rangers, Animated, Star Wars, and TV universes. Pick your heroine, choose your villain, and generate a multi-chapter dark thriller.",
+    stats: [["181+", "Heroines"], ["67", "Villains"], ["8", "Universes"]] as [string,string][],
     features: ["Marvel · DC · CW · The Boys", "Power Rangers · Animated · Star Wars", "Multi-chapter AI story engine"],
     cta: "Enter the Forge",
     grad: "linear-gradient(150deg, rgba(8,2,28,0.99) 0%, rgba(22,4,56,0.97) 55%, rgba(4,10,44,0.97) 100%)",
@@ -365,7 +365,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         <div className="hp-nav-stats" style={{ display: "flex", gap: "2.25rem", alignItems: "center" }}>
-          {[["3", "Story Modes"], ["131+", "Heroines"], ["Venice AI", "Engine"], ["4", "Themes"]].map(([v, l]) => (
+          {[["3", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["4", "Themes"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "0.82rem", fontWeight: 900, color: "rgba(212,175,55,0.7)", lineHeight: 1 }}>{v}</div>
               <div className="font-montserrat" style={{ fontSize: "0.42rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>

@@ -241,6 +241,81 @@ const SW_HEROES = [
   { name: "Mara Jade",        alias: "Mara Jade — Emperor's Hand",               power: "Emperor's personal Force assassin with Jedi-grade telekinesis, expert lightsaber combat and mental shielding trained in total secrecy",      icon: "🟢" },
 ];
 
+const TV_HEROES = [
+  // The Rookie
+  { name: "Lucy Chen",          alias: "Officer Chen — LAPD Metro",              power: "Undercover specialist, psychological warfare expert & combatant who routinely takes down threats twice her size through sheer nerve",  icon: "🚔" },
+  { name: "Nyla Harper",        alias: "Detective Harper — LAPD",                power: "Former deep-cover narcotics detective, relentless interrogator & officer whose instincts were built in places no academy teaches",     icon: "🔍" },
+  { name: "Angela Lopez",       alias: "Sergeant Lopez — LAPD Homicide",         power: "Tactical genius, master negotiator & the most dangerous person in any room she has legal authority to enter",                          icon: "⚖️" },
+  { name: "Tamara Collins",     alias: "Tamara — LAPD Civilian Aide",            power: "Street-smart survival instincts, expert deception & an ability to read threats that no academy could ever teach",                      icon: "🌆" },
+  // Scrubs
+  { name: "Elliot Reid",        alias: "Dr. Elliot Reid — Sacred Heart Intern",  power: "Encyclopaedic diagnostic ability and fiercely competitive medical brilliance forged through the worst shifts a teaching hospital has",  icon: "🩺" },
+  { name: "Jordan Sullivan",    alias: "Dr. Jordan Sullivan — Attending",        power: "Commands entire hospital wings through sheer force of personality — every doctor fears her, no one ever bests her in argument",         icon: "💊" },
+  { name: "Carla Espinosa",     alias: "Carla — Sacred Heart Head Nurse",        power: "De facto power behind the entire hospital — every physician defers to her and she has never lost a fight she chose to take on",          icon: "🏥" },
+  // Chuck
+  { name: "Sarah Walker",       alias: "Agent Walker — CIA/NSA Operative",      power: "World-class martial artist, expert markswoman and deep-cover specialist — the most dangerous active agent on either agency's roster",   icon: "🔫" },
+  { name: "Ellie Bartowski",    alias: "Dr. Ellie Bartowski — Neurosurgeon",    power: "Elite neurosurgeon who performs under impossible pressure; her protective fury for family can override any other consideration",          icon: "🧠" },
+  // Alias
+  { name: "Sydney Bristow",     alias: "Agent Bristow — CIA Double Agent",      power: "Master of disguise, eight-language polyglot, Olympic-grade combatant & the most effective double agent in agency history",                icon: "🎭" },
+  { name: "Irina Derevko",      alias: "The Man — KGB Intelligence Legend",      power: "Operative who faked her death for 20 years while building a global criminal empire through ruthless intelligence brilliance",              icon: "🕵️" },
+  { name: "Nadia Santos",       alias: "Nadia — Rambaldi-Enhanced Agent",        power: "Rambaldi elixir-enhanced combat ability, extraordinary instincts & sister-level training matching Sydney stroke for stroke",             icon: "🌀" },
+  { name: "Anna Espinosa",      alias: "Anna — K-Directorate Operative",         power: "K-Directorate's finest — brutally efficient, personally lethal & the only opponent who consistently stays ahead of SD-6",                icon: "🧊" },
+  // 24
+  { name: "Renee Walker",       alias: "Agent Walker — FBI/CTU Field Agent",     power: "Reckless-effective operative who threw out the rulebook and reached a lethality level most agents never approach",                       icon: "🔴" },
+  { name: "Kate Morgan",        alias: "Agent Morgan — CIA Field Officer",       power: "Wrongly burned CIA officer who rebuilt herself into the single most dangerous asset in the field through sheer controlled fury",          icon: "💢" },
+  { name: "Chloe O'Brian",      alias: "Chloe — CTU Technical Specialist",      power: "Unmatched hacking and satellite access — the technical genius who personally extracted CTU from every impossible scenario it faced",        icon: "💻" },
+  // Nikita
+  { name: "Nikita",             alias: "Nikita — Rogue Division Operative",      power: "Division's own creation turned against it — trained by the world's best killers and now hunting every one of them",                      icon: "⚡" },
+  { name: "Alex",               alias: "Alex — Division Undercover Asset",       power: "Sleeper agent training against Division's elite assassins while maintaining cover — someone with the instincts of nothing left to lose",   icon: "🗡" },
+  { name: "Sonya",              alias: "Sonya — Division Systems Operative",     power: "Division's full network access — every asset, every mission record and every buried secret in the organisation's architecture",           icon: "📡" },
+  // Fringe
+  { name: "Olivia Dunham",      alias: "Agent Dunham — Fringe Division",        power: "Cortexiphan-enhanced pyrokinesis, parallel universe crossover ability & threat-pattern recognition that defies any conventional training", icon: "🔬" },
+  { name: "Astrid Farnsworth",  alias: "Astrid — FBI Fringe Division Support",  power: "Cryptanalysis genius, pattern recognition expert & the one person capable of managing Walter Bishop's unhinged brilliance",              icon: "🧬" },
+  // Charmed
+  { name: "Prue Halliwell",     alias: "Prue — Most Powerful Charmed One",      power: "Telekinesis at master level, astral projection & the sheer raw power that made her the most feared witch in the underworld",              icon: "🌬️" },
+  { name: "Piper Halliwell",    alias: "Piper — Charmed One & Elder",           power: "Molecular immobilization, molecular combustion & accumulated demigod-tier magic that makes her the most dangerous witch alive",            icon: "💧" },
+  { name: "Phoebe Halliwell",   alias: "Phoebe — Charmed One & Empath",        power: "Premonition, levitation & empathy ability absorbing any power she touches — her theoretical ceiling is unlimited",                        icon: "👁" },
+  { name: "Paige Matthews",     alias: "Paige — Charmed One / Whitelighter",    power: "Telekinetic orbing, healing and hybrid witch-Whitelighter abilities that exceed either bloodline alone",                                   icon: "✨" },
+  // Firefly
+  { name: "Zoe Washburne",      alias: "Zoe — Serenity's First Mate",           power: "Battle-hardened Unification War veteran, crack shot & tactical mind who thinks three exchanges ahead of any threat",                       icon: "🚀" },
+  { name: "Inara Serra",        alias: "Inara — Registered Companion",          power: "Companion-trained in combat, poison use, political navigation & the social weaponry that opens every door in the 'Verse",                  icon: "🌸" },
+  { name: "Kaylee Frye",        alias: "Kaylee — Serenity's Engineer",          power: "Mechanical intuition bordering on supernatural — can make any ship fly on components that have no business functioning",                   icon: "🔧" },
+  { name: "River Tam",          alias: "River — Academy Super-Weapon",          power: "Psychic super-weapon engineered by the Academy with precognitive combat awareness — she reads the fight before it starts",                  icon: "🧠" },
+  // Dark Angel
+  { name: "Max Guevara",        alias: "Max — X5-452 Transgenic Soldier",       power: "Genetically engineered feline-DNA supersoldier with superior strength, speed, reflexes and Manticore combat programming",                  icon: "🐈" },
+  // Lost
+  { name: "Kate Austen",        alias: "Kate — Fugitive & Island Survivor",     power: "Elite outdoor survival, firearms mastery, lock-picking & the tactical resourcefulness of someone who has always been hunted",               icon: "🌴" },
+  { name: "Juliet Burke",       alias: "Juliet — DHARMA Surgeon & Other",       power: "Cold-blooded threat assessment, Other operative training & a surgical precision that extends far beyond the operating room",                icon: "🧊" },
+  { name: "Ana Lucia Cortez",   alias: "Ana Lucia — LAPD Officer & Survivor",   power: "Law enforcement combat training combined with island survival instincts and the aggression of someone with nothing left to lose",           icon: "🔫" },
+  // Prison Break
+  { name: "Sara Tancredi",      alias: "Dr. Sara — Fox River Prison MD",        power: "Medical genius who navigated criminal underworlds, government black sites & Company conspiracies through pure resourceful determination",    icon: "💉" },
+  // House MD
+  { name: "Dr. Lisa Cuddy",     alias: "Dr. Cuddy — PPTH Dean of Medicine",    power: "Manages the most dangerous mind in medicine while running a 400-bed hospital — her resilience and authority are genuinely unbreakable",     icon: "🩺" },
+  { name: "Thirteen",           alias: "Dr. Remy Hadley — House's Fellow",      power: "Brilliant diagnostician who operates without fear because she has nothing left to lose — House's most unpredictable hire",                  icon: "🎲" },
+  { name: "Allison Cameron",    alias: "Dr. Cameron — ER Attending",            power: "Compassion-driven diagnostic genius whose ethical clarity is simultaneously her greatest strength and most dangerous blind spot",             icon: "💙" },
+  // Burn Notice
+  { name: "Fiona Glenanne",     alias: "Fiona — Former IRA Operative",          power: "Master bomb-maker and explosives architect — the most dangerous person Michael Westen has ever encountered in any theatre",                 icon: "💣" },
+  // Homeland
+  { name: "Carrie Mathison",    alias: "Carrie — CIA Operations Officer",       power: "Unrivalled pattern-recognition ability and moral ruthlessness that gets results no analyst dares attempt through legitimate channels",      icon: "🧩" },
+  // Scandal
+  { name: "Olivia Pope",        alias: "Olivia — Washington DC's Top Fixer",    power: "Crisis manager who has buried scandals that would topple governments — she commands gladiators and the ear of the President",              icon: "🍷" },
+  // The Americans
+  { name: "Elizabeth Jennings", alias: "Elizabeth — KGB Deep Cover",            power: "KGB operative with elite combat training, unmatched tradecraft and 15 years of perfect deep cover built on absolute conviction",            icon: "🇷🇺" },
+  // Person of Interest
+  { name: "Root",               alias: "Root — The Machine's Interface",        power: "The Machine's chosen vessel — real-time intelligence, encyclopaedic hacking ability and combat lethality that is genuinely unpredictable",  icon: "🤖" },
+  { name: "Joss Carter",        alias: "Detective Carter — NYPD Homicide",     power: "Former Army interrogator turned homicide detective — her integrity withstands every corrupt pressure New York can apply",                   icon: "🏙️" },
+  // Suits
+  { name: "Donna Paulsen",      alias: "Donna — Pearson Specter COO",           power: "Reads every person and every room with supernatural accuracy — the invisible hand behind every deal the firm has ever closed",              icon: "👠" },
+  { name: "Jessica Pearson",    alias: "Jessica — Managing Partner",            power: "The most powerful attorney in New York — she built Pearson Specter from nothing and destroys opposition with precision",                    icon: "⚖️" },
+  // Smallville
+  { name: "Lana Lang",          alias: "Lana — Smallville Survivor",            power: "Martial arts master with Level 33.1 experimental fortitude & the kryptonite-powered suit that briefly made her more powerful than Clark",   icon: "💗" },
+  { name: "Lois Lane",          alias: "Lois — Daily Planet Ace Reporter",      power: "Investigative reporter who infiltrates military compounds and fights trained soldiers — the only person who frightens Perry White",          icon: "✏️" },
+  { name: "Chloe Sullivan",     alias: "Chloe — Watchtower Intelligence",       power: "Justice League's eyes and voice — Level 8 systems access, Watchtower mastermind & meteor-power healing touch",                              icon: "📡" },
+  { name: "Tess Mercer",        alias: "Tess — LuthorCorp CEO",                 power: "Former League operative turned LuthorCorp executive — elite combat trained, ruthlessly ambitious and always five moves ahead",              icon: "🌹" },
+  { name: "Kara Zor-El",        alias: "Kara — Kryptonian Cousin of Clark",    power: "Full Kryptonian power suite — flight, heat vision, freeze breath, invulnerability and speed rivalling Clark at his absolute peak",           icon: "⭐" },
+  // Covert Affairs
+  { name: "Annie Walker",       alias: "Annie — CIA Field Operative",           power: "Linguist, martial artist and expert field improviser who has run operations across six continents with minimal backup",                       icon: "🌍" },
+];
+
 const VILLAINS = [
   // Marvel
   { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",           icon: "💀" },
@@ -484,6 +559,23 @@ const WEAKNESS_CATALOG: Record<string, string[]> = {
   "Qi'ra":             ["Her emotional detachment is armour — anyone who genuinely cares for her without agenda temporarily destabilises it", "Maul's authority over Crimson Dawn was absolute — anyone who credibly channels that authority can access old conditioning", "Her combat relies on close-quarters Teräs Käsi — ranged suppression and distance deny her primary fighting method", "Han Solo is the one wound she never cauterised — his name still costs her a fraction of a second"],
   "Fennec Shand":      ["Her cybernetic enhancements are miracle surgery held together by technology — EMP or targeted damage to her torso compromises her functioning", "Her professional coldness is a mask — a small number of people matter to her and threatening them breaks the mask", "Extreme long-range engagement is where she excels — closing to melee removes her primary advantage", "Her reputation is her currency — destroying it or convincingly framing her ruins the only leverage she has"],
   "Mara Jade":         ["Her years of conditioning as the Emperor's Hand left deep loyalty triggers that resurfaced under extreme stress", "Her relationship with Luke Skywalker is the bond that humanised her — threaten him and her legendary discipline cracks", "Ysalamiri or Force-void environments strip her primary edge and leave her as a baseline human expert only", "Her intelligence and tactical awareness mean she is always anticipating — opponents who are genuinely irrational confound her completely"],
+  // TV
+  "Lucy Chen":          ["Deep undercover assignments require her to fully inhabit false identities — the right leverage can fracture her sense of self", "She is still learning — experienced criminals read her tells", "Her emotional investment in her colleagues is exploitable leverage", "She has human limits: no augmentation, no metahuman edge — sustained trauma will break her"],
+  "Sarah Walker":       ["Her civilian-world anchoring to Chuck is her single greatest vulnerability — he rewired her sense of purpose", "Pre-Chuck she was a mission asset with no personal attachments; those attachments are now all exploitable", "Without equipment she is formidable but not superhuman — sustained pressure overwhelms her", "Her identities are thoroughly documented — someone with the right clearance knows exactly who she is"],
+  "Sydney Bristow":     ["SD-6 conditioning during her early double-agent years left emotional triggers Sloane weaponised repeatedly", "Her father Jack Bristow — love of him is the single override to her mission discipline", "Vaughn — her anchor and her most dangerous blind spot in any field operation", "Prolonged cover maintenance causes deep identity fracture — she has lost herself inside aliases before"],
+  "Irina Derevko":      ["Her love for Sydney is the only crack in her armour — one that she has never fully closed", "Her own deceptions eventually circle back — almost no one trusts her completely, which limits her operational support", "She operates through others; if her network is dismantled she is exposed and alone", "Jack Bristow — the one person whose judgment she values and whose betrayal hurt her genuinely"],
+  "Nikita":             ["Her rebellion is built on personal loyalty to her team — they are her weakness in any negotiation", "Division trained her; they built in kill switches and conditioning that resurface under specific protocols", "She cannot walk away from people being hurt — it will always override the mission", "Michael — her emotional centre and the override switch for any rational tactical decision she would otherwise make"],
+  "Olivia Dunham":      ["Cortexiphan was administered without consent — its activation is unstable and can be triggered against her", "Her alternate universe counterpart can be used to cause profound identity destabilisation", "She is deeply isolated — Fringe Division is a tiny team and losing any member fractures her composure", "Peter Bishop is the anchor of her sanity across universes — threatening him is threatening her coherence"],
+  "Prue Halliwell":     ["Telekinesis requires focus — sustained emotional assault or physical pain breaks her concentration", "She was the most powerful but never the most experienced — her learning curve was weaponised against her repeatedly", "Family as absolute leverage — threaten Piper or Phoebe and Prue abandons every tactical advantage", "Her journalist instinct to investigate drives her into danger before the Power of Three is assembled"],
+  "Piper Halliwell":    ["Her freeze power doesn't work on beings of greater magical power", "Her children — Wyatt and Chris — are the override switch for every rational decision", "Leo's mortal-Whitelighter status means she is always operating with one emotional hostage in play", "Molecular combustion requires aim — in close quarters with multiple targets she risks collateral damage"],
+  "River Tam":          ["Academy conditioning runs deep — certain phrases, images or sounds can override her conscious control", "Her psychic connection means she absorbs the suffering of everyone around her — concentrated horror shuts her down", "She cannot always distinguish between past, present and future — her perception of the immediate moment is unreliable", "Her fragility and her lethality are in constant tension — she is one bad moment from an episode"],
+  "Max Guevara":        ["Barcode on her neck marks her as Manticore property — anyone with the right scanner can identify her", "Feline transgenic DNA means she is subject to cat behavioural instincts — certain stimuli trigger involuntary responses", "Seizure protocol — Manticore built in a neural kill switch that certain frequencies activate", "Logan is her emotional anchor and the hostage any informed captor would use without hesitation"],
+  "Fiona Glenanne":     ["Her IRA past is documented — the right intelligence operative can use it to expose her anywhere", "She is impulsive; she prefers blowing things up to subtle extraction — patience is not her strongest tool", "Michael Westen is the one person she will sacrifice anything for, including the mission", "Her bomb-maker reputation means the moment she is identified, every intelligence agency becomes a threat"],
+  "Elizabeth Jennings": ["Her children are Soviet orphans she adopted; they are the one leverage point that genuinely threatens her cover", "Her marriage to Philip was operational but became real — he is now both her support and her vulnerability", "Her ideological conviction is so absolute it has occasionally blinded her to operational reality", "Her American cover is deep but documented in Moscow Centre records — the right defector could burn her completely"],
+  "Root":               ["The Machine's connection is everything — isolate her from the network and she is a brilliant but unsupported solo operative", "Her devotion to the Machine's mission means she will override her own survival for it", "She was thoroughly broken before the Machine found her — the right psychological assault can reach that person beneath", "Her unpredictability cuts both ways — she sometimes cannot predict her own responses to extreme emotional input"],
+  "Donna Paulsen":      ["She is not a field operative — physical threat bypasses every advantage she has", "Her read on people has almost never been wrong, which means she has no deep counter-manipulation training", "Her loyalty to Harvey Specter is the defining override of every rational calculation she makes", "Her emotional intelligence means she absorbs others' pain — she cannot compartmentalise the way she pretends to"],
+  "Lana Lang":          ["The kryptonite suit that gave her power also had a fatal flaw — it would kill her if she got too close to Clark", "Her emotional history with Clark is a permanent wound — it destabilises her judgment every time", "Post-Lex conditioning during their marriage left psychological triggers she has never fully processed", "Her power without the suit is entirely conventional — trained human combat only"],
+  "Chloe Sullivan":     ["Watchtower access cuts both ways — if she is captured, she is the access point to everything the League has", "Her healing touch was a meteor power she eventually lost — she remembers what it felt like to be vulnerable", "Her love for Jimmy and Oliver are the emotional levers that have bypassed her operational judgment repeatedly", "She cannot fight — her power is information; deny her systems access and she is defenceless"],
 };
 
 function getHeroWeaknesses(hero: { name: string; power: string }): string[] {
@@ -589,7 +681,7 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV";
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
@@ -664,6 +756,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     ...PR_HEROES.map((h) => ({ ...h, universe: "PR" })),
     ...ANIMATED_HEROES.map((h) => ({ ...h, universe: "ANIMATED" })),
     ...SW_HEROES.map((h) => ({ ...h, universe: "SW" })),
+    ...TV_HEROES.map((h) => ({ ...h, universe: "TV" })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -965,9 +1058,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -999,9 +1092,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isPR = h.universe === "PR";
                   const isAnim = h.universe === "ANIMATED";
                   const isSW = h.universe === "SW";
-                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.15)" : "rgba(0,100,220,0.18)";
-                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : isSW ? "rgba(0,180,255,0.28)" : "rgba(0,100,220,0.3)";
+                  const isTV = h.universe === "TV";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.15)" : isTV ? "rgba(255,150,60,0.15)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : isSW ? "rgba(0,180,255,0.28)" : isTV ? "rgba(255,150,60,0.28)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
@@ -1029,10 +1123,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               const isPR = hero.universe === "PR";
               const isAnim = hero.universe === "ANIMATED";
               const isSW = hero.universe === "SW";
+              const isTV = hero.universe === "TV";
               const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : "rgba(0,100,220,0.15)";
-              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : "rgba(0,100,220,0.2)";
+              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
+              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : "rgba(0,100,220,0.15)";
+              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : "rgba(0,100,220,0.2)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
