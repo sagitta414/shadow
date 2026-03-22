@@ -116,29 +116,39 @@ const ACTRESSES = [
 
 // ── Captor Archetypes ─────────────────────────────────────────────
 const CAPTOR_ARCHETYPES = [
-  { id: "director",   label: "The Director",      icon: "🎬", profile: "A powerful Hollywood executive who believes his industry position entitles him to anything — and anyone.", motivation: "Power", methods: ["Manipulation", "Isolation", "Coercion"] },
-  { id: "billionaire",label: "The Billionaire",   icon: "💰", profile: "An ultra-wealthy collector who treats people as acquisitions. Polished, patient, and absolutely ruthless when denied.", motivation: "Collection", methods: ["Psychological", "Isolation", "Surveillance"] },
-  { id: "agent",      label: "The Operative",     icon: "🕵️", profile: "A black-ops intelligence asset operating outside all oversight. Clinical, methodical, and trained to break anyone.", motivation: "Control", methods: ["Psychological", "Restraint", "Isolation"] },
-  { id: "fan",        label: "The Obsessed Fan",  icon: "😈", profile: "Someone who crossed the line from admiration to obsession years ago. Knows everything about her. Has waited a very long time.", motivation: "Obsession", methods: ["Surveillance", "Psychological", "Coercion"] },
-  { id: "boss",       label: "The Crime Boss",    icon: "🔫", profile: "Head of a criminal organization. Calm, calculated, and accustomed to having problems — and people — disposed of efficiently.", motivation: "Leverage", methods: ["Restraint", "Coercion", "Psychological"] },
-  { id: "rival",      label: "The Rival",         icon: "🤝", profile: "Someone from the same world — industry, social circle, or career — eaten alive by jealousy and the need to watch her fall.", motivation: "Revenge", methods: ["Manipulation", "Psychological", "Coercion"] },
-  { id: "custom",     label: "Custom Captor",     icon: "◈", profile: "", motivation: "", methods: [] },
+  { id: "director",   label: "The Director",        icon: "🎬", color: "#CC6600", profile: "A powerful Hollywood executive who believes his industry position entitles him to anything — and anyone. His smile never wavers. His patience is infinite. His leverage is absolute.", motivation: "Power", methods: ["Manipulation", "Isolation", "Coercion"] },
+  { id: "billionaire",label: "The Billionaire",     icon: "💰", color: "#C8A84B", profile: "An ultra-wealthy collector who treats people as acquisitions. Polished, patient, and absolutely ruthless when denied. She's been catalogued, studied, and acquired.", motivation: "Collection", methods: ["Psychological", "Isolation", "Surveillance"] },
+  { id: "agent",      label: "The Operative",       icon: "🕵️", color: "#4080CC", profile: "A black-ops intelligence asset operating outside all oversight. Clinical, methodical, and trained to break anyone. This is just another extraction.", motivation: "Control", methods: ["Psychological", "Restraint", "Isolation"] },
+  { id: "fan",        label: "The Obsessed Fan",    icon: "😈", color: "#CC3366", profile: "Someone who crossed the line from admiration to obsession years ago. He knows everything about her — schedules, fears, preferences. He has waited a very long time for this.", motivation: "Obsession", methods: ["Surveillance", "Psychological", "Coercion"] },
+  { id: "boss",       label: "The Crime Boss",      icon: "🔫", color: "#880000", profile: "Head of a criminal organization. Calm, calculated, and accustomed to having problems — and people — disposed of. She walked into his world. She belongs to it now.", motivation: "Leverage", methods: ["Restraint", "Coercion", "Psychological"] },
+  { id: "rival",      label: "The Rival",           icon: "🤝", color: "#AA44CC", profile: "Someone from the same world — industry, social circle, or career — eaten alive by jealousy and the need to watch her fall. Finally, the power balance shifts.", motivation: "Revenge", methods: ["Manipulation", "Psychological", "Coercion"] },
+  { id: "cult",       label: "The Cult Leader",     icon: "🙏", color: "#884400", profile: "A messianic figure who commands absolute devotion from his followers. Believes he is saving her. His certainty is unshakeable. His followers enforce his word.", motivation: "Devotion", methods: ["Manipulation", "Psychological", "Isolation"] },
+  { id: "sheikh",     label: "The Sheikh",          icon: "👑", color: "#AA8800", profile: "Untouchable foreign royalty accustomed to acquiring whatever — and whoever — he desires. Wealth beyond consequence. No law applies to him. She is an exceptional addition.", motivation: "Collection", methods: ["Isolation", "Surveillance", "Coercion"] },
+  { id: "techbaron",  label: "The Tech Baron",      icon: "💻", color: "#0088CC", profile: "A surveillance-capitalist who has mined her entire digital existence. He knows things about her she has never told anyone. The technology he built was always about this.", motivation: "Control", methods: ["Surveillance", "Psychological", "Manipulation"] },
+  { id: "colonel",    label: "The Military Colonel",icon: "🎖️", color: "#446600", profile: "A decorated officer who operates with total discipline and tactical precision. Breaks people as a professional skill. Follows rules he sets himself — and no others.", motivation: "Domination", methods: ["Restraint", "Psychological", "Isolation"] },
+  { id: "auctioneer", label: "The Auctioneer",      icon: "⚖️", color: "#882200", profile: "Operates an underground market for exclusive, unreachable targets. She is merchandise — assessed, catalogued, and about to be presented. He is dispassionate and efficient.", motivation: "Profit", methods: ["Restraint", "Coercion", "Surveillance"] },
+  { id: "ex",         label: "The Possessive Ex",   icon: "💔", color: "#AA2255", profile: "Someone who loved her once — or believed he did. Knows every vulnerability, every fear, every soft spot. This is not revenge. This is reclamation.", motivation: "Obsession", methods: ["Psychological", "Manipulation", "Coercion"] },
+  { id: "custom",     label: "Custom Captor",       icon: "◈", color: "#888888", profile: "", motivation: "", methods: [] },
 ];
 
-const MOTIVATIONS = ["Obsession", "Power", "Control", "Revenge", "Ransom", "Collection", "Leverage", "Rivalry", "Desire", "Sport"];
-const METHODS = ["Psychological", "Isolation", "Restraint", "Manipulation", "Coercion", "Surveillance", "Seduction", "Blackmail"];
+const MOTIVATIONS = ["Obsession", "Power", "Control", "Revenge", "Ransom", "Collection", "Leverage", "Rivalry", "Desire", "Domination", "Devotion", "Profit", "Sport"];
+const METHODS = ["Psychological", "Isolation", "Restraint", "Manipulation", "Coercion", "Surveillance", "Seduction", "Blackmail", "Conditioning", "Discipline"];
 
 const SETTINGS = [
-  { id: "jet",        label: "Private Jet — Mid-Flight",    icon: "✈️" },
-  { id: "penthouse",  label: "Luxury Penthouse Suite",      icon: "🏙️" },
-  { id: "villa",      label: "Remote Isolated Villa",       icon: "🏡" },
-  { id: "backlot",    label: "Studio Backlot — After Hours",icon: "🎬" },
-  { id: "bunker",     label: "Underground Bunker",          icon: "🔒" },
-  { id: "yacht",      label: "Superyacht at Sea",           icon: "⛵" },
-  { id: "mountain",   label: "Mountain Retreat",            icon: "🏔️" },
-  { id: "island",     label: "Private Island",              icon: "🏝️" },
-  { id: "limo",       label: "Limousine — Moving Vehicle",  icon: "🚗" },
-  { id: "hotel",      label: "5-Star Hotel Room",           icon: "🛎️" },
+  { id: "jet",        label: "Private Jet — Mid-Flight",     icon: "✈️" },
+  { id: "penthouse",  label: "Luxury Penthouse Suite",       icon: "🏙️" },
+  { id: "villa",      label: "Remote Isolated Villa",        icon: "🏡" },
+  { id: "backlot",    label: "Studio Backlot — After Hours", icon: "🎬" },
+  { id: "bunker",     label: "Underground Bunker",           icon: "🔒" },
+  { id: "yacht",      label: "Superyacht at Sea",            icon: "⛵" },
+  { id: "mountain",   label: "Mountain Retreat",             icon: "🏔️" },
+  { id: "island",     label: "Private Island",               icon: "🏝️" },
+  { id: "limo",       label: "Limousine — Moving Vehicle",   icon: "🚗" },
+  { id: "hotel",      label: "5-Star Hotel Room",            icon: "🛎️" },
+  { id: "dungeon",    label: "Private Dungeon / Playroom",   icon: "⛓️" },
+  { id: "compound",   label: "Walled Compound Abroad",       icon: "🏯" },
+  { id: "studio",     label: "Recording Studio — Late Night",icon: "🎤" },
+  { id: "auction",    label: "Underground Auction House",    icon: "⚖️" },
 ];
 
 const ENCOUNTERS = [
@@ -150,6 +160,10 @@ const ENCOUNTERS = [
   { id: "onset",      label: "On-Set Incident" },
   { id: "online",     label: "Digital Stalker Manifests" },
   { id: "insider",    label: "Trusted Person Betrays Her" },
+  { id: "photoshoot", label: "Photoshoot Ambush" },
+  { id: "redcarpet",  label: "Red Carpet Snatch" },
+  { id: "hotel",      label: "Hotel Room Infiltration" },
+  { id: "fansigning", label: "Fan Signing Gone Wrong" },
 ];
 
 const TONES = [
@@ -159,6 +173,45 @@ const TONES = [
   { id: "action",     label: "Action & Danger" },
   { id: "slow",       label: "Slow Burn" },
   { id: "explicit",   label: "Explicit & Unhinged" },
+  { id: "humiliation",label: "Humiliation & Degradation" },
+  { id: "submission", label: "Submission Demanded" },
+  { id: "worship",    label: "Worship Enforced" },
+];
+
+const RESTRAINTS = [
+  { id: "none",       label: "No Restraints" },
+  { id: "silk",       label: "Silk Ties" },
+  { id: "rope",       label: "Rope Bondage" },
+  { id: "cuffs",      label: "Metal Cuffs" },
+  { id: "leather",    label: "Leather Restraints" },
+  { id: "tape",       label: "Tape Bondage" },
+  { id: "shibari",    label: "Full Shibari" },
+  { id: "sensory",    label: "Sensory Deprivation" },
+  { id: "collar",     label: "Collar & Leash" },
+  { id: "chains",     label: "Chains" },
+];
+
+const POWER_DYNAMICS = [
+  { id: "ds",         label: "D/s Protocol" },
+  { id: "predator",   label: "Predator & Prey" },
+  { id: "owner",      label: "Owner & Property" },
+  { id: "stockholm",  label: "Stockholm Protocol" },
+  { id: "devotion",   label: "Forced Devotion" },
+  { id: "helpless",   label: "Complete Helplessness" },
+  { id: "pet",        label: "Captor's Pet" },
+  { id: "auction",    label: "Trophy Acquisition" },
+];
+
+const KINK_ESCALATIONS = [
+  { id: "tease",      label: "Slow Tease" },
+  { id: "humiliation",label: "Verbal Humiliation" },
+  { id: "over",       label: "Overstimulation" },
+  { id: "denial",     label: "Denial & Desperation" },
+  { id: "worship",    label: "Worship Demanded" },
+  { id: "edge",       label: "Edge Control" },
+  { id: "public",     label: "Exposure Threat" },
+  { id: "training",   label: "Obedience Training" },
+  { id: "marks",      label: "Claimed & Marked" },
 ];
 
 const LENGTHS = [
@@ -204,6 +257,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const [selectedEncounter, setSelectedEncounter] = useState("");
   const [selectedTone, setSelectedTone] = useState("");
   const [selectedLength, setSelectedLength] = useState("standard");
+  const [selectedRestraint, setSelectedRestraint] = useState("");
+  const [selectedPowerDynamic, setSelectedPowerDynamic] = useState("");
+  const [selectedKinkEscalation, setSelectedKinkEscalation] = useState("");
   const [extraDetails, setExtraDetails] = useState("");
   const [story, setStory] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -260,6 +316,10 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
       const toneLabel = TONES.find(t => t.id === selectedTone)?.label ?? selectedTone;
       const lengthLabel = LENGTHS.find(l => l.id === selectedLength)?.label ?? selectedLength;
 
+      const restraintLabel = RESTRAINTS.find(r => r.id === selectedRestraint)?.label;
+      const powerLabel = POWER_DYNAMICS.find(p => p.id === selectedPowerDynamic)?.label;
+      const kinkLabel = KINK_ESCALATIONS.find(k => k.id === selectedKinkEscalation)?.label;
+
       const body = {
         actress: actressDesc,
         captor: captorDesc,
@@ -268,6 +328,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
         encounter: encounterLabel,
         tone: toneLabel,
         storyLength: lengthLabel,
+        restraint: restraintLabel || undefined,
+        powerDynamic: powerLabel || undefined,
+        kinkEscalation: kinkLabel || undefined,
         extraDetails: extraDetails.trim() || undefined,
       };
 
@@ -348,7 +411,8 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   function resetAll() {
     setStep(1); setStory(""); setChapters([]); setSelectedActresses([]);
     setCaptors([defaultCaptor()]); setSelectedSetting(""); setSelectedEncounter("");
-    setSelectedTone(""); setExtraDetails(""); setError(""); setSavedId(null);
+    setSelectedTone(""); setSelectedRestraint(""); setSelectedPowerDynamic("");
+    setSelectedKinkEscalation(""); setExtraDetails(""); setError(""); setSavedId(null);
   }
 
   function saveToArchive() {
@@ -509,19 +573,47 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                 {captors.length > 1 && <button onClick={() => removeCaptor(idx)} style={{ background: "none", border: `1px solid rgba(200,0,50,0.2)`, borderRadius: "6px", padding: "0.25rem 0.5rem", color: "rgba(200,0,50,0.5)", fontSize: "0.6rem", cursor: "pointer" }}>Remove</button>}
               </div>
 
-              {/* Archetype selector */}
+              {/* Archetype selector — card tiles */}
               <div>
-                <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.5rem" }}>Archetype</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                  {CAPTOR_ARCHETYPES.map(preset => (
-                    <button key={preset.id} onClick={() => {
-                      if (preset.id === "custom") { setCaptor(idx, { presetId: "custom", name: "", profile: "", motivation: "", methods: [], rules: "" }); }
-                      else { setCaptor(idx, applyPreset(preset)); }
-                    }}
-                      style={{ padding: "0.35rem 0.75rem", background: captor.presetId === preset.id ? goldBg : "rgba(0,0,0,0.4)", border: `1px solid ${captor.presetId === preset.id ? gold + "66" : "rgba(255,255,255,0.07)"}`, borderRadius: "20px", color: captor.presetId === preset.id ? gold : "rgba(200,200,220,0.35)", fontSize: "0.62rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                      {preset.icon} {preset.label}
-                    </button>
-                  ))}
+                <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>
+                  Choose Archetype {captorMode === "solo" && <span style={{ color: "rgba(200,168,75,0.35)", fontWeight: 400 }}>— click to select &amp; continue</span>}
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "130px" : "170px"}, 1fr))`, gap: "0.5rem" }}>
+                  {CAPTOR_ARCHETYPES.map(preset => {
+                    const sel = captor.presetId === preset.id;
+                    return (
+                      <button key={preset.id} onClick={() => {
+                        if (preset.id === "custom") {
+                          setCaptor(idx, { presetId: "custom", name: "", profile: "", motivation: "", methods: [], rules: "" });
+                        } else {
+                          setCaptor(idx, applyPreset(preset));
+                          if (captorMode === "solo") {
+                            setTimeout(() => setStep(3), 180);
+                          }
+                        }
+                      }}
+                        style={{
+                          background: sel ? `${preset.color}22` : "rgba(0,0,0,0.5)",
+                          border: `1px solid ${sel ? preset.color + "88" : "rgba(255,255,255,0.07)"}`,
+                          borderRadius: "12px", padding: "0.875rem 0.75rem", cursor: "pointer",
+                          textAlign: "left", color: "inherit", transition: "all 0.18s",
+                          boxShadow: sel ? `0 0 14px ${preset.color}44` : "none",
+                          position: "relative", overflow: "hidden",
+                        }}
+                        onMouseEnter={e => { if (!sel) { e.currentTarget.style.borderColor = `${preset.color}55`; e.currentTarget.style.background = `${preset.color}11`; } }}
+                        onMouseLeave={e => { if (!sel) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                      >
+                        <div style={{ fontSize: "1.35rem", marginBottom: "0.4rem", lineHeight: 1 }}>{preset.icon}</div>
+                        <div style={{ fontSize: "0.68rem", fontFamily: "'Cinzel', serif", color: sel ? preset.color : "#E0E0F0", fontWeight: 600, lineHeight: 1.3, marginBottom: "0.3rem" }}>{preset.label}</div>
+                        {preset.motivation && (
+                          <div style={{ fontSize: "0.52rem", color: sel ? `${preset.color}99` : "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textTransform: "uppercase" }}>
+                            {preset.motivation}
+                          </div>
+                        )}
+                        {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "0.6rem", color: preset.color }}>✓</div>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -657,6 +749,52 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                   <div style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", marginTop: "2px" }}>{l.desc}</div>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* ── BONDAGE & KINK SECTION ── */}
+          <div style={{ borderTop: `1px solid rgba(200,168,75,0.12)`, paddingTop: "1.5rem" }}>
+            <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.3)", letterSpacing: "4px", textTransform: "uppercase", fontFamily: "'Cinzel', serif", marginBottom: "1.25rem" }}>
+              ◈ Bondage &amp; Kink Configuration <span style={{ fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 400 }}>(optional — all selections feed the AI)</span>
+            </div>
+
+            {/* Restraints */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Restraints</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {RESTRAINTS.map(r => (
+                  <button key={r.id} onClick={() => setSelectedRestraint(selectedRestraint === r.id ? "" : r.id)}
+                    style={{ padding: "0.4rem 0.9rem", background: selectedRestraint === r.id ? "rgba(200,80,80,0.18)" : cardBg, border: `1px solid ${selectedRestraint === r.id ? "rgba(200,80,80,0.55)" : border}`, borderRadius: "20px", color: selectedRestraint === r.id ? "#FF9090" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Power Dynamic */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Power Dynamic</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {POWER_DYNAMICS.map(p => (
+                  <button key={p.id} onClick={() => setSelectedPowerDynamic(selectedPowerDynamic === p.id ? "" : p.id)}
+                    style={{ padding: "0.4rem 0.9rem", background: selectedPowerDynamic === p.id ? "rgba(160,80,200,0.18)" : cardBg, border: `1px solid ${selectedPowerDynamic === p.id ? "rgba(160,80,200,0.55)" : border}`, borderRadius: "20px", color: selectedPowerDynamic === p.id ? "#CC90FF" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Kink Escalation */}
+            <div>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.6rem" }}>Kink Escalation Focus</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {KINK_ESCALATIONS.map(k => (
+                  <button key={k.id} onClick={() => setSelectedKinkEscalation(selectedKinkEscalation === k.id ? "" : k.id)}
+                    style={{ padding: "0.4rem 0.9rem", background: selectedKinkEscalation === k.id ? "rgba(200,50,80,0.18)" : cardBg, border: `1px solid ${selectedKinkEscalation === k.id ? "rgba(200,50,80,0.55)" : border}`, borderRadius: "20px", color: selectedKinkEscalation === k.id ? "#FF8080" : "rgba(200,200,220,0.45)", fontSize: "0.66rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                    {k.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

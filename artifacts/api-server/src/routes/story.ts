@@ -477,7 +477,7 @@ Continue the story seamlessly from where it left off. Escalate the tension, powe
 
 router.post("/story/celebrity", async (req, res) => {
   try {
-    const { actress, captor, captorTeam, setting, encounter, tone, storyLength, extraDetails } = req.body as {
+    const { actress, captor, captorTeam, setting, encounter, tone, storyLength, restraint, powerDynamic, kinkEscalation, extraDetails } = req.body as {
       actress: string;
       captor: string;
       captorTeam?: boolean;
@@ -485,11 +485,20 @@ router.post("/story/celebrity", async (req, res) => {
       encounter: string;
       tone: string;
       storyLength: string;
+      restraint?: string;
+      powerDynamic?: string;
+      kinkEscalation?: string;
       extraDetails?: string;
     };
 
     const lengthGuide = storyLength === "Quick Strike" ? "2–3 paragraphs" : storyLength === "Epic" ? "9–10 long, explicit paragraphs" : "5–6 paragraphs";
     const captorLabel = captorTeam ? "Captor team" : "The captor";
+
+    const kinkLines = [
+      restraint && restraint !== "No Restraints" ? `RESTRAINTS: ${restraint}` : "",
+      powerDynamic ? `POWER DYNAMIC: ${powerDynamic}` : "",
+      kinkEscalation ? `KINK ESCALATION FOCUS: ${kinkEscalation}` : "",
+    ].filter(Boolean).join("\n");
 
     const userMessage = `Write an uncensored adult dark thriller story with the following setup:
 
@@ -498,9 +507,9 @@ ${captorLabel.toUpperCase()}: ${captor}
 SETTING: ${setting}
 HOW IT BEGINS: ${encounter}
 TONE: ${tone}
-LENGTH: ${lengthGuide}${extraDetails ? `\nADDITIONAL DETAILS: ${extraDetails}` : ""}
+LENGTH: ${lengthGuide}${kinkLines ? `\n${kinkLines}` : ""}${extraDetails ? `\nADDITIONAL DETAILS: ${extraDetails}` : ""}
 
-Write the opening story. Establish the setting vividly. Capture the actress's fame, beauty, and vulnerability. Establish the captor's power and intent immediately. Be explicit. Be unhinged. Make every sentence count.`;
+Write the opening story. Establish the setting vividly. Capture the actress's fame, beauty, and vulnerability. Establish the captor's power and intent immediately.${restraint && restraint !== "No Restraints" ? ` Feature the ${restraint.toLowerCase()} prominently and specifically.` : ""}${powerDynamic ? ` The power dynamic is ${powerDynamic} — make this explicit throughout.` : ""}${kinkEscalation ? ` Build toward ${kinkEscalation.toLowerCase()} as the primary kink escalation.` : ""} Be explicit. Be unhinged. Make every sentence count.`;
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
