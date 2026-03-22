@@ -61,10 +61,10 @@ function getDailyScenario() {
 
 // ─── PRIMARY CARD ──────────────────────────────────────────────────────────────
 function PrimaryCard({
-  num, icon, tagline, title, desc, stats, features, cta,
+  num, icon, iconImg, tagline, title, desc, stats, features, cta,
   accent, r, g, b, onClick,
 }: {
-  num: string; icon: string; tagline: string; title: string; desc: string;
+  num: string; icon: string; iconImg?: string; tagline: string; title: string; desc: string;
   stats: [string, string][]; features: string[]; cta: string;
   accent: string; r: number; g: number; b: number;
   onClick: () => void;
@@ -106,7 +106,12 @@ function PrimaryCard({
 
       {/* Icon + tagline */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <div style={{ fontSize: "2.25rem", lineHeight: 1, filter: hov ? `drop-shadow(0 0 22px rgba(${rgb},1)) drop-shadow(0 0 50px rgba(${rgb},0.5))` : `drop-shadow(0 0 7px rgba(${rgb},0.45))`, transition: "filter 0.35s", transform: hov ? "scale(1.1) rotate(-5deg)" : "scale(1)", transitionDuration: "0.28s", display: "inline-block" }}>{icon}</div>
+        <div style={{ lineHeight: 1, filter: hov ? `drop-shadow(0 0 22px rgba(${rgb},1)) drop-shadow(0 0 50px rgba(${rgb},0.5))` : `drop-shadow(0 0 7px rgba(${rgb},0.45))`, transition: "filter 0.35s, transform 0.28s", transform: hov ? "scale(1.08) rotate(-3deg)" : "scale(1)", display: "inline-block", flexShrink: 0 }}>
+          {iconImg
+            ? <img src={iconImg} alt={icon} style={{ width: "58px", height: "58px", objectFit: "cover", borderRadius: "10px", display: "block" }} />
+            : <span style={{ fontSize: "2.25rem" }}>{icon}</span>
+          }
+        </div>
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.49rem", letterSpacing: "3.5px", color: `rgba(${rgb},${hov ? 0.7 : 0.3})`, transition: "color 0.3s", paddingTop: "0.2rem", textTransform: "uppercase" }}>{tagline}</div>
       </div>
 
@@ -149,8 +154,8 @@ function PrimaryCard({
 }
 
 // ─── SUB-MODE CARD (specialist / utility under a primary) ──────────────────────
-function SubCard({ icon, title, desc, accent, r, g, b, badge, onClick }: {
-  icon: string; title: string; desc: string; accent: string;
+function SubCard({ icon, iconImg, title, desc, accent, r, g, b, badge, onClick }: {
+  icon: string; iconImg?: string; title: string; desc: string; accent: string;
   r: number; g: number; b: number; badge?: string; onClick: () => void;
 }) {
   const [hov, setHov] = useState(false);
@@ -179,7 +184,12 @@ function SubCard({ icon, title, desc, accent, r, g, b, badge, onClick }: {
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.7), transparent)` : `linear-gradient(90deg, transparent, rgba(${rgb},0.18), transparent)`, transition: "opacity 0.25s" }} />
 
       {/* Icon box */}
-      <div style={{ width: "34px", height: "34px", borderRadius: "8px", background: `rgba(${rgb},${hov ? 0.18 : 0.07})`, border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.12})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 10px rgba(${rgb},0.7))` : "none" }}>{icon}</div>
+      <div style={{ width: "34px", height: "34px", borderRadius: "8px", background: `rgba(${rgb},${hov ? 0.18 : 0.07})`, border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.12})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 10px rgba(${rgb},0.7))` : "none", overflow: "hidden" }}>
+        {iconImg
+          ? <img src={iconImg} alt={icon} style={{ width: "34px", height: "34px", objectFit: "cover", display: "block" }} />
+          : icon
+        }
+      </div>
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -376,7 +386,7 @@ export default function Homepage(props: HomepageProps) {
         {/* ══ COL 1: HEROINE FORGE ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
           <PrimaryCard
-            num="I" icon="🔱" tagline="Superhero Universe" title="HEROINE FORGE"
+            num="I" icon="🔱" iconImg="/icons/heroine-forge.png" tagline="Superhero Universe" title="HEROINE FORGE"
             desc="181+ heroines across Marvel, DC, CW, The Boys, Power Rangers, Animated, Star Wars, and TV universes. Choose your villain and generate a multi-chapter dark thriller."
             stats={[["181+", "Heroines"], ["67", "Villains"], ["8", "Universes"]]}
             features={["Marvel · DC · CW · The Boys", "Power Rangers · Animated · Star Wars", "Multi-chapter AI story engine"]}
@@ -384,18 +394,18 @@ export default function Homepage(props: HomepageProps) {
             onClick={props.onSuperheroMode}
           />
           <SectionLabel label="Specialist Modes" r={155} g={89} b={255} />
-          <SubCard icon="🌀" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking of her will." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
-          <SubCard icon="⛓" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#40E090" r={64} g={224} b={144} badge="Duo" onClick={props.onDualCapture} />
-          <SubCard icon="🕸" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FF9640" r={255} g={150} b={64} badge="Trap" onClick={props.onRescueGoneWrong} />
-          <SubCard icon="⚡" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A0FF" r={96} g={160} b={255} badge="Meter" onClick={props.onPowerDrain} />
-          <SubCard icon="🗡" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#FF6060" r={255} g={60} b={60} badge="Group" onClick={props.onMassCapture} />
-          <SubCard icon="🌑" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#FF69B4" r={255} g={105} b={180} badge="Arc" onClick={props.onCorruptionArc} />
+          <SubCard icon="🌀" iconImg="/icons/mind-break.png" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking of her will." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
+          <SubCard icon="⛓" iconImg="/icons/two-heroines.png" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#40E090" r={64} g={224} b={144} badge="Duo" onClick={props.onDualCapture} />
+          <SubCard icon="🕸" iconImg="/icons/rescue-gone-wrong.png" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FF9640" r={255} g={150} b={64} badge="Trap" onClick={props.onRescueGoneWrong} />
+          <SubCard icon="⚡" iconImg="/icons/power-drain.png" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A0FF" r={96} g={160} b={255} badge="Meter" onClick={props.onPowerDrain} />
+          <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#FF6060" r={255} g={60} b={60} badge="Group" onClick={props.onMassCapture} />
+          <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#FF69B4" r={255} g={105} b={180} badge="Arc" onClick={props.onCorruptionArc} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
           <PrimaryCard
-            num="II" icon="👁" tagline="Real World Mode" title="CELEBRITY CAPTIVE"
+            num="II" icon="👁" iconImg="/icons/celebrity-captive.png" tagline="Real World Mode" title="CELEBRITY CAPTIVE"
             desc="100 real-world actresses. Build a captor or captor team — 6 archetypes or fully custom. Set the encounter, tone, and scene. Generate an uncensored dark thriller."
             stats={[["100+", "Actresses"], ["6", "Archetypes"], ["8", "Encounters"]]}
             features={["Solo or team captors", "10 settings · 6 tones", "Streaming chapter continuation"]}
@@ -403,15 +413,15 @@ export default function Homepage(props: HomepageProps) {
             onClick={props.onCelebrityMode}
           />
           <SectionLabel label="Scene Tools" r={200} g={168} b={75} />
-          <SubCard icon="🔦" title="Interrogation Room" desc="Live captor-vs-celebrity dialogue, AI-escalated in real time." accent="#E8C870" r={200} g={168} b={75} badge="Live" onClick={props.onInterrogationRoom} />
-          <SubCard icon="🎭" title="Captor Configuration" desc="Full antagonist profiling — motive, methods, endgame goals." accent="#C8A84B" r={180} g={130} b={40} badge="Profile" onClick={props.onCaptorPortal} />
-          <SubCard icon="♟" title="Captor Logic Sim" desc="Set rules and goals. AI simulates captor behaviour and consequences." accent="#B89030" r={160} g={110} b={20} badge="Sim" onClick={props.onCaptorLogic} />
+          <SubCard icon="🔦" iconImg="/icons/interrogation-room.png" title="Interrogation Room" desc="Live captor-vs-celebrity dialogue, AI-escalated in real time." accent="#E8C870" r={200} g={168} b={75} badge="Live" onClick={props.onInterrogationRoom} />
+          <SubCard icon="🎭" iconImg="/icons/captor-config.png" title="Captor Configuration" desc="Full antagonist profiling — motive, methods, endgame goals." accent="#C8A84B" r={180} g={130} b={40} badge="Profile" onClick={props.onCaptorPortal} />
+          <SubCard icon="♟" iconImg="/icons/captor-logic.png" title="Captor Logic Sim" desc="Set rules and goals. AI simulates captor behaviour and consequences." accent="#B89030" r={160} g={110} b={20} badge="Sim" onClick={props.onCaptorLogic} />
         </div>
 
         {/* ══ COL 3: CUSTOM SCENARIO ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
           <PrimaryCard
-            num="III" icon="🔮" tagline="Build From Scratch" title="CUSTOM SCENARIO"
+            num="III" icon="🔮" iconImg="/icons/custom-scenario.png" tagline="Build From Scratch" title="CUSTOM SCENARIO"
             desc="Create your own heroine — psychology, traumas, breaking points. Profile a captor with 8 configuration questions. Set the scene and let the AI write your story."
             stats={[["7", "Heroine Q's"], ["8", "Captor Q's"], ["∞", "Outcomes"]]}
             features={["Full character builder", "Captor profiler", "AI-powered story engine"]}
@@ -419,9 +429,9 @@ export default function Homepage(props: HomepageProps) {
             onClick={props.onEnter}
           />
           <SectionLabel label="Writing Tools" r={200} g={40} b={40} />
-          <SubCard icon="⚙" title="Scenario Engine" desc="Generate 8 tailored narrative questions from 4 config inputs." accent="#FF6060" r={200} g={40} b={40} badge="Questions" onClick={props.onScenarioGenerator} />
-          <SubCard icon="🗺" title="Relationship Map" desc="Visual node map of characters and their dynamics." accent="#CC4444" r={180} g={30} b={30} badge="Visual" onClick={props.onCharacterMapper} />
-          <SubCard icon="💬" title="Sounding Board" desc="Chat with an AI co-writer. Break blocks, get twists, ask anything." accent="#AA3333" r={160} g={20} b={20} badge="AI Chat" onClick={props.onSoundingBoard} />
+          <SubCard icon="⚙" iconImg="/icons/scenario-engine.png" title="Scenario Engine" desc="Generate 8 tailored narrative questions from 4 config inputs." accent="#FF6060" r={200} g={40} b={40} badge="Questions" onClick={props.onScenarioGenerator} />
+          <SubCard icon="🗺" iconImg="/icons/relationship-map.png" title="Relationship Map" desc="Visual node map of characters and their dynamics." accent="#CC4444" r={180} g={30} b={30} badge="Visual" onClick={props.onCharacterMapper} />
+          <SubCard icon="💬" iconImg="/icons/sounding-board.png" title="Sounding Board" desc="Chat with an AI co-writer. Break blocks, get twists, ask anything." accent="#AA3333" r={160} g={20} b={20} badge="AI Chat" onClick={props.onSoundingBoard} />
         </div>
       </div>
 
