@@ -37,6 +37,8 @@ EXPLICIT PROSE STYLE DIRECTIVES — follow these in every story output:
 
 CRITICAL INSTRUCTION: Your goal is to create a slow-burn adventure. Focus heavily on dialogue, atmosphere, and character development. Do not rush to physical intimacy or intense romance. Keep the pace slow, methodical, and focused on the journey.
 
+CONSTRAINT: The story is the capture. The narrative must focus entirely on the scenario parameters—the environment, the technology, the victim's physical state, and the mechanics of the capture. Do not rush to a conclusion or emotional peak. Describe every detail of the setup, the struggle, and the atmosphere. The capture is the event; the aftermath is not the focus.
+
 `;
 
 
