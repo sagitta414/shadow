@@ -572,9 +572,15 @@ function buildSummary(answers: Answers): string {
     violence: { non_lethal: "non-lethal intimidation", calibrated_pain: "calibrated, purposeful pain", unstable: "unstable, unpredictable violence", lethal: "lethal intent" },
     psychology: { detached: "a detached, professional demeanor", predator: "an intimate predator dynamic", sadist: "sadistic pleasure in suffering", desperate: "desperate, erratic behavior", idealist: "ideological certainty" },
     endgame: { release: "conditional release", permanent: "permanent captivity", elimination: "elimination of the victim", conversion: "breaking and reshaping the victim", spectacle: "a public spectacle" },
+    victim_awareness: { knew_from_start: "full knowledge of the reason from the start", gradually_revealed: "a truth that emerged gradually", disinformation: "a deliberately planted false explanation", never_told: "total ignorance of the reason", self_constructed: "a self-constructed explanation" },
+    prior_relationship: { strangers: "no prior connection", acquaintances: "a prior acquaintance", trusted_betrayal: "intimate betrayal of trust", professional: "a professional relationship", unseen_obsession: "a one-sided fixation the victim was unaware of" },
+    victim_profile: { trained: "a trained, prepared background", trauma_survivor: "a trauma-survivor's resilience", sheltered: "no prior hardship or framework", fragile: "pre-existing psychological vulnerability", calculating: "a composed, strategic mindset" },
+    outside_world: { active_search: "an active search underway", cold_case: "a search that has already faded", no_one_knows: "total silence — no one knows", covered_up: "a deliberate cover story planted by the captor", suspect_nearby: "one person who suspects but has not yet acted" },
+    captor_state: { in_control: "complete composure and control", conflicted: "emerging internal conflict", deteriorating: "visible deterioration and cracks", escalating: "a darkening, escalating intensity", satisfied: "contentment with how things are unfolding" },
+    story_pivot: { external_breach: "an external intrusion that disrupts the situation", captor_slip: "a captor's mistake that creates opportunity", victim_action: "an action taken by the victim that shifts the dynamic", revelation: "a revelation that changes everything", unexpected_ally: "an unexpected third party entering the situation", internal_collapse: "an internal psychological breaking point" },
   };
   const get = (k: string) => labels[k]?.[answers[k]] ?? "unknown";
-  return `A captor motivated by ${get("motive")}, operating from ${get("setting")} over the course of ${get("duration")}. They bring ${get("background")}, maintaining control through ${get("control")}. Their violence threshold is ${get("violence")}, their psychological approach is ${get("psychology")}, and their endgame is ${get("endgame")}.`;
+  return `A captor motivated by ${get("motive")}, operating from ${get("setting")} over the course of ${get("duration")}. They bring ${get("background")}, maintaining control through ${get("control")}. Violence threshold: ${get("violence")}. Psychological approach: ${get("psychology")}. Endgame: ${get("endgame")}. The victim has ${get("victim_awareness")}, and their relationship prior to this was ${get("prior_relationship")}. The victim brings ${get("victim_profile")}. The outside world: ${get("outside_world")}. The captor's current state: ${get("captor_state")}. The story's defining turning point: ${get("story_pivot")}.`;
 }
 
 // ─── Select Field Component ────────────────────────
@@ -763,8 +769,8 @@ export default function ScenarioGenerator({ onBack }: ScenarioGeneratorProps) {
         >
           Scenario Question Generator
         </h1>
-        <p style={{ color: "rgba(200,200,220,0.55)", fontSize: "0.95rem", maxWidth: "550px", margin: "0 auto" }}>
-          Configure all 8 parameters of your scenario. Each selection generates 3 targeted narrative questions — up to 24 in total.
+        <p style={{ color: "rgba(200,200,220,0.55)", fontSize: "0.95rem", maxWidth: "600px", margin: "0 auto" }}>
+          Configure all 14 parameters of your scenario. Each selection generates 3 targeted narrative questions — up to 42 in total.
         </p>
         <div className="divider" style={{ maxWidth: "350px", margin: "1.25rem auto 0" }}>
           <span className="divider-symbol">✦</span>
