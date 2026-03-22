@@ -18,6 +18,8 @@ import InterrogationRoom from "./pages/InterrogationRoom";
 import CelebrityMode from "./pages/CelebrityMode";
 import IntroSequence from "./pages/IntroSequence";
 import StoryArchive from "./pages/StoryArchive";
+import DailyScenarioPage from "./pages/DailyScenarioPage";
+import DailyChronicle from "./pages/DailyChronicle";
 
 type Page =
   | "login"
@@ -36,7 +38,9 @@ type Page =
   | "superhero-mode"
   | "interrogation-room"
   | "celebrity-mode"
-  | "story-archive";
+  | "story-archive"
+  | "daily-scenario"
+  | "daily-chronicle";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -160,11 +164,24 @@ function AppInner() {
           onInterrogationRoom={() => navigate("interrogation-room")}
           onCelebrityMode={() => navigate("celebrity-mode")}
           onStoryArchive={() => navigate("story-archive")}
+          onDailyScenario={() => navigate("daily-scenario")}
+          onDailyChronicle={() => navigate("daily-chronicle")}
         />
       )}
 
       {page === "story-archive" && (
         <StoryArchive onBack={() => navigate("home")} />
+      )}
+
+      {page === "daily-scenario" && (
+        <DailyScenarioPage
+          onBack={() => navigate("home")}
+          onChronicle={() => navigate("daily-chronicle")}
+        />
+      )}
+
+      {page === "daily-chronicle" && (
+        <DailyChronicle onBack={() => navigate("daily-scenario")} />
       )}
 
       {page === "character-params" && (

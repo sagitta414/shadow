@@ -20,6 +20,8 @@ const UNIVERSE_COLORS: Record<string, string> = {
   "Power Rangers": "#FF69B4",
   ANIMATED: "#C084FC",
   Celebrity: "#C8A84B",
+  SW: "#4DC8FF",
+  Daily: "#E8D08A",
 };
 
 function univColor(u: string): string {

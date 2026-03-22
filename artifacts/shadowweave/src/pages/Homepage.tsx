@@ -11,6 +11,8 @@ interface HomepageProps {
   onInterrogationRoom: () => void;
   onCelebrityMode: () => void;
   onStoryArchive: () => void;
+  onDailyScenario: () => void;
+  onDailyChronicle: () => void;
 }
 
 // ─── Three primary story modes ────────────────────────────────────────────────
@@ -425,7 +427,7 @@ export default function Homepage(props: HomepageProps) {
       {/* ══ DAILY DARK SCENARIO ══ */}
       <div style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
         <div
-          onClick={props.onSuperheroMode}
+          onClick={props.onDailyScenario}
           onMouseEnter={() => setDailyHov(true)}
           onMouseLeave={() => setDailyHov(false)}
           style={{
@@ -433,7 +435,7 @@ export default function Homepage(props: HomepageProps) {
             background: "rgba(6,2,16,0.92)",
             border: `1px solid ${dailyHov ? "rgba(200,168,75,0.4)" : "rgba(200,168,75,0.1)"}`,
             borderLeft: `3px solid rgba(200,168,75,${dailyHov ? 0.8 : 0.3})`,
-            borderRadius: "10px",
+            borderRadius: "10px 10px 0 0",
             cursor: "pointer",
             transition: "all 0.3s ease",
             display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap",
@@ -461,9 +463,32 @@ export default function Homepage(props: HomepageProps) {
               <div style={{ fontSize: "0.72rem", color: "rgba(200,195,220,0.4)", fontFamily: "'Raleway', sans-serif", maxWidth: "200px" }}>{setting}</div>
             </div>
           </div>
-          <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: "0.4rem", color: dailyHov ? "rgba(200,168,75,0.8)" : "rgba(200,168,75,0.3)", transition: "color 0.3s", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "1.5px" }}>
-            Open in Hero Forge →
+          <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: "0.4rem", color: dailyHov ? "rgba(200,168,75,0.9)" : "rgba(200,168,75,0.3)", transition: "color 0.3s", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "1.5px" }}>
+            ◆ Generate Today's Story →
           </div>
+        </div>
+        {/* Chronicle footer row */}
+        <div
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "0.6rem 1.5rem",
+            background: "rgba(4,2,10,0.9)",
+            border: "1px solid rgba(200,168,75,0.08)",
+            borderTop: "none",
+            borderRadius: "0 0 10px 10px",
+          }}
+        >
+          <span style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.25)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>
+            One story generated and saved each day automatically
+          </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); props.onDailyChronicle(); }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(200,168,75,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.6rem", letterSpacing: "1.5px", padding: "0", transition: "color 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(200,168,75,0.8)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,168,75,0.4)"; }}
+          >
+            View Chronicle →
+          </button>
         </div>
       </div>
 

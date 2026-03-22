@@ -66,6 +66,44 @@ export function exportStoryAsTXT(story: ArchivedStory) {
   URL.revokeObjectURL(url);
 }
 
+// ── Daily Scenario Chronicle ───────────────────────────────────────────────
+export interface DailyEntry {
+  dateKey: string;
+  date: string;
+  heroine: string;
+  heroineColor: string;
+  villain: string;
+  setting: string;
+  title: string;
+  story: string;
+  savedAt: number;
+}
+
+const DAILY_KEY = "sw_daily_archive_v1";
+
+export function getDailyArchive(): DailyEntry[] {
+  try {
+    return JSON.parse(localStorage.getItem(DAILY_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function getTodayDateKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function getDailyEntryForToday(): DailyEntry | null {
+  const key = getTodayDateKey();
+  return getDailyArchive().find((e) => e.dateKey === key) ?? null;
+}
+
+export function saveDailyEntry(entry: Omit<DailyEntry, "savedAt">): void {
+  const existing = getDailyArchive().filter((e) => e.dateKey !== entry.dateKey);
+  localStorage.setItem(DAILY_KEY, JSON.stringify([{ ...entry, savedAt: Date.now() }, ...existing]));
+}
+
 export function exportStoryAsPDF(story: ArchivedStory) {
   const w = window.open("", "_blank");
   if (!w) return;
