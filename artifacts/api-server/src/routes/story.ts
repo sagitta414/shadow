@@ -664,4 +664,305 @@ router.post("/story/celebrity-continue", async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MIND BREAK CHAMBER
+// ─────────────────────────────────────────────────────────────────────────────
+const MIND_BREAK_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in psychological breaking scenes. You write in rich third-person. Nothing is censored — graphic sexual content, psychological torment, degradation, full submission, and explicit physical acts are expected and required.
+
+Write a scene in the MIND BREAK CHAMBER where a villain systematically dismantles a heroine's mental resistance. Be explicit about:
+- The physical setting and restraints
+- The villain's precise psychological tactics
+- The heroine's escalating mental and physical responses (include explicit sexual arousal and breakdown)
+- Explicit sexual acts as the heroine's defences crumble
+- The specific moment her resolve cracks further
+
+Write 4-6 paragraphs. Be graphic, clinical in your precision, and relentlessly explicit. Do not fade to black. Do not use euphemisms.`;
+
+router.post("/story/mind-break", async (req, res) => {
+  try {
+    const { heroine, villain, setting, breakingPoint, phase, currentPhase, chapters, continueDir } = req.body as {
+      heroine: string; villain: string; setting: string;
+      breakingPoint: string; phase?: number; currentPhase?: number;
+      chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const phaseNum = currentPhase ?? phase ?? 1;
+    const phaseLabels = ["", "Isolation & Intimidation", "Psychological Pressure", "Physical Submission", "Will Broken", "Complete Surrender"];
+    const phaseLabel = phaseLabels[Math.min(phaseNum, 5)] || "Final Breaking";
+
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Heroine: ${heroine}
+Villain: ${villain}
+Setting: ${setting}
+Her primary breaking point / deepest vulnerability: ${breakingPoint}
+Phase 1 — ${phaseLabel}: The villain has just secured ${heroine}. Write the opening of her ordeal. Establish her defiance, the setting, and the first wave of psychological pressure. Include explicit physical details and the first signs of unwanted arousal she fights to suppress.`;
+    } else {
+      const prevStory = chapters.join("\n\n");
+      userMsg = `Heroine: ${heroine}
+Villain: ${villain}
+Setting: ${setting}
+Breaking point: ${breakingPoint}
+Phase ${phaseNum} — ${phaseLabel}
+
+Story so far:
+${prevStory}
+
+Continue. Phase ${phaseNum} of the breaking. ${continueDir ? `Direction: ${continueDir}` : ""} The villain escalates. ${heroine}'s resistance drops further. Be more explicit than the previous chapter — graphic sexual acts, deeper psychological penetration, more explicit physical responses. She cracks a little more.`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: MIND_BREAK_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DUAL CAPTURE — Two Heroines, One Cell
+// ─────────────────────────────────────────────────────────────────────────────
+const DUAL_CAPTURE_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in dual-capture scenarios. Two heroines are held together by a villain. Write in third-person. Nothing is censored.
+
+Write richly about:
+- The physical and psychological dynamic between the two captive heroines (trust, tension, jealousy, protectiveness)
+- The villain's strategies for exploiting their relationship and playing them against each other
+- Explicit sexual acts involving one or both heroines
+- How their bond either strengthens or is weaponised and destroyed
+- Specific, graphic physical details — restraints, exposure, acts performed
+
+4-6 paragraphs. Be explicit. Do not fade to black.`;
+
+router.post("/story/dual-capture", async (req, res) => {
+  try {
+    const { heroine1, heroine2, villain, setting, dynamic, chapters, continueDir } = req.body as {
+      heroine1: string; heroine2: string; villain: string;
+      setting: string; dynamic: string;
+      chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Heroine 1: ${heroine1}
+Heroine 2: ${heroine2}
+Villain: ${villain}
+Setting: ${setting}
+Dynamic between the heroines: ${dynamic}
+
+Write the opening. Both heroines are already held. Establish how they ended up here, the cell/location, their relationship dynamic, and the villain's first move to exploit them. Be explicit from the start.`;
+    } else {
+      userMsg = `Heroine 1: ${heroine1}
+Heroine 2: ${heroine2}
+Villain: ${villain}
+Setting: ${setting}
+Dynamic: ${dynamic}
+
+Story so far:
+${chapters.join("\n\n")}
+
+Continue. ${continueDir ? `Direction: ${continueDir}` : "Escalate."} The villain pushes harder. Their dynamic shifts. Be more explicit than the previous chapter.`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: DUAL_CAPTURE_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESCUE GONE WRONG
+// ─────────────────────────────────────────────────────────────────────────────
+const RESCUE_FAILED_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in failed rescue scenarios. A heroine attempts to rescue a captive colleague — and fails, getting herself captured too. Write in third-person. Nothing is censored.
+
+Write about:
+- The original captive's ordeal and state when the rescuer arrives
+- The dramatic, explicit moment the rescue fails and the rescuer is taken
+- The villain's triumphant reaction and how he now has both
+- Explicit sexual content as the villain celebrates his new prize
+- Both heroines' physical and emotional states as hope collapses
+
+4-6 paragraphs. Be graphic and explicit. Do not fade to black.`;
+
+router.post("/story/rescue-failed", async (req, res) => {
+  try {
+    const { captive, rescuer, villain, setting, failReason, chapters, continueDir } = req.body as {
+      captive: string; rescuer: string; villain: string;
+      setting: string; failReason: string;
+      chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Originally captured: ${captive}
+Rescuer who fails: ${rescuer}
+Villain: ${villain}
+Setting: ${setting}
+How the rescue fails: ${failReason}
+
+Write the scene. ${captive} is already deeply in the villain's grip. ${rescuer} breaches the location — and the trap closes. Be explicit about both heroines' physical states and the villain's methods.`;
+    } else {
+      userMsg = `Captive: ${captive}
+Rescuer (now also captured): ${rescuer}
+Villain: ${villain}
+Setting: ${setting}
+
+Story so far:
+${chapters.join("\n\n")}
+
+Continue. ${continueDir ? `Direction: ${continueDir}` : "Both captives, no more hope. Escalate."} Be more explicit.`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: RESCUE_FAILED_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POWER DRAIN — Systematic stripping of powers
+// ─────────────────────────────────────────────────────────────────────────────
+const POWER_DRAIN_SYSTEM = `${VENICE_PREAMBLE}You are an explicit adult fiction engine specialising in power-drain and de-powering scenarios. A villain systematically strips a superheroine of her powers, one by one. Write in third-person. Nothing is censored.
+
+Write richly about:
+- The specific mechanism being used to strip each power (tech, magic, chemicals, kryptonite, etc.)
+- The heroine's physical and psychological experience as each power fades — the disorientation, vulnerability, humiliation
+- Explicit sexual content as her powers and defences drop and the villain exploits each new vulnerability
+- The heroine's mounting despair as she becomes increasingly powerless and exposed
+- Precise physical details — what the drain device looks like, how it attaches, her body's reactions
+
+4-6 paragraphs. Be graphic, technical about the power drain, and explicitly sexual. Do not fade to black.`;
+
+router.post("/story/power-drain", async (req, res) => {
+  try {
+    const { heroine, villain, setting, powers, drainMethod, drainLevel, chapters, continueDir } = req.body as {
+      heroine: string; villain: string; setting: string;
+      powers: string; drainMethod: string; drainLevel: number;
+      chapters?: string[]; continueDir?: string;
+    };
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let userMsg = "";
+    if (!chapters || chapters.length === 0) {
+      userMsg = `Heroine: ${heroine}
+Villain: ${villain}
+Setting: ${setting}
+Her powers: ${powers}
+Drain method: ${drainMethod}
+Current drain level: ${drainLevel}% drained
+
+Write the opening. The drain process has just begun. ${heroine}'s first power begins to fade. Describe the drain device, the experience, the physical and sexual vulnerability that opens up as her first power weakens.`;
+    } else {
+      const newDrain = Math.min(100, drainLevel + 20);
+      userMsg = `Heroine: ${heroine}
+Villain: ${villain}
+Setting: ${setting}
+Powers: ${powers}
+Drain method: ${drainMethod}
+Current drain level: ${newDrain}% drained
+
+Story so far:
+${chapters.join("\n\n")}
+
+Continue. ${continueDir ? `Direction: ${continueDir}` : `Another power weakens. ${newDrain}% drained now.`} She is more vulnerable than before. Be more explicit — describe exactly what the villain does to her now that she's less able to resist.`;
+    }
+
+    let fullContent = "";
+    const stream = await venice.chat.completions.create({
+      model: "venice-uncensored-role-play",
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: POWER_DRAIN_SYSTEM },
+        { role: "user", content: userMsg },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) { fullContent += content; res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`); }
+    }
+    res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
 export default router;

@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { saveStoryToArchive } from "../lib/archive";
+import { saveStoryToArchive, exportStoryAsPDF } from "../lib/archive";
+import { getCustomHeroines, CustomHeroine } from "../lib/customHeroines";
+import CustomHeroineModal from "../components/CustomHeroineModal";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -681,7 +683,7 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "CUSTOM";
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
@@ -737,6 +739,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
   const [marketplaceTech, setMarketplaceTech] = useState<string[]>([]);
   const [marketplaceInfo, setMarketplaceInfo] = useState<string[]>([]);
 
+  // Custom heroines
+  const [customHeroesList, setCustomHeroesList] = useState<CustomHeroine[]>(getCustomHeroines);
+  const [showCustomModal, setShowCustomModal] = useState(false);
+
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -758,6 +764,13 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     ...ANIMATED_HEROES.map((h) => ({ ...h, universe: "ANIMATED" })),
     ...SW_HEROES.map((h) => ({ ...h, universe: "SW" })),
     ...TV_HEROES.map((h) => ({ ...h, universe: "TV" })),
+    ...customHeroesList.map((h) => ({
+      name: h.name,
+      alias: h.appearance ? h.appearance.slice(0, 40) : "Custom Heroine",
+      power: h.powers || "Custom powers",
+      icon: "★",
+      universe: "CUSTOM",
+    })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -973,6 +986,34 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     setSavedId(id);
   }
 
+  function randomize() {
+    const pool = allHeroes;
+    const hero = pool[Math.floor(Math.random() * pool.length)];
+    const villain = VILLAINS[Math.floor(Math.random() * VILLAINS.length)];
+    setSelectedHeroes([hero]);
+    setSelectedVillain(villain);
+    setVillainMode("pick");
+    setStep(2);
+  }
+
+  function exportStoryAsPDFWrapper() {
+    if (!chapters.length) return;
+    const villainName = villainMode === "pick" ? (selectedVillain?.name ?? "Unknown") : customVillain;
+    const heroNames = selectedHeroes.map((h) => h.name);
+    exportStoryAsPDF({
+      id: savedId ?? "tmp",
+      title: heroNames.length === 1 ? `${heroNames[0]} vs ${villainName}` : `${heroNames.join(" & ")} vs ${villainName}`,
+      createdAt: Date.now(),
+      universe: selectedHeroes[0]?.universe ?? "Unknown",
+      tool: "Heroine Forge",
+      characters: [...heroNames, villainName],
+      chapters,
+      tags: [],
+      favourite: false,
+      wordCount: chapters.join(" ").split(/\s+/).filter(Boolean).length,
+    });
+  }
+
   const stepLabels = ["Choose Hero", "Choose Villain", "Scenario", "Story"];
 
   return (
@@ -1059,9 +1100,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV", "CUSTOM"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : u === "CUSTOM" ? "rgba(255,184,0,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : u === "CUSTOM" ? "#FFB800" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : u === "CUSTOM" ? `Custom (${customHeroesList.length})` : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -1077,6 +1118,8 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginLeft: "auto" }}>
+              <button onClick={() => setShowCustomModal(true)} style={{ padding: "0.5rem 0.8rem", background: "rgba(255,184,0,0.07)", border: "1px solid rgba(255,184,0,0.2)", borderRadius: "8px", color: "rgba(255,184,0,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", whiteSpace: "nowrap", transition: "all 0.2s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,184,0,0.15)"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,184,0,0.07)"; }}>★ Custom</button>
+              <button onClick={randomize} title="Pick a random heroine + villain and jump to step 2" style={{ padding: "0.5rem 0.8rem", background: "rgba(255,184,0,0.1)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "8px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", whiteSpace: "nowrap", transition: "all 0.2s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,184,0,0.2)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.6)"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,184,0,0.1)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.3)"; }}>🎲 Randomize</button>
               <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>{filteredHeroes.length}</span>
               <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", overflow: "hidden" }}>
                 {(["grid", "list"] as const).map((m) => (
@@ -2208,7 +2251,8 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
             <div style={{ display: "flex", gap: "0.75rem" }}>
               {chapters.length > 0 && (
                 <>
-                  <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>Export {chapters.length > 1 ? `(${chapters.length} ch.)` : ""}</button>
+                  <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>TXT {chapters.length > 1 ? `(${chapters.length})` : ""}</button>
+                  <button onClick={exportStoryAsPDFWrapper} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>PDF</button>
                   <button
                     onClick={saveToArchive}
                     disabled={!!savedId}
@@ -2224,6 +2268,15 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
 
           <div ref={bottomRef} />
         </div>
+      )}
+
+      {showCustomModal && (
+        <CustomHeroineModal
+          onClose={() => setShowCustomModal(false)}
+          existing={customHeroesList}
+          onCreated={(h) => setCustomHeroesList(prev => [h, ...prev])}
+          onDeleted={(id) => setCustomHeroesList(prev => prev.filter(h => h.id !== id))}
+        />
       )}
     </div>
   );

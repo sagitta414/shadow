@@ -13,6 +13,10 @@ interface HomepageProps {
   onStoryArchive: () => void;
   onDailyScenario: () => void;
   onDailyChronicle: () => void;
+  onMindBreak: () => void;
+  onDualCapture: () => void;
+  onRescueGoneWrong: () => void;
+  onPowerDrain: () => void;
 }
 
 // ─── Three primary story modes ────────────────────────────────────────────────
@@ -314,6 +318,40 @@ function UtilTile({ tool, onClick }: { tool: typeof UTIL_TOOLS[0]; onClick: () =
   );
 }
 
+// ─── Specialist mode card ─────────────────────────────────────────────────────
+function SpecialistCard({ icon, title, desc, accent, r, g, b, onClick }: {
+  icon: string; title: string; desc: string; accent: string;
+  r: number; g: number; b: number; onClick: () => void;
+}) {
+  const [hov, setHov] = useState(false);
+  const rgb = `${r},${g},${b}`;
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: hov ? `rgba(${rgb},0.07)` : "rgba(8,4,18,0.7)",
+        border: `1px solid ${hov ? `rgba(${rgb},0.45)` : `rgba(${rgb},0.12)`}`,
+        borderTop: `2px solid ${hov ? accent : `rgba(${rgb},0.2)`}`,
+        borderRadius: "10px",
+        padding: "1.1rem 1.2rem",
+        cursor: "pointer",
+        transition: "all 0.25s ease",
+        display: "flex", flexDirection: "column", gap: "0.6rem",
+        boxShadow: hov ? `0 8px 40px rgba(${rgb},0.15)` : "none",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <span style={{ fontSize: "1.3rem", filter: hov ? `drop-shadow(0 0 10px rgba(${rgb},0.9))` : "none", transition: "filter 0.25s" }}>{icon}</span>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: hov ? "#FFF" : `rgba(${rgb},0.75)`, transition: "color 0.25s", letterSpacing: "0.04em" }}>{title}</div>
+      </div>
+      <div style={{ fontSize: "0.67rem", color: "rgba(200,195,225,0.35)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.55 }}>{desc}</div>
+      <div style={{ fontSize: "0.58rem", color: hov ? accent : `rgba(${rgb},0.35)`, fontFamily: "'Cinzel', serif", letterSpacing: "1.5px", transition: "color 0.25s" }}>Enter →</div>
+    </div>
+  );
+}
+
 // ─── Homepage ─────────────────────────────────────────────────────────────────
 export default function Homepage(props: HomepageProps) {
   const [mounted, setMounted] = useState(false);
@@ -365,7 +403,7 @@ export default function Homepage(props: HomepageProps) {
         </div>
 
         <div className="hp-nav-stats" style={{ display: "flex", gap: "2.25rem", alignItems: "center" }}>
-          {[["3", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["4", "Themes"]].map(([v, l]) => (
+          {[["7", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["4", "Themes"]].map(([v, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div className="font-cinzel" style={{ fontSize: "0.82rem", fontWeight: 900, color: "rgba(212,175,55,0.7)", lineHeight: 1 }}>{v}</div>
               <div className="font-montserrat" style={{ fontSize: "0.42rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2px", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>
@@ -489,6 +527,23 @@ export default function Homepage(props: HomepageProps) {
           >
             View Chronicle →
           </button>
+        </div>
+      </div>
+
+      {/* ══ SPECIALIST STORY MODES ══ */}
+      <div style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, transition: "opacity 0.7s 0.35s ease" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "1.25rem" }}>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(139,0,0,0.3), rgba(120,50,200,0.15) 60%, transparent)" }} />
+          <span className="font-montserrat" style={{ fontSize: "0.45rem", letterSpacing: "5px", textTransform: "uppercase", color: "rgba(160,100,220,0.4)", fontWeight: 700, whiteSpace: "nowrap" }}>Specialist Modes</span>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(120,50,200,0.15) 40%, rgba(139,0,0,0.3))" }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.75rem" }}>
+          {[
+            { id: "mind-break",         icon: "◉", title: "Mind Break Chamber",   desc: "5 phases of psychological dismantling. Track the breaking of her will in real time.", accent: "#C084FC", r: 192, g: 132, b: 252, onClick: props.onMindBreak },
+            { id: "dual-capture",       icon: "⊕", title: "Two Heroines, One Cell", desc: "Two captives, one villain. Their bond becomes both their hope and his weapon.", accent: "#40E090", r: 64,  g: 224, b: 144, onClick: props.onDualCapture },
+            { id: "rescue-gone-wrong",  icon: "✗", title: "Rescue Gone Wrong",     desc: "A second heroine comes to save the first — and falls into the trap herself.", accent: "#FF9640", r: 255, g: 150, b: 64,  onClick: props.onRescueGoneWrong },
+            { id: "power-drain",        icon: "↓", title: "Power Drain Mode",      desc: "Systematic stripping of a heroine's powers, one by one. A live drain meter tracks her fall.", accent: "#60A0FF", r: 96,  g: 160, b: 255, onClick: props.onPowerDrain },
+          ].map((m) => <SpecialistCard key={m.id} {...m} />)}
         </div>
       </div>
 

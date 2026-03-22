@@ -20,6 +20,10 @@ import IntroSequence from "./pages/IntroSequence";
 import StoryArchive from "./pages/StoryArchive";
 import DailyScenarioPage from "./pages/DailyScenarioPage";
 import DailyChronicle from "./pages/DailyChronicle";
+import MindBreakMode from "./pages/MindBreakMode";
+import DualCaptureMode from "./pages/DualCaptureMode";
+import RescueGoneWrongMode from "./pages/RescueGoneWrongMode";
+import PowerDrainMode from "./pages/PowerDrainMode";
 
 type Page =
   | "login"
@@ -40,7 +44,11 @@ type Page =
   | "celebrity-mode"
   | "story-archive"
   | "daily-scenario"
-  | "daily-chronicle";
+  | "daily-chronicle"
+  | "mind-break"
+  | "dual-capture"
+  | "rescue-gone-wrong"
+  | "power-drain";
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -166,6 +174,10 @@ function AppInner() {
           onStoryArchive={() => navigate("story-archive")}
           onDailyScenario={() => navigate("daily-scenario")}
           onDailyChronicle={() => navigate("daily-chronicle")}
+          onMindBreak={() => navigate("mind-break")}
+          onDualCapture={() => navigate("dual-capture")}
+          onRescueGoneWrong={() => navigate("rescue-gone-wrong")}
+          onPowerDrain={() => navigate("power-drain")}
         />
       )}
 
@@ -259,6 +271,22 @@ function AppInner() {
 
       {page === "celebrity-mode" && (
         <CelebrityMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "mind-break" && (
+        <MindBreakMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "dual-capture" && (
+        <DualCaptureMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "rescue-gone-wrong" && (
+        <RescueGoneWrongMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "power-drain" && (
+        <PowerDrainMode onBack={() => navigate("home")} />
       )}
     </div>
   );
