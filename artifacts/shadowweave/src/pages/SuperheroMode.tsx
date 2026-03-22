@@ -288,12 +288,23 @@ const VILLAINS = [
   // Power Rangers
   { name: "Rita Repulsa",    universe: "PR",     scheme: "Conquer Earth and destroy the Power Rangers once and for all",                 icon: "🧙" },
   { name: "Lord Zedd",       universe: "PR",     scheme: "Reclaim dominion as Emperor of Evil across the entire universe",              icon: "👑" },
+  { name: "Thrax",           universe: "PR",     scheme: "Unite all villains to destroy Sentinel Knight and avenge his parents' defeat", icon: "⚔" },
+  { name: "Dark Specter",    universe: "PR",     scheme: "Drain Zordon's power and conquer the entire universe as Grand Monarch",      icon: "🌑" },
   { name: "Astronema",       universe: "PR",     scheme: "Serve Dark Specter and obliterate the Space Rangers utterly",                 icon: "🌑" },
   { name: "Divatox",         universe: "PR",     scheme: "Plunder the galaxy and eliminate Zordon's lasting legacy",                   icon: "🏴‍☠️" },
-  { name: "Ransik",          universe: "PR",     scheme: "Dominate the past and reshape the future entirely for mutantkind",           icon: "🧬" },
-  { name: "Mesogog",         universe: "PR",     scheme: "De-evolve humanity back to the prehistoric age of dinosaurs",                icon: "🦖" },
-  { name: "Master Xandred",  universe: "PR",     scheme: "Flood the Sanzu River into the human world and rule it in darkness",        icon: "🌊" },
+  { name: "Scorpius",        universe: "PR",     scheme: "Gather the Quasar Sabers to achieve ultimate power over the galaxy",         icon: "🦂" },
   { name: "Trakeena",        universe: "PR",     scheme: "Destroy everything Kendrix Morgan sacrificed herself to protect",            icon: "🦂" },
+  { name: "Ransik",          universe: "PR",     scheme: "Dominate the past and reshape the future entirely for mutantkind",           icon: "🧬" },
+  { name: "Master Org",      universe: "PR",     scheme: "Exterminate humanity and restore Orgs as rulers of the Wild Force world",   icon: "🌿" },
+  { name: "Lothor",          universe: "PR",     scheme: "Collect enough ninja souls to open the Abyss of Evil and conquer Earth",    icon: "🌀" },
+  { name: "Mesogog",         universe: "PR",     scheme: "De-evolve humanity back to the prehistoric age of dinosaurs",                icon: "🦖" },
+  { name: "Gruumm",          universe: "PR",     scheme: "Conquer Earth for the Troobian Empire and feed the Magnificence",           icon: "💀" },
+  { name: "Venjix",          universe: "PR",     scheme: "Wipe out the last of humanity and absorb all computer systems as one",      icon: "🤖" },
+  { name: "Master Xandred",  universe: "PR",     scheme: "Flood the Sanzu River into the human world and rule it in darkness",        icon: "🌊" },
+  { name: "Vrak",            universe: "PR",     scheme: "Betray his own royal family to reshape Earth under Warstar dominion",       icon: "👽" },
+  { name: "Sledge",          universe: "PR",     scheme: "Collect every powerful Energem and sell them across the galaxy",            icon: "⛓" },
+  { name: "Madame Odius",    universe: "PR",     scheme: "Steal ninja power through deception and claim the Ninja Nexus Prism",       icon: "🎭" },
+  { name: "Void Knight",     universe: "PR",     scheme: "Resurrect his beloved at any cost — even destroying the Dino Fury Rangers", icon: "🗡" },
 ];
 
 // ── Weakness Catalog ──────────────────────────────────────────
