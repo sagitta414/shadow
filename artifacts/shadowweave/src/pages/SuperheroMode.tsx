@@ -225,6 +225,22 @@ const ANIMATED_HEROES = [
   { name: "Korra",         alias: "Avatar Korra — Protector of Republic City", power: "Full Avatar mastery of Water, Earth, Fire & Air; energy-bending & Avatar State granting cosmic-tier power", icon: "🌊" },
 ];
 
+const SW_HEROES = [
+  { name: "Padmé Amidala",    alias: "Senator & Former Queen of Naboo",          power: "Brilliant political strategist, skilled markswoman, and fearless leader who routinely outwits Sith Lords through sheer force of will",    icon: "👑" },
+  { name: "Leia Organa",      alias: "Princess — Senator — General",             power: "Gifted Force-sensitive, exceptional strategist, expert marksman, and the unbreakable moral spine of the Rebellion",                         icon: "⭐" },
+  { name: "Rey",              alias: "Rey Skywalker — Last Jedi",                power: "Gifted Force prodigy — telekinesis, mind bonds, Force healing, Jedi combat mastery, and dyad connection granting cosmic-level potential",   icon: "⚔" },
+  { name: "Ahsoka Tano",      alias: "The Daughter — Former Jedi, Rebel Agent", power: "Dual white lightsabers, apex Jedi combat mastery refined across decades, Force powers, and battle-hardened tactical brilliance",             icon: "⚔" },
+  { name: "Jyn Erso",         alias: "Jyn Erso — Rogue One",                     power: "Guerrilla combat expert, infiltration specialist and fearless operative who once cracked an Empire death-code under fire",                   icon: "🔫" },
+  { name: "Sabine Wren",      alias: "Sabine Wren — Mandalorian Artist",         power: "Mandalorian warrior trained by Bo-Katan, Darksaber wielder, explosives genius and covert infiltration expert",                              icon: "💣" },
+  { name: "Hera Syndulla",    alias: "General Hera Syndulla — Rebel Command",   power: "Finest pilot in the Rebellion, tactical command genius, and Twi'lek Force-heritage making her instinctively read a battle before it starts", icon: "🚀" },
+  { name: "Bo-Katan Kryze",   alias: "Bo-Katan Kryze — Nite Owl Commander",     power: "Elite Mandalorian warrior, Darksaber claimant, and Night Owls leader with peak combat ability in beskar armour",                          icon: "🗡" },
+  { name: "Asajj Ventress",   alias: "Asajj Ventress — Former Sith Assassin",   power: "Ferociously powerful dark side Force user, twin red lightsaber master, and assassin trained to perfection by Count Dooku",                  icon: "🔴" },
+  { name: "Aayla Secura",     alias: "Aayla Secura — Jedi Knight",              power: "Extraordinary Force agility, expert dual lightsaber combat, empathic battlefield intuition and Twi'lek physical superiority",               icon: "💙" },
+  { name: "Qi'ra",            alias: "Qi'ra — Crimson Dawn Underlord",           power: "Teräs Käsi martial arts master, underworld strategist, and the most dangerous person in any room who shows none of her true capability",     icon: "💀" },
+  { name: "Fennec Shand",     alias: "Fennec Shand — Elite Assassin",            power: "Galaxy's finest sniper, cybernetically enhanced survivability, and cold-blooded tactical precision refined over decades of wetwork",         icon: "🎯" },
+  { name: "Mara Jade",        alias: "Mara Jade — Emperor's Hand",               power: "Emperor's personal Force assassin with Jedi-grade telekinesis, expert lightsaber combat and mental shielding trained in total secrecy",      icon: "🟢" },
+];
+
 const VILLAINS = [
   // Marvel
   { name: "Thanos",           universe: "Marvel", scheme: "Wield cosmic power to reshape reality",           icon: "💀" },
@@ -337,6 +353,21 @@ const VILLAINS = [
   { name: "Sledge",          universe: "PR",     scheme: "Collect every powerful Energem and sell them across the galaxy",            icon: "⛓" },
   { name: "Madame Odius",    universe: "PR",     scheme: "Steal ninja power through deception and claim the Ninja Nexus Prism",       icon: "🎭" },
   { name: "Void Knight",     universe: "PR",     scheme: "Resurrect his beloved at any cost — even destroying the Dino Fury Rangers", icon: "🗡" },
+  // Star Wars
+  { name: "Darth Vader",        universe: "SW", scheme: "Serve the Emperor and crush all Rebel resistance across the galaxy", icon: "⬛" },
+  { name: "Emperor Palpatine",  universe: "SW", scheme: "Rule the galaxy as God-Emperor through absolute Sith mastery", icon: "👁" },
+  { name: "Kylo Ren",           universe: "SW", scheme: "Destroy the last Jedi and rule the galaxy as Supreme Leader", icon: "🔴" },
+  { name: "Count Dooku",        universe: "SW", scheme: "Reshape galactic politics through Separatist war and Sith manipulation", icon: "⚡" },
+  { name: "Darth Maul",         universe: "SW", scheme: "Rebuild his criminal empire and destroy those who humiliated him", icon: "🔴" },
+  { name: "Grand Admiral Thrawn",universe: "SW",scheme: "Conquer the New Republic through tactical genius and cultural study", icon: "🎨" },
+  { name: "Moff Gideon",        universe: "SW", scheme: "Harness Mandalorian power and dark science to rebuild the Empire", icon: "⚔" },
+  { name: "Director Krennic",   universe: "SW", scheme: "Complete the Death Star and claim his place at the Emperor's side", icon: "💀" },
+  { name: "Grand Moff Tarkin",  universe: "SW", scheme: "Rule through fear — the Death Star is the ultimate demonstration", icon: "🏛" },
+  { name: "Boba Fett",          universe: "SW", scheme: "Complete any bounty contract and cement his legacy as the galaxy's greatest hunter", icon: "🎯" },
+  { name: "The Grand Inquisitor",universe: "SW",scheme: "Hunt every surviving Jedi to extinction on the Emperor's order", icon: "🔺" },
+  { name: "Jabba the Hutt",     universe: "SW", scheme: "Expand Hutt cartel dominion and collect every debt owed to him", icon: "🐸" },
+  { name: "General Grievous",   universe: "SW", scheme: "Collect Jedi lightsabers as trophies while executing Separatist conquest", icon: "🤖" },
+  { name: "Darth Revan",        universe: "SW", scheme: "Forge an empire through the combined power of both light and dark side", icon: "🌑" },
   // Animated — Disney
   { name: "Maleficent",      universe: "Animated", scheme: "Curse every soul who defies her and blanket the Moors in eternal darkness",            icon: "🌑" },
   { name: "Ursula",          universe: "Animated", scheme: "Collect desperate souls through impossible bargains and seize Triton's trident",       icon: "🐙" },
@@ -439,6 +470,20 @@ const WEAKNESS_CATALOG: Record<string, string[]> = {
   "Jessica Rabbit":    ["Toon physics only protect her inside Toon-logic contexts — real-world weapons operate normally against her", "Her devastating weaponised charm works on those who want to be charmed — emotionally disciplined opponents are immune", "Roger Rabbit is her absolute lever — threaten him and she loses all composure and strategic clarity", "Her Toon nature is visible and traceable — she cannot hide what she is in the human world"],
   "Asami Sato":        ["No bending whatsoever — against skilled benders she must rely entirely on speed, tech, and terrain", "The chi-blocker glove has finite charge — once depleted she loses her primary non-lethal weapon", "Her father Hiroshi's ghost and its legacy create deep psychological pressure under sustained interrogation", "Korra is her primary emotional lever — any threat to the Avatar produces irrational protective responses"],
   "Korra":             ["Hot-headed instinct to meet every threat head-on makes her tactically predictable", "Avatar State requires emotional calm — psychological destabilisation makes it inaccessible at the worst moments", "Equalist chi-blocking temporarily severs her bending — she is baseline-human until the block is released", "Mako, Asami, Bolin, and especially Tenzin as leverage — she charges recklessly into anything that threatens them"],
+  // Star Wars
+  "Padmé Amidala":     ["Her deep trust in democratic institutions means she underestimates how far true power-seekers will go", "Anakin Skywalker is the most devastating lever — any threat to him or her children overrides all political discipline", "Physical combat training is minimal — away from guards and handmaidens she is entirely vulnerable", "Her faith in the Senate and the Republic is weaponised against her — she keeps negotiating when she should run"],
+  "Leia Organa":       ["Torture resistance is extraordinary but biological — there are limits and the Empire found them", "Han Solo, Luke Skywalker, and the Rebellion as leverage — she will sacrifice her own safety for any of them without hesitation", "Her status as a leader means she can never fully disappear — her face is known across the galaxy", "Emotional suppression of Force sensitivity leaves her spiritually open to Sith influence she doesn't recognise as such"],
+  "Rey":               ["Force dyad bond with Kylo Ren means whatever she feels he can access — the connection cannot be blocked by will alone", "Her desperate need to belong and understand her own identity is her deepest psychological wound", "Physical exhaustion collapses her Force abilities — she overextends and her power becomes uncontrolled", "Dark side temptation is more powerful in her than any other Jedi — Palpatine's blood is a constant undertow"],
+  "Ahsoka Tano":       ["Her emotional connection to Anakin/Vader is the most devastating lever — she cannot fully commit to destroying him", "Years of distrust of institutions make her operate alone — isolation strips her of backup at critical moments", "White lightsabers mark her as Force-sensitive and make her unmistakable — she cannot truly go undercover", "Her moral code means she always hesitates before the killing stroke — opponents who don't share that code exploit it"],
+  "Jyn Erso":          ["Her father Galen is the single greatest emotional lever — she will abandon any mission for him", "Chronic distrust means she rejects backup — her instinct is always to go alone, which leaves her without support", "Her combat skill is entirely conventional human — no Force, no enhanced physiology, nothing but training", "Her reckless willingness to die means she doesn't value her own survival — she won't negotiate for herself"],
+  "Sabine Wren":       ["Her armour and Darksaber are her primary advantages — stripped of them she is a very good but baseline fighter", "Mandalorian honour culture creates exploitable predictable responses to challenges and disrespect", "Her family — the clan, Hera, Ahsoka — as leverage; she will walk into obvious traps to protect them", "Her artistic compulsion means she always leaves a mark — she cannot resist personalising her work"],
+  "Hera Syndulla":     ["Outside the cockpit and away from her crew she loses her primary tactical advantages entirely", "Her Ghost family — Chopper, Kanan's ghost, Jacen — as absolute leverage", "She relies on communication and coordination — jamming and isolation strip her command capability completely", "Her Twi'lek lekku are sensitive and can be used as pain or control leverage in close quarters"],
+  "Bo-Katan Kryze":    ["Darksaber legitimacy is everything — undermine her claim to it and her people may abandon her", "The Darksaber itself is a weapon she struggled to wield — opponents who know this can force her into combat with it", "Mandalorian creed rigidity creates blind spots that more flexible opponents can exploit", "Loss of her homeworld and people is the wound that never healed — Mandalore as leverage is catastrophic for her discipline"],
+  "Asajj Ventress":    ["Dark side power is fuelled by rage and pain — emotional manipulation that flattens her anger weakens her Force connection", "Dooku's abandonment left a wound she never fully closed — anyone who mirrors his manipulation can exploit the same vulnerabilities", "Her twin lightsabers are her primary combat tool — without them she is still dangerous but significantly less so", "Her mercenary status post-Dooku means she operates alone — no reinforcements, no political protection, no name to invoke"],
+  "Aayla Secura":      ["Her Twi'lek lekku contain a large portion of her neural functions — injuries to them cause disproportionate cognitive disruption", "Her empathic Force intuition can be weaponised — broadcasting intense artificial emotions overwhelms her sensitivity", "Clone trooper loyalties were her lifeline — Order 66 demonstrated how completely she was exposed to betrayal from allies", "Her physical combat assumes a two-saber style that requires open space — confined quarters and grappling negate her advantage"],
+  "Qi'ra":             ["Her emotional detachment is armour — anyone who genuinely cares for her without agenda temporarily destabilises it", "Maul's authority over Crimson Dawn was absolute — anyone who credibly channels that authority can access old conditioning", "Her combat relies on close-quarters Teräs Käsi — ranged suppression and distance deny her primary fighting method", "Han Solo is the one wound she never cauterised — his name still costs her a fraction of a second"],
+  "Fennec Shand":      ["Her cybernetic enhancements are miracle surgery held together by technology — EMP or targeted damage to her torso compromises her functioning", "Her professional coldness is a mask — a small number of people matter to her and threatening them breaks the mask", "Extreme long-range engagement is where she excels — closing to melee removes her primary advantage", "Her reputation is her currency — destroying it or convincingly framing her ruins the only leverage she has"],
+  "Mara Jade":         ["Her years of conditioning as the Emperor's Hand left deep loyalty triggers that resurfaced under extreme stress", "Her relationship with Luke Skywalker is the bond that humanised her — threaten him and her legendary discipline cracks", "Ysalamiri or Force-void environments strip her primary edge and leave her as a baseline human expert only", "Her intelligence and tactical awareness mean she is always anticipating — opponents who are genuinely irrational confound her completely"],
 };
 
 function getHeroWeaknesses(hero: { name: string; power: string }): string[] {
@@ -544,8 +589,8 @@ const STORY_LENGTHS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED";
-type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW";
+type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
 export default function SuperheroMode({ onBack }: SuperheroModeProps) {
@@ -618,6 +663,7 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
     ...TB_HEROES.map((h) => ({ ...h, universe: "TB" })),
     ...PR_HEROES.map((h) => ({ ...h, universe: "PR" })),
     ...ANIMATED_HEROES.map((h) => ({ ...h, universe: "ANIMATED" })),
+    ...SW_HEROES.map((h) => ({ ...h, universe: "SW" })),
   ];
 
   const filteredHeroes = allHeroes.filter((h) => {
@@ -919,9 +965,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -952,9 +998,10 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
                   const isTB = h.universe === "TB";
                   const isPR = h.universe === "PR";
                   const isAnim = h.universe === "ANIMATED";
-                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : "rgba(0,100,220,0.18)";
-                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : "rgba(0,100,220,0.3)";
+                  const isSW = h.universe === "SW";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.15)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : isSW ? "rgba(0,180,255,0.28)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
@@ -981,10 +1028,11 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               const isTB = hero.universe === "TB";
               const isPR = hero.universe === "PR";
               const isAnim = hero.universe === "ANIMATED";
+              const isSW = hero.universe === "SW";
               const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : "#60A0FF";
-              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : "rgba(0,100,220,0.15)";
-              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : "rgba(0,100,220,0.2)";
+              const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : "#60A0FF";
+              const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : "rgba(0,100,220,0.15)";
+              const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : "rgba(0,100,220,0.2)";
               return (
                 <button
                   key={`${hero.universe}-${hero.name}`}
@@ -1072,9 +1120,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               {/* Villain 1 universe filter */}
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", alignItems: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined }}>
-                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR", "Animated"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : v === "Animated" ? "rgba(160,0,255,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : v === "Animated" ? "#C084FC" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : v === "Animated" ? "Animated ✦" : "The Boys ✦"}
+                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR", "Animated", "SW"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : v === "Animated" ? "rgba(160,0,255,0.25)" : v === "SW" ? "rgba(0,180,255,0.22)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : v === "Animated" ? "#C084FC" : v === "SW" ? "#4DC8FF" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : v === "Animated" ? "Animated ✦" : v === "SW" ? "Star Wars ✦" : "The Boys ✦"}
                     </button>
                   ))}
                 </div>
@@ -1184,9 +1232,9 @@ export default function SuperheroMode({ onBack }: SuperheroModeProps) {
               <div style={{ fontSize: "0.6rem", color: "#FF6060", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>▸ Villain 2</div>
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.875rem", alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden" }}>
-                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR", "Animated"] as VillainFilter[]).map((v, i, arr) => (
-                    <button key={v} onClick={() => setVillainFilter2(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter2 === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : v === "Animated" ? "rgba(160,0,255,0.25)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter2 === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : v === "Animated" ? "#C084FC" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : v === "Animated" ? "Animated ✦" : "The Boys ✦"}
+                  {(["ALL", "Marvel", "DC", "CW", "TB", "PR", "Animated", "SW"] as VillainFilter[]).map((v, i, arr) => (
+                    <button key={v} onClick={() => setVillainFilter2(v)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.85rem", background: villainFilter2 === v ? (v === "Marvel" ? "rgba(220,30,30,0.25)" : v === "DC" ? "rgba(0,100,220,0.25)" : v === "CW" ? "rgba(0,180,100,0.2)" : v === "TB" ? "rgba(200,30,0,0.25)" : v === "PR" ? "rgba(220,0,150,0.25)" : v === "Animated" ? "rgba(160,0,255,0.25)" : v === "SW" ? "rgba(0,180,255,0.22)" : "rgba(200,0,50,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: villainFilter2 === v ? (v === "Marvel" ? "#FF6060" : v === "DC" ? "#60A0FF" : v === "CW" ? "#40E090" : v === "TB" ? "#FF3D00" : v === "PR" ? "#FF69B4" : v === "Animated" ? "#C084FC" : v === "SW" ? "#4DC8FF" : "#FF4060") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                      {v === "ALL" ? "All" : v === "Marvel" ? "Marvel ✦" : v === "DC" ? "DC ✦" : v === "CW" ? "CW ✦" : v === "PR" ? "Power Rangers ✦" : v === "Animated" ? "Animated ✦" : v === "SW" ? "Star Wars ✦" : "The Boys ✦"}
                     </button>
                   ))}
                 </div>
