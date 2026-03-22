@@ -194,20 +194,20 @@ const PR_HEROES = [
 ];
 
 const ANIMATED_HEROES = [
-  { name: "Kim Possible",    alias: "World-Saving Teen Spy",        power: "Expert martial arts, Kimmunicator tech & unmatched acrobatics",    icon: "🟢" },
-  { name: "Sam",             alias: "Totally Spies — Brains",       power: "WOOHP spy gadgets, tactical leadership & hand-to-hand combat",      icon: "🟩" },
-  { name: "Clover",          alias: "Totally Spies — Combat",       power: "WOOHP spy gadgets, fearless improvisation & acrobatic fighting",     icon: "❤" },
-  { name: "Alex",            alias: "Totally Spies — Heart",        power: "WOOHP spy gadgets, athletic agility & fierce loyal courage",         icon: "💛" },
-  { name: "Helen Parr",      alias: "Elastigirl",                   power: "Full-body rubber elasticity, shape-shifting & incredible reach",     icon: "🦸" },
-  { name: "Rita Farr",       alias: "Elasti-Woman",                 power: "Unlimited size alteration — shrink to microscopic or grow to giant",  icon: "⬆" },
-  { name: "Adora",           alias: "She-Ra, Princess of Power",    power: "Sword of Protection, superhuman strength & magical healing",         icon: "⚔" },
-  { name: "Glimmer",         alias: "Queen of Bright Moon",         power: "Teleportation, blinding light bursts & Runestone magic",             icon: "✨" },
-  { name: "Raven",           alias: "Teen Titans — Dark Empath",   power: "Telekinesis, dimensional portals & soul-self astral projection",     icon: "🌑" },
-  { name: "Starfire",        alias: "Teen Titans — Tamaranean",    power: "Flight, starbolts, superhuman strength & UV light absorption",        icon: "⭐" },
-  { name: "Carmen Sandiego", alias: "The Thief Who Fights Back",   power: "Master thief skills, global network & acrobatic infiltration",        icon: "🌍" },
-  { name: "Batgirl",         alias: "Barbara Gordon — BTAS",       power: "Peak human combat, cape-glider & detective intellect",               icon: "🦇" },
-  { name: "Huntress",        alias: "JLU — Helena Bertinelli",     power: "Expert markswoman, crossbow mastery & relentless pursuit",           icon: "🎯" },
-  { name: "Black Canary",    alias: "JLU — Dinah Lance",           power: "Sonic Canary Cry, world-class martial arts & fearless leadership",   icon: "🐦" },
+  { name: "Elsa",        alias: "Queen of Arendelle — Ice Sorceress",  power: "Absolute cryokinesis — blizzards, ice constructs & glacial fortresses at will",          icon: "❄" },
+  { name: "Anna",        alias: "Princess of Arendelle",               power: "Act of true love magic, fearless tenacity & surprising combat instinct",                   icon: "💖" },
+  { name: "Rapunzel",    alias: "Lost Princess of Corona",              power: "70 feet of enchanted hair with immense strength, painting magic & healing golden light",   icon: "🌸" },
+  { name: "Tiana",       alias: "Princess of the Bayou",               power: "Indomitable willpower, bayou survival instincts & voodoo-touched resilience",              icon: "🐸" },
+  { name: "Pocahontas",  alias: "Daughter of Chief Powhatan",          power: "Nature communion — speaks to wind, water & animals; foresight through spirit visions",    icon: "🍃" },
+  { name: "Megara",      alias: "Meg — Former Servant of Hades",       power: "Razor wit, manipulative genius & the one weakness that broke a god's champion",           icon: "🏛" },
+  { name: "Esmeralda",   alias: "La Esmeralda — Gypsy of Paris",       power: "Master acrobat, mesmerising dancer & street-fighter who evades every trap set for her",   icon: "🔥" },
+  { name: "Jane",        alias: "Dr. Jane Porter — Jungle Scholar",    power: "Scientific brilliance, primate language fluency & survival instincts honed in the wild",  icon: "🌿" },
+  { name: "Kida",        alias: "Queen Kidagakash of Atlantis",        power: "Ancient Atlantean crystal power, millennia of warrior training & divine energy ascension", icon: "💎" },
+  { name: "Cinderella",  alias: "Princess of the Kingdom",             power: "Enchanted resilience — magic finds her, animals fight for her & kindness becomes power",  icon: "👑" },
+  { name: "Mulan",       alias: "Fa Mulan — Warrior of China",         power: "Strategic genius, expert swordsmanship & the strength to bring down an army alone",       icon: "⚔" },
+  { name: "Nani",        alias: "Nani Pelekai — Protector of Lilo",   power: "Exceptional athleticism, fierce maternal fury & surfer's body trained to near-peak",     icon: "🌊" },
+  { name: "Belle",       alias: "Belle — Beauty Who Broke the Curse",  power: "Intellectual mastery, enchanted castle access & the power to see through any monster",    icon: "📖" },
+  { name: "Isabela",     alias: "Isabela Madrigal — Encanto",          power: "Full flora manipulation — flowers, thorns, vines & plant life shaped by pure emotion",    icon: "🌺" },
 ];
 
 const VILLAINS = [
@@ -322,14 +322,14 @@ const VILLAINS = [
   { name: "Sledge",          universe: "PR",     scheme: "Collect every powerful Energem and sell them across the galaxy",            icon: "⛓" },
   { name: "Madame Odius",    universe: "PR",     scheme: "Steal ninja power through deception and claim the Ninja Nexus Prism",       icon: "🎭" },
   { name: "Void Knight",     universe: "PR",     scheme: "Resurrect his beloved at any cost — even destroying the Dino Fury Rangers", icon: "🗡" },
-  // Animated
-  { name: "Shego",           universe: "Animated", scheme: "Dominate the world alongside Drakken — or alone if he keeps failing",       icon: "🟢" },
-  { name: "DNAmy",           universe: "Animated", scheme: "Fuse human and animal DNA to create the perfect cuddly creature army",       icon: "🧬" },
-  { name: "Catra",           universe: "Animated", scheme: "Prove her worth to the Horde and destroy Adora's hope completely",          icon: "🐱" },
-  { name: "Shadow Weaver",   universe: "Animated", scheme: "Drain Adora's magical power to fuel the Horde's conquest of Etheria",       icon: "🌑" },
-  { name: "Mirage",          universe: "Animated", scheme: "Seduce and expose superhero identities through perfect deception",           icon: "🌀" },
-  { name: "Ember McLain",    universe: "Animated", scheme: "Use rock music to hypnotise the living world into worshipping her",          icon: "🎸" },
-  { name: "Demona",          universe: "Animated", scheme: "Exterminate humanity before it can destroy gargoyle kind first",             icon: "🦇" },
+  // Animated — Disney
+  { name: "Maleficent",      universe: "Animated", scheme: "Curse every soul who defies her and blanket the Moors in eternal darkness",            icon: "🌑" },
+  { name: "Ursula",          universe: "Animated", scheme: "Collect desperate souls through impossible bargains and seize Triton's trident",       icon: "🐙" },
+  { name: "Evil Queen",      universe: "Animated", scheme: "Destroy Snow White and reclaim the title of the fairest through dark sorcery",         icon: "🍎" },
+  { name: "Mother Gothel",   universe: "Animated", scheme: "Keep Rapunzel imprisoned forever as a living source of youth and immortality",         icon: "🌸" },
+  { name: "Cruella de Vil",  universe: "Animated", scheme: "Skin one hundred and one Dalmatian puppies to create the ultimate fur coat",           icon: "💀" },
+  { name: "Yzma",            universe: "Animated", scheme: "Assassinate Emperor Kuzco and seize the Incan Empire through scheming brilliance",     icon: "⚗" },
+  { name: "Queen of Hearts", universe: "Animated", scheme: "Maintain absolute terrifying rule through arbitrary decrees — off with their heads",   icon: "❤" },
 ];
 
 // ── Weakness Catalog ──────────────────────────────────────────
@@ -395,6 +395,21 @@ const WEAKNESS_CATALOG: Record<string, string[]> = {
   "Firecracker":       ["Her real past identity buried but usable against her", "Compound V-driven powers are newer and less refined", "Media and image-based vulnerability", "Victoria Neuman's political entanglements make her a liability"],
   "Sister Sage":       ["Intelligence doesn't equal physical power — fragile in direct combat", "Neural manipulation used against others can be reversed", "Self-harm induced cognitive resets as her coping mechanism", "Blind spots in her calculations create exploitable gaps"],
   "Victoria Neuman":   ["Head-explosion range is limited — distance and shielding matter", "Congressional accountability — public exposure ends her career", "Starlight has witnessed her power — living witness she cannot eliminate", "Hughie's blood-pressure drug suppresses her ability"],
+  // Disney Heroines
+  "Elsa":              ["Emotional manipulation collapses her cryokinetic control — fear triggers uncontrolled blizzards that harm those she loves", "Prolonged warmth and heat environments gradually erode her ice constructs", "Her absolute terror of hurting people she loves is the deepest lever — threaten Anna and she freezes", "Isolation-induced dissociation from her years alone makes her slow to trust or call for help"],
+  "Anna":              ["No powers whatsoever — fully human and fully vulnerable to any physical threat", "Her relentless naive optimism is exploited — she trusts charming people too quickly and catastrophically", "Elsa as leverage — any threat to her sister destroys Anna's judgment entirely", "The act of true love enchantment is her only reset — without Elsa she has nothing supernatural to rely on"],
+  "Rapunzel":          ["Cutting her hair permanently severs all magical power — scissors end everything instantly", "18 years of isolation have created a desperate craving for human connection — she bonds fast and trusts dangerously", "Her enchanted hair is a liability in close quarters — it can be grabbed, used as rope, or weaponised against her", "Pascal and Maximus can be taken hostage as leverage — she cannot bear to endanger them"],
+  "Tiana":             ["Human with no powers — relies entirely on skill, wit, and determination; all of which fail under physical threat", "Her lifelong dream (the restaurant) is her deepest emotional core — threaten it and her composure shatters", "Voodoo-adjacent environment is her strength — outside the bayou she loses her instinctual advantages", "Naveen's safety is the one thing that overrides her otherwise ironclad self-control"],
+  "Pocahontas":        ["Her profound empathy causes her to hesitate at the moment of violence — she cannot bring herself to harm without reason", "Severed from the natural world in urban or enclosed settings she loses the spirit vision that guides her", "Tribal loyalty creates crippling ethical paralysis — she cannot protect herself if it means endangering her people", "John Smith, Nakoma, or her father used as hostages achieve instant compliance"],
+  "Megara":            ["Her past trauma — sold into servitude — means she distrusts love and instinctively recoils from help, leaving her isolated", "Hades' original contract exploits her sense of debt — she can be convinced she still owes him", "Hercules as leverage completely overrides her cynical self-preservation instincts", "Her armour of sarcasm and wit crumbles catastrophically the moment she admits genuine feeling"],
+  "Esmeralda":         ["Her gypsy network can be systematically dismantled to isolate her", "Her faith creates absolute moral red lines she will not cross — exploitable as a predictable constraint", "Frollo's obsessive authority over Paris means he can turn every escape route against her", "Her natural performance instincts draw attention in a city where she cannot afford to be seen"],
+  "Jane":              ["Her scientific curiosity overrides all self-preservation instinct — novel discoveries disable her threat assessment completely", "Disconnected from Tarzan and the jungle she is just an unarmed academic in the wrong place", "Her verbose enthusiastic communication style betrays her position and intention every time", "Emotional attachment to Tarzan means he is the ultimate pressure point"],
+  "Kida":              ["Away from Atlantis the crystal connection gradually weakens — she is cut off from her power source", "Her people's isolation means she fundamentally cannot read surface-world deception and social manipulation", "Atlantean technology is the foundation of her advantage — without it she is a strong but conventional warrior", "Her millennia of isolation created blind spots about the full range of human cruelty and ambition"],
+  "Cinderella":        ["No powers whatsoever — she is a young woman entirely at the mercy of her environment", "Decades of emotional abuse from her stepfamily have deeply conditioned her to obey and endure", "The enchantment that transforms her has a time limit — midnight erases everything and leaves her exposed", "Her fundamental goodness means she always looks for the best in captors — a catastrophic tactical blindspot"],
+  "Mulan":             ["Her primary advantage is disguise and deception — expose either and she is compromised and without allies", "Her fighting style is entirely leverage and improvisation — remove the environment and she is outmatched physically", "Mushu, Cri-Kee, and her unit are her emotional support structure — isolate her from all three and she starts doubting herself", "Her family honour is the core of her identity — threaten her family and she becomes reckless"],
+  "Nani":              ["No superpowers whatsoever — she is a physically strong surfer and that is all", "Her overwhelming sense of responsibility for Lilo is the most powerful pressure point imaginable", "Social services and custody status exploited — any threat to her guardianship produces instant desperate compliance", "Financial precarity means she cannot afford to fight prolonged battles of any kind"],
+  "Belle":             ["Her beauty has always made her a target and she has no training to handle the attention", "Her love of books and intellectual stimulation used as distraction and isolation — give her a library and she disappears", "Her deep empathy means she always eventually finds the humanity in whoever holds her — a profound vulnerability", "The Beast, Lumiere, Cogsworth, and Mrs Potts as leverage — she will sacrifice herself rather than see them harmed"],
+  "Isabela":           ["Her gift is emotional — deep psychological distress completely collapses her flora control", "Years of perfectionism and suppressed identity mean she is one accusation of failure away from freezing entirely", "Her family's expectations are weaponised through guilt — she cannot disappoint la familia", "Cut off from soil and living plant matter in a completely barren environment she has nothing to manipulate"],
 };
 
 function getHeroWeaknesses(hero: { name: string; power: string }): string[] {
