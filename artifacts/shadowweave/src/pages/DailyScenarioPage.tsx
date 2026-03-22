@@ -4,7 +4,6 @@ import {
   getDailyEntryForToday,
   saveDailyEntry,
   getTodayDateKey,
-  DailyEntry,
 } from "../lib/archive";
 
 // ── Daily data (mirrors Homepage.tsx) ────────────────────────────────────────
@@ -104,19 +103,23 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
   const { heroine, villain, setting, title } = scenario;
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const [story, setStory] = useState("");
+  const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [continuing, setContinuing] = useState(false);
+  const [continueDir, setContinueDir] = useState("");
   const [error, setError] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
   const [alreadySaved, setAlreadySaved] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const hasGenerated = useRef(false);
 
+  const fullStory = chapters.join("\n\n---\n\n");
+
   useEffect(() => {
     const existing = getDailyEntryForToday();
     if (existing) {
-      setStory(existing.story);
+      setChapters([existing.story]);
       setAlreadySaved(true);
       return;
     }
@@ -128,11 +131,11 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [streamingText, story]);
+  }, [streamingText, chapters]);
 
   async function generate() {
     setLoading(true);
-    setStory("");
+    setChapters([]);
     setStreamingText("");
     setError("");
     setSavedId(null);
@@ -154,8 +157,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
           setStreamingText(accumulated);
         }
       );
-      setStory(full);
-      // Auto-save to daily chronicle
+      setChapters([full]);
       saveDailyEntry({
         dateKey: getTodayDateKey(),
         date: today,
@@ -175,20 +177,64 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
     }
   }
 
+  async function continueStory() {
+    if (!fullStory) return;
+    setContinuing(true);
+    setStreamingText("");
+    setError("");
+    let accumulated = "";
+    try {
+      const full = await streamRequest(
+        "/api/story/daily-continue",
+        {
+          previousStory: fullStory,
+          chapterNumber: chapters.length + 1,
+          heroine: `${heroine.name} — ${heroine.power}`,
+          villain,
+          setting,
+          continueDirection: continueDir.trim() || undefined,
+        },
+        (c) => {
+          accumulated += c;
+          setStreamingText(accumulated);
+        }
+      );
+      const newChapters = [...chapters, full];
+      setChapters(newChapters);
+      setContinueDir("");
+      // Update chronicle with full accumulated story
+      saveDailyEntry({
+        dateKey: getTodayDateKey(),
+        date: today,
+        heroine: heroine.name,
+        heroineColor: heroine.color,
+        villain,
+        setting,
+        title,
+        story: newChapters.join("\n\n---\n\n"),
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Continuation failed");
+    } finally {
+      setContinuing(false);
+      setStreamingText("");
+    }
+  }
+
   function saveToMainArchive() {
-    if (!story) return;
+    if (!fullStory) return;
     const id = saveStoryToArchive({
       title,
       universe: "Daily",
       tool: "Daily Dark Scenario",
       characters: [heroine.name, villain],
-      chapters: [story],
+      chapters,
     });
     setSavedId(id);
   }
 
-  const displayText = story || streamingText;
-  const paragraphs = displayText.split(/\n+/).filter(Boolean);
+  const isBusy = loading || continuing;
+  const displayParagraphs = (text: string) => text.split(/\n+/).filter(Boolean);
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem 1.5rem", minHeight: "100vh" }}>
@@ -234,12 +280,12 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
         ))}
       </div>
 
-      {/* Story output */}
+      {/* Story output — all chapters */}
       <div style={{ background: "rgba(4,2,12,0.85)", border: "1px solid rgba(200,168,75,0.1)", borderLeft: "3px solid rgba(200,168,75,0.35)", borderRadius: "12px", padding: "2rem 2rem 1.5rem", marginBottom: "1.5rem", minHeight: "300px", position: "relative" }}>
-        {loading && !streamingText && (
+        {isBusy && !streamingText && chapters.length === 0 && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", padding: "3rem 0" }}>
             <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.5)", letterSpacing: "4px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", animation: "pulse 2s ease-in-out infinite" }}>
-              Generating today's story...
+              {loading ? "Generating today's story..." : "Continuing the story..."}
             </div>
             <div style={{ display: "flex", gap: "0.4rem" }}>
               {[0, 1, 2].map((i) => (
@@ -250,46 +296,131 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
         )}
 
         {error && (
-          <div style={{ color: "#FF6060", fontFamily: "'Montserrat', sans-serif", fontSize: "0.78rem", padding: "1rem", background: "rgba(200,0,0,0.08)", border: "1px solid rgba(200,0,0,0.2)", borderRadius: "8px" }}>
+          <div style={{ color: "#FF6060", fontFamily: "'Montserrat', sans-serif", fontSize: "0.78rem", padding: "1rem", background: "rgba(200,0,0,0.08)", border: "1px solid rgba(200,0,0,0.2)", borderRadius: "8px", marginBottom: "1rem" }}>
             ✗ {error}
           </div>
         )}
 
-        {paragraphs.length > 0 && (
-          <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.05rem", lineHeight: 1.9, color: "rgba(228,222,210,0.85)" }}>
-            {paragraphs.map((p, i) => (
-              <p key={i} style={{ margin: "0 0 1.2em", textIndent: "1.5em" }}>{p}</p>
-            ))}
-            {loading && (
+        <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.05rem", lineHeight: 1.9, color: "rgba(228,222,210,0.85)" }}>
+          {chapters.map((chapter, ci) => (
+            <div key={ci}>
+              {ci > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.5rem" }}>
+                  <div style={{ flex: 1, height: "1px", background: "rgba(200,168,75,0.15)" }} />
+                  <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.4)", letterSpacing: "3px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                    Chapter {ci + 1}
+                  </div>
+                  <div style={{ flex: 1, height: "1px", background: "rgba(200,168,75,0.15)" }} />
+                </div>
+              )}
+              {displayParagraphs(chapter).map((p, i) => (
+                <p key={i} style={{ margin: "0 0 1.2em", textIndent: "1.5em" }}>{p}</p>
+              ))}
+            </div>
+          ))}
+
+          {/* Streaming text for current in-progress chapter */}
+          {streamingText && (
+            <div>
+              {chapters.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.5rem" }}>
+                  <div style={{ flex: 1, height: "1px", background: "rgba(200,168,75,0.15)" }} />
+                  <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.4)", letterSpacing: "3px", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                    Chapter {chapters.length + 1}
+                  </div>
+                  <div style={{ flex: 1, height: "1px", background: "rgba(200,168,75,0.15)" }} />
+                </div>
+              )}
+              {displayParagraphs(streamingText).map((p, i) => (
+                <p key={i} style={{ margin: "0 0 1.2em", textIndent: "1.5em" }}>{p}</p>
+              ))}
               <span style={{ display: "inline-block", width: "2px", height: "1.1em", background: "rgba(200,168,75,0.7)", verticalAlign: "middle", animation: "pulseDot 1s ease-in-out infinite", marginLeft: "2px" }} />
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         <div ref={bottomRef} />
       </div>
 
       {/* Action bar */}
-      {story && (
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "2rem" }}>
+      {fullStory && (
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
           {alreadySaved && (
             <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.5rem 1rem", background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(0,200,80,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
-              ✓ Auto-saved to Chronicle
+              ✓ Saved to Chronicle
             </div>
           )}
           {!savedId ? (
             <button onClick={saveToMainArchive} style={{ padding: "0.6rem 1.5rem", background: "rgba(200,168,75,0.1)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "8px", color: "rgba(200,168,75,0.8)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.18)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.6)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.3)"; }}>
-              ◈ Save to Story Archive
+              ◈ Save to Archive
             </button>
           ) : (
             <div style={{ padding: "0.5rem 1rem", background: "rgba(0,100,200,0.08)", border: "1px solid rgba(0,100,200,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(100,180,255,0.7)", fontFamily: "'Montserrat', sans-serif" }}>
-              ✓ Saved to Story Archive
+              ✓ Saved to Archive
             </div>
           )}
-          <button onClick={() => { hasGenerated.current = false; generate(); }} disabled={loading} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: loading ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: loading ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
+          <button onClick={() => { hasGenerated.current = false; generate(); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
             ⚡ Regenerate
+          </button>
+        </div>
+      )}
+
+      {/* Continue Story section */}
+      {fullStory && !isBusy && (
+        <div style={{ background: "rgba(8,4,20,0.6)", border: "1px solid rgba(200,168,75,0.15)", borderRadius: "12px", padding: "1.5rem", marginBottom: "2rem" }}>
+          <div style={{ fontSize: "0.52rem", color: "rgba(200,168,75,0.5)", letterSpacing: "3px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem", fontWeight: 700 }}>
+            ◈ Continue the Story — Chapter {chapters.length + 1}
+          </div>
+
+          <textarea
+            value={continueDir}
+            onChange={(e) => setContinueDir(e.target.value)}
+            placeholder={`Optional: steer the next chapter… "She attempts escape," "The villain escalates," "She breaks," "Introduce a new threat," or leave blank to let it escalate naturally.`}
+            rows={3}
+            style={{
+              width: "100%",
+              background: "rgba(0,0,0,0.5)",
+              border: "1px solid rgba(200,168,75,0.2)",
+              borderRadius: "8px",
+              padding: "0.875rem 1rem",
+              color: "#E8E8F5",
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: "0.875rem",
+              lineHeight: 1.6,
+              resize: "vertical",
+              outline: "none",
+              boxSizing: "border-box",
+              marginBottom: "1rem",
+              transition: "border-color 0.2s",
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,168,75,0.5)")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(200,168,75,0.2)")}
+          />
+
+          <button
+            onClick={continueStory}
+            disabled={isBusy}
+            style={{
+              padding: "0.75rem 2rem",
+              background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))",
+              border: "none",
+              borderRadius: "10px",
+              color: "#0a0808",
+              fontFamily: "'Cinzel', serif",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              cursor: isBusy ? "not-allowed" : "pointer",
+              opacity: isBusy ? 0.5 : 1,
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => { if (!isBusy) e.currentTarget.style.filter = "brightness(1.15)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
+          >
+            {continuing ? "Writing..." : `Continue → Chapter ${chapters.length + 1}`}
           </button>
         </div>
       )}

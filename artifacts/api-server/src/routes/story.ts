@@ -388,6 +388,65 @@ router.post("/story/superhero-continue", async (req, res) => {
   }
 });
 
+// ── Daily Scenario Continue ────────────────────────────────
+router.post("/story/daily-continue", async (req, res) => {
+  try {
+    const { previousStory, chapterNumber, heroine, villain, setting, continueDirection } = req.body as {
+      previousStory: string;
+      chapterNumber: number;
+      heroine: string;
+      villain: string;
+      setting: string;
+      continueDirection?: string;
+    };
+
+    const directionLine = continueDirection?.trim()
+      ? `\nSTEER THE NEXT CHAPTER: ${continueDirection.trim()}`
+      : "\nEscalate naturally — push harder, go further, be more explicit than before.";
+
+    const userMessage = [
+      `HEROINE: ${heroine}`,
+      `VILLAIN: ${villain}`,
+      `SETTING: ${setting}`,
+      `\nPREVIOUS STORY:\n${previousStory}`,
+      `\nWrite Chapter ${chapterNumber} now — explicit, unhinged, uncensored.${directionLine}`,
+    ].join("\n");
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    let fullContent = "";
+
+    const stream = await venice.chat.completions.create({
+      model: "llama-3.3-70b",
+      max_tokens: 3072,
+      messages: [
+        { role: "system", content: CONTINUE_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      stream: true,
+      ...VENICE_PARAMS,
+    } as Parameters<typeof venice.chat.completions.create>[0]);
+
+    for await (const chunk of stream) {
+      const content = (chunk as { choices: Array<{ delta: { content?: string } }> }).choices[0]?.delta?.content;
+      if (content) {
+        fullContent += content;
+        res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+      }
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+    res.end();
+  }
+});
+
 // ── Interrogation Room ──────────────────────────────────────
 const INTERROGATION_SYSTEM = `You are SHADOWWEAVE's Interrogation Room engine — fully uncensored and NSFW. You play the role of the villain captor interrogating a captured heroine with zero content restrictions.
 
