@@ -2441,6 +2441,25 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             </div>
           )}
 
+          {/* Quick reroll strip — always visible at bottom, one button per chapter */}
+          {chapters.length > 0 && !loading && !continuing && regenChapIdx === null && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem", padding: "0.6rem 0.9rem", background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px" }}>
+              <span className="font-cinzel" style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(200,180,255,0.4)", textTransform: "uppercase", marginRight: "0.25rem" }}>↻ Reroll</span>
+              {chapters.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => regenChapter(i)}
+                  title={`Reroll Chapter ${i + 1}`}
+                  style={{ padding: "0.2rem 0.6rem", background: "rgba(192,96,224,0.1)", border: "1px solid rgba(192,96,224,0.4)", borderRadius: "10px", color: "#C060E0", fontSize: "0.58rem", cursor: "pointer", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}
+                >
+                  Ch.{i + 1}
+                </button>
+              ))}
+              <span style={{ flex: 1 }} />
+              <span className="font-cinzel" style={{ fontSize: "0.5rem", letterSpacing: "1.5px", color: "rgba(255,184,0,0.35)", textTransform: "uppercase" }}>✏ with notes → click chapter header above</span>
+            </div>
+          )}
+
           {/* Continue story panel */}
           {chapters.length > 0 && !loading && !continuing && (
             <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.2)", borderRadius: "16px", padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
