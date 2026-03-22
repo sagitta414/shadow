@@ -93,7 +93,7 @@ router.post("/story/generate", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 4096,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
@@ -183,7 +183,7 @@ router.post("/story/captor-logic", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 2048,
       messages: [
         { role: "system", content: CAPTOR_LOGIC_PROMPT },
@@ -299,7 +299,7 @@ router.post("/story/superhero", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 4096,
       messages: [
         { role: "system", content: SUPERHERO_PROMPT },
@@ -374,7 +374,7 @@ router.post("/story/superhero-continue", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 3072,
       messages: [
         { role: "system", content: CONTINUE_PROMPT },
@@ -433,7 +433,7 @@ router.post("/story/daily-continue", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 3072,
       messages: [
         { role: "system", content: CONTINUE_PROMPT },
@@ -506,7 +506,7 @@ router.post("/story/interrogation", async (req, res) => {
     let fullContent = "";
 
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 512,
       messages: [
         { role: "system", content: INTERROGATION_SYSTEM },
@@ -590,7 +590,7 @@ Write the opening story. Establish the setting vividly. Capture the actress's fa
 
     let fullContent = "";
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: storyLength === "Epic" ? 2200 : storyLength === "Quick Strike" ? 700 : 1400,
       messages: [
         { role: "system", content: CELEBRITY_SYSTEM },
@@ -637,7 +637,7 @@ router.post("/story/celebrity-continue", async (req, res) => {
 
     let fullContent = "";
     const stream = await venice.chat.completions.create({
-      model: "venice-uncensored",
+      model: "venice-uncensored-role-play",
       max_tokens: 1400,
       messages: [
         { role: "system", content: CELEBRITY_CONTINUE_SYSTEM },
