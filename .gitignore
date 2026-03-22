@@ -1,8 +1,8 @@
 node_modules/
-dist/
-.env
-*.log
-.DS_Store
-public/heroes/
-public/villains/
-public/celebrities/
+  dist/
+  .cache/
+  coverage/
+  .env
+  *.log
+  .DS_Store
+  
