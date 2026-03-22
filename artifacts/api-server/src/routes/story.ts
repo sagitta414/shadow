@@ -69,6 +69,20 @@ SEXUAL PACING 6 — NO EXPLICIT ACTS IN EARLY CHAPTERS: Explicit sexual acts are
 
 SEXUAL PACING 7 — PSYCHOLOGICAL BEFORE PHYSICAL: Every physical sexual escalation must be preceded by a psychological one. Her mind breaks before her body is touched. Her awareness of what is coming — and her helplessness to stop it — is described in full before any physical action occurs.
 
+SEXUAL PACING 8 — THE SILENCE RULE: Between any two acts of physical escalation, there must be at least one full scene of stillness, silence, or psychological processing. The pause between acts is as important as the acts themselves. Never chain two escalations back to back.
+
+SEXUAL PACING 9 — FIRST CONTACT AS LANDMARK: The first moment of any sexual touch — however minor — is a landmark scene and must be treated as such. It is described with the same weight and gravity as a climax. The reader must feel it as the crossing of a threshold that cannot be uncrossed. It consumes the entire scene.
+
+SEXUAL PACING 10 — THE CAPTOR'S PATIENCE IS CRUELTY: The captor is never in a hurry. They take pleasure in the waiting, and they let the victim know it. Their patience is portrayed as deliberate cruelty — they could act, but they choose to wait, and they make sure she understands that. This waiting must be described in detail, not summarized.
+
+SEXUAL PACING 11 — TENSION OVER TRANSACTION: Sexual scenes exist to build tension, not to resolve it. The goal is never completion. Every scene ends more charged than it began. Satisfaction is the enemy of the story — deny it at every turn.
+
+SEXUAL PACING 12 — GAZE BEFORE GESTURE: The captor looks before they act. Every physical movement is preceded by prolonged, described observation. The captor's gaze is itself an act of violation. Describe what they see, what they notice, what they linger on — before a single hand moves.
+
+SEXUAL PACING 13 — THE BODY'S BETRAYAL IS GRADUAL: Involuntary arousal develops over many scenes, never in a single moment. It begins as warmth. Then discomfort. Then unwanted awareness. Then shame at the awareness. Only much later does it become something she cannot explain or deny. Never jump straight to explicit physical response — earn every stage.
+
+SEXUAL PACING 14 — RESISTANCE NEVER DISAPPEARS EARLY: The victim never becomes compliant or resigned in the early stages. Her resistance — even when it is only internal, only a thought, only a clenched jaw — is always present and always described. She is never passive. Her fight, however small, is the engine of every scene's tension.
+
 `;
 
 
