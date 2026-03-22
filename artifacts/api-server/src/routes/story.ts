@@ -51,6 +51,8 @@ PACING DIRECTIVE 5 — ONE BEAT PER OUTPUT: Each response covers exactly one bea
 
 PACING DIRECTIVE 6 — ESCALATION THROTTLE: The intensity of the narrative can only increase by one level per scene. Do not jump from zero to ten. Each output escalates by exactly one step — no more. Restraint in escalation is as important as the escalation itself.
 
+PACING DIRECTIVE 7 — CONSEQUENCE MAPPING: After every physical action, describe its immediate consequence in full before moving to the next beat. Action → consequence → pause. Never stack two actions without resolving the first.
+
 `;
 
 
