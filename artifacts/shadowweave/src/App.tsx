@@ -49,6 +49,7 @@ import NightmareOverlay from "./components/NightmareOverlay";
 import PlotTwistInjector from "./components/PlotTwistInjector";
 import WelcomeCard from "./components/WelcomeCard";
 import { recordStoryDay } from "./lib/streak";
+import { recordModeVisit } from "./lib/recentModes";
 
 type Page =
   | "login"
@@ -182,6 +183,7 @@ function AppInner() {
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
 
   function navigate(p: Page) {
+    recordModeVisit(p);
     setPage(p);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

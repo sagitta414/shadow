@@ -5,6 +5,8 @@ import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievemen
 import { getTopVillains, type VillainStat } from "../lib/infamy";
 import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { getRecentModes, type RecentMode } from "../lib/recentModes";
+import { getArchive } from "../lib/archive";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -417,6 +419,35 @@ function SpecialistChip({ icon, title, badge, accent, r, g, b, completed, onClic
   );
 }
 
+function RecentModeChip({ rm, onClick }: { rm: RecentMode; onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", gap: "0.4rem",
+        padding: "0.35rem 0.75rem",
+        background: hov ? "rgba(168,85,247,0.14)" : "rgba(168,85,247,0.05)",
+        border: `1px solid ${hov ? "rgba(168,85,247,0.45)" : "rgba(168,85,247,0.18)"}`,
+        borderRadius: "20px",
+        cursor: "pointer",
+        transition: "all 0.18s ease",
+        transform: hov ? "translateY(-1px)" : "none",
+        boxShadow: hov ? "0 4px 12px rgba(168,85,247,0.15)" : "none",
+      }}
+    >
+      <span style={{ fontSize: "0.7rem" }}>{rm.icon}</span>
+      <span style={{
+        fontFamily: "'Cinzel', serif", fontSize: "0.52rem", fontWeight: 600,
+        letterSpacing: "0.5px", color: hov ? "rgba(216,180,254,0.92)" : "rgba(192,132,252,0.6)",
+        transition: "color 0.18s", whiteSpace: "nowrap",
+      }}>{rm.label}</span>
+    </button>
+  );
+}
+
 function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number; b: number }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", margin: "0.4rem 0 0.5rem" }}>
@@ -440,6 +471,14 @@ export default function Homepage(props: HomepageProps) {
   const [activitySlots] = useState(() => buildActivitySlots(91));
   const [activitySet] = useState(() => getWritingActivitySet(91));
   const activeDays = activitySet.size;
+  const [recentModes] = useState<RecentMode[]>(() => getRecentModes());
+  const [archiveStats] = useState(() => {
+    const archive = getArchive();
+    const totalWords = archive.reduce((sum, s) => sum + s.wordCount, 0);
+    const uniqueHeroines = new Set(archive.flatMap((s) => s.characters)).size;
+    const modesTried = new Set(archive.map((s) => s.tool)).size;
+    return { total: archive.length, totalWords, uniqueHeroines, modesTried };
+  });
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -576,6 +615,41 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </div>
 
+      {/* ─── RECENTLY VISITED ─── */}
+      {recentModes.length > 0 && (
+        <div className="hp-pad" style={{ padding: "0 2rem 1.4rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.06s ease both" : "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.55rem" }}>
+            <div style={{ width: "16px", height: "1px", background: "rgba(168,85,247,0.3)" }} />
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.38rem", letterSpacing: "4px", color: "rgba(168,85,247,0.4)", textTransform: "uppercase" }}>Jump Back In</span>
+            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.15), transparent)" }} />
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            {recentModes.map((rm) => (
+              <RecentModeChip key={rm.page} rm={rm} onClick={() => {
+                const map: Record<string, keyof HomepageProps> = {
+                  "superhero-mode": "onSuperheroMode", "celebrity-mode": "onCelebrityMode",
+                  "daily-scenario": "onDailyScenario", "character-params": "onEnter",
+                  "mind-break": "onMindBreak", "dual-capture": "onDualCapture",
+                  "rescue-gone-wrong": "onRescueGoneWrong", "power-drain": "onPowerDrain",
+                  "mass-capture": "onMassCapture", "corruption-arc": "onCorruptionArc",
+                  "hero-auction": "onHeroAuction", "trophy-display": "onTrophyDisplay",
+                  "obedience-training": "onObedienceTraining", "showcase": "onShowcase",
+                  "public-property": "onPublicProperty", "betting-pool": "onBettingPool",
+                  "villain-team-up": "onVillainTeamUp", "chain-of-custody": "onChainOfCustody",
+                  "long-game": "onLongGame", "dark-mirror": "onDarkMirror",
+                  "arena-mode": "onArenaMode", "the-handler": "onTheHandler",
+                  "interrogation-room": "onInterrogationRoom", "captor-home": "onCaptorPortal",
+                  "captor-logic": "onCaptorLogic", "scenario-generator": "onScenarioGenerator",
+                  "character-mapper": "onCharacterMapper", "sounding-board": "onSoundingBoard",
+                };
+                const propKey = map[rm.page];
+                if (propKey) (props[propKey] as () => void)();
+              }} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ─── DAILY DISPATCH ─── */}
       <div className="hp-pad" style={{ padding: "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
         <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
@@ -634,6 +708,29 @@ export default function Homepage(props: HomepageProps) {
           </div>
         </div>
       </div>
+
+      {/* ─── STUDIO STATS ─── */}
+      {archiveStats.total > 0 && (
+        <div className="hp-pad" style={{ padding: "0 2rem 1.4rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.095s ease both" : "none" }}>
+          <div style={{ display: "flex", gap: "0", background: "rgba(6,2,14,0.75)", border: "1px solid rgba(168,85,247,0.08)", borderRadius: "14px", overflow: "hidden", backdropFilter: "blur(12px)" }}>
+            {[
+              { value: archiveStats.total.toString(), label: "Stories Written", color: "168,85,247" },
+              { value: archiveStats.totalWords >= 1000 ? `${(archiveStats.totalWords / 1000).toFixed(1)}k` : archiveStats.totalWords.toString(), label: "Total Words", color: "251,191,36" },
+              { value: archiveStats.uniqueHeroines.toString(), label: "Heroines Used", color: "249,115,22" },
+              { value: archiveStats.modesTried.toString(), label: "Modes Tried", color: "52,211,153" },
+            ].map(({ value, label, color }, i, arr) => (
+              <div key={label} style={{
+                flex: 1, padding: isMobile ? "0.7rem 0.5rem" : "0.8rem 1rem", textAlign: "center",
+                borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                position: "relative",
+              }}>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "1rem" : "1.15rem", fontWeight: 900, color: `rgba(${color},0.9)`, letterSpacing: "1px", textShadow: `0 0 20px rgba(${color},0.3)` }}>{value}</div>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.36rem", letterSpacing: "2px", color: `rgba(${color},0.35)`, textTransform: "uppercase", marginTop: "3px" }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─── INFAMY BOARD ─── */}
       {topVillains.length > 0 && (

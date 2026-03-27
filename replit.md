@@ -23,7 +23,10 @@
 - **Chapter Regeneration** — ↻ Re-roll button on each chapter in Heroine Forge; calls `/story/superhero-regen` with context
 - **Random Picker** — One-click randomize heroine + villain in Heroine Forge
 - **Export TXT/PDF** — All story modes support export; PDF is print-ready with Cinzel/Garamond fonts
-- **Story Archive** — localStorage archive with search, tags, favourites, sort, and export
+- **Story Archive** — localStorage archive with search, tags, favourites, sort (newest/oldest/words/alpha/top-rated), export, star ratings, and copy to clipboard
+- **Recently Visited Modes** — homepage "Jump Back In" chip row (last 6 modes); tracked via `sw_recent_modes_v1`; powered by `lib/recentModes.ts`
+- **Studio Stats Bar** — homepage live stats (total stories, words, heroines used, modes tried) computed from archive; visible once ≥1 story exists
+- **Star Ratings** — 1–5 star rating on each archived story; shown in card header; sortable; "Top Rated" sort option in archive
 - **Venice AI** — `venice-uncensored-role-play` model for all 11 story endpoints; `lustify-v7` for portraits; zero safety restrictions
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
 

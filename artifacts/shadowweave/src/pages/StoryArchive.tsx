@@ -49,7 +49,8 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
   const [stories, setStories] = useState<ArchivedStory[]>([]);
   const [search, setSearch] = useState("");
   const [filterFav, setFilterFav] = useState(false);
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "words" | "alpha">("newest");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "words" | "alpha" | "rated">("newest");
+  const [copyState, setCopyState] = useState<Record<string, boolean>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState<Record<string, string>>({});
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -106,6 +107,7 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
       if (sortBy === "newest") return b.createdAt - a.createdAt;
       if (sortBy === "oldest") return a.createdAt - b.createdAt;
       if (sortBy === "words") return b.wordCount - a.wordCount;
+      if (sortBy === "rated") return (b.rating ?? 0) - (a.rating ?? 0);
       return a.title.localeCompare(b.title);
     });
 
@@ -144,6 +146,11 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
                 {s.title}
               </span>
               {s.favourite && <span style={{ color: "#FFB800", fontSize: "0.85rem" }}>★</span>}
+              {s.rating != null && (
+                <span style={{ fontSize: "0.62rem", color: "#FFB800", letterSpacing: "1px", opacity: 0.8 }}>
+                  {"★".repeat(s.rating)}{"☆".repeat(5 - s.rating)}
+                </span>
+              )}
             </div>
             <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.5)", letterSpacing: "1px", marginBottom: "0.5rem" }}>
               {s.characters.join(" · ")}
@@ -220,6 +227,35 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
               ))}
             </div>
 
+            {/* ── Star Rating ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+              <div style={{ fontSize: "0.58rem", letterSpacing: "2px", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Rate this story</div>
+              <div style={{ display: "flex", gap: "0.25rem" }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={(e) => { e.stopPropagation(); updateArchiveStory(s.id, { rating: star }); reload(); }}
+                    title={`${star} star${star !== 1 ? "s" : ""}`}
+                    style={{
+                      fontSize: "1.1rem", cursor: "pointer",
+                      color: (s.rating ?? 0) >= star ? "#FFB800" : "rgba(255,255,255,0.1)",
+                      transition: "color 0.15s, transform 0.1s",
+                      display: "inline-block",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.25)"; e.currentTarget.style.color = "#FFB800"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.color = (s.rating ?? 0) >= star ? "#FFB800" : "rgba(255,255,255,0.1)"; }}
+                  >★</span>
+                ))}
+              </div>
+              {s.rating != null && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); updateArchiveStory(s.id, { rating: undefined }); reload(); }}
+                  style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.25)", cursor: "pointer", letterSpacing: "1px", fontFamily: "'Montserrat', sans-serif" }}
+                  title="Clear rating"
+                >✕ clear</span>
+              )}
+            </div>
+
             <div style={{ marginBottom: "1rem" }}>
               <div style={{ fontSize: "0.65rem", letterSpacing: "2px", color: "rgba(200,200,220,0.4)", marginBottom: "0.5rem" }}>TAGS</div>
               <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap", alignItems: "center" }}>
@@ -278,6 +314,26 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
                   }}
                 >
                   ↓ TXT
+                </button>
+                <button
+                  onClick={() => {
+                    const text = s.chapters.map((ch, i) =>
+                      s.chapters.length > 1 ? `CHAPTER ${i + 1}\n\n${ch}` : ch
+                    ).join("\n\n─────────────────\n\n");
+                    navigator.clipboard.writeText(`${s.title}\n${"─".repeat(40)}\n\n${text}`).then(() => {
+                      setCopyState((prev) => ({ ...prev, [s.id]: true }));
+                      setTimeout(() => setCopyState((prev) => ({ ...prev, [s.id]: false })), 1800);
+                    });
+                  }}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: copyState[s.id] ? "rgba(52,211,153,0.1)" : "rgba(255,255,255,0.04)",
+                    border: copyState[s.id] ? "1px solid rgba(52,211,153,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                    color: copyState[s.id] ? "#34D399" : "rgba(200,200,220,0.6)",
+                  }}
+                >
+                  {copyState[s.id] ? "✓ Copied!" : "⎘ Copy"}
                 </button>
                 <button
                   onClick={() => exportStoryAsPDF(s)}
@@ -393,6 +449,7 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
           <option value="oldest">Oldest First</option>
           <option value="words">Most Words</option>
           <option value="alpha">A → Z</option>
+          <option value="rated">Top Rated</option>
         </select>
       </div>
 

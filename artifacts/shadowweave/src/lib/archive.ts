@@ -12,6 +12,7 @@ export interface ArchivedStory {
   tags: string[];
   favourite: boolean;
   wordCount: number;
+  rating?: number;
 }
 
 const KEY = "sw_archive_v1";
