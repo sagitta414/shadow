@@ -122,6 +122,41 @@ body {
   100% { transform: translateY(-100vh) translateX(60px) rotate(360deg); opacity: 0; }
 }
 
+@keyframes nightmareVignette {
+  0%,100% { opacity: 0.75; }
+  50%     { opacity: 1; }
+}
+@keyframes nightmareScan {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes nightmareFlicker {
+  0%,87%,89%,91%,100% { opacity: 1; }
+  88%,90%             { opacity: 0.72; }
+}
+@keyframes nightmareGlitch {
+  0%,94%,96%,100% { transform: translate(0,0); filter: none; }
+  95%             { transform: translate(-3px,0); filter: hue-rotate(90deg) saturate(2); }
+  96.5%           { transform: translate(2px,0); filter: hue-rotate(-90deg) saturate(2); }
+}
+@keyframes nightmarePillPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(180,0,30,0.5); }
+  50%     { box-shadow: 0 0 20px rgba(220,0,40,0.9), 0 0 40px rgba(180,0,30,0.4); }
+}
+@keyframes twistReveal {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes twistBorderSpin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes twistLightning {
+  0%,90%,100% { opacity: 0; }
+  92%,98%     { opacity: 1; }
+}
+
 /* ─── Background System ───────────────────────────── */
 .void-bg {
   position: fixed;

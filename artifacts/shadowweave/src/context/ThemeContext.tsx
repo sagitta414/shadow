@@ -151,6 +151,8 @@ interface ThemeContextValue {
   setTheme: (name: ThemeName) => void;
   typewriterMode: boolean;
   toggleTypewriter: () => void;
+  nightmareMode: boolean;
+  toggleNightmare: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -158,6 +160,8 @@ const ThemeContext = createContext<ThemeContextValue>({
   setTheme: () => {},
   typewriterMode: false,
   toggleTypewriter: () => {},
+  nightmareMode: false,
+  toggleNightmare: () => {},
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -167,6 +171,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const [typewriterMode, setTypewriterMode] = useState(() => {
     return localStorage.getItem("sw_typewriter") === "1";
+  });
+
+  const [nightmareMode, setNightmareMode] = useState(() => {
+    return localStorage.getItem("sw_nightmare") === "1";
   });
 
   const theme = THEMES.find((t) => t.name === themeName) ?? THEMES[0];
@@ -185,8 +193,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("sw_typewriter", next ? "1" : "0");
   }
 
+  function toggleNightmare() {
+    const next = !nightmareMode;
+    setNightmareMode(next);
+    localStorage.setItem("sw_nightmare", next ? "1" : "0");
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: setThemeName, typewriterMode, toggleTypewriter }}>
+    <ThemeContext.Provider value={{ theme, setTheme: setThemeName, typewriterMode, toggleTypewriter, nightmareMode, toggleNightmare }}>
       {children}
     </ThemeContext.Provider>
   );

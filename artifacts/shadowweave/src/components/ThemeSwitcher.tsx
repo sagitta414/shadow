@@ -2,7 +2,7 @@ import { useState } from "react";
 import { THEMES, useTheme, type ThemeName } from "../context/ThemeContext";
 
 export default function ThemeSwitcher() {
-  const { theme, setTheme, typewriterMode, toggleTypewriter } = useTheme();
+  const { theme, setTheme, typewriterMode, toggleTypewriter, nightmareMode, toggleNightmare } = useTheme();
   const [open, setOpen] = useState(false);
 
   return (
@@ -80,34 +80,54 @@ export default function ThemeSwitcher() {
           <div className="font-cinzel" style={{ fontSize: "0.55rem", color: "rgba(184,134,11,0.45)", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "0.6rem" }}>
             Story Effect
           </div>
-          <button
-            onClick={toggleTypewriter}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "0.875rem",
-              padding: "0.65rem 0.875rem",
-              background: typewriterMode ? "rgba(168,85,247,0.1)" : "transparent",
-              border: `1px solid ${typewriterMode ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.06)"}`,
-              borderRadius: "10px",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              color: "inherit",
-              width: "100%",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
-              <span style={{ fontSize: "1rem", lineHeight: 1 }}>⌨</span>
-              <div>
-                <div className="font-cinzel" style={{ fontSize: "0.8rem", color: typewriterMode ? "#C084FC" : "#C8C8D8", fontWeight: 700, letterSpacing: "1px" }}>Typewriter</div>
-                <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", marginTop: "1px" }}>Char-by-char stream</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <button
+              onClick={toggleTypewriter}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                gap: "0.875rem", padding: "0.65rem 0.875rem",
+                background: typewriterMode ? "rgba(168,85,247,0.1)" : "transparent",
+                border: `1px solid ${typewriterMode ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.06)"}`,
+                borderRadius: "10px", cursor: "pointer", transition: "all 0.2s ease",
+                color: "inherit", width: "100%",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
+                <span style={{ fontSize: "1rem", lineHeight: 1 }}>⌨</span>
+                <div>
+                  <div className="font-cinzel" style={{ fontSize: "0.8rem", color: typewriterMode ? "#C084FC" : "#C8C8D8", fontWeight: 700, letterSpacing: "1px" }}>Typewriter</div>
+                  <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", marginTop: "1px" }}>Char-by-char stream</div>
+                </div>
               </div>
-            </div>
-            <div style={{ width: "32px", height: "18px", borderRadius: "9px", background: typewriterMode ? "rgba(168,85,247,0.7)" : "rgba(255,255,255,0.1)", border: `1px solid ${typewriterMode ? "rgba(168,85,247,0.8)" : "rgba(255,255,255,0.15)"}`, position: "relative", transition: "all 0.25s", flexShrink: 0 }}>
-              <div style={{ position: "absolute", width: "12px", height: "12px", borderRadius: "50%", background: typewriterMode ? "#C084FC" : "rgba(255,255,255,0.4)", top: "2px", left: typewriterMode ? "16px" : "2px", transition: "left 0.25s, background 0.25s", boxShadow: typewriterMode ? "0 0 8px rgba(192,132,252,0.8)" : "none" }} />
-            </div>
-          </button>
+              <div style={{ width: "32px", height: "18px", borderRadius: "9px", background: typewriterMode ? "rgba(168,85,247,0.7)" : "rgba(255,255,255,0.1)", border: `1px solid ${typewriterMode ? "rgba(168,85,247,0.8)" : "rgba(255,255,255,0.15)"}`, position: "relative", transition: "all 0.25s", flexShrink: 0 }}>
+                <div style={{ position: "absolute", width: "12px", height: "12px", borderRadius: "50%", background: typewriterMode ? "#C084FC" : "rgba(255,255,255,0.4)", top: "2px", left: typewriterMode ? "16px" : "2px", transition: "left 0.25s, background 0.25s", boxShadow: typewriterMode ? "0 0 8px rgba(192,132,252,0.8)" : "none" }} />
+              </div>
+            </button>
+
+            <button
+              onClick={toggleNightmare}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                gap: "0.875rem", padding: "0.65rem 0.875rem",
+                background: nightmareMode ? "rgba(180,0,30,0.12)" : "transparent",
+                border: `1px solid ${nightmareMode ? "rgba(220,0,40,0.45)" : "rgba(255,255,255,0.06)"}`,
+                borderRadius: "10px", cursor: "pointer", transition: "all 0.2s ease",
+                color: "inherit", width: "100%",
+                boxShadow: nightmareMode ? "0 0 18px rgba(180,0,30,0.25)" : "none",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
+                <span style={{ fontSize: "1rem", lineHeight: 1 }}>👁</span>
+                <div>
+                  <div className="font-cinzel" style={{ fontSize: "0.8rem", color: nightmareMode ? "#FF3050" : "#C8C8D8", fontWeight: 700, letterSpacing: "1px" }}>Nightmare</div>
+                  <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", marginTop: "1px" }}>Visual distortion</div>
+                </div>
+              </div>
+              <div style={{ width: "32px", height: "18px", borderRadius: "9px", background: nightmareMode ? "rgba(220,0,40,0.7)" : "rgba(255,255,255,0.1)", border: `1px solid ${nightmareMode ? "rgba(220,0,40,0.9)" : "rgba(255,255,255,0.15)"}`, position: "relative", transition: "all 0.25s", flexShrink: 0 }}>
+                <div style={{ position: "absolute", width: "12px", height: "12px", borderRadius: "50%", background: nightmareMode ? "#FF3050" : "rgba(255,255,255,0.4)", top: "2px", left: nightmareMode ? "16px" : "2px", transition: "left 0.25s, background 0.25s", boxShadow: nightmareMode ? "0 0 8px rgba(255,48,80,0.9)" : "none" }} />
+              </div>
+            </button>
+          </div>
         </div>
       )}
 
