@@ -21,6 +21,7 @@ interface HomepageProps {
   onPowerDrain: () => void;
   onMassCapture: () => void;
   onCorruptionArc: () => void;
+  onHeroAuction: () => void;
   onSurpriseMe: () => void;
   onStoryArcs: () => void;
   onHeroineDossier: () => void;
@@ -469,6 +470,7 @@ export default function Homepage(props: HomepageProps) {
           <SubCard icon="⚡" iconImg="/icons/power-drain.png" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A5FA" r={96} g={165} b={250} badge="Meter" onClick={props.onPowerDrain} />
           <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
           <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
+          <SubCard icon="⚖" iconImg="/icons/corruption-arc.png" title="Hero Auction" desc="Choose your heroines, pick your auctioneer. Villains bid live — degrading comments, competing demands, escalating prices." accent="#FCA311" r={252} g={163} b={17} badge="Auction" onClick={props.onHeroAuction} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}

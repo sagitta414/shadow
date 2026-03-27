@@ -26,6 +26,7 @@ import RescueGoneWrongMode from "./pages/RescueGoneWrongMode";
 import PowerDrainMode from "./pages/PowerDrainMode";
 import MassCaptureMode from "./pages/MassCaptureMode";
 import CorruptionArcMode from "./pages/CorruptionArcMode";
+import HeroAuctionMode from "./pages/HeroAuctionMode";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -61,7 +62,8 @@ type Page =
   | "story-arcs"
   | "heroine-dossier"
   | "villain-builder"
-  | "relationship-map";
+  | "relationship-map"
+  | "hero-auction";
 
 
 function BackgroundEffects() {
@@ -196,6 +198,7 @@ function AppInner() {
           onPowerDrain={() => navigate("power-drain")}
           onMassCapture={() => navigate("mass-capture")}
           onCorruptionArc={() => navigate("corruption-arc")}
+          onHeroAuction={() => navigate("hero-auction")}
           onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
           onStoryArcs={() => navigate("story-arcs")}
           onHeroineDossier={() => navigate("heroine-dossier")}
@@ -327,6 +330,10 @@ function AppInner() {
 
       {page === "corruption-arc" && (
         <CorruptionArcMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "hero-auction" && (
+        <HeroAuctionMode onBack={() => navigate("home")} />
       )}
 
       {page === "story-arcs" && (
