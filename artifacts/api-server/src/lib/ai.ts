@@ -16,8 +16,8 @@ export const VENICE_PARAMS = {
   venice_parameters: {
     include_venice_system_prompt: false,
   },
-  frequency_penalty: 0.42,
-  presence_penalty: 0.32,
+  frequency_penalty: 0.15,
+  presence_penalty: 0.10,
 };
 
 export function getProvider(_body: unknown): AiProvider {
@@ -45,7 +45,7 @@ export async function streamChat({
   messages,
   maxTokens,
   onChunk,
-  temperature = 1.0,
+  temperature = 0.78,
 }: {
   provider?: AiProvider;
   messages: ChatMessage[];
@@ -73,7 +73,7 @@ export async function streamChat({
 export async function completeChat({
   messages,
   maxTokens,
-  temperature = 1.0,
+  temperature = 0.78,
 }: {
   provider?: AiProvider;
   messages: ChatMessage[];
