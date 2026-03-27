@@ -46,12 +46,77 @@ const QUICK_VILLAINS = [
   { name: "Stormfront",       universe: "TB",     scheme: "Weaponize supes for ideological supremacy" },
 ];
 
+const CELEBRITY_CAPTORS = [
+  { name: "Chris Hemsworth",   category: "Actor",      scheme: "The leading man who plays by his own rules — off camera" },
+  { name: "Jason Momoa",       category: "Actor",      scheme: "The king who never really left the role behind" },
+  { name: "Henry Cavill",      category: "Actor",      scheme: "The man of steel in ways that don't make it to press" },
+  { name: "Idris Elba",        category: "Actor",      scheme: "A voice that expects obedience — and receives it" },
+  { name: "Tom Hardy",         category: "Actor",      scheme: "Intensity that doesn't stop when the cameras do" },
+  { name: "Dwayne Johnson",    category: "Actor",      scheme: "Power that was never just for the screen" },
+  { name: "Michael B. Jordan", category: "Actor",      scheme: "Ambition with no ceiling and no oversight" },
+  { name: "Ryan Reynolds",     category: "Actor",      scheme: "Charm deployed as a weapon — until it isn't charm anymore" },
+  { name: "Dave Bautista",     category: "Actor",      scheme: "Discipline and size applied without apology" },
+  { name: "John Cena",         category: "Actor",      scheme: "You cannot see him — until it is already too late" },
+  { name: "Pedro Pascal",      category: "Actor",      scheme: "The protector who decides what he protects — and what he keeps" },
+  { name: "Oscar Isaac",       category: "Actor",      scheme: "Layered, methodical, with a plan behind every expression" },
+  { name: "Conor McGregor",    category: "Fighter",    scheme: "Precision violence, packaged as entertainment" },
+  { name: "Jon Jones",         category: "Fighter",    scheme: "Controlled aggression — until the cameras leave" },
+  { name: "LeBron James",      category: "Athlete",    scheme: "The greatest closer — in any arena" },
+  { name: "Cristiano Ronaldo", category: "Athlete",    scheme: "Obsessive discipline redirected toward one purpose" },
+  { name: "Bad Bunny",         category: "Music",      scheme: "Cultural dominance translated into something more personal" },
+  { name: "Drake",             category: "Music",      scheme: "The obsessive with the resources to follow through" },
+  { name: "The Weeknd",        category: "Music",      scheme: "Dark fantasies that became operational plans" },
+  { name: "Elon Musk",         category: "Billionaire",scheme: "The wealthiest man alive — with a very specific agenda" },
+  { name: "Jeff Bezos",        category: "Billionaire",scheme: "Empire-builder who decides what is allowed to exist" },
+  { name: "Mark Zuckerberg",   category: "Billionaire",scheme: "Every data point weaponised — including hers" },
+];
+
+const REALISTIC_CAPTORS = [
+  { name: "The Russian Operative", category: "Intelligence", scheme: "Decades of black-site methodology, refined to an art form" },
+  { name: "The CIA Handler",       category: "Intelligence", scheme: "Deniable authority, clean paperwork, no witnesses" },
+  { name: "The Black Site Director",category:"Intelligence", scheme: "Jurisdiction ends at his door. So does oversight." },
+  { name: "The Cartel Boss",       category: "Criminal",    scheme: "An empire built on leverage — she is the latest acquisition" },
+  { name: "The Crime Lord",        category: "Criminal",    scheme: "The city answers to him. She is in his city now." },
+  { name: "The Arms Dealer",       category: "Criminal",    scheme: "He trades in weapons — and now in something more valuable" },
+  { name: "The Mercenary",         category: "Military",    scheme: "The contract specifies delivery, not condition" },
+  { name: "The Warden",            category: "Authority",   scheme: "Total institutional control — she is inside his facility" },
+  { name: "The Detective",         category: "Authority",   scheme: "He wrote the manual — and discarded its limits long ago" },
+  { name: "The Fixer",             category: "Professional",scheme: "Problems disappear. She is the latest problem." },
+  { name: "The Surgeon",           category: "Professional",scheme: "Methodical and exact — the precision of a man who removes things" },
+  { name: "The Collector",         category: "Private",     scheme: "An obsessive with time, money, and no one to answer to" },
+  { name: "The Cult Leader",       category: "Private",     scheme: "He doesn't need force — she will come to believe on her own" },
+  { name: "The Senator",           category: "Political",   scheme: "Untouchable immunity applied with quiet precision" },
+  { name: "The Tech Mogul",        category: "Corporate",   scheme: "Surveillance capitalism evolved into something unregulated" },
+  { name: "The Billionaire Recluse",category:"Private",     scheme: "Wealth old enough that the law forgot to follow it inside" },
+];
+
 function nameToSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-{2,}/g, "-").replace(/^-|-$/g, "");
 }
 
 function universeColor(u: string) {
   return u === "Marvel" ? "#FF6060" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : "#60A0FF";
+}
+
+function celebColor(cat: string) {
+  if (cat === "Actor")       return "#F59E0B";
+  if (cat === "Fighter")     return "#EF4444";
+  if (cat === "Athlete")     return "#3B82F6";
+  if (cat === "Music")       return "#A855F7";
+  if (cat === "Billionaire") return "#10B981";
+  return "#F59E0B";
+}
+
+function realisticColor(cat: string) {
+  if (cat === "Intelligence") return "#94A3B8";
+  if (cat === "Criminal")     return "#EF4444";
+  if (cat === "Military")     return "#78716C";
+  if (cat === "Authority")    return "#0EA5E9";
+  if (cat === "Professional") return "#A78BFA";
+  if (cat === "Private")      return "#C084FC";
+  if (cat === "Political")    return "#60A5FA";
+  if (cat === "Corporate")    return "#34D399";
+  return "#94A3B8";
 }
 
 export default function InterrogationRoom({ onBack }: Props) {
@@ -61,9 +126,11 @@ export default function InterrogationRoom({ onBack }: Props) {
   const [heroineName, setHeroineName] = useState("");
   const [heroineSearch, setHeroineSearch] = useState("");
   const [selectedVillain, setSelectedVillain] = useState<typeof QUICK_VILLAINS[0] | null>(null);
+  const [selectedCeleb, setSelectedCeleb] = useState<typeof CELEBRITY_CAPTORS[0] | null>(null);
+  const [selectedRealistic, setSelectedRealistic] = useState<typeof REALISTIC_CAPTORS[0] | null>(null);
   const [customVillain, setCustomVillain] = useState("");
   const [customVillainScheme, setCustomVillainScheme] = useState("");
-  const [villainMode, setVillainMode] = useState<"pick" | "custom">("pick");
+  const [villainMode, setVillainMode] = useState<"villains" | "celebrity" | "realistic" | "custom">("villains");
   const [weaknessNotes, setWeaknessNotes] = useState("");
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -86,11 +153,17 @@ export default function InterrogationRoom({ onBack }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingText]);
 
-  const villainLabel = villainMode === "pick"
-    ? selectedVillain ? `${selectedVillain.name} — ${selectedVillain.scheme}` : ""
-    : customVillain.trim() ? `${customVillain.trim()}${customVillainScheme.trim() ? ` — ${customVillainScheme.trim()}` : ""}` : "";
+  const villainLabel =
+    villainMode === "villains"  ? (selectedVillain  ? `${selectedVillain.name} — ${selectedVillain.scheme}` : "") :
+    villainMode === "celebrity" ? (selectedCeleb    ? `${selectedCeleb.name} — ${selectedCeleb.scheme}` : "") :
+    villainMode === "realistic" ? (selectedRealistic? `${selectedRealistic.name} — ${selectedRealistic.scheme}` : "") :
+    customVillain.trim() ? `${customVillain.trim()}${customVillainScheme.trim() ? ` — ${customVillainScheme.trim()}` : ""}` : "";
 
-  const villainName = villainMode === "pick" ? selectedVillain?.name ?? "" : customVillain.trim();
+  const villainName =
+    villainMode === "villains"  ? (selectedVillain?.name ?? "") :
+    villainMode === "celebrity" ? (selectedCeleb?.name ?? "") :
+    villainMode === "realistic" ? (selectedRealistic?.name ?? "") :
+    customVillain.trim();
 
   const canBegin = heroineName.trim().length > 0 && villainLabel.length > 0;
 
@@ -158,9 +231,11 @@ export default function InterrogationRoom({ onBack }: Props) {
     setTimeout(() => textareaRef.current?.focus(), 100);
   }
 
-  const accentColor = villainMode === "pick" && selectedVillain
-    ? universeColor(selectedVillain.universe)
-    : "#FF4060";
+  const accentColor =
+    villainMode === "villains"  && selectedVillain  ? universeColor(selectedVillain.universe) :
+    villainMode === "celebrity" && selectedCeleb    ? celebColor(selectedCeleb.category) :
+    villainMode === "realistic" && selectedRealistic? realisticColor(selectedRealistic.category) :
+    "#FF4060";
 
   if (phase === "setup") {
     return (
@@ -215,30 +290,72 @@ export default function InterrogationRoom({ onBack }: Props) {
           <div style={{ background: "rgba(0,0,0,0.45)", border: "1px solid rgba(200,0,50,0.2)", borderRadius: "16px", padding: "1.5rem" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>The Captor</div>
 
-            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-              {(["pick", "custom"] as const).map((m) => (
-                <button key={m} onClick={() => setVillainMode(m)} style={{ padding: "0.4rem 1rem", background: villainMode === m ? "rgba(200,0,50,0.2)" : "rgba(0,0,0,0.35)", border: `1px solid ${villainMode === m ? "rgba(200,0,50,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "8px", color: villainMode === m ? "#FF4060" : "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
-                  {m === "pick" ? "Choose from List" : "Custom Villain"}
+            {/* ── Mode tabs ── */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "1rem" }}>
+              {([
+                { key: "villains",  label: "Supervillains", color: "#FF4060" },
+                { key: "celebrity", label: "Celebrities",   color: "#F59E0B" },
+                { key: "realistic", label: "Realistic",     color: "#94A3B8" },
+                { key: "custom",    label: "Custom",        color: "#A78BFA" },
+              ] as const).map((m) => (
+                <button key={m.key} onClick={() => setVillainMode(m.key)} style={{ padding: "0.4rem 1rem", background: villainMode === m.key ? `rgba(${m.key === "villains" ? "200,0,50" : m.key === "celebrity" ? "245,158,11" : m.key === "realistic" ? "148,163,184" : "167,139,250"},0.18)` : "rgba(0,0,0,0.35)", border: `1px solid ${villainMode === m.key ? `${m.color}88` : "rgba(255,255,255,0.07)"}`, borderRadius: "8px", color: villainMode === m.key ? m.color : "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {m.label}
                 </button>
               ))}
             </div>
 
-            {villainMode === "pick" ? (
+            {/* ── Supervillains grid ── */}
+            {villainMode === "villains" && (
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: "0.4rem", maxHeight: "280px", overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.2) transparent" }}>
                 {QUICK_VILLAINS.map((v) => {
                   const isSel = selectedVillain?.name === v.name;
                   const ac = universeColor(v.universe);
                   return (
-                    <button key={v.name} onClick={() => setSelectedVillain(v)} style={{ background: isSel ? `rgba(200,0,50,0.2)` : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(200,0,50,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", padding: "0.6rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.15s", color: "inherit" }}>
+                    <button key={v.name} onClick={() => setSelectedVillain(v)} style={{ background: isSel ? "rgba(200,0,50,0.2)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(200,0,50,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", padding: "0.6rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.15s", color: "inherit" }}>
                       <div className="font-cinzel" style={{ fontSize: "0.68rem", color: isSel ? "#FF4060" : "#E0E0F0", fontWeight: 700, marginBottom: "0.15rem" }}>{v.name}</div>
                       <div style={{ fontSize: "0.55rem", color: ac, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 700 }}>{v.universe}</div>
                     </button>
                   );
                 })}
               </div>
-            ) : (
+            )}
+
+            {/* ── Celebrity captors grid ── */}
+            {villainMode === "celebrity" && (
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: "0.4rem", maxHeight: "300px", overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: "rgba(245,158,11,0.2) transparent" }}>
+                {CELEBRITY_CAPTORS.map((v) => {
+                  const isSel = selectedCeleb?.name === v.name;
+                  const ac = celebColor(v.category);
+                  return (
+                    <button key={v.name} onClick={() => setSelectedCeleb(v)} style={{ background: isSel ? `rgba(245,158,11,0.18)` : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(245,158,11,0.55)" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", padding: "0.6rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.15s", color: "inherit" }}>
+                      <div className="font-cinzel" style={{ fontSize: "0.68rem", color: isSel ? "#F59E0B" : "#E0E0F0", fontWeight: 700, marginBottom: "0.15rem" }}>{v.name}</div>
+                      <div style={{ fontSize: "0.55rem", color: ac, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 700 }}>{v.category}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ── Realistic captors grid ── */}
+            {villainMode === "realistic" && (
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: "0.4rem", maxHeight: "300px", overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: "rgba(148,163,184,0.2) transparent" }}>
+                {REALISTIC_CAPTORS.map((v) => {
+                  const isSel = selectedRealistic?.name === v.name;
+                  const ac = realisticColor(v.category);
+                  return (
+                    <button key={v.name} onClick={() => setSelectedRealistic(v)} style={{ background: isSel ? "rgba(148,163,184,0.15)" : "rgba(0,0,0,0.4)", border: `1px solid ${isSel ? "rgba(148,163,184,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", padding: "0.6rem 0.75rem", cursor: "pointer", textAlign: "left", transition: "all 0.15s", color: "inherit" }}>
+                      <div className="font-cinzel" style={{ fontSize: "0.68rem", color: isSel ? "#E2E8F0" : "#E0E0F0", fontWeight: 700, marginBottom: "0.15rem" }}>{v.name}</div>
+                      <div style={{ fontSize: "0.55rem", color: ac, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", fontWeight: 700 }}>{v.category}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ── Custom villain ── */}
+            {villainMode === "custom" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                <input value={customVillain} onChange={(e) => setCustomVillain(e.target.value)} placeholder="Villain name…" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.5)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")} />
+                <input value={customVillain} onChange={(e) => setCustomVillain(e.target.value)} placeholder="Captor name…" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.5)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")} />
                 <input value={customVillainScheme} onChange={(e) => setCustomVillainScheme(e.target.value)} placeholder="Their scheme / goal (optional)…" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(200,0,50,0.5)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")} />
               </div>
             )}
