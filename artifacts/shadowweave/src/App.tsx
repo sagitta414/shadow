@@ -44,6 +44,7 @@ import VillainBuilder from "./pages/VillainBuilder";
 import RelationshipMap from "./pages/RelationshipMap";
 import AchievementsPage from "./pages/AchievementsPage";
 import AchievementToastManager from "./components/AchievementToast";
+import SessionTimer from "./components/SessionTimer";
 import { recordStoryDay } from "./lib/streak";
 
 type Page =
@@ -90,6 +91,15 @@ type Page =
   | "the-handler"
   | "achievements";
 
+const STORY_MODE_PAGES = new Set<Page>([
+  "superhero-mode","celebrity-mode","daily-scenario","character-params",
+  "story-editor","interactive-story","captor-home","captor-config",
+  "captor-summary","captor-logic","interrogation-room","mind-break",
+  "dual-capture","rescue-gone-wrong","power-drain","mass-capture",
+  "corruption-arc","hero-auction","trophy-display","obedience-training",
+  "showcase","public-property","betting-pool","villain-team-up",
+  "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
+]);
 
 function BackgroundEffects() {
   const { theme } = useTheme();
@@ -201,6 +211,7 @@ function AppInner() {
           <CandlelightOverlay />
           <ThemeSwitcher />
           <AchievementToastManager />
+          {STORY_MODE_PAGES.has(page) && <SessionTimer key={page} pageKey={page} />}
         </>
       )}
 

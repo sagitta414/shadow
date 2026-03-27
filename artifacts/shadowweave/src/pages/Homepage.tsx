@@ -3,6 +3,7 @@ import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
 import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
 import { getTopVillains, type VillainStat } from "../lib/infamy";
+import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -434,6 +435,9 @@ export default function Homepage(props: HomepageProps) {
   const [achCount] = useState(() => getUnlockCount());
   const [achXP] = useState(() => getTotalXP());
   const [topVillains] = useState<VillainStat[]>(() => getTopVillains(5));
+  const [activitySlots] = useState(() => buildActivitySlots(91));
+  const [activitySet] = useState(() => getWritingActivitySet(91));
+  const activeDays = activitySet.size;
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -573,6 +577,58 @@ export default function Homepage(props: HomepageProps) {
       {/* ─── DAILY DISPATCH ─── */}
       <div className="hp-pad" style={{ padding: "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
         <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
+      </div>
+
+      {/* ─── WRITING HEATMAP ─── */}
+      <div className="hp-pad" style={{ padding: "0 2rem 1.2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.09s ease both" : "none" }}>
+        <div style={{ padding: "0.7rem 1.2rem", background: "rgba(6,3,14,0.85)", border: "1px solid rgba(34,197,94,0.1)", borderRadius: "14px", backdropFilter: "blur(12px)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.6rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 8px rgba(34,197,94,0.7)" }} />
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "rgba(34,197,94,0.5)", textTransform: "uppercase" }}>Writing Activity · 91 Days</span>
+            </div>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", color: "rgba(34,197,94,0.6)", fontWeight: 700 }}>
+              {activeDays > 0 ? `${activeDays} active day${activeDays !== 1 ? "s" : ""}` : "No stories yet"}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
+            {activitySlots.map((slot) => {
+              const has = activitySet.has(slot.key);
+              return (
+                <div
+                  key={slot.key}
+                  title={slot.key + (has ? " · Story written" : " · No story")}
+                  style={{
+                    width: "9px", height: "9px", borderRadius: "2px",
+                    background: slot.isToday
+                      ? (has ? "rgba(34,197,94,0.95)" : "rgba(34,197,94,0.3)")
+                      : has
+                        ? "rgba(34,197,94,0.6)"
+                        : "rgba(255,255,255,0.04)",
+                    border: slot.isToday ? "1px solid rgba(34,197,94,0.7)" : "none",
+                    boxShadow: slot.isToday && has ? "0 0 8px rgba(34,197,94,0.6)" : "none",
+                    transition: "transform 0.12s",
+                    cursor: "default",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.55)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
+                />
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.1rem", marginTop: "0.55rem" }}>
+            {[
+              { color: "rgba(34,197,94,0.6)", label: "Story written" },
+              { color: "rgba(34,197,94,0.3)", label: "Today" },
+              { color: "rgba(255,255,255,0.04)", label: "No story" },
+            ].map(({ color, label }) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                <div style={{ width: "7px", height: "7px", borderRadius: "2px", background: color }} />
+                <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.36rem", color: "rgba(34,197,94,0.25)", letterSpacing: "1.5px", textTransform: "uppercase" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ─── INFAMY BOARD ─── */}
