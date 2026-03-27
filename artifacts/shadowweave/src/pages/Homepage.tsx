@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
+import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -38,6 +39,7 @@ interface HomepageProps {
   onHeroineDossier: () => void;
   onVillainBuilder: () => void;
   onRelationshipMap: () => void;
+  onAchievements: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -309,9 +311,10 @@ function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, on
   );
 }
 
-function SpecialistChip({ icon, title, badge, accent, r, g, b, onClick }: {
+function SpecialistChip({ icon, title, badge, accent, r, g, b, completed, onClick }: {
   icon: string; title: string; badge: string;
-  accent: string; r: number; g: number; b: number; onClick: () => void;
+  accent: string; r: number; g: number; b: number;
+  completed?: boolean; onClick: () => void;
 }) {
   const [hov, setHov] = useState(false);
   const rgb = `${r},${g},${b}`;
@@ -339,15 +342,28 @@ function SpecialistChip({ icon, title, badge, accent, r, g, b, onClick }: {
         overflow: "hidden",
       }}
     >
-      {/* Icon */}
-      <div style={{
-        width: "28px", height: "28px", borderRadius: "7px", flexShrink: 0,
-        background: hov ? `rgba(${rgb},0.2)` : `rgba(${rgb},0.09)`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: "0.9rem", transition: "all 0.2s",
-        filter: hov ? `drop-shadow(0 0 6px rgba(${rgb},0.8))` : "none",
-        border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.12})`,
-      }}>{icon}</div>
+      {/* Icon + completion badge */}
+      <div style={{ position: "relative", flexShrink: 0 }}>
+        <div style={{
+          width: "28px", height: "28px", borderRadius: "7px",
+          background: hov ? `rgba(${rgb},0.2)` : (completed ? `rgba(${rgb},0.14)` : `rgba(${rgb},0.09)`),
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: "0.9rem", transition: "all 0.2s",
+          filter: hov ? `drop-shadow(0 0 6px rgba(${rgb},0.8))` : (completed ? `drop-shadow(0 0 4px rgba(${rgb},0.45))` : "none"),
+          border: `1px solid rgba(${rgb},${hov ? 0.35 : completed ? 0.28 : 0.12})`,
+        }}>{icon}</div>
+        {completed && (
+          <div style={{
+            position: "absolute", top: "-4px", right: "-4px",
+            width: "10px", height: "10px", borderRadius: "50%",
+            background: accent,
+            border: "1.5px solid rgba(4,1,12,0.9)",
+            boxShadow: `0 0 6px ${accent}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "0.35rem", color: "#000", fontWeight: 900,
+          }}>✓</div>
+        )}
+      </div>
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
@@ -386,6 +402,9 @@ export default function Homepage(props: HomepageProps) {
   const [surpriseHov, setSurpriseHov] = useState(false);
   const [showDice, setShowDice] = useState(false);
   const [streak] = useState(() => getStreak());
+  const [completedModes] = useState(() => getCompletedModes());
+  const [achCount] = useState(() => getUnlockCount());
+  const [achXP] = useState(() => getTotalXP());
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -452,6 +471,10 @@ export default function Homepage(props: HomepageProps) {
               <span style={{ fontSize: "0.58rem", fontFamily: "'Cinzel', serif", letterSpacing: "1px", color: "rgba(253,186,69,0.85)", fontWeight: 700 }}>{streak.count}</span>
             </div>
           )}
+          <button onClick={props.onAchievements} style={{ display: "flex", alignItems: "center", gap: "0.45rem", padding: "0.42rem 0.9rem", background: "rgba(245,214,122,0.07)", border: "1px solid rgba(245,214,122,0.22)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(245,214,122,0.14)"; e.currentTarget.style.borderColor = "rgba(245,214,122,0.55)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(245,214,122,0.07)"; e.currentTarget.style.borderColor = "rgba(245,214,122,0.22)"; }}>
+            <span style={{ fontSize: "0.65rem" }}>🏆</span>
+            <span style={{ fontSize: "0.52rem", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(245,214,122,0.75)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>{achCount > 0 ? `${achCount} · ${achXP} XP` : "Trophies"}</span>
+          </button>
           <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.42rem 1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s", boxShadow: "0 0 0 0 rgba(168,85,247,0)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(168,85,247,0.25)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.1)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.3)"; e.currentTarget.style.boxShadow = "none"; }}>
             <span style={{ fontSize: "0.65rem", color: "rgba(192,132,252,0.85)" }}>◈</span>
             <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
@@ -538,24 +561,24 @@ export default function Homepage(props: HomepageProps) {
           />
           <SectionLabel label="Specialist Modes" r={168} g={85} b={247} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
-            <SpecialistChip icon="🌀" title="Mind Break" badge="Psych · 5 phases" accent="#C084FC" r={192} g={132} b={252} onClick={props.onMindBreak} />
-            <SpecialistChip icon="⛓" title="Two Heroines" badge="Duo · Shared Cell" accent="#34D399" r={52} g={211} b={153} onClick={props.onDualCapture} />
-            <SpecialistChip icon="🕸" title="Rescue Gone Wrong" badge="Trap · Ambush" accent="#FB923C" r={251} g={146} b={60} onClick={props.onRescueGoneWrong} />
-            <SpecialistChip icon="⚡" title="Power Drain" badge="Meter · Drain" accent="#60A5FA" r={96} g={165} b={250} onClick={props.onPowerDrain} />
-            <SpecialistChip icon="🗡" title="Mass Capture" badge="Group · 3–5" accent="#F87171" r={248} g={113} b={113} onClick={props.onMassCapture} />
-            <SpecialistChip icon="🌑" title="Corruption Arc" badge="Arc · 7 chapters" accent="#F472B6" r={244} g={114} b={182} onClick={props.onCorruptionArc} />
-            <SpecialistChip icon="⚖" title="Hero Auction" badge="Bid · Live" accent="#FCA311" r={252} g={163} b={17} onClick={props.onHeroAuction} />
-            <SpecialistChip icon="👁" title="Trophy Display" badge="Display · Visits" accent="#EF4444" r={239} g={68} b={68} onClick={props.onTrophyDisplay} />
-            <SpecialistChip icon="📋" title="Obedience Training" badge="Session · Track" accent="#2DD4BF" r={45} g={212} b={191} onClick={props.onObedienceTraining} />
-            <SpecialistChip icon="🎭" title="The Showcase" badge="Style · Staged" accent="#E879F9" r={232} g={121} b={249} onClick={props.onShowcase} />
-            <SpecialistChip icon="🔓" title="Public Property" badge="Exposed · Open" accent="#FBBF24" r={251} g={191} b={36} onClick={props.onPublicProperty} />
-            <SpecialistChip icon="🎲" title="Betting Pool" badge="Wager · 2–6" accent="#A78BFA" r={167} g={139} b={250} onClick={props.onBettingPool} />
-            <SpecialistChip icon="⚔" title="Villain Team-Up" badge="Duo · Ego" accent="#FB7185" r={251} g={113} b={133} onClick={props.onVillainTeamUp} />
-            <SpecialistChip icon="🔗" title="Chain of Custody" badge="Chain · Transfer" accent="#94A3B8" r={148} g={163} b={184} onClick={props.onChainOfCustody} />
-            <SpecialistChip icon="⏳" title="The Long Game" badge="Slow Burn · Weeks" accent="#34D399" r={52} g={211} b={153} onClick={props.onLongGame} />
-            <SpecialistChip icon="🪞" title="Dark Mirror" badge="Identity · Clone" accent="#818CF8" r={129} g={140} b={248} onClick={props.onDarkMirror} />
-            <SpecialistChip icon="🏟" title="Arena Mode" badge="Fight · Crowd" accent="#F97316" r={249} g={115} b={22} onClick={props.onArenaMode} />
-            <SpecialistChip icon="📁" title="The Handler" badge="Protocol · Pro" accent="#D4A76A" r={212} g={167} b={106} onClick={props.onTheHandler} />
+            <SpecialistChip icon="🌀" title="Mind Break" badge="Psych · 5 phases" accent="#C084FC" r={192} g={132} b={252} completed={completedModes.includes("Mind Break Chamber")} onClick={props.onMindBreak} />
+            <SpecialistChip icon="⛓" title="Two Heroines" badge="Duo · Shared Cell" accent="#34D399" r={52} g={211} b={153} completed={completedModes.includes("Two Heroines One Cell")} onClick={props.onDualCapture} />
+            <SpecialistChip icon="🕸" title="Rescue Gone Wrong" badge="Trap · Ambush" accent="#FB923C" r={251} g={146} b={60} completed={completedModes.includes("Rescue Gone Wrong")} onClick={props.onRescueGoneWrong} />
+            <SpecialistChip icon="⚡" title="Power Drain" badge="Meter · Drain" accent="#60A5FA" r={96} g={165} b={250} completed={completedModes.includes("Power Drain Mode")} onClick={props.onPowerDrain} />
+            <SpecialistChip icon="🗡" title="Mass Capture" badge="Group · 3–5" accent="#F87171" r={248} g={113} b={113} completed={completedModes.includes("Mass Capture Mode")} onClick={props.onMassCapture} />
+            <SpecialistChip icon="🌑" title="Corruption Arc" badge="Arc · 7 chapters" accent="#F472B6" r={244} g={114} b={182} completed={completedModes.includes("Corruption Arc")} onClick={props.onCorruptionArc} />
+            <SpecialistChip icon="⚖" title="Hero Auction" badge="Bid · Live" accent="#FCA311" r={252} g={163} b={17} completed={completedModes.includes("Hero Auction")} onClick={props.onHeroAuction} />
+            <SpecialistChip icon="👁" title="Trophy Display" badge="Display · Visits" accent="#EF4444" r={239} g={68} b={68} completed={completedModes.includes("Trophy Display")} onClick={props.onTrophyDisplay} />
+            <SpecialistChip icon="📋" title="Obedience Training" badge="Session · Track" accent="#2DD4BF" r={45} g={212} b={191} completed={completedModes.includes("Obedience Training")} onClick={props.onObedienceTraining} />
+            <SpecialistChip icon="🎭" title="The Showcase" badge="Style · Staged" accent="#E879F9" r={232} g={121} b={249} completed={completedModes.includes("The Showcase")} onClick={props.onShowcase} />
+            <SpecialistChip icon="🔓" title="Public Property" badge="Exposed · Open" accent="#FBBF24" r={251} g={191} b={36} completed={completedModes.includes("Public Property")} onClick={props.onPublicProperty} />
+            <SpecialistChip icon="🎲" title="Betting Pool" badge="Wager · 2–6" accent="#A78BFA" r={167} g={139} b={250} completed={completedModes.includes("Betting Pool")} onClick={props.onBettingPool} />
+            <SpecialistChip icon="⚔" title="Villain Team-Up" badge="Duo · Ego" accent="#FB7185" r={251} g={113} b={133} completed={completedModes.includes("Villain Team-Up")} onClick={props.onVillainTeamUp} />
+            <SpecialistChip icon="🔗" title="Chain of Custody" badge="Chain · Transfer" accent="#94A3B8" r={148} g={163} b={184} completed={completedModes.includes("Chain of Custody")} onClick={props.onChainOfCustody} />
+            <SpecialistChip icon="⏳" title="The Long Game" badge="Slow Burn · Weeks" accent="#34D399" r={52} g={211} b={153} completed={completedModes.includes("The Long Game")} onClick={props.onLongGame} />
+            <SpecialistChip icon="🪞" title="Dark Mirror" badge="Identity · Clone" accent="#818CF8" r={129} g={140} b={248} completed={completedModes.includes("Dark Mirror")} onClick={props.onDarkMirror} />
+            <SpecialistChip icon="🏟" title="Arena Mode" badge="Fight · Crowd" accent="#F97316" r={249} g={115} b={22} completed={completedModes.includes("Arena Mode")} onClick={props.onArenaMode} />
+            <SpecialistChip icon="📁" title="The Handler" badge="Protocol · Pro" accent="#D4A76A" r={212} g={167} b={106} completed={completedModes.includes("The Handler")} onClick={props.onTheHandler} />
           </div>
         </div>
 
@@ -600,6 +623,7 @@ export default function Homepage(props: HomepageProps) {
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.25) 60%, transparent)" }} />
         </div>
         <div className="hp-general" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.7rem" }}>
+          <ToolTile icon="🏆" title="Trophy Vault" desc={achCount > 0 ? `${achCount} trophies · ${achXP} XP earned` : "Track achievements and unlock dark trophies."} hex="#E8B830" r={232} g={184} b={48} onClick={props.onAchievements} />
           <ToolTile icon="🕯" title="Mood Lighting" desc="Switch atmosphere: Void, Isolation, Candlelight, Glitch." hex="#D97706" r={217} g={119} b={6} onClick={() => { const btn = document.querySelector("[title='Change theme']") as HTMLButtonElement | null; btn?.click(); }} />
           <ToolTile icon="📜" title="Story Archive" desc="Browse, tag, favourite, and export every story you've saved." hex="#3B82F6" r={59} g={130} b={246} onClick={props.onStoryArchive} />
           <ToolTile icon="🌙" title="Daily Chronicle" desc="The full collection of past daily dark scenarios." hex="#8B5CF6" r={139} g={92} b={246} onClick={props.onDailyChronicle} />

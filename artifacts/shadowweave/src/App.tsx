@@ -42,6 +42,8 @@ import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
 import RelationshipMap from "./pages/RelationshipMap";
+import AchievementsPage from "./pages/AchievementsPage";
+import AchievementToastManager from "./components/AchievementToast";
 import { recordStoryDay } from "./lib/streak";
 
 type Page =
@@ -85,7 +87,8 @@ type Page =
   | "long-game"
   | "dark-mirror"
   | "arena-mode"
-  | "the-handler";
+  | "the-handler"
+  | "achievements";
 
 
 function BackgroundEffects() {
@@ -197,6 +200,7 @@ function AppInner() {
           <GlitchOverlay />
           <CandlelightOverlay />
           <ThemeSwitcher />
+          <AchievementToastManager />
         </>
       )}
 
@@ -237,6 +241,7 @@ function AppInner() {
           onHeroineDossier={() => navigate("heroine-dossier")}
           onVillainBuilder={() => navigate("villain-builder")}
           onRelationshipMap={() => navigate("relationship-map")}
+          onAchievements={() => navigate("achievements")}
         />
       )}
 
@@ -427,6 +432,10 @@ function AppInner() {
 
       {page === "relationship-map" && (
         <RelationshipMap onBack={() => navigate("home")} />
+      )}
+
+      {page === "achievements" && (
+        <AchievementsPage onBack={() => navigate("home")} />
       )}
     </div>
   );

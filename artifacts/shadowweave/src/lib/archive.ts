@@ -1,4 +1,5 @@
 import { recordStoryDay } from "./streak";
+import { checkAndUnlockAchievements, recordModeCompletion } from "./achievements";
 
 export interface ArchivedStory {
   id: string;
@@ -38,6 +39,8 @@ export function saveStoryToArchive(
   const existing = getArchive();
   localStorage.setItem(KEY, JSON.stringify([full, ...existing]));
   recordStoryDay();
+  recordModeCompletion(story.tool);
+  checkAndUnlockAchievements();
   return id;
 }
 
