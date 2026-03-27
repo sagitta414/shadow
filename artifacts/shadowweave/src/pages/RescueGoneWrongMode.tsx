@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -63,6 +64,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
   const [failureMethod, setFailureMethod] = useState("");
   const [captorReaction, setCaptorReaction] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fCaptive = customCaptive || captive;
@@ -82,7 +84,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _failureMethodMap: Record<string,string> = {"ambush":"Ambush","betrayal":"Betrayal","overpowered":"Overpowered","trap":"Trap","inside_job":"Inside Job"};
-      const _captorReactionMap: Record<string,string> = {"amused":"Amused","enraged":"Enraged","uses_it":"Uses It Against Her","coldly_punishes":"Cold Punishment"}; return [failureMethod ? `How the Rescue Failed: ${_failureMethodMap[failureMethod] ?? failureMethod}` : "", captorReaction ? `Captor's Reaction: ${_captorReactionMap[captorReaction] ?? captorReaction}` : ""].filter(Boolean).join("\n"); })(), failureMethod, captorReaction, captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
+      const _captorReactionMap: Record<string,string> = {"amused":"Amused","enraged":"Enraged","uses_it":"Uses It Against Her","coldly_punishes":"Cold Punishment"}; return [failureMethod ? `How the Rescue Failed: ${_failureMethodMap[failureMethod] ?? failureMethod}` : "", captorReaction ? `Captor's Reaction: ${_captorReactionMap[captorReaction] ?? captorReaction}` : ""].filter(Boolean).join("\n"); })(), failureMethod, captorReaction, captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -162,15 +164,6 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
             </button>
           </div>
         )}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#FB923C"
-          accentRgb="251,146,60"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -193,6 +186,34 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
           <input value={customFailReason} onChange={e => { setCustomFailReason(e.target.value); setFailReason(""); }} placeholder="Or describe how it goes wrong…" style={inputStyle(accRgb)} />
         </Sec>
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#FB923C" accentRgb="251,146,60" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #FB923C, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#FB923C"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(251,146,60,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(251,146,60,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>HOW THE RESCUE FAILED</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"ambush","icon":"⚔️","label":"Walked Into an Ambush"},{"id":"betrayal","icon":"🗡️","label":"Betrayed from Inside"},{"id":"overpowered","icon":"💥","label":"Simply Overpowered"},{"id":"trap","icon":"🕷️","label":"Elaborate Trap"},{"id":"inside_job","icon":"🔑","label":"Inside Job"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setFailureMethod(failureMethod === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${failureMethod === opt.id ? "#FB923C" : "rgba(200,195,240,0.15)"}`,background:failureMethod === opt.id ? "rgba(251,146,60,0.16)" : "rgba(255,255,255,0.03)",color:failureMethod === opt.id ? "#FB923C" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:failureMethod === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CAPTOR'S REACTION TO ATTEMPT</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"amused","icon":"😏","label":"Amused — Expected It"},{"id":"enraged","icon":"🔥","label":"Enraged — Doubles Down"},{"id":"uses_it","icon":"🧠","label":"Uses It Against Her"},{"id":"coldly_punishes","icon":"🧊","label":"Cold Calculated Punishment"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCaptorReaction(captorReaction === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${captorReaction === opt.id ? "#FB923C" : "rgba(200,195,240,0.15)"}`,background:captorReaction === opt.id ? "rgba(251,146,60,0.16)" : "rgba(255,255,255,0.03)",color:captorReaction === opt.id ? "#FB923C" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:captorReaction === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#FB923C" accentRgb="251,146,60" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#FB923C" accentRgb="251,146,60" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           {loading ? "GENERATING..." : "SPRING THE TRAP"}
         </button>

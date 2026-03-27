@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -75,6 +76,7 @@ export default function InterrogationRoom({ onBack }: Props) {
   const [extractionTarget, setExtractionTarget] = useState("");
   const [silenceConsequence, setSilenceConsequence] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const [round, setRound] = useState(1);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -109,7 +111,7 @@ export default function InterrogationRoom({ onBack }: Props) {
       const _silenceConsequenceMap: Record<string,string> = {"escalating_pain":"Escalating Pain","psychological":"Psychological Pressure","others_harmed":"Others Are Harmed","public_exposure":"Public Exposure","deprivation":"Sensory Deprivation"}; return [extractionTarget ? `Extraction Target: ${_extractionTargetMap[extractionTarget] ?? extractionTarget}` : "", silenceConsequence ? `Consequence for Silence: ${_silenceConsequenceMap[silenceConsequence] ?? silenceConsequence}` : ""].filter(Boolean).join("\n"); })(), extractionTarget, silenceConsequence, heroine: heroineName.trim(),
           villain: villainLabel,
           weaknesses: weaknessNotes.trim() || undefined,
-          messages: msgs, }),
+          messages: msgs, storyLength }),
       });
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
       const reader = res.body.getReader();
@@ -248,6 +250,33 @@ export default function InterrogationRoom({ onBack }: Props) {
             <textarea value={weaknessNotes} onChange={(e) => setWeaknessNotes(e.target.value)} placeholder="e.g. Kryptonite exposure, magic-based attacks, emotional manipulation via loved ones…" rows={2} style={{ width: "100%", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.65rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.85rem", outline: "none", resize: "vertical", boxSizing: "border-box" }} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,100,0,0.4)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")} />
           </div>
 
+          {/* ── Outfit, Scene & Narrative Controls ── */}
+          <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#A78BFA" accentRgb="167,139,250" />
+          <div style={{marginTop:"1.25rem"}}>
+            <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+              <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #A78BFA, transparent)"}} />
+              <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#A78BFA"}}>Scene Parameters</span>
+              <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(167,139,250,0.25), transparent)"}} />
+              <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+            </div>
+            <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(167,139,250,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+              <div style={{marginBottom:"0.875rem"}}>
+                <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WHAT'S BEING EXTRACTED</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+                  {[{id:"safe_house_locations",icon:"🏠",label:"Safe House Locations"},{id:"access_codes",icon:"🔑",label:"Access Codes / Passwords"},{id:"ally_identities",icon:"👥",label:"Ally Identities"},{id:"classified_intel",icon:"📁",label:"Classified Intelligence"},{id:"personal_secrets",icon:"💭",label:"Personal Secrets"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setExtractionTarget(extractionTarget === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${extractionTarget === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:extractionTarget === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:extractionTarget === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:extractionTarget === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+                </div>
+              </div>
+              <div style={{marginBottom:"0.875rem"}}>
+                <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CONSEQUENCE FOR SILENCE</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+                  {[{id:"escalating_pain",icon:"⚡",label:"Escalating Pain"},{id:"psychological",icon:"🧠",label:"Psychological Pressure"},{id:"others_harmed",icon:"💔",label:"Others Are Harmed"},{id:"public_exposure",icon:"📢",label:"Public Exposure"},{id:"deprivation",icon:"🚫",label:"Sensory Deprivation"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setSilenceConsequence(silenceConsequence === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${silenceConsequence === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:silenceConsequence === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:silenceConsequence === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:silenceConsequence === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#A78BFA" accentRgb="167,139,250" />
+          <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#A78BFA" accentRgb="167,139,250" />
+
           <button onClick={beginInterrogation} disabled={!canBegin} style={{ padding: "1rem 2rem", background: canBegin ? "rgba(200,0,50,0.25)" : "rgba(255,255,255,0.04)", border: `1px solid ${canBegin ? "rgba(200,0,50,0.6)" : "rgba(255,255,255,0.07)"}`, borderRadius: "14px", color: canBegin ? "#FF4060" : "rgba(200,200,220,0.2)", fontFamily: "'Cinzel', serif", fontSize: "1rem", letterSpacing: "4px", textTransform: "uppercase", cursor: canBegin ? "pointer" : "not-allowed", transition: "all 0.3s", boxShadow: canBegin ? "0 4px 24px rgba(200,0,50,0.2)" : "none" }}>
             Enter the Room
           </button>
@@ -312,16 +341,6 @@ export default function InterrogationRoom({ onBack }: Props) {
             </div>
           </div>
         )}
-
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#A78BFA"
-          accentRgb="167,139,250"
-        />
                 {error && (
           <div style={{ textAlign: "center", padding: "0.75rem", background: "rgba(200,0,50,0.1)", border: "1px solid rgba(200,0,50,0.3)", borderRadius: "8px", color: "#FF4060", fontFamily: "'Montserrat', sans-serif", fontSize: "0.75rem" }}>
             {error}

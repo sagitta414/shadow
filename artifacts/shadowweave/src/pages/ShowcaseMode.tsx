@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -76,6 +77,7 @@ export default function ShowcaseMode({ onBack }: Props) {
   const [showcasePurpose, setShowcasePurpose] = useState("");
   const [audienceExclusivity, setAudienceExclusivity] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -100,7 +102,7 @@ export default function ShowcaseMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _showcasePurposeMap: Record<string,string> = {"power_demonstration":"Power Demonstration","pre_auction_preview":"Pre-Auction Preview","breaking_performance":"Breaking Performance","leverage_display":"Leverage Display"};
-      const _audienceExclusivityMap: Record<string,string> = {"invitation_only":"Invitation Only","villain_community":"Villain Community","semi_public":"Semi-Public","online_stream":"Encrypted Online Stream"}; return [showcasePurpose ? `Showcase Purpose: ${_showcasePurposeMap[showcasePurpose] ?? showcasePurpose}` : "", audienceExclusivity ? `Audience: ${_audienceExclusivityMap[audienceExclusivity] ?? audienceExclusivity}` : ""].filter(Boolean).join("\n"); })(), showcasePurpose, audienceExclusivity, heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
+      const _audienceExclusivityMap: Record<string,string> = {"invitation_only":"Invitation Only","villain_community":"Villain Community","semi_public":"Semi-Public","online_stream":"Encrypted Online Stream"}; return [showcasePurpose ? `Showcase Purpose: ${_showcasePurposeMap[showcasePurpose] ?? showcasePurpose}` : "", audienceExclusivity ? `Audience: ${_audienceExclusivityMap[audienceExclusivity] ?? audienceExclusivity}` : ""].filter(Boolean).join("\n"); })(), showcasePurpose, audienceExclusivity, heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -205,15 +207,6 @@ export default function ShowcaseMode({ onBack }: Props) {
         )}
         {chapters.length >= 4 && <div style={endLabel(accRgb)}>— THE SHOWCASE ENDS. THE GUESTS DEPART. SHE REMAINS. —</div>}
         {continuing && <div style={loadLabel(accRgb)}>The scene shifts…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#60A5FA"
-          accentRgb="96,165,250"
-        />
                 {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
@@ -240,6 +233,34 @@ export default function ShowcaseMode({ onBack }: Props) {
         </Section>
 
         {error && <div style={errStyle}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#60A5FA" accentRgb="96,165,250" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #60A5FA, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#60A5FA"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(96,165,250,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(96,165,250,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>SHOWCASE PURPOSE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"power_demonstration","icon":"⚡","label":"Power Demonstration"},{"id":"pre_auction_preview","icon":"🔍","label":"Pre-Auction Preview"},{"id":"breaking_performance","icon":"💀","label":"Breaking Performance"},{"id":"leverage_display","icon":"🎭","label":"Leverage Display"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setShowcasePurpose(showcasePurpose === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${showcasePurpose === opt.id ? "#60A5FA" : "rgba(200,195,240,0.15)"}`,background:showcasePurpose === opt.id ? "rgba(96,165,250,0.16)" : "rgba(255,255,255,0.03)",color:showcasePurpose === opt.id ? "#60A5FA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:showcasePurpose === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>AUDIENCE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"invitation_only","icon":"💎","label":"Invitation Only"},{"id":"villain_community","icon":"🕷️","label":"Villain Community"},{"id":"semi_public","icon":"👥","label":"Semi-Public"},{"id":"online_stream","icon":"📡","label":"Encrypted Online Stream"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAudienceExclusivity(audienceExclusivity === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${audienceExclusivity === opt.id ? "#60A5FA" : "rgba(200,195,240,0.15)"}`,background:audienceExclusivity === opt.id ? "rgba(96,165,250,0.16)" : "rgba(255,255,255,0.03)",color:audienceExclusivity === opt.id ? "#60A5FA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:audienceExclusivity === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#60A5FA" accentRgb="96,165,250" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#60A5FA" accentRgb="96,165,250" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={primBtn(canGen, accRgb, acc)}>
           {loading ? "STAGING…" : "🎭 BEGIN THE SHOWCASE"}
         </button>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -59,6 +60,7 @@ export default function MassCaptureMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [groupDynamicType, setGroupDynamicType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -89,7 +91,7 @@ export default function MassCaptureMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mass-capture`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _groupDynamicMap: Record<string,string> = {"isolated":"Isolated","forced_interact":"Forced to Interact","made_to_compete":"Made to Compete","ranked_hierarchy":"Ranked Hierarchy","collective_break":"Collectively Broken"}; return [groupDynamicType ? `Group Dynamic: ${_groupDynamicMap[groupDynamicType] ?? groupDynamicType}` : ""].filter(Boolean).join("\n"); })(), groupDynamicType, heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _groupDynamicMap: Record<string,string> = {"isolated":"Isolated","forced_interact":"Forced to Interact","made_to_compete":"Made to Compete","ranked_hierarchy":"Ranked Hierarchy","collective_break":"Collectively Broken"}; return [groupDynamicType ? `Group Dynamic: ${_groupDynamicMap[groupDynamicType] ?? groupDynamicType}` : ""].filter(Boolean).join("\n"); })(), groupDynamicType, heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
@@ -183,15 +185,6 @@ export default function MassCaptureMode({ onBack }: Props) {
             </button>
           </div>
         )}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#F87171"
-          accentRgb="248,113,113"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -215,6 +208,28 @@ export default function MassCaptureMode({ onBack }: Props) {
         </Sec>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#F87171" accentRgb="248,113,113" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #F87171, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#F87171"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(248,113,113,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(248,113,113,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>GROUP DYNAMIC</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"isolated","icon":"🚫","label":"Isolated from Each Other"},{"id":"forced_interact","icon":"👥","label":"Forced to Interact"},{"id":"made_to_compete","icon":"⚔️","label":"Made to Compete"},{"id":"ranked_hierarchy","icon":"📊","label":"Ranked Hierarchy"},{"id":"collective_break","icon":"💔","label":"Collectively Broken Together"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setGroupDynamicType(groupDynamicType === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${groupDynamicType === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:groupDynamicType === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:groupDynamicType === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:groupDynamicType === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#F87171" accentRgb="248,113,113" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#F87171" accentRgb="248,113,113" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           {loading ? "GENERATING..." : "SPRING THE TRAP"}
         </button>

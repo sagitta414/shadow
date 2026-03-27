@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -72,6 +73,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
   const [corruptionTarget, setCorruptionTarget] = useState("");
   const [corruptionMethodType, setCorruptionMethodType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -103,7 +105,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _corruptionTargetMap: Record<string,string> = {"villain_allegiance":"Full Villain Allegiance","personal_submission":"Personal Submission","ideology_adoption":"Ideology Adoption","abandon_heroics":"Abandon Heroics"};
-      const _corruptionMethodMap: Record<string,string> = {"slow_manipulation":"Slow Manipulation","trauma_bonding":"Trauma Bonding","ideology":"Ideology Replacement","love_bombing":"Love Bombing","isolation_dependency":"Isolation & Dependency"}; return [corruptionTarget ? `Corruption Target: ${_corruptionTargetMap[corruptionTarget] ?? corruptionTarget}` : "", corruptionMethodType ? `Corruption Method: ${_corruptionMethodMap[corruptionMethodType] ?? corruptionMethodType}` : ""].filter(Boolean).join("\n"); })(), corruptionTarget, corruptionMethod, heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
+      const _corruptionMethodMap: Record<string,string> = {"slow_manipulation":"Slow Manipulation","trauma_bonding":"Trauma Bonding","ideology":"Ideology Replacement","love_bombing":"Love Bombing","isolation_dependency":"Isolation & Dependency"}; return [corruptionTarget ? `Corruption Target: ${_corruptionTargetMap[corruptionTarget] ?? corruptionTarget}` : "", corruptionMethodType ? `Corruption Method: ${_corruptionMethodMap[corruptionMethodType] ?? corruptionMethodType}` : ""].filter(Boolean).join("\n"); })(), corruptionTarget, corruptionMethodType, heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
@@ -229,15 +231,6 @@ export default function CorruptionArcMode({ onBack }: Props) {
             <div style={{ fontSize: "0.62rem", color: "rgba(200,195,225,0.4)", marginTop: "0.5rem", fontFamily: "'Raleway', sans-serif" }}>The corruption arc is complete. She serves him now.</div>
           </div>
         )}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#60A5FA"
-          accentRgb="96,165,250"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -262,6 +255,34 @@ export default function CorruptionArcMode({ onBack }: Props) {
         </Sec>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#60A5FA" accentRgb="96,165,250" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #60A5FA, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#60A5FA"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(96,165,250,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(96,165,250,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WHAT SHE'S BEING TURNED TOWARD</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"villain_allegiance","icon":"💀","label":"Full Villain Allegiance"},{"id":"personal_submission","icon":"🌹","label":"Personal Submission to Captor"},{"id":"ideology_adoption","icon":"📖","label":"Adopting His Ideology"},{"id":"abandon_heroics","icon":"🦸","label":"Simply Abandoning Heroics"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCorruptionTarget(corruptionTarget === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${corruptionTarget === opt.id ? "#60A5FA" : "rgba(200,195,240,0.15)"}`,background:corruptionTarget === opt.id ? "rgba(96,165,250,0.16)" : "rgba(255,255,255,0.03)",color:corruptionTarget === opt.id ? "#60A5FA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:corruptionTarget === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CORRUPTION METHOD</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"slow_manipulation","icon":"🕷️","label":"Slow Manipulation"},{"id":"trauma_bonding","icon":"💔","label":"Trauma Bonding"},{"id":"ideology","icon":"📜","label":"Ideological Replacement"},{"id":"love_bombing","icon":"💕","label":"Love Bombing"},{"id":"isolation_dependency","icon":"🔒","label":"Isolation & Dependency"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCorruptionMethodType(corruptionMethodType === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${corruptionMethodType === opt.id ? "#60A5FA" : "rgba(200,195,240,0.15)"}`,background:corruptionMethodType === opt.id ? "rgba(96,165,250,0.16)" : "rgba(255,255,255,0.03)",color:corruptionMethodType === opt.id ? "#60A5FA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:corruptionMethodType === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#60A5FA" accentRgb="96,165,250" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#60A5FA" accentRgb="96,165,250" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           {loading ? "BEGINNING..." : "BEGIN THE CORRUPTION"}
         </button>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -80,6 +81,7 @@ export default function LongGameMode({ onBack }: Props) {
   const [timelineScale, setTimelineScale] = useState("");
   const [coverStoryType, setCoverStoryType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -100,7 +102,7 @@ export default function LongGameMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _timelineScaleMap: Record<string,string> = {"days":"Days","weeks":"Weeks","months":"Months"};
-      const _coverStoryTypeMap: Record<string,string> = {"missing_hero":"Missing / Gone Dark","retired":"Retired from Heroics","undercover_op":"On Classified Operation","personal_leave":"Personal Leave","no_cover":"No Cover — Publicly Vanished"}; return [timelineScale ? `Timeline Scale: ${_timelineScaleMap[timelineScale] ?? timelineScale}` : "", coverStoryType ? `Public Cover Story: ${_coverStoryTypeMap[coverStoryType] ?? coverStoryType}` : ""].filter(Boolean).join("\n"); })(), timelineScale, coverStoryType, heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, continueDir }),
+      const _coverStoryTypeMap: Record<string,string> = {"missing_hero":"Missing / Gone Dark","retired":"Retired from Heroics","undercover_op":"On Classified Operation","personal_leave":"Personal Leave","no_cover":"No Cover — Publicly Vanished"}; return [timelineScale ? `Timeline Scale: ${_timelineScaleMap[timelineScale] ?? timelineScale}` : "", coverStoryType ? `Public Cover Story: ${_coverStoryTypeMap[coverStoryType] ?? coverStoryType}` : ""].filter(Boolean).join("\n"); })(), timelineScale, coverStoryType, heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -216,15 +218,6 @@ export default function LongGameMode({ onBack }: Props) {
         )}
         {chapters.length >= 7 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— TIME HAS DONE ITS WORK. —</div>}
         {continuing && <div style={{ textAlign: "center", padding: "1.5rem", color: `rgba(${accRgb},0.5)`, fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>Time passes…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#C084FC"
-          accentRgb="192,132,252"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -253,6 +246,34 @@ export default function LongGameMode({ onBack }: Props) {
           <div style={prr}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
         </Sec2>
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#C084FC" accentRgb="192,132,252" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #C084FC, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#C084FC"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(192,132,252,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(192,132,252,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>TIMELINE SCALE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"days","icon":"📅","label":"Days"},{"id":"weeks","icon":"🗓️","label":"Weeks"},{"id":"months","icon":"📆","label":"Months"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setTimelineScale(timelineScale === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${timelineScale === opt.id ? "#C084FC" : "rgba(200,195,240,0.15)"}`,background:timelineScale === opt.id ? "rgba(192,132,252,0.16)" : "rgba(255,255,255,0.03)",color:timelineScale === opt.id ? "#C084FC" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:timelineScale === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>PUBLIC COVER STORY</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"missing_hero","icon":"❓","label":"Missing / Gone Dark"},{"id":"retired","icon":"🏠","label":"Retired from Heroics"},{"id":"undercover_op","icon":"🎭","label":"On Classified Operation"},{"id":"personal_leave","icon":"✈️","label":"Personal Leave"},{"id":"no_cover","icon":"🌑","label":"No Cover — Publicly Vanished"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCoverStoryType(coverStoryType === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${coverStoryType === opt.id ? "#C084FC" : "rgba(200,195,240,0.15)"}`,background:coverStoryType === opt.id ? "rgba(192,132,252,0.16)" : "rgba(255,255,255,0.03)",color:coverStoryType === opt.id ? "#C084FC" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:coverStoryType === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#C084FC" accentRgb="192,132,252" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#C084FC" accentRgb="192,132,252" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={pB2(canGen, accRgb, acc)}>
           ⏳ BEGIN THE LONG GAME
         </button>

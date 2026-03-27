@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -58,6 +59,7 @@ export default function DualCaptureMode({ onBack }: Props) {
   const [heroineRelationship, setHeroineRelationship] = useState("");
   const [communicationStatus, setCommunicationStatus] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH1 = customH1 || heroine1;
@@ -76,7 +78,7 @@ export default function DualCaptureMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _heroineRelationshipMap: Record<string,string> = {"rivals":"Rivals","close_allies":"Close Allies","teammates":"Teammates","strangers":"Strangers","former_enemies":"Former Enemies"};
-      const _communicationStatusMap: Record<string,string> = {"yes_freely":"Yes — Freely","yes_limited":"Yes — Limited","no_separated":"No — Separated","forced_to_watch":"Forced to Watch Each Other"}; return [heroineRelationship ? `Heroine Relationship: ${_heroineRelationshipMap[heroineRelationship] ?? heroineRelationship}` : "", communicationStatus ? `Can They Communicate?: ${_communicationStatusMap[communicationStatus] ?? communicationStatus}` : ""].filter(Boolean).join("\n"); })(), heroineRelationship, communicationStatus, heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, continueDir }),
+      const _communicationStatusMap: Record<string,string> = {"yes_freely":"Yes — Freely","yes_limited":"Yes — Limited","no_separated":"No — Separated","forced_to_watch":"Forced to Watch Each Other"}; return [heroineRelationship ? `Heroine Relationship: ${_heroineRelationshipMap[heroineRelationship] ?? heroineRelationship}` : "", communicationStatus ? `Can They Communicate?: ${_communicationStatusMap[communicationStatus] ?? communicationStatus}` : ""].filter(Boolean).join("\n"); })(), heroineRelationship, communicationStatus, heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -156,15 +158,6 @@ export default function DualCaptureMode({ onBack }: Props) {
             </button>
           </div>
         )}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#F472B6"
-          accentRgb="244,114,182"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -188,6 +181,34 @@ export default function DualCaptureMode({ onBack }: Props) {
         </Sec>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#F472B6" accentRgb="244,114,182" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #F472B6, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#F472B6"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(244,114,182,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(244,114,182,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>RELATIONSHIP BETWEEN HEROINES</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"rivals","icon":"⚔️","label":"Rivals"},{"id":"close_allies","icon":"💜","label":"Close Allies"},{"id":"teammates","icon":"🤝","label":"Teammates"},{"id":"strangers","icon":"❓","label":"Strangers"},{"id":"former_enemies","icon":"🔥","label":"Former Enemies"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setHeroineRelationship(heroineRelationship === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${heroineRelationship === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:heroineRelationship === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:heroineRelationship === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:heroineRelationship === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CAN THEY COMMUNICATE?</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"yes_freely","icon":"💬","label":"Yes — Freely"},{"id":"yes_limited","icon":"🤫","label":"Yes — Limited / Watched"},{"id":"no_separated","icon":"🚫","label":"No — Kept Separated"},{"id":"forced_to_watch","icon":"👁️","label":"Forced to Watch Each Other"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCommunicationStatus(communicationStatus === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${communicationStatus === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:communicationStatus === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:communicationStatus === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:communicationStatus === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#F472B6" accentRgb="244,114,182" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#F472B6" accentRgb="244,114,182" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           {loading ? "GENERATING..." : "LOCK THEM IN"}
         </button>

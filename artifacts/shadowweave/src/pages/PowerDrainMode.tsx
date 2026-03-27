@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -67,6 +68,7 @@ export default function PowerDrainMode({ onBack }: Props) {
   const [powerReturn, setPowerReturn] = useState("");
   const [drainedPowerUse, setDrainedPowerUse] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fHeroine = customHeroine || heroine;
@@ -90,7 +92,7 @@ export default function PowerDrainMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _powerReturnMap: Record<string,string> = {"permanently_gone":"Gone Permanently","slowly_returning":"Slowly Returning","worst_moments":"Return at Worst Moments","traded_away":"Traded Away"};
-      const _drainedPowerUseMap: Record<string,string> = {"villain_absorbs":"Absorbs Them","stored_device":"Stored in Device","sold_to_others":"Sold to Others","destroyed":"Destroyed"}; return [powerReturn ? `Power Return: ${_powerReturnMap[powerReturn] ?? powerReturn}` : "", drainedPowerUse ? `What Villain Does With Powers: ${_drainedPowerUseMap[drainedPowerUse] ?? drainedPowerUse}` : ""].filter(Boolean).join("\n"); })(), powerReturn, drainedPowerUse, heroine: fHeroine, villain: fVillain, setting, powers, drainMethod, drainLevel: currentDrain, chapters: isFirst ? [] : chapters, continueDir }),
+      const _drainedPowerUseMap: Record<string,string> = {"villain_absorbs":"Absorbs Them","stored_device":"Stored in Device","sold_to_others":"Sold to Others","destroyed":"Destroyed"}; return [powerReturn ? `Power Return: ${_powerReturnMap[powerReturn] ?? powerReturn}` : "", drainedPowerUse ? `What Villain Does With Powers: ${_drainedPowerUseMap[drainedPowerUse] ?? drainedPowerUse}` : ""].filter(Boolean).join("\n"); })(), powerReturn, drainedPowerUse, heroine: fHeroine, villain: fVillain, setting, powers, drainMethod, drainLevel: currentDrain, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -185,15 +187,6 @@ export default function PowerDrainMode({ onBack }: Props) {
           </div>
         )}
         {drainLevel >= 100 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: "#FF6060", fontSize: "0.7rem", letterSpacing: "3px" }}>— FULLY DRAINED — ALL POWER GONE —</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#34D399"
-          accentRgb="52,211,153"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -218,6 +211,34 @@ export default function PowerDrainMode({ onBack }: Props) {
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>{DRAIN_METHODS.map(d => pill(d, drainMethod === d, () => setDrainMethod(d)))}</div>
         </Sec>
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#34D399" accentRgb="52,211,153" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #34D399, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#34D399"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(52,211,153,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(52,211,153,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>DO HER POWERS RETURN?</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"permanently_gone","icon":"💀","label":"Gone Permanently"},{"id":"slowly_returning","icon":"📈","label":"Slowly Regenerating"},{"id":"worst_moments","icon":"⚡","label":"Return at Worst Moments"},{"id":"traded_away","icon":"🤝","label":"Traded Away by Her"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setPowerReturn(powerReturn === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${powerReturn === opt.id ? "#34D399" : "rgba(200,195,240,0.15)"}`,background:powerReturn === opt.id ? "rgba(52,211,153,0.16)" : "rgba(255,255,255,0.03)",color:powerReturn === opt.id ? "#34D399" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:powerReturn === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WHAT THE VILLAIN DOES WITH HER POWERS</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"villain_absorbs","icon":"👿","label":"Absorbs Them"},{"id":"stored_device","icon":"🔋","label":"Stored in a Device"},{"id":"sold_to_others","icon":"💰","label":"Sold to Others"},{"id":"destroyed","icon":"💥","label":"Destroyed Permanently"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setDrainedPowerUse(drainedPowerUse === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${drainedPowerUse === opt.id ? "#34D399" : "rgba(200,195,240,0.15)"}`,background:drainedPowerUse === opt.id ? "rgba(52,211,153,0.16)" : "rgba(255,255,255,0.03)",color:drainedPowerUse === opt.id ? "#34D399" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:drainedPowerUse === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#34D399" accentRgb="52,211,153" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#34D399" accentRgb="52,211,153" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           {loading ? "INITIATING..." : "BEGIN THE DRAIN"}
         </button>

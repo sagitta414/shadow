@@ -1,21 +1,39 @@
 # SHADOWWEAVE — Dark Narrative Studio
 
-## Story Modes (9 total)
+## Story Modes (27+ total)
 - **Heroine Forge** — 181+ heroines (Marvel/DC/CW/The Boys/PR/Animated/Star Wars/TV), 67 villains, 4-step wizard, multi-chapter AI story
 - **Celebrity Captive** — 100 actresses, captor builder, streaming AI story
 - **Custom Scenario** — Full character builder + captor profiler
 - **Daily Dark Scenario** — Daily seeded scenario with multi-chapter continuation
 - **Mind Break Chamber** — 5-phase psychological breaking, psyche tracking
-- **Two Heroines, One Cell** — Dual captive scenario with dynamic between them
+- **Two Heroines, One Cell** (DualCapture) — Dual captive scenario with dynamic between them
 - **Rescue Gone Wrong** — Second heroine attempts rescue and fails; both captured
 - **Power Drain Mode** — Systematic stripping of powers with live drain % meter
 - **Mass Capture Mode** — 3–5 heroines, one dominant villain, group dynamics, collective breaking
 - **Corruption Arc** — 7-chapter arc tracking heroine's loyalty from 100% → 0%; she genuinely switches sides
+- **Betting Pool** — Villain syndicate wagers on who breaks the heroine first; live resistance tracking
+- **Villain Team-Up** — Two villains with shifting alliance dynamics
+- **Chain of Custody** — Heroine transferred between captors with escalating conditions
+- **Long Game** — Slow arc across days/weeks/months with public cover story
+- **Dark Mirror** — Psychological corruption arc turning heroine toward villain's worldview
+- **Arena Mode** — Combat showcase with crowd interaction and match rules
+- **The Handler** — Clinical ownership relationship with compliance tracking
+- **Trophy Display** — Heroine exhibited with visitor interaction levels
+- **Obedience Training** — Conditioning via philosophy (punishment/reward/psychological)
+- **Showcase Mode** — Power demonstration / pre-auction preview events
+- **Public Property** — Identity exposure with varying anonymity levels
+- **Hero Auction** — Live bidding, sealed bids, or private negotiation
+- **Interrogation Room** — Real-time role-play chat with extraction targets and captor AI
 
 ## Utility Tools
-- Interrogation Room, Captor Logic Sim, Sounding Board, Scenario Engine, Character Mapper, Captor Configuration, Story Archive
+- Interrogation Room (phase-based chat), Captor Logic Sim, Sounding Board, Scenario Engine, Character Mapper, Captor Configuration, Story Archive
 
 ## Key Features
+- **Step 2 Config Panels** — All 19 specialist modes have OutfitSelector + Scene Parameters (mode-unique options) + UniversalOptions (Tone/Pacing/POV/Restraint/Dialogue) + StoryLengthPicker in step 2 before generating
+- **Story Length** — Short (0.6×) / Standard / Long (1.5×, max 2200 tokens) controlled by `resolveTokens()` in ai.ts; `storyLength` sent in all fetch bodies; all 21 doStream calls use `resolveTokens(base, req.body)` in story.ts
+- **Outfit Selector** — 60+ outfits with damage levels; sends `outfitContext` string to backend on every generate
+- **Universal Narrative Controls** — Tone / Pacing / POV / Restraint / Dialogue sent as `universalContext` to all story endpoints
+- **Scene Parameters** — Mode-unique option panels (e.g. Audience Type, Handler Tone, Alliance Stability, Transfer Method, etc.) sent as `modeContext`
 - **Custom Heroine Builder** — Create your own heroines saved to localStorage, appear in Heroine Forge picker (CUSTOM tab)
 - **Favorite Heroines** — Star any heroine in Heroine Forge; favorites sorted first in grid, persisted to `sw_favorites_v1` localStorage key
 - **Heroine Lore Cards** — Click ℹ on any hero card to see a modal with powers, alias, universe, known vulnerabilities, and favorite toggle
@@ -30,6 +48,7 @@
 - **Dual AI Providers** — Venice AI (`venice-uncensored-role-play`) or NovelAI (`kayra-v1`); toggled via bottom-left badge; persisted to `sw_ai_provider_v1` localStorage; all 27 story endpoints + soundboard + plottwist support both providers
 - **Anti-Repetition** — `frequency_penalty: 0.42` + `presence_penalty: 0.32` baked into all Venice calls via `lib/ai.ts`
 - **AiProviderBadge** — fixed bottom-left overlay; shows active engine with glow; click to toggle; Venice=violet, NovelAI=green
+- **Mobile CSS** — Comprehensive mobile responsive styles in `index.css` (safe-area insets, sticky generate button, touch targets, pill scrolling, responsive grids)
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
 
 # Workspace

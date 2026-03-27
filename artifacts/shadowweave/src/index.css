@@ -942,3 +942,129 @@ body.theme-glitch {
 .infamy-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(239,68,68,0.4);
 }
+
+/* ─── Mobile: Mode Pages ──────────────────────────── */
+@media (max-width: 640px) {
+  /* Universal page padding reduction */
+  .mode-page-wrap {
+    padding: 1rem !important;
+  }
+
+  /* Pill row horizontal scroll on narrow screens */
+  .pill-scroll-mobile {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Story text bigger on mobile for readability */
+  .story-prose {
+    font-size: 1rem !important;
+    line-height: 1.85 !important;
+  }
+
+  /* Config panels full width */
+  .config-panel {
+    padding: 0.875rem !important;
+  }
+
+  /* Back button reduced size */
+  .mode-back-btn {
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* Trio toggle 3-col still on mobile — but tighter */
+  .trio-toggle {
+    gap: 0.35rem !important;
+  }
+
+  /* Generate button sticky at bottom on mobile */
+  .gen-btn-sticky {
+    position: sticky !important;
+    bottom: 1rem !important;
+    z-index: 10 !important;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.5) !important;
+  }
+
+  /* Primary card height on homepage */
+  .hp-primary-card {
+    height: 280px !important;
+  }
+
+  /* Homepage mode grid — 2 cols on mobile */
+  .hp-specialist-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* AiProviderBadge — compact on mobile */
+  .ai-badge-wrap {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.58rem !important;
+  }
+
+  /* Scoreboard / stats wrap — allow scroll */
+  .stats-row {
+    overflow-x: auto !important;
+  }
+
+  /* Narrative Controls section touch targets */
+  .narrative-controls-btn {
+    padding: 0.5rem 0.4rem !important;
+    min-height: 60px !important;
+  }
+
+  /* StoryLengthPicker buttons — taller for touch */
+  .length-picker-btn {
+    min-height: 70px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Page containers — full bleed */
+  .page-inner-wrap {
+    padding: 0.875rem !important;
+  }
+
+  /* Section labels compressed */
+  .sec-label {
+    font-size: 0.5rem !important;
+    letter-spacing: 2px !important;
+  }
+
+  /* Pill buttons — larger touch target */
+  .pill-btn {
+    min-height: 34px !important;
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  /* Step indicators — compact */
+  .step-indicator-row {
+    gap: 0.5rem !important;
+  }
+
+  /* Export buttons — row */
+  .export-btn-row {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-left: auto !important;
+  }
+
+  /* Story chapter dividers */
+  .chapter-divider-text {
+    font-size: 0.55rem !important;
+    letter-spacing: 2px !important;
+  }
+}
+
+/* ─── Safe area insets (iPhone notch etc) ─────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .gen-btn-sticky {
+    bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+  }
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

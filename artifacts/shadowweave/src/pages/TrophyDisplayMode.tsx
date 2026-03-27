@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -64,6 +65,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
   const [visitorInteraction, setVisitorInteraction] = useState("");
   const [displayDuration, setDisplayDuration] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -87,7 +89,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _visitorInteractionMap: Record<string,string> = {"observe_only":"Observe Only","limited_contact":"Limited Contact","full_access":"Full Access"};
-      const _displayDurationMap: Record<string,string> = {"single_event":"Single Event","ongoing":"Ongoing Exhibition","rotating":"Rotating Display"}; return [visitorInteraction ? `Visitor Interaction: ${_visitorInteractionMap[visitorInteraction] ?? visitorInteraction}` : "", displayDuration ? `Display Duration: ${_displayDurationMap[displayDuration] ?? displayDuration}` : ""].filter(Boolean).join("\n"); })(), visitorInteraction, displayDuration, heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, continueDir }),
+      const _displayDurationMap: Record<string,string> = {"single_event":"Single Event","ongoing":"Ongoing Exhibition","rotating":"Rotating Display"}; return [visitorInteraction ? `Visitor Interaction: ${_visitorInteractionMap[visitorInteraction] ?? visitorInteraction}` : "", displayDuration ? `Display Duration: ${_displayDurationMap[displayDuration] ?? displayDuration}` : ""].filter(Boolean).join("\n"); })(), visitorInteraction, displayDuration, heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -173,15 +175,6 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLabel}>— THE DISPLAY CONTINUES. THE VISITORS KEEP COMING. —</div>}
         {continuing && <div style={loadingLabel(accRgb)}>Footsteps in the corridor…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#FBBF24"
-          accentRgb="251,191,36"
-        />
                 {error && <div style={errorStyle}>Error: {error}</div>}
       </div>
     );
@@ -208,6 +201,34 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         </Section>
 
         {error && <div style={errorStyle}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#FBBF24" accentRgb="251,191,36" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #FBBF24, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#FBBF24"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(251,191,36,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(251,191,36,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>VISITOR INTERACTION LEVEL</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"observe_only","icon":"👁️","label":"Observe Only"},{"id":"limited_contact","icon":"🤲","label":"Limited Contact"},{"id":"full_access","icon":"🔓","label":"Full Access"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setVisitorInteraction(visitorInteraction === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${visitorInteraction === opt.id ? "#FBBF24" : "rgba(200,195,240,0.15)"}`,background:visitorInteraction === opt.id ? "rgba(251,191,36,0.16)" : "rgba(255,255,255,0.03)",color:visitorInteraction === opt.id ? "#FBBF24" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:visitorInteraction === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>DISPLAY DURATION</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"single_event","icon":"⏱️","label":"Single Event"},{"id":"ongoing","icon":"📅","label":"Ongoing Exhibition"},{"id":"rotating","icon":"🔄","label":"Rotating Display"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setDisplayDuration(displayDuration === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${displayDuration === opt.id ? "#FBBF24" : "rgba(200,195,240,0.15)"}`,background:displayDuration === opt.id ? "rgba(251,191,36,0.16)" : "rgba(255,255,255,0.03)",color:displayDuration === opt.id ? "#FBBF24" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:displayDuration === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#FBBF24" accentRgb="251,191,36" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#FBBF24" accentRgb="251,191,36" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={primaryBtn(canGen, accRgb, acc)}>
           {loading ? "MOUNTING HER…" : "👁 BEGIN THE DISPLAY"}
         </button>

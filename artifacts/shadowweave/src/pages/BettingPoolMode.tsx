@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -61,6 +62,7 @@ export default function BettingPoolMode({ onBack }: Props) {
   const [audienceType, setAudienceType] = useState("");
   const [commentaryTone, setCommentaryTone] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -84,7 +86,7 @@ export default function BettingPoolMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _audienceTypeMap: Record<string,string> = {"private_syndicate":"Villain Syndicate","paying_spectators":"Paying Spectators","small_elite_group":"Small Elite Group","encrypted_stream":"Encrypted Live Stream","mixed_criminal":"Mixed Criminal Crowd"};
-      const _commentaryToneMap: Record<string,string> = {"crude_betting":"Crude Betting Talk","clinical_scoring":"Clinical Scoring","excited_crowd":"Excited Crowd","silent_tension":"Tense Silence"}; return [audienceType ? `Audience Type: ${_audienceTypeMap[audienceType] ?? audienceType}` : "", commentaryTone ? `Commentary Tone: ${_commentaryToneMap[commentaryTone] ?? commentaryTone}` : ""].filter(Boolean).join("\n"); })(), audienceType, commentaryTone, heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, continueDir }),
+      const _commentaryToneMap: Record<string,string> = {"crude_betting":"Crude Betting Talk","clinical_scoring":"Clinical Scoring","excited_crowd":"Excited Crowd","silent_tension":"Tense Silence"}; return [audienceType ? `Audience Type: ${_audienceTypeMap[audienceType] ?? audienceType}` : "", commentaryTone ? `Commentary Tone: ${_commentaryToneMap[commentaryTone] ?? commentaryTone}` : ""].filter(Boolean).join("\n"); })(), audienceType, commentaryTone, heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -195,15 +197,6 @@ export default function BettingPoolMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLbl(accRgb)}>— THE BETS ARE SETTLED. —</div>}
         {continuing && <div style={loadLbl(accRgb)}>The next session begins…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#A78BFA"
-          accentRgb="167,139,250"
-        />
                 {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
@@ -224,6 +217,34 @@ export default function BettingPoolMode({ onBack }: Props) {
           <div style={pillRow}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
         </Sec>
         {error && <div style={errStyle}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#A78BFA" accentRgb="167,139,250" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #A78BFA, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#A78BFA"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(167,139,250,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(167,139,250,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>AUDIENCE TYPE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"private_syndicate","icon":"🤝","label":"Villain Syndicate"},{"id":"paying_spectators","icon":"💰","label":"Paying Spectators"},{"id":"small_elite_group","icon":"💎","label":"Small Elite Group"},{"id":"encrypted_stream","icon":"📡","label":"Encrypted Live Stream"},{"id":"mixed_criminal","icon":"🎭","label":"Mixed Criminal Crowd"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAudienceType(audienceType === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${audienceType === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:audienceType === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:audienceType === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:audienceType === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>COMMENTARY TONE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"crude_betting","icon":"🎲","label":"Crude Betting Talk"},{"id":"clinical_scoring","icon":"📋","label":"Clinical Scoring"},{"id":"excited_crowd","icon":"📢","label":"Excited Crowd"},{"id":"silent_tension","icon":"🤫","label":"Tense Silence"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCommentaryTone(commentaryTone === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${commentaryTone === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:commentaryTone === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:commentaryTone === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:commentaryTone === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#A78BFA" accentRgb="167,139,250" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#A78BFA" accentRgb="167,139,250" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={primBtn(canGen, accRgb, acc)}>
           🎲 PLACE THE BETS
         </button>

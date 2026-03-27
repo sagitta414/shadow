@@ -180,7 +180,6 @@ export default function OutfitSelector({
         {selected && (
           <div style={{
             margin: "0 0.9rem",
-            marginBottom: openCat ? "0" : "0",
             padding: "0.5rem 0.75rem",
             borderRadius: "8px",
             background: `rgba(${accentRgb},0.08)`,

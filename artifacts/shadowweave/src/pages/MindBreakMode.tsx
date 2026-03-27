@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -56,6 +57,7 @@ export default function MindBreakMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [methodFocus, setMethodFocus] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
   const phase = Math.min(chapters.length + 1, 5);
 
@@ -78,8 +80,7 @@ export default function MindBreakMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _methodFocusMap: Record<string,string> = {"physical_exhaustion":"Physical Exhaustion","psychological":"Psychological Manipulation","sensory_overload":"Sensory Overload","chemical_assistance":"Chemical Assistance","combined":"Combined / All Methods"}; return [methodFocus ? `Primary Breaking Method: ${_methodFocusMap[methodFocus] ?? methodFocus}` : ""].filter(Boolean).join("\n"); })(), methodFocus, heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
-          breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase,
-          chapters: isFirst ? [] : chapters, continueDir, }),
+          breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase, storyLength, chapters: isFirst ? [] : chapters, continueDir, }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -103,7 +104,7 @@ export default function MindBreakMode({ onBack }: Props) {
       setStreamingText("");
       setContinueDir("");
       if (isFirst) {
-        const id = saveStoryToArchive({ title: `${finalVillain} Breaks ${finalHeroine}`, universe: "Mind Break", tool: "Mind Break Chamber", characters: [finalHeroine, finalVillain], chapters: newChapters });
+        const id = saveStoryToArchive({ title: `${finalVillain} Breaks ${finalHeroine}`, universe: "Mind Break", tool: "Mind Break Chamber", characters: [finalHeroine, finalVillain], storyLength, chapters: newChapters });
         setSavedId(id);
       } else if (savedId) {
         const { updateArchiveStory } = await import("../lib/archive");
@@ -188,15 +189,6 @@ export default function MindBreakMode({ onBack }: Props) {
           </div>
         )}
         {chapters.length >= 5 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— COMPLETE SURRENDER ACHIEVED —</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#A78BFA"
-          accentRgb="167,139,250"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
       </div>
     );
@@ -223,6 +215,28 @@ export default function MindBreakMode({ onBack }: Props) {
         </Section>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>Error: {error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#A78BFA" accentRgb="167,139,250" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #A78BFA, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#A78BFA"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(167,139,250,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(167,139,250,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>PRIMARY BREAKING METHOD</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"physical_exhaustion","icon":"💪","label":"Physical Exhaustion"},{"id":"psychological","icon":"🧠","label":"Psychological Manipulation"},{"id":"sensory_overload","icon":"🌀","label":"Sensory Overload"},{"id":"chemical_assistance","icon":"💉","label":"Chemical Assistance"},{"id":"combined","icon":"⚡","label":"Combined / All Methods"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setMethodFocus(methodFocus === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${methodFocus === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:methodFocus === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:methodFocus === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:methodFocus === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#A78BFA" accentRgb="167,139,250" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#A78BFA" accentRgb="167,139,250" />
+
         <button onClick={() => { if (canGenerate) { setStep(3); generate(true); } }} disabled={!canGenerate || loading} style={{ width: "100%", padding: "1rem", background: canGenerate ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGenerate ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGenerate ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGenerate ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px", transition: "all 0.2s" }}>
           {loading ? "INITIATING..." : "BEGIN THE BREAKING"}
         </button>

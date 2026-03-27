@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -79,6 +80,7 @@ export default function PublicPropertyMode({ onBack }: Props) {
   const [exposureLevel, setExposureLevel] = useState("");
   const [anonymityLevel, setAnonymityLevel] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -102,7 +104,7 @@ export default function PublicPropertyMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _exposureLevelMap: Record<string,string> = {"semi_controlled":"Semi-Public / Controlled","fully_public":"Fully Public","identity_partly_known":"Identity Partially Revealed"};
-      const _anonymityLevelMap: Record<string,string> = {"fully_masked":"Fully Masked","civilian_name":"Civilian Name Known","hero_identity_exposed":"Hero Identity Exposed"}; return [exposureLevel ? `Exposure Level: ${_exposureLevelMap[exposureLevel] ?? exposureLevel}` : "", anonymityLevel ? `Anonymity: ${_anonymityLevelMap[anonymityLevel] ?? anonymityLevel}` : ""].filter(Boolean).join("\n"); })(), exposureLevel, anonymityLevel, heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, continueDir }),
+      const _anonymityLevelMap: Record<string,string> = {"fully_masked":"Fully Masked","civilian_name":"Civilian Name Known","hero_identity_exposed":"Hero Identity Exposed"}; return [exposureLevel ? `Exposure Level: ${_exposureLevelMap[exposureLevel] ?? exposureLevel}` : "", anonymityLevel ? `Anonymity: ${_anonymityLevelMap[anonymityLevel] ?? anonymityLevel}` : ""].filter(Boolean).join("\n"); })(), exposureLevel, anonymityLevel, heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -193,15 +195,6 @@ export default function PublicPropertyMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLabel(accRgb)}>— THEY KEEP COMING. SHE IS PUBLIC PROPERTY. —</div>}
         {continuing && <div style={loadLabel(accRgb)}>Another one approaches…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#F87171"
-          accentRgb="248,113,113"
-        />
                 {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
@@ -231,6 +224,34 @@ export default function PublicPropertyMode({ onBack }: Props) {
         </Section>
 
         {error && <div style={errStyle}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#F87171" accentRgb="248,113,113" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #F87171, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#F87171"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(248,113,113,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(248,113,113,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>EXPOSURE LEVEL</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"semi_controlled","icon":"🔒","label":"Semi-Public / Controlled"},{"id":"fully_public","icon":"🌍","label":"Fully Public"},{"id":"identity_partly_known","icon":"🎭","label":"Identity Partially Revealed"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setExposureLevel(exposureLevel === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${exposureLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:exposureLevel === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:exposureLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:exposureLevel === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>IDENTITY ANONYMITY</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"fully_masked","icon":"😷","label":"Fully Masked"},{"id":"civilian_name","icon":"📋","label":"Civilian Name Known"},{"id":"hero_identity_exposed","icon":"💥","label":"Hero Identity Exposed"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAnonymityLevel(anonymityLevel === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${anonymityLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:anonymityLevel === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:anonymityLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:anonymityLevel === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#F87171" accentRgb="248,113,113" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#F87171" accentRgb="248,113,113" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={primBtn(canGen, accRgb, acc)}>
           {loading ? "SPREADING THE WORD…" : "🔓 OPEN THE DOORS"}
         </button>

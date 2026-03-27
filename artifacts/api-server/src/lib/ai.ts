@@ -25,6 +25,14 @@ export function getProvider(body: unknown): AiProvider {
   return b?.provider === "novelai" ? "novelai" : "venice";
 }
 
+export function resolveTokens(base: number, body: unknown): number {
+  const b = body as Record<string, unknown>;
+  const sl = b?.storyLength as string | undefined;
+  if (sl === "short") return Math.round(base * 0.6);
+  if (sl === "long")  return Math.min(Math.round(base * 1.5), 2200);
+  return base;
+}
+
 export function trimHistory(text: string, maxChars = 5500): string {
   if (!text || text.length <= maxChars) return text;
   const trimmed = text.slice(-maxChars);

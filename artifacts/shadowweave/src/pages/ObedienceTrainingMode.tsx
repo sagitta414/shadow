@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -67,6 +68,7 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
   const [trainingPhilosophy, setTrainingPhilosophy] = useState("");
   const [complianceMilestone, setComplianceMilestone] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -87,7 +89,7 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _trainingPhilosophyMap: Record<string,string> = {"pure_punishment":"Pure Punishment","reward_conditioning":"Reward Conditioning","psychological":"Psychological Erosion","mixed":"Mixed Approach"};
-      const _complianceMilestoneMap: Record<string,string> = {"verbal_acknowledgment":"Verbal Acknowledgment","behavioral_compliance":"Behavioral Compliance","total_submission":"Total Submission","genuine_cooperation":"Genuine Cooperation"}; return [trainingPhilosophy ? `Training Philosophy: ${_trainingPhilosophyMap[trainingPhilosophy] ?? trainingPhilosophy}` : "", complianceMilestone ? `Compliance Goal: ${_complianceMilestoneMap[complianceMilestone] ?? complianceMilestone}` : ""].filter(Boolean).join("\n"); })(), trainingPhilosophy, complianceMilestone, heroine: fH, trainer: fT, location, method, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+      const _complianceMilestoneMap: Record<string,string> = {"verbal_acknowledgment":"Verbal Acknowledgment","behavioral_compliance":"Behavioral Compliance","total_submission":"Total Submission","genuine_cooperation":"Genuine Cooperation"}; return [trainingPhilosophy ? `Training Philosophy: ${_trainingPhilosophyMap[trainingPhilosophy] ?? trainingPhilosophy}` : "", complianceMilestone ? `Compliance Goal: ${_complianceMilestoneMap[complianceMilestone] ?? complianceMilestone}` : ""].filter(Boolean).join("\n"); })(), trainingPhilosophy, complianceMilestone, heroine: fH, trainer: fT, location, method, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -197,15 +199,6 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLabel(accRgb)}>— TRAINING COMPLETE. SHE RESPONDS WITHOUT THINKING. —</div>}
         {continuing && <div style={loadLabel(accRgb)}>Session in progress…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#E879F9"
-          accentRgb="232,121,249"
-        />
                 {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
@@ -239,6 +232,34 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
         </Section>
 
         {error && <div style={errStyle}>{error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#E879F9" accentRgb="232,121,249" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #E879F9, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#E879F9"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(232,121,249,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(232,121,249,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>TRAINING PHILOSOPHY</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"pure_punishment","icon":"⚡","label":"Pure Punishment"},{"id":"reward_conditioning","icon":"🌟","label":"Reward Conditioning"},{"id":"psychological","icon":"🧠","label":"Psychological Erosion"},{"id":"mixed","icon":"⚖️","label":"Mixed Approach"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setTrainingPhilosophy(trainingPhilosophy === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${trainingPhilosophy === opt.id ? "#E879F9" : "rgba(200,195,240,0.15)"}`,background:trainingPhilosophy === opt.id ? "rgba(232,121,249,0.16)" : "rgba(255,255,255,0.03)",color:trainingPhilosophy === opt.id ? "#E879F9" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:trainingPhilosophy === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>COMPLIANCE GOAL</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"verbal_acknowledgment","icon":"💬","label":"Verbal Acknowledgment"},{"id":"behavioral_compliance","icon":"🎯","label":"Behavioral Compliance"},{"id":"total_submission","icon":"⛓️","label":"Total Submission"},{"id":"genuine_cooperation","icon":"🤝","label":"Genuine Cooperation"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setComplianceMilestone(complianceMilestone === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${complianceMilestone === opt.id ? "#E879F9" : "rgba(200,195,240,0.15)"}`,background:complianceMilestone === opt.id ? "rgba(232,121,249,0.16)" : "rgba(255,255,255,0.03)",color:complianceMilestone === opt.id ? "#E879F9" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:complianceMilestone === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#E879F9" accentRgb="232,121,249" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#E879F9" accentRgb="232,121,249" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={primBtn(canGen, accRgb, acc)}>
           {loading ? "BEGINNING…" : "📋 BEGIN TRAINING"}
         </button>

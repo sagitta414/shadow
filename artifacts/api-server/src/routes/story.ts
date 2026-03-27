@@ -1,6 +1,6 @@
 import { Router } from "express";
 import OpenAI from "openai";
-import { streamChat, getProvider, trimHistory, VENICE_PARAMS, type AiProvider } from "../lib/ai";
+import { streamChat, getProvider, trimHistory, VENICE_PARAMS, resolveTokens, type AiProvider } from "../lib/ai";
 
 const router = Router();
 
@@ -174,7 +174,7 @@ router.post("/story/generate", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userMessage },
-      ], 4096, res);
+      ], resolveTokens(4096, req.body), res);
 
     let parsed: { scene: string; choices: string[]; psyche?: { sanityDelta: number; hopeDelta: number; event: string } };
     try {
@@ -251,7 +251,7 @@ router.post("/story/captor-logic", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: CAPTOR_LOGIC_PROMPT },
         { role: "user", content: userMessage },
-      ], 2048, res);
+      ], resolveTokens(2048, req.body), res);
 
     let parsed: {
       assessment: string;
@@ -365,7 +365,7 @@ router.post("/story/superhero", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: SUPERHERO_PROMPT },
         { role: "user", content: userMessage },
-      ], 4096, res);
+      ], resolveTokens(4096, req.body), res);
 
     res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
     res.end();
@@ -429,7 +429,7 @@ router.post("/story/superhero-continue", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: CONTINUE_PROMPT },
         { role: "user", content: userMessage },
-      ], 3072, res);
+      ], resolveTokens(3072, req.body), res);
 
     res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
     res.end();
@@ -475,7 +475,7 @@ router.post("/story/daily-continue", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: CONTINUE_PROMPT },
         { role: "user", content: userMessage },
-      ], 3072, res);
+      ], resolveTokens(3072, req.body), res);
 
     res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
     res.end();
@@ -535,7 +535,7 @@ router.post("/story/interrogation", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: INTERROGATION_SYSTEM },
         { role: "user", content: userMessage },
-      ], 512, res);
+      ], resolveTokens(512, req.body), res);
 
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
@@ -648,7 +648,7 @@ router.post("/story/celebrity-continue", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: CELEBRITY_CONTINUE_SYSTEM },
         { role: "user", content: userMessage },
-      ], 1400, res);
+      ], resolveTokens(1400, req.body), res);
 
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
@@ -717,7 +717,7 @@ Continue. Phase ${phaseNum} of the breaking. ${continueDir ? `Direction: ${conti
     fullContent = await doStream(provider, [
         { role: "system", content: MIND_BREAK_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -782,7 +782,7 @@ Continue. ${continueDir ? `Direction: ${continueDir}` : "Escalate."} The villain
     fullContent = await doStream(provider, [
         { role: "system", content: DUAL_CAPTURE_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -846,7 +846,7 @@ Continue. ${continueDir ? `Direction: ${continueDir}` : "Both captives, no more 
     fullContent = await doStream(provider, [
         { role: "system", content: RESCUE_FAILED_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -914,7 +914,7 @@ Continue. ${continueDir ? `Direction: ${continueDir}` : `Another power weakens. 
     fullContent = await doStream(provider, [
         { role: "system", content: POWER_DRAIN_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -978,7 +978,7 @@ Continue. ${continueDir ? `Direction: ${continueDir}` : "Escalate. The villain a
     fullContent = await doStream(provider, [
         { role: "system", content: MASS_CAPTURE_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -1052,7 +1052,7 @@ ${continueDir ? `Direction: ${continueDir}` : "Continue the corruption arc."} He
     fullContent = await doStream(provider, [
         { role: "system", content: CORRUPTION_ARC_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2000, res);
+      ], resolveTokens(2000, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -1116,7 +1116,7 @@ router.post("/story/superhero-regen", async (req, res) => {
     fullContent = await doStream(provider, [
         { role: "system", content: REGEN_PROMPT },
         { role: "user", content: userMessage },
-      ], 3072, res);
+      ], resolveTokens(3072, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, story: fullContent })}\n\n`);
     res.end();
   } catch (err) {
@@ -1270,7 +1270,7 @@ ${continueDir ? continueDir + "." : "The tension between them escalates. " + (cN
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: VILLAIN_TEAM_UP_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
+    fullContent = await doStream(provider, [{ role: "system", content: VILLAIN_TEAM_UP_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2200, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -1341,7 +1341,7 @@ ${heroine} has been transferred. ${currentCaptor ? `Her new captor is ${currentC
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: CHAIN_OF_CUSTODY_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
+    fullContent = await doStream(provider, [{ role: "system", content: CHAIN_OF_CUSTODY_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2200, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -1411,7 +1411,7 @@ ${continueDir ? continueDir + "." : "Time has passed. Something has shifted that
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: LONG_GAME_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
+    fullContent = await doStream(provider, [{ role: "system", content: LONG_GAME_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2200, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -1496,7 +1496,7 @@ The duplicate's next action in service of: ${mission}. In full explicit detail. 
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: DARK_MIRROR_SYSTEM }, { role: "user", content: userMsg }], 2400, res);
+    fullContent = await doStream(provider, [{ role: "system", content: DARK_MIRROR_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2400, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -1568,7 +1568,7 @@ ${continueDir ? continueDir + "." : "The crowd wants more. Another match is arra
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: ARENA_MODE_SYSTEM }, { role: "user", content: userMsg }], 2400, res);
+    fullContent = await doStream(provider, [{ role: "system", content: ARENA_MODE_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2400, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -1639,7 +1639,7 @@ ${continueDir ? continueDir + "." : `Session ${sNum} proceeds according to sched
     res.setHeader("Connection", "keep-alive");
     res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
-    fullContent = await doStream(provider, [{ role: "system", content: THE_HANDLER_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
+    fullContent = await doStream(provider, [{ role: "system", content: THE_HANDLER_SYSTEM }, { role: "user", content: userMsg }], resolveTokens(2200, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
   } catch (err) { res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end(); }
 });
@@ -2150,7 +2150,7 @@ Continue the auction. Bids have escalated significantly. ${continueDir ? `Steer 
     fullContent = await doStream(provider, [
         { role: "system", content: HERO_AUCTION_SYSTEM },
         { role: "user", content: userMsg },
-      ], 2500, res);
+      ], resolveTokens(2500, req.body), res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`);
     res.end();
   } catch (err) {

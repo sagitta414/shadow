@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -65,6 +66,7 @@ export default function ArenaMode({ onBack }: Props) {
   const [matchRules, setMatchRules] = useState("");
   const [crowdInteraction, setCrowdInteraction] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const allFighters = customFighter.trim() ? [...fighters, customFighter.trim()] : fighters;
@@ -87,7 +89,7 @@ export default function ArenaMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _matchRulesMap: Record<string,string> = {"submission_only":"Submission Only","no_rules":"No Rules","staged_exhibition":"Staged Exhibition","points_system":"Points System"};
-      const _crowdInteractionMap: Record<string,string> = {"watch_only":"Watch Only","can_call_out":"Can Call Out","participatory":"Fully Participatory"}; return [matchRules ? `Match Rules: ${_matchRulesMap[matchRules] ?? matchRules}` : "", crowdInteraction ? `Crowd Interaction: ${_crowdInteractionMap[crowdInteraction] ?? crowdInteraction}` : ""].filter(Boolean).join("\n"); })(), matchRules, crowdInteraction, fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
+      const _crowdInteractionMap: Record<string,string> = {"watch_only":"Watch Only","can_call_out":"Can Call Out","participatory":"Fully Participatory"}; return [matchRules ? `Match Rules: ${_matchRulesMap[matchRules] ?? matchRules}` : "", crowdInteraction ? `Crowd Interaction: ${_crowdInteractionMap[crowdInteraction] ?? crowdInteraction}` : ""].filter(Boolean).join("\n"); })(), matchRules, crowdInteraction, fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -180,15 +182,6 @@ export default function ArenaMode({ onBack }: Props) {
         )}
         {chapters.length >= 5 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— THE ARENA NEVER CLOSES. —</div>}
         {continuing && <div style={{ textAlign: "center", padding: "1.5rem", color: `rgba(${accRgb},0.5)`, fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>The crowd waits…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#F97316"
-          accentRgb="249,115,22"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
@@ -211,6 +204,34 @@ export default function ArenaMode({ onBack }: Props) {
         <AS title="STAKES" rgb={accRgb}>
           <div style={aR}>{STAKES.map(s => pill(s, stakes === s, () => setStakes(s)))}</div>
         </AS>
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#F97316" accentRgb="249,115,22" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #F97316, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#F97316"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(249,115,22,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(249,115,22,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>MATCH RULES</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"submission_only","icon":"🤲","label":"Submission Only"},{"id":"no_rules","icon":"🔥","label":"No Rules"},{"id":"staged_exhibition","icon":"🎭","label":"Staged Exhibition"},{"id":"points_system","icon":"📋","label":"Points System"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setMatchRules(matchRules === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${matchRules === opt.id ? "#F97316" : "rgba(200,195,240,0.15)"}`,background:matchRules === opt.id ? "rgba(249,115,22,0.16)" : "rgba(255,255,255,0.03)",color:matchRules === opt.id ? "#F97316" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:matchRules === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CROWD INTERACTION LEVEL</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"watch_only","icon":"👁️","label":"Watch Only"},{"id":"can_call_out","icon":"📢","label":"Can Call Out / Shout"},{"id":"participatory","icon":"🤝","label":"Fully Participatory"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCrowdInteraction(crowdInteraction === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${crowdInteraction === opt.id ? "#F97316" : "rgba(200,195,240,0.15)"}`,background:crowdInteraction === opt.id ? "rgba(249,115,22,0.16)" : "rgba(255,255,255,0.03)",color:crowdInteraction === opt.id ? "#F97316" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:crowdInteraction === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#F97316" accentRgb="249,115,22" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#F97316" accentRgb="249,115,22" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={{ width: "100%", padding: "1rem", background: canGen ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${canGen ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: canGen ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: canGen ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>
           🏟 OPEN THE ARENA
         </button>

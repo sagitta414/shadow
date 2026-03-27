@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -114,6 +115,7 @@ export default function HeroAuctionMode({ onBack }: Props) {
   const [auctionFormat, setAuctionFormat] = useState("");
   const [buyerAnonymity, setBuyerAnonymity] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const finalAuctioneer = customAuctioneer.trim() || auctioneer;
@@ -147,8 +149,7 @@ export default function HeroAuctionMode({ onBack }: Props) {
           auctioneer: finalAuctioneer,
           bidders: selectedBidders,
           setting,
-          auctionType,
-          chapters: isFirst ? [] : chapters,
+          auctionType, storyLength, chapters: isFirst ? [] : chapters,
           roundNumber: isFirst ? 1 : roundNum,
           continueDir, }),
       });
@@ -172,7 +173,7 @@ export default function HeroAuctionMode({ onBack }: Props) {
       setChapters(newChapters); setStreamingText(""); setContinueDir("");
       const title = `${finalAuctioneer}'s Auction — ${allHeroes.join(", ")}`;
       if (isFirst) {
-        const id = saveStoryToArchive({ title, universe: "Hero Auction", tool: "Hero Auction", characters: [...allHeroes, finalAuctioneer], chapters: newChapters });
+        const id = saveStoryToArchive({ title, universe: "Hero Auction", tool: "Hero Auction", characters: [...allHeroes, finalAuctioneer], storyLength, chapters: newChapters });
         setSavedId(id);
       } else if (savedId) {
         updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
@@ -284,16 +285,6 @@ export default function HeroAuctionMode({ onBack }: Props) {
             The bidding room stirs…
           </div>
         )}
-
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#A3E635"
-          accentRgb="163,230,53"
-        />
                 {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
       </div>
     );
@@ -348,6 +339,32 @@ export default function HeroAuctionMode({ onBack }: Props) {
         </AuctionSection>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>Error: {error}</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#A3E635" accentRgb="163,230,53" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #A3E635, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#A3E635"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(163,230,53,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(163,230,53,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>AUCTION FORMAT</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"live_bidding","icon":"📢","label":"Live Open Bidding"},{"id":"sealed_bids","icon":"📩","label":"Sealed Bids"},{"id":"private_sale","icon":"🤝","label":"Negotiated Private Sale"},{"id":"reserve_price","icon":"🏷️","label":"Reserve Price Minimum"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAuctionFormat(auctionFormat === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${auctionFormat === opt.id ? "#A3E635" : "rgba(200,195,240,0.15)"}`,background:auctionFormat === opt.id ? "rgba(163,230,53,0.16)" : "rgba(255,255,255,0.03)",color:auctionFormat === opt.id ? "#A3E635" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:auctionFormat === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>BUYER ANONYMITY</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"all_hidden","icon":"🕶️","label":"All Identities Hidden"},{"id":"known_to_each_other","icon":"👁️","label":"Known to Each Other"},{"id":"known_to_auctioneer","icon":"🎩","label":"Known to Auctioneer Only"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setBuyerAnonymity(buyerAnonymity === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${buyerAnonymity === opt.id ? "#A3E635" : "rgba(200,195,240,0.15)"}`,background:buyerAnonymity === opt.id ? "rgba(163,230,53,0.16)" : "rgba(255,255,255,0.03)",color:buyerAnonymity === opt.id ? "#A3E635" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:buyerAnonymity === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#A3E635" accentRgb="163,230,53" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#A3E635" accentRgb="163,230,53" />
         <button
           onClick={() => { if (canGenerate) { setStep(3); generate(true); } }}
           disabled={!canGenerate || loading}

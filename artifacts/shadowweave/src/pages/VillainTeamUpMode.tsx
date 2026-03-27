@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
@@ -57,6 +58,7 @@ export default function VillainTeamUpMode({ onBack }: Props) {
   const [allianceStability, setAllianceStability] = useState("");
   const [allianceDominant, setAllianceDominant] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
+  const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -74,7 +76,7 @@ export default function VillainTeamUpMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _allianceStabilityMap: Record<string,string> = {"fragile":"Fragile — About to Break","uneasy":"Uneasy — Constant Tension","coordinated":"Surprisingly Coordinated"};
-      const _allianceDominantMap: Record<string,string> = {"villain1":"First Villain","villain2":"Second Villain","equal":"Genuinely Equal"}; return [allianceStability ? `Alliance Stability: ${_allianceStabilityMap[allianceStability] ?? allianceStability}` : "", allianceDominant ? `Upper Hand: ${_allianceDominantMap[allianceDominant] ?? allianceDominant}` : ""].filter(Boolean).join("\n"); })(), allianceStability, allianceDominant, heroine: fH, villain1, villain2, tension, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+      const _allianceDominantMap: Record<string,string> = {"villain1":"First Villain","villain2":"Second Villain","equal":"Genuinely Equal"}; return [allianceStability ? `Alliance Stability: ${_allianceStabilityMap[allianceStability] ?? allianceStability}` : "", allianceDominant ? `Upper Hand: ${_allianceDominantMap[allianceDominant] ?? allianceDominant}` : ""].filter(Boolean).join("\n"); })(), allianceStability, allianceDominant, heroine: fH, villain1, villain2, tension, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -159,15 +161,6 @@ export default function VillainTeamUpMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={eL(accRgb)}>— THE ALLIANCE FRACTURES OR HOLDS. —</div>}
         {continuing && <div style={lL(accRgb)}>The negotiation continues…</div>}
-
-        <OutfitSelector
-          outfitId={outfitId}
-          damage={outfitDamage}
-          onOutfitChange={setOutfitId}
-          onDamageChange={setOutfitDamage}
-          accentColor="#FB7185"
-          accentRgb="251,113,133"
-        />
                 {error && <div style={err}>Error: {error}</div>}
       </div>
     );
@@ -197,6 +190,34 @@ export default function VillainTeamUpMode({ onBack }: Props) {
           <div style={pr}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
         </Sec>
         {!canGen && villain1 && villain2 && villain1 === villain2 && <div style={{ color: "#FBBF24", fontSize: "0.7rem", marginBottom: "1rem" }}>Partner 1 and Partner 2 must be different villains.</div>}
+        {/* ── Outfit, Scene & Narrative Controls ── */}
+        <OutfitSelector outfitId={outfitId} damage={outfitDamage} onOutfitChange={setOutfitId} onDamageChange={setOutfitDamage} accentColor="#FB7185" accentRgb="251,113,133" />
+        <div style={{marginTop:"1.25rem"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.6rem",marginBottom:"0.875rem"}}>
+            <div style={{width:"3px",height:"18px",borderRadius:"2px",background:"linear-gradient(180deg, #FB7185, transparent)"}} />
+            <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"#FB7185"}}>Scene Parameters</span>
+            <div style={{flex:1,height:"1px",background:"linear-gradient(90deg, rgba(251,113,133,0.25), transparent)"}} />
+            <span style={{fontSize:"0.62rem",color:"rgba(200,195,240,0.3)",fontStyle:"italic"}}>optional</span>
+          </div>
+          <div style={{background:"rgba(15,10,30,0.5)",border:"1px solid rgba(251,113,133,0.18)",borderRadius:"12px",padding:"1rem",backdropFilter:"blur(8px)"}}>
+
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>ALLIANCE STABILITY</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"fragile","icon":"💔","label":"Fragile — About to Break"},{"id":"uneasy","icon":"⚖️","label":"Uneasy — Constant Tension"},{"id":"coordinated","icon":"🤝","label":"Surprisingly Coordinated"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAllianceStability(allianceStability === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${allianceStability === opt.id ? "#FB7185" : "rgba(200,195,240,0.15)"}`,background:allianceStability === opt.id ? "rgba(251,113,133,0.16)" : "rgba(255,255,255,0.03)",color:allianceStability === opt.id ? "#FB7185" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:allianceStability === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WHO HAS THE UPPER HAND</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{"id":"villain1","icon":"👑","label":"First Villain"},{"id":"villain2","icon":"🗡️","label":"Second Villain"},{"id":"equal","icon":"⚔️","label":"Genuinely Equal"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAllianceDominant(allianceDominant === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${allianceDominant === opt.id ? "#FB7185" : "rgba(200,195,240,0.15)"}`,background:allianceDominant === opt.id ? "rgba(251,113,133,0.16)" : "rgba(255,255,255,0.03)",color:allianceDominant === opt.id ? "#FB7185" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:allianceDominant === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          </div>
+        </div>
+        <UniversalOptions config={universalConfig} onChange={setUniversalConfig} accentColor="#FB7185" accentRgb="251,113,133" />
+        <StoryLengthPicker value={storyLength} onChange={setStoryLength} accentColor="#FB7185" accentRgb="251,113,133" />
+
         <button onClick={() => { if (canGen) { setStep(3); generate(true); } }} disabled={!canGen} style={pBtn(canGen, accRgb, acc)}>
           ⚔ BEGIN THE ALLIANCE
         </button>
