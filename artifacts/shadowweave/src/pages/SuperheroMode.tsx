@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { saveStoryToArchive, exportStoryAsPDF } from "../lib/archive";
+import { saveStoryToArchive, updateArchiveStory, exportStoryAsPDF } from "../lib/archive";
 import { getCustomHeroines, CustomHeroine } from "../lib/customHeroines";
 import CustomHeroineModal from "../components/CustomHeroineModal";
 import { getPreset, savePreset } from "../lib/presets";
@@ -1069,9 +1069,10 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         setStreamingText(accumulated);
       }, ctrl.signal);
       setChapters([full]);
+      autoSaveChapters([full]);
     } catch (e) {
       if (isAbort(e)) {
-        if (accumulated.trim()) setChapters([accumulated]);
+        if (accumulated.trim()) { setChapters([accumulated]); autoSaveChapters([accumulated]); }
       } else {
         setError(e instanceof Error ? e.message : "Story generation failed");
       }
@@ -1104,12 +1105,26 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         accumulated += c;
         setStreamingText(accumulated);
       }, ctrl.signal);
-      setChapters((prev) => [...prev, full]);
+      const newChapters = [...chapters, full];
+      setChapters(newChapters);
       setContinuePrompt("");
       setChapterFocusTags([]);
+      if (savedId) {
+        updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
+      } else {
+        autoSaveChapters(newChapters);
+      }
     } catch (e) {
       if (isAbort(e)) {
-        if (accumulated.trim()) setChapters((prev) => [...prev, accumulated]);
+        if (accumulated.trim()) {
+          const newChapters = [...chapters, accumulated];
+          setChapters(newChapters);
+          if (savedId) {
+            updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
+          } else {
+            autoSaveChapters(newChapters);
+          }
+        }
       } else {
         setError(e instanceof Error ? e.message : "Continuation failed");
       }
@@ -1172,8 +1187,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     URL.revokeObjectURL(url);
   }
 
-  function saveToArchive() {
-    if (!chapters.length) return;
+  function autoSaveChapters(chs: string[]) {
+    if (!chs.length) return;
     const villainName = villainMode === "pick" ? (selectedVillain?.name ?? "Unknown") : customVillain;
     const heroNames = selectedHeroes.map((h) => h.name);
     const id = saveStoryToArchive({
@@ -1183,9 +1198,15 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       universe: selectedHeroes[0]?.universe ?? "Unknown",
       tool: "Heroine Forge",
       characters: [...heroNames, villainName],
-      chapters,
+      chapters: chs,
     });
     setSavedId(id);
+    return id;
+  }
+
+  function saveToArchive() {
+    if (!chapters.length) return;
+    autoSaveChapters(chapters);
   }
 
   function randomize() {
@@ -2656,13 +2677,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 <>
                   <button onClick={exportStory} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>TXT {chapters.length > 1 ? `(${chapters.length})` : ""}</button>
                   <button onClick={exportStoryAsPDFWrapper} style={{ padding: "0.75rem 1.25rem", background: "rgba(255,184,0,0.12)", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>PDF</button>
-                  <button
-                    onClick={saveToArchive}
-                    disabled={!!savedId}
-                    style={{ padding: "0.75rem 1.25rem", background: savedId ? "rgba(68,210,110,0.1)" : "rgba(44,95,138,0.12)", border: `1px solid ${savedId ? "rgba(68,210,110,0.35)" : "rgba(106,173,228,0.35)"}`, borderRadius: "10px", color: savedId ? "#44D26E" : "#6AADE4", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: savedId ? "default" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
-                  >
-                    {savedId ? "✓ Saved" : "Save to Archive"}
-                  </button>
+                  {savedId ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.75rem 1.25rem", background: "rgba(68,210,110,0.08)", border: "1px solid rgba(68,210,110,0.28)", borderRadius: "10px", color: "#44D26E", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", letterSpacing: "1px" }}>
+                      ✓ Auto-saved
+                    </div>
+                  ) : null}
                   <button onClick={() => { setSavedId(null); setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
                 </>
               )}

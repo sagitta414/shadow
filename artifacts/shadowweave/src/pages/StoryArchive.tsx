@@ -53,6 +53,7 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState<Record<string, string>>({});
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [hoverRow, setHoverRow] = useState<string | null>(null);
 
   function reload() {
     setStories(getArchive());
@@ -114,6 +115,8 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
     return (
       <div
         key={s.id}
+        onMouseEnter={() => setHoverRow(s.id)}
+        onMouseLeave={() => setHoverRow(null)}
         style={{
           background: "rgba(10,8,16,0.85)",
           border: `1px solid ${isOpen ? col : "rgba(255,255,255,0.07)"}`,
@@ -122,6 +125,7 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
           overflow: "hidden",
           transition: "border-color 0.25s",
           marginBottom: "0.75rem",
+          position: "relative",
         }}
       >
         <div
@@ -164,9 +168,33 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
               </div>
             )}
           </div>
-          <span style={{ color: isOpen ? col : "rgba(200,200,220,0.25)", fontSize: "0.8rem", marginTop: "0.25rem", flexShrink: 0, transition: "all 0.2s" }}>
-            {isOpen ? "▲" : "▼"}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginTop: "0.15rem" }}>
+            {/* Quick delete — visible on row hover when not expanded */}
+            {!isOpen && hoverRow === s.id && (
+              confirmDelete === s.id ? (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <button onClick={() => doDelete(s.id)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "rgba(200,0,0,0.22)", border: "1px solid rgba(200,0,0,0.45)", color: "#FF6060", fontSize: "0.65rem", cursor: "pointer", fontFamily: "'Cinzel',serif" }}>Yes</button>
+                  <button onClick={() => setConfirmDelete(null)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,200,220,0.4)", fontSize: "0.65rem", cursor: "pointer" }}>No</button>
+                </div>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setConfirmDelete(s.id); }}
+                  title="Delete story"
+                  style={{ padding: "0.2rem 0.5rem", borderRadius: "5px", background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.18)", color: "rgba(200,100,100,0.45)", fontSize: "0.72rem", cursor: "pointer", transition: "all 0.18s", lineHeight: 1 }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.18)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.45)"; e.currentTarget.style.color = "#FF6060"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.06)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.18)"; e.currentTarget.style.color = "rgba(200,100,100,0.45)"; }}
+                >
+                  ✕
+                </button>
+              )
+            )}
+            <span style={{ color: isOpen ? col : "rgba(200,200,220,0.25)", fontSize: "0.8rem", transition: "all 0.2s" }}>
+              {isOpen ? "▲" : "▼"}
+            </span>
+          </div>
         </div>
 
         {isOpen && (
