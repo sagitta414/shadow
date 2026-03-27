@@ -309,6 +309,68 @@ function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, on
   );
 }
 
+function SpecialistChip({ icon, title, badge, accent, r, g, b, onClick }: {
+  icon: string; title: string; badge: string;
+  accent: string; r: number; g: number; b: number; onClick: () => void;
+}) {
+  const [hov, setHov] = useState(false);
+  const rgb = `${r},${g},${b}`;
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+      style={{
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        padding: "0.52rem 0.7rem 0.52rem 0.85rem",
+        background: hov ? `rgba(${rgb},0.12)` : `rgba(${rgb},0.045)`,
+        border: `1px solid rgba(${rgb},${hov ? 0.5 : 0.16})`,
+        borderLeft: `3px solid ${hov ? accent : `rgba(${rgb},0.35)`}`,
+        borderRadius: "9px",
+        cursor: "pointer",
+        textAlign: "left",
+        transition: "all 0.2s cubic-bezier(0.25,0.46,0.45,0.94)",
+        transform: hov ? "translateY(-2px)" : "translateY(0)",
+        boxShadow: hov ? `0 6px 20px rgba(${rgb},0.2)` : "none",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      {/* Icon */}
+      <div style={{
+        width: "28px", height: "28px", borderRadius: "7px", flexShrink: 0,
+        background: hov ? `rgba(${rgb},0.2)` : `rgba(${rgb},0.09)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "0.9rem", transition: "all 0.2s",
+        filter: hov ? `drop-shadow(0 0 6px rgba(${rgb},0.8))` : "none",
+        border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.12})`,
+      }}>{icon}</div>
+      {/* Text */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.02em",
+          color: hov ? "#FFF" : `rgba(225,220,248,0.68)`, transition: "color 0.2s",
+          lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+        }}>{title}</div>
+        <div style={{
+          fontSize: "0.4rem", letterSpacing: "1.5px", color: hov ? accent : `rgba(${rgb},0.45)`,
+          fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", marginTop: "2px",
+          transition: "color 0.2s", fontWeight: 700,
+        }}>{badge}</div>
+      </div>
+      {/* Arrow */}
+      <span style={{
+        fontSize: "0.6rem", color: hov ? accent : `rgba(${rgb},0.2)`,
+        flexShrink: 0, transition: "all 0.2s",
+        transform: hov ? "translateX(2px)" : "none", display: "inline-block",
+      }}>→</span>
+    </button>
+  );
+}
+
 function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number; b: number }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", margin: "0.4rem 0 0.5rem" }}>
@@ -464,16 +526,37 @@ export default function Homepage(props: HomepageProps) {
       {/* ─── THREE COLUMNS ─── */}
       <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.4rem", padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.14s ease both" : "none" }}>
 
-        {/* ══ COL 1: HEROINE FORGE ══ */}
+        {/* ══ COL 1: HEROINE FORGE + SPECIALIST MODES ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
           <PrimaryCard
             num="I" icon="🔱" iconImg="/icons/heroine-forge.png" tagline="Superhero Universe" title="HEROINE FORGE"
             desc="181+ heroines across Marvel, DC, CW, The Boys, Power Rangers, Animated, Star Wars, and TV universes. Choose your villain and generate a multi-chapter dark thriller."
-            stats={[["181+", "Heroines"], ["67", "Villains"], ["8", "Universes"]]}
+            stats={[["181+", "Heroines"], ["18", "Modes"], ["8", "Universes"]]}
             features={["Marvel · DC · CW · The Boys", "Power Rangers · Animated · Star Wars", "Multi-chapter AI story engine"]}
             cta="Enter the Forge" accent="#C084FC" r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
           />
+          <SectionLabel label="Specialist Modes" r={168} g={85} b={247} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
+            <SpecialistChip icon="🌀" title="Mind Break" badge="Psych · 5 phases" accent="#C084FC" r={192} g={132} b={252} onClick={props.onMindBreak} />
+            <SpecialistChip icon="⛓" title="Two Heroines" badge="Duo · Shared Cell" accent="#34D399" r={52} g={211} b={153} onClick={props.onDualCapture} />
+            <SpecialistChip icon="🕸" title="Rescue Gone Wrong" badge="Trap · Ambush" accent="#FB923C" r={251} g={146} b={60} onClick={props.onRescueGoneWrong} />
+            <SpecialistChip icon="⚡" title="Power Drain" badge="Meter · Drain" accent="#60A5FA" r={96} g={165} b={250} onClick={props.onPowerDrain} />
+            <SpecialistChip icon="🗡" title="Mass Capture" badge="Group · 3–5" accent="#F87171" r={248} g={113} b={113} onClick={props.onMassCapture} />
+            <SpecialistChip icon="🌑" title="Corruption Arc" badge="Arc · 7 chapters" accent="#F472B6" r={244} g={114} b={182} onClick={props.onCorruptionArc} />
+            <SpecialistChip icon="⚖" title="Hero Auction" badge="Bid · Live" accent="#FCA311" r={252} g={163} b={17} onClick={props.onHeroAuction} />
+            <SpecialistChip icon="👁" title="Trophy Display" badge="Display · Visits" accent="#EF4444" r={239} g={68} b={68} onClick={props.onTrophyDisplay} />
+            <SpecialistChip icon="📋" title="Obedience Training" badge="Session · Track" accent="#2DD4BF" r={45} g={212} b={191} onClick={props.onObedienceTraining} />
+            <SpecialistChip icon="🎭" title="The Showcase" badge="Style · Staged" accent="#E879F9" r={232} g={121} b={249} onClick={props.onShowcase} />
+            <SpecialistChip icon="🔓" title="Public Property" badge="Exposed · Open" accent="#FBBF24" r={251} g={191} b={36} onClick={props.onPublicProperty} />
+            <SpecialistChip icon="🎲" title="Betting Pool" badge="Wager · 2–6" accent="#A78BFA" r={167} g={139} b={250} onClick={props.onBettingPool} />
+            <SpecialistChip icon="⚔" title="Villain Team-Up" badge="Duo · Ego" accent="#FB7185" r={251} g={113} b={133} onClick={props.onVillainTeamUp} />
+            <SpecialistChip icon="🔗" title="Chain of Custody" badge="Chain · Transfer" accent="#94A3B8" r={148} g={163} b={184} onClick={props.onChainOfCustody} />
+            <SpecialistChip icon="⏳" title="The Long Game" badge="Slow Burn · Weeks" accent="#34D399" r={52} g={211} b={153} onClick={props.onLongGame} />
+            <SpecialistChip icon="🪞" title="Dark Mirror" badge="Identity · Clone" accent="#818CF8" r={129} g={140} b={248} onClick={props.onDarkMirror} />
+            <SpecialistChip icon="🏟" title="Arena Mode" badge="Fight · Crowd" accent="#F97316" r={249} g={115} b={22} onClick={props.onArenaMode} />
+            <SpecialistChip icon="📁" title="The Handler" badge="Protocol · Pro" accent="#D4A76A" r={212} g={167} b={106} onClick={props.onTheHandler} />
+          </div>
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}
@@ -509,44 +592,6 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </div>
 
-      {/* ─── SPECIALIST MODES GALLERY ─── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.18s ease both" : "none" }}>
-        <style>{`
-          .sw-gallery::-webkit-scrollbar { display: none; }
-          .sw-gallery { -ms-overflow-style: none; scrollbar-width: none; }
-          @keyframes galleryPulse { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
-        `}</style>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.1rem" }}>
-          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.3))", flex: 1 }} />
-          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
-            <span style={{ fontSize: "0.4rem", letterSpacing: "5px", textTransform: "uppercase", color: "rgba(168,85,247,0.55)", fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>Specialist Modes</span>
-            <span style={{ fontSize: "0.45rem", color: "rgba(168,85,247,0.3)", fontFamily: "'Cinzel', serif", letterSpacing: "2px" }}>18 available</span>
-          </div>
-          <div style={{ height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.3), transparent)", flex: 1 }} />
-          <span style={{ fontSize: "0.45rem", color: "rgba(168,85,247,0.3)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2px", whiteSpace: "nowrap", animation: "galleryPulse 3s ease-in-out infinite" }}>scroll →</span>
-        </div>
-        <div className="sw-gallery" style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
-          <GalleryCard icon="🌀" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking point in real time." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
-          <GalleryCard icon="⛓" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon against them." accent="#34D399" r={52} g={211} b={153} badge="Duo" onClick={props.onDualCapture} />
-          <GalleryCard icon="🕸" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the same trap." accent="#FB923C" r={251} g={146} b={60} badge="Trap" onClick={props.onRescueGoneWrong} />
-          <GalleryCard icon="⚡" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A5FA" r={96} g={165} b={250} badge="Meter" onClick={props.onPowerDrain} />
-          <GalleryCard icon="🗡" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
-          <GalleryCard icon="🌑" title="Corruption Arc" desc="7 chapters. 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
-          <GalleryCard icon="⚖" title="Hero Auction" desc="Villains bid live — degrading commentary, competing demands, escalating prices." accent="#FCA311" r={252} g={163} b={17} badge="Auction" onClick={props.onHeroAuction} />
-          <GalleryCard icon="👁" title="Trophy Display" desc="Restrained on permanent display. Each chapter is a different visitor." accent="#EF4444" r={239} g={68} b={68} badge="Display" onClick={props.onTrophyDisplay} />
-          <GalleryCard icon="📋" title="Obedience Training" desc="6 structured sessions. Compliance tracked live. By session 6 she responds without thinking." accent="#2DD4BF" r={45} g={212} b={191} badge="Training" onClick={props.onObedienceTraining} />
-          <GalleryCard icon="🎭" title="The Showcase" desc="He dictates her appearance, posture, and words. Audience included. Complete staging." accent="#E879F9" r={232} g={121} b={249} badge="Style" onClick={props.onShowcase} />
-          <GalleryCard icon="🔓" title="Public Property" desc="Identity exposed. Each chapter is a different encounter — strangers, enemies, people she once protected." accent="#FBBF24" r={251} g={191} b={36} badge="Exposed" onClick={props.onPublicProperty} />
-          <GalleryCard icon="🎲" title="The Betting Pool" desc="2–6 villains bet on her. Resistance meter tracked. Each takes a turn." accent="#A78BFA" r={167} g={139} b={250} badge="Wager" onClick={props.onBettingPool} />
-          <GalleryCard icon="⚔" title="Villain Team-Up" desc="Two villains. One captive. Their ego clashes affect what happens to her every chapter." accent="#FB7185" r={251} g={113} b={133} badge="Duo" onClick={props.onVillainTeamUp} />
-          <GalleryCard icon="🔗" title="Chain of Custody" desc="A different captor every chapter. You choose who gets her next. Visual chain tracker." accent="#94A3B8" r={148} g={163} b={184} badge="Chain" onClick={props.onChainOfCustody} />
-          <GalleryCard icon="⏳" title="The Long Game" desc="Weeks between chapters. A patient villain. An erosion meter. Gradual is the horror." accent="#34D399" r={52} g={211} b={153} badge="Slow Burn" onClick={props.onLongGame} />
-          <GalleryCard icon="🪞" title="Dark Mirror" desc="A duplicate destroys her reputation in public. The original watches it happen, helpless." accent="#818CF8" r={129} g={140} b={248} badge="Identity" onClick={props.onDarkMirror} />
-          <GalleryCard icon="🏟" title="Arena Mode" desc="Powers suppressed. Forced to fight each other. Crowd betting. Loser faces consequences." accent="#F97316" r={249} g={115} b={22} badge="Fight" onClick={props.onArenaMode} />
-          <GalleryCard icon="📁" title="The Handler" desc="No supervillain. A competent professional doing a job. Protocols. Compliance metrics." accent="#D4A76A" r={212} g={167} b={106} badge="Protocol" onClick={props.onTheHandler} />
-        </div>
-      </div>
-
       {/* ─── STUDIO TOOLS ─── */}
       <div className="hp-pad" style={{ padding: "0 2rem 3rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.22s ease both" : "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginBottom: "0.85rem" }}>
@@ -574,70 +619,3 @@ export default function Homepage(props: HomepageProps) {
   );
 }
 
-// ─── Gallery Card ─────────────────────────────────────────────────────────────
-interface GalleryCardProps {
-  icon: string; title: string; desc: string;
-  accent: string; r: number; g: number; b: number;
-  badge: string; onClick: () => void;
-}
-function GalleryCard({ icon, title, desc, accent, r, g, b, badge, onClick }: GalleryCardProps) {
-  const [hov, setHov] = useState(false);
-  return (
-    <button
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      onClick={onClick}
-      style={{
-        flexShrink: 0,
-        width: "182px",
-        background: hov ? `rgba(${r},${g},${b},0.13)` : `rgba(${r},${g},${b},0.065)`,
-        border: `1px solid rgba(${r},${g},${b},${hov ? 0.55 : 0.22})`,
-        borderTop: `3px solid ${accent}`,
-        borderRadius: "12px",
-        padding: "1.1rem 1rem 1.1rem",
-        cursor: "pointer",
-        textAlign: "left",
-        transition: "all 0.22s cubic-bezier(0.25,0.46,0.45,0.94)",
-        transform: hov ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hov ? `0 10px 36px rgba(${r},${g},${b},0.22), 0 0 0 1px rgba(${r},${g},${b},0.12)` : "none",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.9rem" }}>
-        <span style={{ fontSize: "1.65rem", lineHeight: 1, filter: hov ? `drop-shadow(0 0 8px rgba(${r},${g},${b},0.7))` : "none", transition: "filter 0.22s" }}>{icon}</span>
-        <span style={{
-          fontSize: "0.44rem", letterSpacing: "1.5px", padding: "0.2rem 0.55rem",
-          borderRadius: "20px", border: `1px solid rgba(${r},${g},${b},${hov ? 0.55 : 0.3})`,
-          color: hov ? accent : `rgba(${r},${g},${b},0.7)`,
-          fontFamily: "'Cinzel', serif", transition: "all 0.22s", whiteSpace: "nowrap",
-          background: hov ? `rgba(${r},${g},${b},0.12)` : "transparent",
-        }}>{badge}</span>
-      </div>
-      <div style={{
-        fontFamily: "'Cinzel', serif",
-        fontSize: "0.68rem",
-        color: hov ? accent : "rgba(220,215,240,0.85)",
-        letterSpacing: "0.5px",
-        marginBottom: "0.55rem",
-        fontWeight: 700,
-        lineHeight: 1.35,
-        transition: "color 0.22s",
-      }}>{title}</div>
-      <div style={{
-        fontSize: "0.57rem",
-        color: hov ? "rgba(220,215,240,0.55)" : "rgba(200,195,225,0.38)",
-        fontFamily: "'Raleway', sans-serif",
-        lineHeight: 1.55,
-        transition: "color 0.22s",
-      }}>{desc}</div>
-      <div style={{
-        marginTop: "0.8rem",
-        fontSize: "0.5rem",
-        color: hov ? accent : `rgba(${r},${g},${b},0.35)`,
-        fontFamily: "'Cinzel', serif",
-        letterSpacing: "2px",
-        transition: "all 0.22s",
-        opacity: hov ? 1 : 0.6,
-      }}>ENTER →</div>
-    </button>
-  );
-}
