@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { useIsMobile } from "../hooks/useIsMobile";
 
@@ -70,6 +71,9 @@ export default function InterrogationRoom({ onBack }: Props) {
   const [streamingText, setStreamingText] = useState("");
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [extractionTarget, setExtractionTarget] = useState("");
+  const [silenceConsequence, setSilenceConsequence] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [round, setRound] = useState(1);
 
@@ -101,7 +105,8 @@ export default function InterrogationRoom({ onBack }: Props) {
       const res = await fetch("/api/story/interrogation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: heroineName.trim(),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _extractionTargetMap: Record<string,string> = {"safe_house_locations":"Safe House Locations","access_codes":"Access Codes","ally_identities":"Ally Identities","classified_intel":"Classified Intel","personal_secrets":"Personal Secrets"};
+      const _silenceConsequenceMap: Record<string,string> = {"escalating_pain":"Escalating Pain","psychological":"Psychological Pressure","others_harmed":"Others Are Harmed","public_exposure":"Public Exposure","deprivation":"Sensory Deprivation"}; return [extractionTarget ? `Extraction Target: ${_extractionTargetMap[extractionTarget] ?? extractionTarget}` : "", silenceConsequence ? `Consequence for Silence: ${_silenceConsequenceMap[silenceConsequence] ?? silenceConsequence}` : ""].filter(Boolean).join("\n"); })(), extractionTarget, silenceConsequence, heroine: heroineName.trim(),
           villain: villainLabel,
           weaknesses: weaknessNotes.trim() || undefined,
           messages: msgs, }),

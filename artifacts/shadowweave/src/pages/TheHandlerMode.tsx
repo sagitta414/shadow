@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -57,6 +58,9 @@ export default function TheHandlerMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [handlerTone, setHandlerTone] = useState("");
+  const [complianceTracking, setComplianceTracking] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +80,8 @@ export default function TheHandlerMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/the-handler`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _handlerToneMap: Record<string,string> = {"clinical":"Clinical Detachment","obsessive":"Obsessive Attachment","professional":"Professional Ownership","cold":"Cold Efficiency"};
+      const _complianceTrackingMap: Record<string,string> = {"logged":"Logged & Filed","verbal":"Verbal Reporting","inspection":"Physical Inspection","behavioral":"Behavioral Observation"}; return [handlerTone ? `Handler Tone: ${_handlerToneMap[handlerTone] ?? handlerTone}` : "", complianceTracking ? `Compliance Tracking: ${_complianceTrackingMap[complianceTracking] ?? complianceTracking}` : ""].filter(Boolean).join("\n"); })(), handlerTone, complianceTracking, heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

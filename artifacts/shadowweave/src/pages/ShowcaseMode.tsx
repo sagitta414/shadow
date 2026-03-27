@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -71,6 +72,9 @@ export default function ShowcaseMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [showcasePurpose, setShowcasePurpose] = useState("");
+  const [audienceExclusivity, setAudienceExclusivity] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +99,8 @@ export default function ShowcaseMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/showcase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _showcasePurposeMap: Record<string,string> = {"power_demonstration":"Power Demonstration","pre_auction_preview":"Pre-Auction Preview","breaking_performance":"Breaking Performance","leverage_display":"Leverage Display"};
+      const _audienceExclusivityMap: Record<string,string> = {"invitation_only":"Invitation Only","villain_community":"Villain Community","semi_public":"Semi-Public","online_stream":"Encrypted Online Stream"}; return [showcasePurpose ? `Showcase Purpose: ${_showcasePurposeMap[showcasePurpose] ?? showcasePurpose}` : "", audienceExclusivity ? `Audience: ${_audienceExclusivityMap[audienceExclusivity] ?? audienceExclusivity}` : ""].filter(Boolean).join("\n"); })(), showcasePurpose, audienceExclusivity, heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

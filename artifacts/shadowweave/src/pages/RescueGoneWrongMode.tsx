@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -58,6 +59,9 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [failureMethod, setFailureMethod] = useState("");
+  const [captorReaction, setCaptorReaction] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +81,8 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/rescue-failed`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _failureMethodMap: Record<string,string> = {"ambush":"Ambush","betrayal":"Betrayal","overpowered":"Overpowered","trap":"Trap","inside_job":"Inside Job"};
+      const _captorReactionMap: Record<string,string> = {"amused":"Amused","enraged":"Enraged","uses_it":"Uses It Against Her","coldly_punishes":"Cold Punishment"}; return [failureMethod ? `How the Rescue Failed: ${_failureMethodMap[failureMethod] ?? failureMethod}` : "", captorReaction ? `Captor's Reaction: ${_captorReactionMap[captorReaction] ?? captorReaction}` : ""].filter(Boolean).join("\n"); })(), failureMethod, captorReaction, captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

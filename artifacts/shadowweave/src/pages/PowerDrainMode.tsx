@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -62,6 +63,9 @@ export default function PowerDrainMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [powerReturn, setPowerReturn] = useState("");
+  const [drainedPowerUse, setDrainedPowerUse] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +89,8 @@ export default function PowerDrainMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/power-drain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fHeroine, villain: fVillain, setting, powers, drainMethod, drainLevel: currentDrain, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _powerReturnMap: Record<string,string> = {"permanently_gone":"Gone Permanently","slowly_returning":"Slowly Returning","worst_moments":"Return at Worst Moments","traded_away":"Traded Away"};
+      const _drainedPowerUseMap: Record<string,string> = {"villain_absorbs":"Absorbs Them","stored_device":"Stored in Device","sold_to_others":"Sold to Others","destroyed":"Destroyed"}; return [powerReturn ? `Power Return: ${_powerReturnMap[powerReturn] ?? powerReturn}` : "", drainedPowerUse ? `What Villain Does With Powers: ${_drainedPowerUseMap[drainedPowerUse] ?? drainedPowerUse}` : ""].filter(Boolean).join("\n"); })(), powerReturn, drainedPowerUse, heroine: fHeroine, villain: fVillain, setting, powers, drainMethod, drainLevel: currentDrain, chapters: isFirst ? [] : chapters, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

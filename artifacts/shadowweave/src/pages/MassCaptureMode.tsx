@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -55,6 +56,8 @@ export default function MassCaptureMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [groupDynamicType, setGroupDynamicType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -86,7 +89,7 @@ export default function MassCaptureMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mass-capture`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _groupDynamicMap: Record<string,string> = {"isolated":"Isolated","forced_interact":"Forced to Interact","made_to_compete":"Made to Compete","ranked_hierarchy":"Ranked Hierarchy","collective_break":"Collectively Broken"}; return [groupDynamicType ? `Group Dynamic: ${_groupDynamicMap[groupDynamicType] ?? groupDynamicType}` : ""].filter(Boolean).join("\n"); })(), groupDynamicType, heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();

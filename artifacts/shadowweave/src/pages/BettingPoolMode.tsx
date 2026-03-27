@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -56,6 +57,9 @@ export default function BettingPoolMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [audienceType, setAudienceType] = useState("");
+  const [commentaryTone, setCommentaryTone] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +83,8 @@ export default function BettingPoolMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/betting-pool`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _audienceTypeMap: Record<string,string> = {"private_syndicate":"Villain Syndicate","paying_spectators":"Paying Spectators","small_elite_group":"Small Elite Group","encrypted_stream":"Encrypted Live Stream","mixed_criminal":"Mixed Criminal Crowd"};
+      const _commentaryToneMap: Record<string,string> = {"crude_betting":"Crude Betting Talk","clinical_scoring":"Clinical Scoring","excited_crowd":"Excited Crowd","silent_tension":"Tense Silence"}; return [audienceType ? `Audience Type: ${_audienceTypeMap[audienceType] ?? audienceType}` : "", commentaryTone ? `Commentary Tone: ${_commentaryToneMap[commentaryTone] ?? commentaryTone}` : ""].filter(Boolean).join("\n"); })(), audienceType, commentaryTone, heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

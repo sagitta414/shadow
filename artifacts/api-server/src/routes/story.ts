@@ -1171,9 +1171,19 @@ SESSION ${sNum} — ${activeVillain?.toUpperCase() ?? "NEXT VILLAIN"}
 ${activeVillain}'s turn. ${continueDir ? continueDir + "." : `${activeVillain} uses their own specific methods — distinct from previous sessions. ${heroine}'s resistance has weakened since Session ${sNum - 1}. Something that held before doesn't hold today.`} Describe the session in full explicit detail. Include reactions from the watching villains. Something measurably breaks.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
     }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
@@ -1240,7 +1250,20 @@ CHAPTER ${cNum}
 ${continueDir ? continueDir + "." : "The tension between them escalates. " + (cNum % 2 === 0 ? `${villain1} asserts dominance in a way ${villain2} cannot accept.` : `${villain2} does something with ${heroine} that ${villain1} did not sanction.`)} Write the full chapter — the clash between them, what it means for ${heroine}, and how the alliance strains further.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1298,7 +1321,20 @@ CHAPTER ${cNum} — ${currentCaptor ? currentCaptor.toUpperCase() : "NEW CAPTOR"
 ${heroine} has been transferred. ${currentCaptor ? `Her new captor is ${currentCaptor}.` : "Her new captor emerges — establish who they are immediately."} Describe the transfer itself — how it happens, her experience of it — then the new captor's immediate establishment of their dynamic. This person is distinctly different from everyone before them. Write the full chapter in explicit detail — their approach, their methods, what they do with her, and how she responds.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1355,7 +1391,20 @@ ${ts.toUpperCase()} — CHAPTER ${cNum}
 ${continueDir ? continueDir + "." : "Time has passed. Something has shifted that wasn't there before."} Write this chapter. Show what has changed in ${heroine} since the last chapter — something she accepts now that she resisted before, or something she's stopped doing, or something new she's started wanting. The villain's patience is paying off in small, specific ways. Write in full explicit detail — the texture of their life together, what happens between them in this chapter, and the exact nature of what has eroded.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1427,7 +1476,20 @@ ${heroine}'s experience — what she has learned since last chapter, what she ha
 The duplicate's next action in service of: ${mission}. In full explicit detail. The irreversible damage being done in ${heroine}'s name.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1486,7 +1548,20 @@ MATCH ${mNum}
 ${continueDir ? continueDir + "." : "The crowd wants more. Another match is arranged."} Write the full match — the lead-up, the fight itself in explicit physical detail, the crowd's demands and reactions, and the consequences for the loser. Each match should escalate from the previous one in some specific way.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1544,7 +1619,20 @@ SESSION ${sNum}
 ${continueDir ? continueDir + "." : `Session ${sNum} proceeds according to schedule. ${handlerName} has noted observations from previous sessions and adjusts the protocol accordingly.`} Write the full session in explicit detail — the protocol application, ${heroine}'s experience of it, ${handlerName}'s clinical observations and adjustments. Include the texture of their interaction — her attempts to communicate with him as a person, his functional responses, what is logged.`;
     }
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+    if (_ctxAppend) {
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1609,9 +1697,26 @@ A new visitor arrives. ${continueDir ? continueDir + "." : "Make this visitor di
     }
 
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+
+    if (_ctxAppend) {
+
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+
     }
     const provider = getProvider(req.body);
 
@@ -1691,9 +1796,26 @@ Continue the training. Compliance has increased since last session — her body 
     }
 
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+
+    if (_ctxAppend) {
+
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+
     }
     const provider = getProvider(req.body);
 
@@ -1771,9 +1893,26 @@ ${continueDir ? continueDir + "." : ""} ${
     }
 
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+
+    if (_ctxAppend) {
+
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+
     }
     const provider = getProvider(req.body);
 
@@ -1848,9 +1987,26 @@ A new person arrives. ${continueDir ? continueDir + "." : "Make this encounter d
     }
 
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+
+    if (_ctxAppend) {
+
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+
     }
     const provider = getProvider(req.body);
 
@@ -1962,9 +2118,26 @@ Continue the auction. Bids have escalated significantly. ${continueDir ? `Steer 
     }
 
     const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
-    if (outfitContext) {
-      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
-      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+
+
+    const universalContext = (req.body as Record<string,unknown>).universalContext as string | undefined;
+
+
+    const modeContext = (req.body as Record<string,unknown>).modeContext as string | undefined;
+
+
+    const _ctxAppend = [outfitContext, universalContext, modeContext].filter(Boolean).join("\n\n");
+
+
+    if (_ctxAppend) {
+
+
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + _ctxAppend;
+
+
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + _ctxAppend;
+
+
     }
     const provider = getProvider(req.body);
 

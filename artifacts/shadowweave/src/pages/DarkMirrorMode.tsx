@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -52,6 +53,9 @@ export default function DarkMirrorMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [corruptionFocus, setCorruptionFocus] = useState("");
+  const [mirrorTrigger, setMirrorTrigger] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +74,8 @@ export default function DarkMirrorMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/dark-mirror`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, villain: fV, mission, captiveSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _corruptionFocusMap: Record<string,string> = {"ideology":"Switch to Villain's Ideology","personal_loyalty":"Personal Loyalty to Captor","general_submission":"General Submission","become_villain":"Become a Villain Herself"};
+      const _mirrorTriggerMap: Record<string,string> = {"trauma":"Trauma & Breaking","manipulation":"Slow Manipulation","ideology":"Ideological Argument","love_bombing":"Love Bombing / Attachment"}; return [corruptionFocus ? `Corruption Target: ${_corruptionFocusMap[corruptionFocus] ?? corruptionFocus}` : "", mirrorTrigger ? `Corruption Trigger: ${_mirrorTriggerMap[mirrorTrigger] ?? mirrorTrigger}` : ""].filter(Boolean).join("\n"); })(), corruptionFocus, mirrorTrigger, heroine: fH, villain: fV, mission, captiveSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

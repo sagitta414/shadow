@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -52,6 +53,9 @@ export default function VillainTeamUpMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [allianceStability, setAllianceStability] = useState("");
+  const [allianceDominant, setAllianceDominant] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +73,8 @@ export default function VillainTeamUpMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/villain-team-up`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, villain1, villain2, tension, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _allianceStabilityMap: Record<string,string> = {"fragile":"Fragile — About to Break","uneasy":"Uneasy — Constant Tension","coordinated":"Surprisingly Coordinated"};
+      const _allianceDominantMap: Record<string,string> = {"villain1":"First Villain","villain2":"Second Villain","equal":"Genuinely Equal"}; return [allianceStability ? `Alliance Stability: ${_allianceStabilityMap[allianceStability] ?? allianceStability}` : "", allianceDominant ? `Upper Hand: ${_allianceDominantMap[allianceDominant] ?? allianceDominant}` : ""].filter(Boolean).join("\n"); })(), allianceStability, allianceDominant, heroine: fH, villain1, villain2, tension, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

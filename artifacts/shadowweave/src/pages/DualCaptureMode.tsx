@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -53,6 +54,9 @@ export default function DualCaptureMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [heroineRelationship, setHeroineRelationship] = useState("");
+  const [communicationStatus, setCommunicationStatus] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +75,8 @@ export default function DualCaptureMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/dual-capture`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _heroineRelationshipMap: Record<string,string> = {"rivals":"Rivals","close_allies":"Close Allies","teammates":"Teammates","strangers":"Strangers","former_enemies":"Former Enemies"};
+      const _communicationStatusMap: Record<string,string> = {"yes_freely":"Yes — Freely","yes_limited":"Yes — Limited","no_separated":"No — Separated","forced_to_watch":"Forced to Watch Each Other"}; return [heroineRelationship ? `Heroine Relationship: ${_heroineRelationshipMap[heroineRelationship] ?? heroineRelationship}` : "", communicationStatus ? `Can They Communicate?: ${_communicationStatusMap[communicationStatus] ?? communicationStatus}` : ""].filter(Boolean).join("\n"); })(), heroineRelationship, communicationStatus, heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

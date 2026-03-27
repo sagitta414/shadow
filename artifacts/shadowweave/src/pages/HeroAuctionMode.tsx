@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -109,6 +110,9 @@ export default function HeroAuctionMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [auctionFormat, setAuctionFormat] = useState("");
+  const [buyerAnonymity, setBuyerAnonymity] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -138,7 +142,8 @@ export default function HeroAuctionMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/hero-auction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroes: allHeroes,
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _auctionFormatMap: Record<string,string> = {"live_bidding":"Live Open Bidding","sealed_bids":"Sealed Bids","private_sale":"Negotiated Private Sale","reserve_price":"Reserve Price Minimum"};
+      const _buyerAnonymityMap: Record<string,string> = {"all_hidden":"All Identities Hidden","known_to_each_other":"Known to Each Other","known_to_auctioneer":"Known to Auctioneer Only"}; return [auctionFormat ? `Auction Format: ${_auctionFormatMap[auctionFormat] ?? auctionFormat}` : "", buyerAnonymity ? `Buyer Anonymity: ${_buyerAnonymityMap[buyerAnonymity] ?? buyerAnonymity}` : ""].filter(Boolean).join("\n"); })(), auctionFormat, buyerAnonymity, heroes: allHeroes,
           auctioneer: finalAuctioneer,
           bidders: selectedBidders,
           setting,

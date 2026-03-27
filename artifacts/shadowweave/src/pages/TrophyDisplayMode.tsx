@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -59,6 +60,9 @@ export default function TrophyDisplayMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [visitorInteraction, setVisitorInteraction] = useState("");
+  const [displayDuration, setDisplayDuration] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +86,8 @@ export default function TrophyDisplayMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/trophy-display`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _visitorInteractionMap: Record<string,string> = {"observe_only":"Observe Only","limited_contact":"Limited Contact","full_access":"Full Access"};
+      const _displayDurationMap: Record<string,string> = {"single_event":"Single Event","ongoing":"Ongoing Exhibition","rotating":"Rotating Display"}; return [visitorInteraction ? `Visitor Interaction: ${_visitorInteractionMap[visitorInteraction] ?? visitorInteraction}` : "", displayDuration ? `Display Duration: ${_displayDurationMap[displayDuration] ?? displayDuration}` : ""].filter(Boolean).join("\n"); })(), visitorInteraction, displayDuration, heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

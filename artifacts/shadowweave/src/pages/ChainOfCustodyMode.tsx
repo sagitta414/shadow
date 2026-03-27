@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -55,6 +56,9 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [transferMethod, setTransferMethod] = useState("");
+  const [conditionsProgression, setConditionsProgression] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +79,8 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/chain-of-custody`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, currentCaptor: isFirst ? firstCaptor : (fNext || ""), previousChain: isFirst ? [] : chain, transferType, firstSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1 }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _transferMethodMap: Record<string,string> = {"sold":"Sold","traded":"Traded","gifted":"Gifted","stolen":"Stolen","won_bet":"Won in a Bet","extortion":"Extortion Payment"};
+      const _conditionsProgressionMap: Record<string,string> = {"steadily_worse":"Steadily Worse","unpredictable":"Unpredictable","briefly_better":"Brief Reprieve Then Worse","escalating":"Rapidly Escalating"}; return [transferMethod ? `Transfer Method: ${_transferMethodMap[transferMethod] ?? transferMethod}` : "", conditionsProgression ? `Conditions Progression: ${_conditionsProgressionMap[conditionsProgression] ?? conditionsProgression}` : ""].filter(Boolean).join("\n"); })(), transferMethod, conditionsProgression, heroine: fH, currentCaptor: isFirst ? firstCaptor : (fNext || ""), previousChain: isFirst ? [] : chain, transferType, firstSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1 }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

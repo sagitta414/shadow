@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -52,6 +53,8 @@ export default function MindBreakMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [methodFocus, setMethodFocus] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const phase = Math.min(chapters.length + 1, 5);
@@ -74,7 +77,7 @@ export default function MindBreakMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mind-break`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _methodFocusMap: Record<string,string> = {"physical_exhaustion":"Physical Exhaustion","psychological":"Psychological Manipulation","sensory_overload":"Sensory Overload","chemical_assistance":"Chemical Assistance","combined":"Combined / All Methods"}; return [methodFocus ? `Primary Breaking Method: ${_methodFocusMap[methodFocus] ?? methodFocus}` : ""].filter(Boolean).join("\n"); })(), methodFocus, heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
           breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase,
           chapters: isFirst ? [] : chapters, continueDir, }),
       });

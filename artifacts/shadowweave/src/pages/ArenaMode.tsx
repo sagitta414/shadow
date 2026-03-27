@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -60,6 +61,9 @@ export default function ArenaMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [matchRules, setMatchRules] = useState("");
+  const [crowdInteraction, setCrowdInteraction] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +86,8 @@ export default function ArenaMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/arena-mode`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _matchRulesMap: Record<string,string> = {"submission_only":"Submission Only","no_rules":"No Rules","staged_exhibition":"Staged Exhibition","points_system":"Points System"};
+      const _crowdInteractionMap: Record<string,string> = {"watch_only":"Watch Only","can_call_out":"Can Call Out","participatory":"Fully Participatory"}; return [matchRules ? `Match Rules: ${_matchRulesMap[matchRules] ?? matchRules}` : "", crowdInteraction ? `Crowd Interaction: ${_crowdInteractionMap[crowdInteraction] ?? crowdInteraction}` : ""].filter(Boolean).join("\n"); })(), matchRules, crowdInteraction, fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -74,6 +75,9 @@ export default function PublicPropertyMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [exposureLevel, setExposureLevel] = useState("");
+  const [anonymityLevel, setAnonymityLevel] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +101,8 @@ export default function PublicPropertyMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/public-property`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _exposureLevelMap: Record<string,string> = {"semi_controlled":"Semi-Public / Controlled","fully_public":"Fully Public","identity_partly_known":"Identity Partially Revealed"};
+      const _anonymityLevelMap: Record<string,string> = {"fully_masked":"Fully Masked","civilian_name":"Civilian Name Known","hero_identity_exposed":"Hero Identity Exposed"}; return [exposureLevel ? `Exposure Level: ${_exposureLevelMap[exposureLevel] ?? exposureLevel}` : "", anonymityLevel ? `Anonymity: ${_anonymityLevelMap[anonymityLevel] ?? anonymityLevel}` : ""].filter(Boolean).join("\n"); })(), exposureLevel, anonymityLevel, heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

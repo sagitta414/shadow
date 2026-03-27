@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -75,6 +76,9 @@ export default function LongGameMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [timelineScale, setTimelineScale] = useState("");
+  const [coverStoryType, setCoverStoryType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +99,8 @@ export default function LongGameMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/long-game`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _timelineScaleMap: Record<string,string> = {"days":"Days","weeks":"Weeks","months":"Months"};
+      const _coverStoryTypeMap: Record<string,string> = {"missing_hero":"Missing / Gone Dark","retired":"Retired from Heroics","undercover_op":"On Classified Operation","personal_leave":"Personal Leave","no_cover":"No Cover — Publicly Vanished"}; return [timelineScale ? `Timeline Scale: ${_timelineScaleMap[timelineScale] ?? timelineScale}` : "", coverStoryType ? `Public Cover Story: ${_coverStoryTypeMap[coverStoryType] ?? coverStoryType}` : ""].filter(Boolean).join("\n"); })(), timelineScale, coverStoryType, heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

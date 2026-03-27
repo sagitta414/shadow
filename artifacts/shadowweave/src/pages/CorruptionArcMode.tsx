@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
+import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -67,6 +68,9 @@ export default function CorruptionArcMode({ onBack }: Props) {
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
+  const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
+  const [corruptionTarget, setCorruptionTarget] = useState("");
+  const [corruptionMethodType, setCorruptionMethodType] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -98,7 +102,8 @@ export default function CorruptionArcMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/corruption-arc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _corruptionTargetMap: Record<string,string> = {"villain_allegiance":"Full Villain Allegiance","personal_submission":"Personal Submission","ideology_adoption":"Ideology Adoption","abandon_heroics":"Abandon Heroics"};
+      const _corruptionMethodMap: Record<string,string> = {"slow_manipulation":"Slow Manipulation","trauma_bonding":"Trauma Bonding","ideology":"Ideology Replacement","love_bombing":"Love Bombing","isolation_dependency":"Isolation & Dependency"}; return [corruptionTarget ? `Corruption Target: ${_corruptionTargetMap[corruptionTarget] ?? corruptionTarget}` : "", corruptionMethodType ? `Corruption Method: ${_corruptionMethodMap[corruptionMethodType] ?? corruptionMethodType}` : ""].filter(Boolean).join("\n"); })(), corruptionTarget, corruptionMethod, heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
