@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
 import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
+import { getTopVillains, type VillainStat } from "../lib/infamy";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -246,6 +247,21 @@ function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, on
   title: string; today: string; onGenerate: () => void; onChronicle: () => void;
 }) {
   const [hov, setHov] = useState(false);
+  const [clock, setClock] = useState("");
+  useEffect(() => {
+    function tick() {
+      const now = new Date();
+      const midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now.getTime();
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setClock(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
+    }
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
   return (
     <div
       onClick={onGenerate}
@@ -306,6 +322,18 @@ function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, on
             <button onClick={(e) => { e.stopPropagation(); onChronicle(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(251,191,36,0.28)", fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "1.5px", padding: "0 0 0 1rem", transition: "color 0.2s", borderLeft: "1px solid rgba(251,191,36,0.12)" }} onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(251,191,36,0.72)"; }} onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(251,191,36,0.28)"; }}>Chronicle →</button>
           </div>
         </div>
+      </div>
+
+      {/* ── Ritual Clock strip ── */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ borderTop: "1px solid rgba(251,191,36,0.07)", padding: "0.42rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.9rem", background: "rgba(0,0,0,0.2)" }}
+      >
+        <div style={{ width: "28px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(251,191,36,0.2))" }} />
+        <span style={{ fontSize: "0.36rem", letterSpacing: "4px", color: "rgba(251,191,36,0.28)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Next Dispatch In</span>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: "rgba(251,191,36,0.6)", letterSpacing: "5px", textShadow: "0 0 18px rgba(251,191,36,0.25)", minWidth: "72px", textAlign: "center" }}>{clock}</span>
+        <span style={{ fontSize: "0.36rem", letterSpacing: "4px", color: "rgba(251,191,36,0.18)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Ritual Resets at Midnight</span>
+        <div style={{ width: "28px", height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.2), transparent)" }} />
       </div>
     </div>
   );
@@ -405,6 +433,7 @@ export default function Homepage(props: HomepageProps) {
   const [completedModes] = useState(() => getCompletedModes());
   const [achCount] = useState(() => getUnlockCount());
   const [achXP] = useState(() => getTotalXP());
+  const [topVillains] = useState<VillainStat[]>(() => getTopVillains(5));
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -545,6 +574,42 @@ export default function Homepage(props: HomepageProps) {
       <div className="hp-pad" style={{ padding: "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.08s ease both" : "none" }}>
         <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
       </div>
+
+      {/* ─── INFAMY BOARD ─── */}
+      {topVillains.length > 0 && (
+        <div className="hp-pad" style={{ padding: "0 2rem 1.6rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.1s ease both" : "none" }}>
+          <div style={{ border: "1px solid rgba(239,68,68,0.12)", borderRadius: "16px", overflow: "hidden", background: "rgba(6,2,16,0.85)", backdropFilter: "blur(16px)" }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.65rem 1.4rem", borderBottom: "1px solid rgba(239,68,68,0.08)", background: "rgba(239,68,68,0.04)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#EF4444", boxShadow: "0 0 10px rgba(239,68,68,0.7)", animation: "pulseDot 2.5s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "5px", color: "rgba(239,68,68,0.55)", textTransform: "uppercase", fontWeight: 700 }}>Infamy Board</span>
+                <span style={{ fontSize: "0.36rem", color: "rgba(200,200,220,0.2)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif" }}>· Most Feared Adversaries ·</span>
+              </div>
+              <span style={{ fontSize: "0.36rem", letterSpacing: "2px", color: "rgba(239,68,68,0.2)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Based on your archive</span>
+            </div>
+            {/* Villain row */}
+            <div style={{ display: "flex", alignItems: "stretch", gap: 0 }}>
+              {topVillains.map((vs, i) => (
+                <div key={vs.name} style={{ flex: 1, padding: "0.85rem 1rem", borderRight: i < topVillains.length - 1 ? "1px solid rgba(239,68,68,0.06)" : "none", display: "flex", flexDirection: "column", gap: "0.35rem", position: "relative", overflow: "hidden" }}>
+                  {/* rank glow bg */}
+                  <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 100%, rgba(${vs.level.rgb},0.06) 0%, transparent 70%)`, pointerEvents: "none" }} />
+                  {/* rank */}
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", fontWeight: 900, color: `rgba(${vs.level.rgb},0.25)`, letterSpacing: "1px" }}>#{i + 1}</div>
+                  {/* name */}
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.75rem", fontWeight: 700, color: i === 0 ? vs.level.color : "rgba(220,215,245,0.72)", letterSpacing: "0.5px", lineHeight: 1.2, textShadow: i === 0 ? `0 0 20px ${vs.level.glow}` : "none" }}>{vs.name}</div>
+                  {/* infamy title */}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.15rem 0.55rem", borderRadius: "10px", background: `rgba(${vs.level.rgb},0.1)`, border: `1px solid rgba(${vs.level.rgb},0.22)`, alignSelf: "flex-start" }}>
+                    <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: vs.level.color, fontFamily: "'Cinzel', serif", textTransform: "uppercase", fontWeight: 700 }}>{vs.level.title}</span>
+                  </div>
+                  {/* count */}
+                  <div style={{ fontSize: "0.38rem", color: "rgba(200,200,220,0.28)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif" }}>{vs.count} {vs.count === 1 ? "story" : "stories"}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── THREE COLUMNS ─── */}
       <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.4rem", padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.14s ease both" : "none" }}>

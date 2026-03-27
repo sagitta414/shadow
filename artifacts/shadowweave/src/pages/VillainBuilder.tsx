@@ -3,6 +3,7 @@ import {
   getCustomVillains, saveCustomVillain, deleteCustomVillain,
   VILLAIN_PERSONALITY_TRAITS, VILLAIN_FACTIONS, CustomVillain,
 } from "../lib/customVillains";
+import { getVillainStat } from "../lib/infamy";
 
 interface Props { onBack: () => void; }
 
@@ -169,9 +170,18 @@ export default function VillainBuilder({ onBack }: Props) {
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {villains.map(v => (
           <div key={v.id} style={{ background: "rgba(0,0,0,0.45)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "16px", padding: "1.25rem 1.5rem" }}>
+            {(() => { const stat = getVillainStat(v.name); return (
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", marginBottom: "0.5rem" }}>
               <div>
-                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#FCA5A5", fontWeight: 700, letterSpacing: "1px" }}>{v.name}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#FCA5A5", fontWeight: 700, letterSpacing: "1px" }}>{v.name}</div>
+                  {stat.count > 0 && (
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.15rem 0.6rem", borderRadius: "10px", background: `rgba(${stat.level.rgb},0.1)`, border: `1px solid rgba(${stat.level.rgb},0.28)` }}>
+                      <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: stat.level.color, fontFamily: "'Cinzel', serif", textTransform: "uppercase", fontWeight: 700 }}>{stat.level.title}</span>
+                      <span style={{ fontSize: "0.36rem", color: `rgba(${stat.level.rgb},0.45)`, fontFamily: "'Montserrat', sans-serif" }}>· {stat.count}</span>
+                    </div>
+                  )}
+                </div>
                 {v.alias && <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.45)", fontFamily: "'Raleway', sans-serif", fontStyle: "italic" }}>{v.alias}</div>}
               </div>
               <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
@@ -186,6 +196,7 @@ export default function VillainBuilder({ onBack }: Props) {
                 )}
               </div>
             </div>
+            ); })()}
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
               <span style={{ fontSize: "0.62rem", padding: "0.2rem 0.65rem", borderRadius: "12px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "rgba(252,165,165,0.7)", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>{v.faction}</span>
               {v.personality.map(t => (
