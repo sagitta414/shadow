@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import ThemeSwitcher from "./components/ThemeSwitcher";
 import Login from "./pages/Login";
+import AdminPage from "./pages/AdminPage";
 import Homepage from "./pages/Homepage";
 import CharacterParameters from "./pages/CharacterParameters";
 import StoryEditor from "./pages/StoryEditor";
@@ -93,7 +94,8 @@ type Page =
   | "dark-mirror"
   | "arena-mode"
   | "the-handler"
-  | "achievements";
+  | "achievements"
+  | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
   "superhero-mode","celebrity-mode","daily-scenario","character-params",
@@ -194,22 +196,29 @@ function AppInner() {
   return (
     <div style={{ minHeight: "100vh", background: bgColor, color: textColor, transition: "background 0.6s ease, color 0.6s ease" }}>
       {page === "login" && (
-        <Login onEnter={() => {
-          const played = sessionStorage.getItem("sw_intro_played");
-          if (!played) {
-            sessionStorage.setItem("sw_intro_played", "1");
-            navigate("intro");
-          } else {
-            navigate("home");
-          }
-        }} />
+        <Login
+          onAdmin={() => navigate("admin")}
+          onEnter={() => {
+            const played = sessionStorage.getItem("sw_intro_played");
+            if (!played) {
+              sessionStorage.setItem("sw_intro_played", "1");
+              navigate("intro");
+            } else {
+              navigate("home");
+            }
+          }}
+        />
+      )}
+
+      {page === "admin" && (
+        <AdminPage onBack={() => navigate("login")} />
       )}
 
       {page === "intro" && (
         <IntroSequence onComplete={() => navigate("home")} />
       )}
 
-      {page !== "login" && (
+      {page !== "login" && page !== "admin" && (
         <>
           <BackgroundEffects />
           <GlitchOverlay />
