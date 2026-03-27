@@ -1,11 +1,14 @@
 import HeroinePicker from "../components/HeroinePicker";
 import VillainPicker from "../components/VillainPicker";
+import { ALL_HEROINES } from "../lib/heroines";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
+
+const HEROINES = ALL_HEROINES.map(h => h.name);
 
 interface Props { onBack: () => void; }
 
