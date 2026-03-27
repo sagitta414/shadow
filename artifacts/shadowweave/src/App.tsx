@@ -47,6 +47,7 @@ import AchievementToastManager from "./components/AchievementToast";
 import SessionTimer from "./components/SessionTimer";
 import NightmareOverlay from "./components/NightmareOverlay";
 import PlotTwistInjector from "./components/PlotTwistInjector";
+import WelcomeCard from "./components/WelcomeCard";
 import { recordStoryDay } from "./lib/streak";
 
 type Page =
@@ -212,6 +213,7 @@ function AppInner() {
           <GlitchOverlay />
           <CandlelightOverlay />
           <NightmareOverlay />
+          <WelcomeCard />
           <ThemeSwitcher />
           <AchievementToastManager />
           {STORY_MODE_PAGES.has(page) && <SessionTimer key={page} pageKey={page} />}

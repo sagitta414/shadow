@@ -860,3 +860,85 @@ body.theme-glitch {
     overflow-x: hidden;
   }
 }
+
+/* ─── Mobile layout improvements ─────────────────────── */
+@media (max-width: 768px) {
+  /* Story mode pages — better padding */
+  .story-mode-page {
+    padding: 1rem !important;
+  }
+
+  /* Heatmap container — prevent overflow */
+  .hp-pad .heatmap-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  /* Daily dispatch — improve wrapping */
+  .hp-daily {
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+    align-items: flex-start !important;
+  }
+  .hp-daily-cta {
+    margin-left: 0 !important;
+  }
+
+  /* Step wizard headers in story modes */
+  .step-header-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Hero grid on story mode — compact */
+  .hero-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Surprise Me / Story Dice buttons — reduce padding */
+  .hp-surprise button {
+    padding: 0.65rem 1.4rem !important;
+  }
+
+  /* Section labels — reduce letter spacing */
+  .section-label-text {
+    letter-spacing: 2px !important;
+  }
+
+  /* Studio tools grid — 2 col on narrow */
+  .hp-general {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Story arc + dossier panels */
+  .panel-two-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* WelcomeCard on small phones */
+  .welcome-card-inner {
+    border-radius: 16px !important;
+  }
+
+  /* Nav brand letter-spacing compress */
+  .nav-brand-text {
+    letter-spacing: 3px !important;
+  }
+}
+
+/* Scrollbar styling for infamy board horizontal scroll */
+.infamy-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.infamy-scroll::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0);
+}
+.infamy-scroll::-webkit-scrollbar-thumb {
+  background: rgba(239,68,68,0.2);
+  border-radius: 2px;
+}
+.infamy-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(239,68,68,0.4);
+}

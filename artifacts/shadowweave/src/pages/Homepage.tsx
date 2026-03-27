@@ -4,6 +4,7 @@ import { getStreak } from "../lib/streak";
 import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
 import { getTopVillains, type VillainStat } from "../lib/infamy";
 import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface HomepageProps {
   onEnter: () => void;
@@ -427,6 +428,7 @@ function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number;
 }
 
 export default function Homepage(props: HomepageProps) {
+  const isMobile = useIsMobile(768);
   const [mounted, setMounted] = useState(false);
   const [surpriseHov, setSurpriseHov] = useState(false);
   const [showDice, setShowDice] = useState(false);
@@ -506,11 +508,11 @@ export default function Homepage(props: HomepageProps) {
           )}
           <button onClick={props.onAchievements} style={{ display: "flex", alignItems: "center", gap: "0.45rem", padding: "0.42rem 0.9rem", background: "rgba(245,214,122,0.07)", border: "1px solid rgba(245,214,122,0.22)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(245,214,122,0.14)"; e.currentTarget.style.borderColor = "rgba(245,214,122,0.55)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(245,214,122,0.07)"; e.currentTarget.style.borderColor = "rgba(245,214,122,0.22)"; }}>
             <span style={{ fontSize: "0.65rem" }}>🏆</span>
-            <span style={{ fontSize: "0.52rem", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(245,214,122,0.75)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>{achCount > 0 ? `${achCount} · ${achXP} XP` : "Trophies"}</span>
+            {!isMobile && <span style={{ fontSize: "0.52rem", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(245,214,122,0.75)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>{achCount > 0 ? `${achCount} · ${achXP} XP` : "Trophies"}</span>}
           </button>
           <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.42rem 1rem", background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "30px", cursor: "pointer", color: "inherit", transition: "all 0.3s", boxShadow: "0 0 0 0 rgba(168,85,247,0)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(168,85,247,0.25)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.1)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.3)"; e.currentTarget.style.boxShadow = "none"; }}>
             <span style={{ fontSize: "0.65rem", color: "rgba(192,132,252,0.85)" }}>◈</span>
-            <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>
+            {!isMobile && <span style={{ fontSize: "0.56rem", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(192,132,252,0.85)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Archive</span>}
           </button>
         </div>
       </nav>
@@ -591,15 +593,16 @@ export default function Homepage(props: HomepageProps) {
               {activeDays > 0 ? `${activeDays} active day${activeDays !== 1 ? "s" : ""}` : "No stories yet"}
             </span>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "2px" : "3px" }}>
             {activitySlots.map((slot) => {
               const has = activitySet.has(slot.key);
+              const dotSize = isMobile ? "7px" : "9px";
               return (
                 <div
                   key={slot.key}
                   title={slot.key + (has ? " · Story written" : " · No story")}
                   style={{
-                    width: "9px", height: "9px", borderRadius: "2px",
+                    width: dotSize, height: dotSize, borderRadius: "2px",
                     background: slot.isToday
                       ? (has ? "rgba(34,197,94,0.95)" : "rgba(34,197,94,0.3)")
                       : has
@@ -609,6 +612,7 @@ export default function Homepage(props: HomepageProps) {
                     boxShadow: slot.isToday && has ? "0 0 8px rgba(34,197,94,0.6)" : "none",
                     transition: "transform 0.12s",
                     cursor: "default",
+                    flexShrink: 0,
                   }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.55)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
@@ -645,9 +649,9 @@ export default function Homepage(props: HomepageProps) {
               <span style={{ fontSize: "0.36rem", letterSpacing: "2px", color: "rgba(239,68,68,0.2)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Based on your archive</span>
             </div>
             {/* Villain row */}
-            <div style={{ display: "flex", alignItems: "stretch", gap: 0 }}>
+            <div className="infamy-scroll" style={{ display: "flex", alignItems: "stretch", gap: 0, overflowX: isMobile ? "auto" : "visible" }}>
               {topVillains.map((vs, i) => (
-                <div key={vs.name} style={{ flex: 1, padding: "0.85rem 1rem", borderRight: i < topVillains.length - 1 ? "1px solid rgba(239,68,68,0.06)" : "none", display: "flex", flexDirection: "column", gap: "0.35rem", position: "relative", overflow: "hidden" }}>
+                <div key={vs.name} style={{ flex: isMobile ? "0 0 140px" : 1, minWidth: isMobile ? "140px" : undefined, padding: "0.85rem 1rem", borderRight: i < topVillains.length - 1 ? "1px solid rgba(239,68,68,0.06)" : "none", display: "flex", flexDirection: "column", gap: "0.35rem", position: "relative", overflow: "hidden" }}>
                   {/* rank glow bg */}
                   <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 100%, rgba(${vs.level.rgb},0.06) 0%, transparent 70%)`, pointerEvents: "none" }} />
                   {/* rank */}
