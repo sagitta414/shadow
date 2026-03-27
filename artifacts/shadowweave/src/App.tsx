@@ -27,6 +27,10 @@ import PowerDrainMode from "./pages/PowerDrainMode";
 import MassCaptureMode from "./pages/MassCaptureMode";
 import CorruptionArcMode from "./pages/CorruptionArcMode";
 import HeroAuctionMode from "./pages/HeroAuctionMode";
+import TrophyDisplayMode from "./pages/TrophyDisplayMode";
+import ObedienceTrainingMode from "./pages/ObedienceTrainingMode";
+import ShowcaseMode from "./pages/ShowcaseMode";
+import PublicPropertyMode from "./pages/PublicPropertyMode";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -63,7 +67,11 @@ type Page =
   | "heroine-dossier"
   | "villain-builder"
   | "relationship-map"
-  | "hero-auction";
+  | "hero-auction"
+  | "trophy-display"
+  | "obedience-training"
+  | "showcase"
+  | "public-property";
 
 
 function BackgroundEffects() {
@@ -199,6 +207,10 @@ function AppInner() {
           onMassCapture={() => navigate("mass-capture")}
           onCorruptionArc={() => navigate("corruption-arc")}
           onHeroAuction={() => navigate("hero-auction")}
+          onTrophyDisplay={() => navigate("trophy-display")}
+          onObedienceTraining={() => navigate("obedience-training")}
+          onShowcase={() => navigate("showcase")}
+          onPublicProperty={() => navigate("public-property")}
           onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
           onStoryArcs={() => navigate("story-arcs")}
           onHeroineDossier={() => navigate("heroine-dossier")}
@@ -334,6 +346,22 @@ function AppInner() {
 
       {page === "hero-auction" && (
         <HeroAuctionMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "trophy-display" && (
+        <TrophyDisplayMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "obedience-training" && (
+        <ObedienceTrainingMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "showcase" && (
+        <ShowcaseMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "public-property" && (
+        <PublicPropertyMode onBack={() => navigate("home")} />
       )}
 
       {page === "story-arcs" && (

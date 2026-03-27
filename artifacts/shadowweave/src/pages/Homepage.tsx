@@ -22,6 +22,10 @@ interface HomepageProps {
   onMassCapture: () => void;
   onCorruptionArc: () => void;
   onHeroAuction: () => void;
+  onTrophyDisplay: () => void;
+  onObedienceTraining: () => void;
+  onShowcase: () => void;
+  onPublicProperty: () => void;
   onSurpriseMe: () => void;
   onStoryArcs: () => void;
   onHeroineDossier: () => void;
@@ -471,6 +475,10 @@ export default function Homepage(props: HomepageProps) {
           <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
           <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
           <SubCard icon="⚖" iconImg="/icons/corruption-arc.png" title="Hero Auction" desc="Choose your heroines, pick your auctioneer. Villains bid live — degrading comments, competing demands, escalating prices." accent="#FCA311" r={252} g={163} b={17} badge="Auction" onClick={props.onHeroAuction} />
+          <SubCard icon="👁" iconImg="/icons/corruption-arc.png" title="Trophy Display" desc="She's mounted, restrained, and on permanent display. Each chapter is a different visitor who comes to look, appraise, and leave their mark." accent="#EF4444" r={239} g={68} b={68} badge="Display" onClick={props.onTrophyDisplay} />
+          <SubCard icon="📋" iconImg="/icons/corruption-arc.png" title="Obedience Training" desc="6 structured sessions. Compliance tracked in real time. The trainer is calm, methodical, and patient. By session 6 she responds without thinking." accent="#2DD4BF" r={45} g={212} b={191} badge="Training" onClick={props.onObedienceTraining} />
+          <SubCard icon="🎭" iconImg="/icons/corruption-arc.png" title="The Showcase" desc="He decides how she looks, stands, and speaks. Style directives, audience reactions, and a complete loss of agency over her own presentation." accent="#E879F9" r={232} g={121} b={249} badge="Style" onClick={props.onShowcase} />
+          <SubCard icon="🔓" iconImg="/icons/corruption-arc.png" title="Public Property" desc="Identity exposed. Anyone who qualifies can come. Each chapter is a different encounter — stranger, former enemy, someone she used to protect." accent="#FBBF24" r={251} g={191} b={36} badge="Exposed" onClick={props.onPublicProperty} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}
