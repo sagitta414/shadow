@@ -26,6 +26,13 @@ interface HomepageProps {
   onObedienceTraining: () => void;
   onShowcase: () => void;
   onPublicProperty: () => void;
+  onBettingPool: () => void;
+  onVillainTeamUp: () => void;
+  onChainOfCustody: () => void;
+  onLongGame: () => void;
+  onDarkMirror: () => void;
+  onArenaMode: () => void;
+  onTheHandler: () => void;
   onSurpriseMe: () => void;
   onStoryArcs: () => void;
   onHeroineDossier: () => void;
@@ -479,6 +486,13 @@ export default function Homepage(props: HomepageProps) {
           <SubCard icon="📋" iconImg="/icons/corruption-arc.png" title="Obedience Training" desc="6 structured sessions. Compliance tracked in real time. The trainer is calm, methodical, and patient. By session 6 she responds without thinking." accent="#2DD4BF" r={45} g={212} b={191} badge="Training" onClick={props.onObedienceTraining} />
           <SubCard icon="🎭" iconImg="/icons/corruption-arc.png" title="The Showcase" desc="He decides how she looks, stands, and speaks. Style directives, audience reactions, and a complete loss of agency over her own presentation." accent="#E879F9" r={232} g={121} b={249} badge="Style" onClick={props.onShowcase} />
           <SubCard icon="🔓" iconImg="/icons/corruption-arc.png" title="Public Property" desc="Identity exposed. Anyone who qualifies can come. Each chapter is a different encounter — stranger, former enemy, someone she used to protect." accent="#FBBF24" r={251} g={191} b={36} badge="Exposed" onClick={props.onPublicProperty} />
+          <SubCard icon="🎲" iconImg="/icons/corruption-arc.png" title="The Betting Pool" desc="2–6 villains bet on how long she lasts. Each takes a turn. Resistance tracked live. A competition scoreboard shows whose methods are working." accent="#A78BFA" r={167} g={139} b={250} badge="Wager" onClick={props.onBettingPool} />
+          <SubCard icon="⚔" iconImg="/icons/corruption-arc.png" title="Villain Team-Up" desc="Two villains, one captive, irreconcilable differences. Their ego clashes and power struggles directly affect what happens to her each chapter." accent="#FB7185" r={251} g={113} b={133} badge="Duo" onClick={props.onVillainTeamUp} />
+          <SubCard icon="🔗" iconImg="/icons/corruption-arc.png" title="Chain of Custody" desc="A different captor every chapter. You choose who gets her next. A visual chain tracker grows as she passes from owner to owner." accent="#94A3B8" r={148} g={163} b={184} badge="Chain" onClick={props.onChainOfCustody} />
+          <SubCard icon="⏳" iconImg="/icons/corruption-arc.png" title="The Long Game" desc="Weeks between chapters. A patient villain who never raises his voice. An erosion meter tracking what's gone. The horror is in how gradual it is." accent="#34D399" r={52} g={211} b={153} badge="Slow Burn" onClick={props.onLongGame} />
+          <SubCard icon="🪞" iconImg="/icons/corruption-arc.png" title="Dark Mirror" desc="A duplicate wears her face in public. The original watches on a screen. Dual narrative — two perspectives per chapter. Identity horror." accent="#818CF8" r={129} g={140} b={248} badge="Identity" onClick={props.onDarkMirror} />
+          <SubCard icon="🏟" iconImg="/icons/corruption-arc.png" title="Arena Mode" desc="Powers suppressed. Heroines forced to fight each other. Crowd watching. Match record tracked. Loser faces consequences every time." accent="#F97316" r={249} g={115} b={22} badge="Fight" onClick={props.onArenaMode} />
+          <SubCard icon="📁" iconImg="/icons/corruption-arc.png" title="The Handler" desc="No supervillain. Just a competent, clinical professional doing a job. Schedules, protocols, compliance metrics. The mundanity is the horror." accent="#D4A76A" r={212} g={167} b={106} badge="Protocol" onClick={props.onTheHandler} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}

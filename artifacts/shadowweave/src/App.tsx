@@ -31,6 +31,13 @@ import TrophyDisplayMode from "./pages/TrophyDisplayMode";
 import ObedienceTrainingMode from "./pages/ObedienceTrainingMode";
 import ShowcaseMode from "./pages/ShowcaseMode";
 import PublicPropertyMode from "./pages/PublicPropertyMode";
+import BettingPoolMode from "./pages/BettingPoolMode";
+import VillainTeamUpMode from "./pages/VillainTeamUpMode";
+import ChainOfCustodyMode from "./pages/ChainOfCustodyMode";
+import LongGameMode from "./pages/LongGameMode";
+import DarkMirrorMode from "./pages/DarkMirrorMode";
+import ArenaMode from "./pages/ArenaMode";
+import TheHandlerMode from "./pages/TheHandlerMode";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -71,7 +78,14 @@ type Page =
   | "trophy-display"
   | "obedience-training"
   | "showcase"
-  | "public-property";
+  | "public-property"
+  | "betting-pool"
+  | "villain-team-up"
+  | "chain-of-custody"
+  | "long-game"
+  | "dark-mirror"
+  | "arena-mode"
+  | "the-handler";
 
 
 function BackgroundEffects() {
@@ -211,6 +225,13 @@ function AppInner() {
           onObedienceTraining={() => navigate("obedience-training")}
           onShowcase={() => navigate("showcase")}
           onPublicProperty={() => navigate("public-property")}
+          onBettingPool={() => navigate("betting-pool")}
+          onVillainTeamUp={() => navigate("villain-team-up")}
+          onChainOfCustody={() => navigate("chain-of-custody")}
+          onLongGame={() => navigate("long-game")}
+          onDarkMirror={() => navigate("dark-mirror")}
+          onArenaMode={() => navigate("arena-mode")}
+          onTheHandler={() => navigate("the-handler")}
           onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
           onStoryArcs={() => navigate("story-arcs")}
           onHeroineDossier={() => navigate("heroine-dossier")}
@@ -362,6 +383,34 @@ function AppInner() {
 
       {page === "public-property" && (
         <PublicPropertyMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "betting-pool" && (
+        <BettingPoolMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "villain-team-up" && (
+        <VillainTeamUpMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "chain-of-custody" && (
+        <ChainOfCustodyMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "long-game" && (
+        <LongGameMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "dark-mirror" && (
+        <DarkMirrorMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "arena-mode" && (
+        <ArenaMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "the-handler" && (
+        <TheHandlerMode onBack={() => navigate("home")} />
       )}
 
       {page === "story-arcs" && (
