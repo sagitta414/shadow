@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-export type AiProvider = "venice" | "novelai";
+export type AiProvider = "venice";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -20,9 +20,8 @@ export const VENICE_PARAMS = {
   presence_penalty: 0.32,
 };
 
-export function getProvider(body: unknown): AiProvider {
-  const b = body as Record<string, unknown>;
-  return b?.provider === "novelai" ? "novelai" : "venice";
+export function getProvider(_body: unknown): AiProvider {
+  return "venice";
 }
 
 export function resolveTokens(base: number, body: unknown): number {
@@ -43,7 +42,6 @@ export function trimHistory(text: string, maxChars = 5500): string {
 }
 
 export async function streamChat({
-  provider = "venice",
   messages,
   maxTokens,
   onChunk,
@@ -55,36 +53,6 @@ export async function streamChat({
   onChunk: (text: string) => void;
   temperature?: number;
 }): Promise<void> {
-  if (provider === "novelai") {
-    await streamNovelAI(messages, maxTokens, onChunk, temperature);
-  } else {
-    await streamVenice(messages, maxTokens, onChunk, temperature);
-  }
-}
-
-export async function completeChat({
-  provider = "venice",
-  messages,
-  maxTokens,
-  temperature = 1.0,
-}: {
-  provider?: AiProvider;
-  messages: ChatMessage[];
-  maxTokens: number;
-  temperature?: number;
-}): Promise<string> {
-  if (provider === "novelai") {
-    return completeNovelAI(messages, maxTokens, temperature);
-  }
-  return completeVenice(messages, maxTokens, temperature);
-}
-
-async function streamVenice(
-  messages: ChatMessage[],
-  maxTokens: number,
-  onChunk: (t: string) => void,
-  temperature: number
-): Promise<void> {
   const stream = await venice.chat.completions.create({
     model: "venice-uncensored-role-play",
     max_tokens: maxTokens,
@@ -102,11 +70,16 @@ async function streamVenice(
   }
 }
 
-async function completeVenice(
-  messages: ChatMessage[],
-  maxTokens: number,
-  temperature: number
-): Promise<string> {
+export async function completeChat({
+  messages,
+  maxTokens,
+  temperature = 1.0,
+}: {
+  provider?: AiProvider;
+  messages: ChatMessage[];
+  maxTokens: number;
+  temperature?: number;
+}): Promise<string> {
   const completion = await venice.chat.completions.create({
     model: "venice-uncensored-role-play",
     max_tokens: maxTokens,
@@ -115,133 +88,4 @@ async function completeVenice(
     ...VENICE_PARAMS,
   } as Parameters<typeof venice.chat.completions.create>[0]);
   return completion.choices[0]?.message?.content?.trim() ?? "";
-}
-
-function buildNovelAIInput(messages: ChatMessage[]): string {
-  const system = messages.find((m) => m.role === "system")?.content ?? "";
-  const rest = messages.filter((m) => m.role !== "system");
-
-  let input = system.trimEnd();
-  for (const msg of rest) {
-    if (msg.role === "user") {
-      input += `\n\n### Request:\n${msg.content}`;
-    } else {
-      input += `\n\n### Response:\n${msg.content}`;
-    }
-  }
-  input += "\n\n### Response:\n";
-  return input;
-}
-
-async function streamNovelAI(
-  messages: ChatMessage[],
-  maxTokens: number,
-  onChunk: (t: string) => void,
-  temperature: number
-): Promise<void> {
-  const input = buildNovelAIInput(messages);
-  const res = await fetch("https://api.novelai.net/ai/generate-stream", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env["NOVELAI_API_KEY"] ?? ""}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      input,
-      model: "kayra-v1",
-      parameters: {
-        use_string: true,
-        response_length: Math.min(maxTokens, 2048),
-        min_length: 16,
-        temperature,
-        top_k: 0,
-        top_p: 0.95,
-        tail_free_sampling: 0.968,
-        top_a: 0.085,
-        repetition_penalty: 2.8,
-        repetition_penalty_range: 2048,
-        repetition_penalty_slope: 0.09,
-        repetition_penalty_frequency: 0,
-        repetition_penalty_presence: 0,
-      },
-    }),
-  });
-
-  if (!res.ok || !res.body) {
-    const err = await res.text().catch(() => "");
-    throw new Error(`NovelAI ${res.status}: ${err.slice(0, 200)}`);
-  }
-
-  const reader = (res.body as ReadableStream<Uint8Array>).getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  let eventType = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-
-    const lines = buf.split("\n");
-    buf = lines.pop() ?? "";
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("event:")) {
-        eventType = trimmed.slice(6).trim();
-      } else if (trimmed.startsWith("data:") && eventType === "completion") {
-        try {
-          const data = JSON.parse(trimmed.slice(5).trim()) as {
-            token?: string;
-          };
-          if (data.token) onChunk(data.token);
-        } catch {
-          // skip malformed
-        }
-        eventType = "";
-      }
-    }
-  }
-}
-
-async function completeNovelAI(
-  messages: ChatMessage[],
-  maxTokens: number,
-  temperature: number
-): Promise<string> {
-  const input = buildNovelAIInput(messages);
-  const res = await fetch("https://api.novelai.net/ai/generate", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env["NOVELAI_API_KEY"] ?? ""}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      input,
-      model: "kayra-v1",
-      parameters: {
-        use_string: true,
-        response_length: Math.min(maxTokens, 2048),
-        min_length: 16,
-        temperature,
-        top_k: 0,
-        top_p: 0.95,
-        tail_free_sampling: 0.968,
-        top_a: 0.085,
-        repetition_penalty: 2.8,
-        repetition_penalty_range: 2048,
-        repetition_penalty_slope: 0.09,
-        repetition_penalty_frequency: 0,
-        repetition_penalty_presence: 0,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text().catch(() => "");
-    throw new Error(`NovelAI ${res.status}: ${err.slice(0, 200)}`);
-  }
-
-  const data = (await res.json()) as { output?: string };
-  return data.output?.trim() ?? "";
 }
