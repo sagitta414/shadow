@@ -474,25 +474,6 @@ export default function Homepage(props: HomepageProps) {
             cta="Enter the Forge" accent="#C084FC" r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
           />
-          <SectionLabel label="Specialist Modes" r={168} g={85} b={247} />
-          <SubCard icon="🌀" iconImg="/icons/mind-break.png" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking of her will." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
-          <SubCard icon="⛓" iconImg="/icons/two-heroines.png" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon." accent="#34D399" r={52} g={211} b={153} badge="Duo" onClick={props.onDualCapture} />
-          <SubCard icon="🕸" iconImg="/icons/rescue-gone-wrong.png" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the trap herself." accent="#FB923C" r={251} g={146} b={60} badge="Trap" onClick={props.onRescueGoneWrong} />
-          <SubCard icon="⚡" iconImg="/icons/power-drain.png" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A5FA" r={96} g={165} b={250} badge="Meter" onClick={props.onPowerDrain} />
-          <SubCard icon="🗡" iconImg="/icons/mass-capture.png" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Group dynamics, divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
-          <SubCard icon="🌑" iconImg="/icons/corruption-arc.png" title="Corruption Arc" desc="7 chapters, 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
-          <SubCard icon="⚖" iconImg="/icons/corruption-arc.png" title="Hero Auction" desc="Choose your heroines, pick your auctioneer. Villains bid live — degrading comments, competing demands, escalating prices." accent="#FCA311" r={252} g={163} b={17} badge="Auction" onClick={props.onHeroAuction} />
-          <SubCard icon="👁" iconImg="/icons/corruption-arc.png" title="Trophy Display" desc="She's mounted, restrained, and on permanent display. Each chapter is a different visitor who comes to look, appraise, and leave their mark." accent="#EF4444" r={239} g={68} b={68} badge="Display" onClick={props.onTrophyDisplay} />
-          <SubCard icon="📋" iconImg="/icons/corruption-arc.png" title="Obedience Training" desc="6 structured sessions. Compliance tracked in real time. The trainer is calm, methodical, and patient. By session 6 she responds without thinking." accent="#2DD4BF" r={45} g={212} b={191} badge="Training" onClick={props.onObedienceTraining} />
-          <SubCard icon="🎭" iconImg="/icons/corruption-arc.png" title="The Showcase" desc="He decides how she looks, stands, and speaks. Style directives, audience reactions, and a complete loss of agency over her own presentation." accent="#E879F9" r={232} g={121} b={249} badge="Style" onClick={props.onShowcase} />
-          <SubCard icon="🔓" iconImg="/icons/corruption-arc.png" title="Public Property" desc="Identity exposed. Anyone who qualifies can come. Each chapter is a different encounter — stranger, former enemy, someone she used to protect." accent="#FBBF24" r={251} g={191} b={36} badge="Exposed" onClick={props.onPublicProperty} />
-          <SubCard icon="🎲" iconImg="/icons/corruption-arc.png" title="The Betting Pool" desc="2–6 villains bet on how long she lasts. Each takes a turn. Resistance tracked live. A competition scoreboard shows whose methods are working." accent="#A78BFA" r={167} g={139} b={250} badge="Wager" onClick={props.onBettingPool} />
-          <SubCard icon="⚔" iconImg="/icons/corruption-arc.png" title="Villain Team-Up" desc="Two villains, one captive, irreconcilable differences. Their ego clashes and power struggles directly affect what happens to her each chapter." accent="#FB7185" r={251} g={113} b={133} badge="Duo" onClick={props.onVillainTeamUp} />
-          <SubCard icon="🔗" iconImg="/icons/corruption-arc.png" title="Chain of Custody" desc="A different captor every chapter. You choose who gets her next. A visual chain tracker grows as she passes from owner to owner." accent="#94A3B8" r={148} g={163} b={184} badge="Chain" onClick={props.onChainOfCustody} />
-          <SubCard icon="⏳" iconImg="/icons/corruption-arc.png" title="The Long Game" desc="Weeks between chapters. A patient villain who never raises his voice. An erosion meter tracking what's gone. The horror is in how gradual it is." accent="#34D399" r={52} g={211} b={153} badge="Slow Burn" onClick={props.onLongGame} />
-          <SubCard icon="🪞" iconImg="/icons/corruption-arc.png" title="Dark Mirror" desc="A duplicate wears her face in public. The original watches on a screen. Dual narrative — two perspectives per chapter. Identity horror." accent="#818CF8" r={129} g={140} b={248} badge="Identity" onClick={props.onDarkMirror} />
-          <SubCard icon="🏟" iconImg="/icons/corruption-arc.png" title="Arena Mode" desc="Powers suppressed. Heroines forced to fight each other. Crowd watching. Match record tracked. Loser faces consequences every time." accent="#F97316" r={249} g={115} b={22} badge="Fight" onClick={props.onArenaMode} />
-          <SubCard icon="📁" iconImg="/icons/corruption-arc.png" title="The Handler" desc="No supervillain. Just a competent, clinical professional doing a job. Schedules, protocols, compliance metrics. The mundanity is the horror." accent="#D4A76A" r={212} g={167} b={106} badge="Protocol" onClick={props.onTheHandler} />
         </div>
 
         {/* ══ COL 2: CELEBRITY CAPTIVE ══ */}
@@ -528,6 +509,44 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </div>
 
+      {/* ─── SPECIALIST MODES GALLERY ─── */}
+      <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.18s ease both" : "none" }}>
+        <style>{`
+          .sw-gallery::-webkit-scrollbar { display: none; }
+          .sw-gallery { -ms-overflow-style: none; scrollbar-width: none; }
+          @keyframes galleryPulse { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
+        `}</style>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.1rem" }}>
+          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.3))", flex: 1 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+            <span style={{ fontSize: "0.4rem", letterSpacing: "5px", textTransform: "uppercase", color: "rgba(168,85,247,0.55)", fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>Specialist Modes</span>
+            <span style={{ fontSize: "0.45rem", color: "rgba(168,85,247,0.3)", fontFamily: "'Cinzel', serif", letterSpacing: "2px" }}>18 available</span>
+          </div>
+          <div style={{ height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.3), transparent)", flex: 1 }} />
+          <span style={{ fontSize: "0.45rem", color: "rgba(168,85,247,0.3)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2px", whiteSpace: "nowrap", animation: "galleryPulse 3s ease-in-out infinite" }}>scroll →</span>
+        </div>
+        <div className="sw-gallery" style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
+          <GalleryCard icon="🌀" title="Mind Break Chamber" desc="5 phases of psychological dismantling. Track the breaking point in real time." accent="#C084FC" r={192} g={132} b={252} badge="Psych" onClick={props.onMindBreak} />
+          <GalleryCard icon="⛓" title="Two Heroines, One Cell" desc="Two captives, one villain. Their bond becomes both hope and weapon against them." accent="#34D399" r={52} g={211} b={153} badge="Duo" onClick={props.onDualCapture} />
+          <GalleryCard icon="🕸" title="Rescue Gone Wrong" desc="A second heroine comes to save the first — and falls into the same trap." accent="#FB923C" r={251} g={146} b={60} badge="Trap" onClick={props.onRescueGoneWrong} />
+          <GalleryCard icon="⚡" title="Power Drain Mode" desc="Systematic stripping of powers, one by one. A live drain meter tracks her fall." accent="#60A5FA" r={96} g={165} b={250} badge="Meter" onClick={props.onPowerDrain} />
+          <GalleryCard icon="🗡" title="Mass Capture Mode" desc="3–5 heroines, one dominant villain. Divided loyalty, collective submission." accent="#F87171" r={248} g={113} b={113} badge="Group" onClick={props.onMassCapture} />
+          <GalleryCard icon="🌑" title="Corruption Arc" desc="7 chapters. 100% → 0% loyalty. Watch a heroine fall and genuinely switch sides." accent="#F472B6" r={244} g={114} b={182} badge="Arc" onClick={props.onCorruptionArc} />
+          <GalleryCard icon="⚖" title="Hero Auction" desc="Villains bid live — degrading commentary, competing demands, escalating prices." accent="#FCA311" r={252} g={163} b={17} badge="Auction" onClick={props.onHeroAuction} />
+          <GalleryCard icon="👁" title="Trophy Display" desc="Restrained on permanent display. Each chapter is a different visitor." accent="#EF4444" r={239} g={68} b={68} badge="Display" onClick={props.onTrophyDisplay} />
+          <GalleryCard icon="📋" title="Obedience Training" desc="6 structured sessions. Compliance tracked live. By session 6 she responds without thinking." accent="#2DD4BF" r={45} g={212} b={191} badge="Training" onClick={props.onObedienceTraining} />
+          <GalleryCard icon="🎭" title="The Showcase" desc="He dictates her appearance, posture, and words. Audience included. Complete staging." accent="#E879F9" r={232} g={121} b={249} badge="Style" onClick={props.onShowcase} />
+          <GalleryCard icon="🔓" title="Public Property" desc="Identity exposed. Each chapter is a different encounter — strangers, enemies, people she once protected." accent="#FBBF24" r={251} g={191} b={36} badge="Exposed" onClick={props.onPublicProperty} />
+          <GalleryCard icon="🎲" title="The Betting Pool" desc="2–6 villains bet on her. Resistance meter tracked. Each takes a turn." accent="#A78BFA" r={167} g={139} b={250} badge="Wager" onClick={props.onBettingPool} />
+          <GalleryCard icon="⚔" title="Villain Team-Up" desc="Two villains. One captive. Their ego clashes affect what happens to her every chapter." accent="#FB7185" r={251} g={113} b={133} badge="Duo" onClick={props.onVillainTeamUp} />
+          <GalleryCard icon="🔗" title="Chain of Custody" desc="A different captor every chapter. You choose who gets her next. Visual chain tracker." accent="#94A3B8" r={148} g={163} b={184} badge="Chain" onClick={props.onChainOfCustody} />
+          <GalleryCard icon="⏳" title="The Long Game" desc="Weeks between chapters. A patient villain. An erosion meter. Gradual is the horror." accent="#34D399" r={52} g={211} b={153} badge="Slow Burn" onClick={props.onLongGame} />
+          <GalleryCard icon="🪞" title="Dark Mirror" desc="A duplicate destroys her reputation in public. The original watches it happen, helpless." accent="#818CF8" r={129} g={140} b={248} badge="Identity" onClick={props.onDarkMirror} />
+          <GalleryCard icon="🏟" title="Arena Mode" desc="Powers suppressed. Forced to fight each other. Crowd betting. Loser faces consequences." accent="#F97316" r={249} g={115} b={22} badge="Fight" onClick={props.onArenaMode} />
+          <GalleryCard icon="📁" title="The Handler" desc="No supervillain. A competent professional doing a job. Protocols. Compliance metrics." accent="#D4A76A" r={212} g={167} b={106} badge="Protocol" onClick={props.onTheHandler} />
+        </div>
+      </div>
+
       {/* ─── STUDIO TOOLS ─── */}
       <div className="hp-pad" style={{ padding: "0 2rem 3rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.22s ease both" : "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginBottom: "0.85rem" }}>
@@ -552,5 +571,73 @@ export default function Homepage(props: HomepageProps) {
         <span style={{ fontSize: "0.43rem", color: "rgba(200,200,220,0.14)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Venice AI · venice-uncensored-role-play · Uncensored</span>
       </div>
     </div>
+  );
+}
+
+// ─── Gallery Card ─────────────────────────────────────────────────────────────
+interface GalleryCardProps {
+  icon: string; title: string; desc: string;
+  accent: string; r: number; g: number; b: number;
+  badge: string; onClick: () => void;
+}
+function GalleryCard({ icon, title, desc, accent, r, g, b, badge, onClick }: GalleryCardProps) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+      style={{
+        flexShrink: 0,
+        width: "182px",
+        background: hov ? `rgba(${r},${g},${b},0.13)` : `rgba(${r},${g},${b},0.065)`,
+        border: `1px solid rgba(${r},${g},${b},${hov ? 0.55 : 0.22})`,
+        borderTop: `3px solid ${accent}`,
+        borderRadius: "12px",
+        padding: "1.1rem 1rem 1.1rem",
+        cursor: "pointer",
+        textAlign: "left",
+        transition: "all 0.22s cubic-bezier(0.25,0.46,0.45,0.94)",
+        transform: hov ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hov ? `0 10px 36px rgba(${r},${g},${b},0.22), 0 0 0 1px rgba(${r},${g},${b},0.12)` : "none",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.9rem" }}>
+        <span style={{ fontSize: "1.65rem", lineHeight: 1, filter: hov ? `drop-shadow(0 0 8px rgba(${r},${g},${b},0.7))` : "none", transition: "filter 0.22s" }}>{icon}</span>
+        <span style={{
+          fontSize: "0.44rem", letterSpacing: "1.5px", padding: "0.2rem 0.55rem",
+          borderRadius: "20px", border: `1px solid rgba(${r},${g},${b},${hov ? 0.55 : 0.3})`,
+          color: hov ? accent : `rgba(${r},${g},${b},0.7)`,
+          fontFamily: "'Cinzel', serif", transition: "all 0.22s", whiteSpace: "nowrap",
+          background: hov ? `rgba(${r},${g},${b},0.12)` : "transparent",
+        }}>{badge}</span>
+      </div>
+      <div style={{
+        fontFamily: "'Cinzel', serif",
+        fontSize: "0.68rem",
+        color: hov ? accent : "rgba(220,215,240,0.85)",
+        letterSpacing: "0.5px",
+        marginBottom: "0.55rem",
+        fontWeight: 700,
+        lineHeight: 1.35,
+        transition: "color 0.22s",
+      }}>{title}</div>
+      <div style={{
+        fontSize: "0.57rem",
+        color: hov ? "rgba(220,215,240,0.55)" : "rgba(200,195,225,0.38)",
+        fontFamily: "'Raleway', sans-serif",
+        lineHeight: 1.55,
+        transition: "color 0.22s",
+      }}>{desc}</div>
+      <div style={{
+        marginTop: "0.8rem",
+        fontSize: "0.5rem",
+        color: hov ? accent : `rgba(${r},${g},${b},0.35)`,
+        fontFamily: "'Cinzel', serif",
+        letterSpacing: "2px",
+        transition: "all 0.22s",
+        opacity: hov ? 1 : 0.6,
+      }}>ENTER →</div>
+    </button>
   );
 }
