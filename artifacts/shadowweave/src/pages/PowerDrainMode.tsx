@@ -122,7 +122,17 @@ export default function PowerDrainMode({ onBack }: Props) {
     </button>
   );
 
-  if (step === 3 && chapters.length > 0) {
+  if (step === 3) {
+    if (loading && chapters.length === 0) {
+      return (
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1.5rem" }}>
+          <style>{`@keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }`}</style>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.75rem", color: acc, letterSpacing: "4px", textTransform: "uppercase", animation: "pulse 2s ease-in-out infinite" }}>Initiating the drain…</div>
+          <div style={{ fontSize: "0.65rem", color: `rgba(${accRgb},0.4)`, fontFamily: "'Raleway', sans-serif", letterSpacing: "2px" }}>Writing the opening scene</div>
+        </div>
+      );
+    }
+
     const drainPct = Math.min(100, drainLevel);
     return (
       <div style={{ minHeight: "100vh", padding: "2rem", maxWidth: "860px", margin: "0 auto" }}>
