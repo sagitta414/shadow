@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -54,6 +55,8 @@ export default function BettingPoolMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -76,7 +79,7 @@ export default function BettingPoolMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/betting-pool`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -187,7 +190,16 @@ export default function BettingPoolMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLbl(accRgb)}>— THE BETS ARE SETTLED. —</div>}
         {continuing && <div style={loadLbl(accRgb)}>The next session begins…</div>}
-        {error && <div style={errStyle}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#A78BFA"
+          accentRgb="167,139,250"
+        />
+                {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
   }

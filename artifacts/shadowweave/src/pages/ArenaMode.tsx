@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -58,6 +59,8 @@ export default function ArenaMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const allFighters = customFighter.trim() ? [...fighters, customFighter.trim()] : fighters;
@@ -79,7 +82,7 @@ export default function ArenaMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/arena-mode`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -172,7 +175,16 @@ export default function ArenaMode({ onBack }: Props) {
         )}
         {chapters.length >= 5 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— THE ARENA NEVER CLOSES. —</div>}
         {continuing && <div style={{ textAlign: "center", padding: "1.5rem", color: `rgba(${accRgb},0.5)`, fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>The crowd waits…</div>}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#F97316"
+          accentRgb="249,115,22"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
   }

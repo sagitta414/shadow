@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { useIsMobile } from "../hooks/useIsMobile";
 
@@ -68,6 +69,8 @@ export default function InterrogationRoom({ onBack }: Props) {
   const [loading, setLoading] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const [round, setRound] = useState(1);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -98,7 +101,7 @@ export default function InterrogationRoom({ onBack }: Props) {
       const res = await fetch("/api/story/interrogation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: heroineName.trim(),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: heroineName.trim(),
           villain: villainLabel,
           weaknesses: weaknessNotes.trim() || undefined,
           messages: msgs, }),
@@ -305,7 +308,16 @@ export default function InterrogationRoom({ onBack }: Props) {
           </div>
         )}
 
-        {error && (
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#A78BFA"
+          accentRgb="167,139,250"
+        />
+                {error && (
           <div style={{ textAlign: "center", padding: "0.75rem", background: "rgba(200,0,50,0.1)", border: "1px solid rgba(200,0,50,0.3)", borderRadius: "8px", color: "#FF4060", fontFamily: "'Montserrat', sans-serif", fontSize: "0.75rem" }}>
             {error}
           </div>

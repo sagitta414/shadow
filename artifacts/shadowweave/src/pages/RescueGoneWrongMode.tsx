@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -56,6 +57,8 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fCaptive = customCaptive || captive;
@@ -74,7 +77,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/rescue-failed`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -154,7 +157,16 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
             </button>
           </div>
         )}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#FB923C"
+          accentRgb="251,146,60"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
   }

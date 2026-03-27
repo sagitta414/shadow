@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -60,6 +61,8 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -79,7 +82,7 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/obedience-training`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, trainer: fT, location, method, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, trainer: fT, location, method, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -189,7 +192,16 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLabel(accRgb)}>— TRAINING COMPLETE. SHE RESPONDS WITHOUT THINKING. —</div>}
         {continuing && <div style={loadLabel(accRgb)}>Session in progress…</div>}
-        {error && <div style={errStyle}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#E879F9"
+          accentRgb="232,121,249"
+        />
+                {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
   }

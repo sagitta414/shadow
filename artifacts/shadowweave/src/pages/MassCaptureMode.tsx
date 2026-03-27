@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -53,6 +54,8 @@ export default function MassCaptureMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -83,7 +86,7 @@ export default function MassCaptureMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mass-capture`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroines: allHeroines, villain: fVillain, setting, groupDynamic, chapters: isFirst ? [] : chapters, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
@@ -177,7 +180,16 @@ export default function MassCaptureMode({ onBack }: Props) {
             </button>
           </div>
         )}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#F87171"
+          accentRgb="248,113,113"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
   }

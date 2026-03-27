@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -55,6 +56,8 @@ export default function TheHandlerMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -73,7 +76,7 @@ export default function TheHandlerMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/the-handler`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -162,7 +165,16 @@ export default function TheHandlerMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— THE CASE REMAINS OPEN INDEFINITELY. —</div>}
         {continuing && <div style={{ textAlign: "center", padding: "1.5rem", color: `rgba(${accRgb},0.5)`, fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>Logging session…</div>}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#34D399"
+          accentRgb="52,211,153"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
   }

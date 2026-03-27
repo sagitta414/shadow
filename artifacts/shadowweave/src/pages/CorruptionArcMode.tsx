@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -65,6 +66,8 @@ export default function CorruptionArcMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -95,7 +98,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/corruption-arc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();
@@ -221,7 +224,16 @@ export default function CorruptionArcMode({ onBack }: Props) {
             <div style={{ fontSize: "0.62rem", color: "rgba(200,195,225,0.4)", marginTop: "0.5rem", fontFamily: "'Raleway', sans-serif" }}>The corruption arc is complete. She serves him now.</div>
           </div>
         )}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#60A5FA"
+          accentRgb="96,165,250"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem" }}>Error: {error}</div>}
       </div>
     );
   }

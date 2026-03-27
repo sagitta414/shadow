@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -57,6 +58,8 @@ export default function TrophyDisplayMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -79,7 +82,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/trophy-display`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -165,7 +168,16 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         )}
         {chapters.length >= 6 && <div style={endLabel}>— THE DISPLAY CONTINUES. THE VISITORS KEEP COMING. —</div>}
         {continuing && <div style={loadingLabel(accRgb)}>Footsteps in the corridor…</div>}
-        {error && <div style={errorStyle}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#FBBF24"
+          accentRgb="251,191,36"
+        />
+                {error && <div style={errorStyle}>Error: {error}</div>}
       </div>
     );
   }

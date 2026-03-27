@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -69,6 +70,8 @@ export default function ShowcaseMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fH = customHeroine.trim() || heroine;
@@ -92,7 +95,7 @@ export default function ShowcaseMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/showcase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -197,7 +200,16 @@ export default function ShowcaseMode({ onBack }: Props) {
         )}
         {chapters.length >= 4 && <div style={endLabel(accRgb)}>— THE SHOWCASE ENDS. THE GUESTS DEPART. SHE REMAINS. —</div>}
         {continuing && <div style={loadLabel(accRgb)}>The scene shifts…</div>}
-        {error && <div style={errStyle}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#60A5FA"
+          accentRgb="96,165,250"
+        />
+                {error && <div style={errStyle}>Error: {error}</div>}
       </div>
     );
   }

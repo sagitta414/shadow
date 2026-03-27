@@ -1170,6 +1170,11 @@ SESSION ${sNum} — ${activeVillain?.toUpperCase() ?? "NEXT VILLAIN"}
 
 ${activeVillain}'s turn. ${continueDir ? continueDir + "." : `${activeVillain} uses their own specific methods — distinct from previous sessions. ${heroine}'s resistance has weakened since Session ${sNum - 1}. Something that held before doesn't hold today.`} Describe the session in full explicit detail. Include reactions from the watching villains. Something measurably breaks.`;
     }
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -1234,7 +1239,13 @@ CHAPTER ${cNum}
 
 ${continueDir ? continueDir + "." : "The tension between them escalates. " + (cNum % 2 === 0 ? `${villain1} asserts dominance in a way ${villain2} cannot accept.` : `${villain2} does something with ${heroine} that ${villain1} did not sanction.`)} Write the full chapter — the clash between them, what it means for ${heroine}, and how the alliance strains further.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: VILLAIN_TEAM_UP_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1286,7 +1297,13 @@ CHAPTER ${cNum} — ${currentCaptor ? currentCaptor.toUpperCase() : "NEW CAPTOR"
 
 ${heroine} has been transferred. ${currentCaptor ? `Her new captor is ${currentCaptor}.` : "Her new captor emerges — establish who they are immediately."} Describe the transfer itself — how it happens, her experience of it — then the new captor's immediate establishment of their dynamic. This person is distinctly different from everyone before them. Write the full chapter in explicit detail — their approach, their methods, what they do with her, and how she responds.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: CHAIN_OF_CUSTODY_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1337,7 +1354,13 @@ ${ts.toUpperCase()} — CHAPTER ${cNum}
 
 ${continueDir ? continueDir + "." : "Time has passed. Something has shifted that wasn't there before."} Write this chapter. Show what has changed in ${heroine} since the last chapter — something she accepts now that she resisted before, or something she's stopped doing, or something new she's started wanting. The villain's patience is paying off in small, specific ways. Write in full explicit detail — the texture of their life together, what happens between them in this chapter, and the exact nature of what has eroded.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: LONG_GAME_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1403,7 +1426,13 @@ ${heroine}'s experience — what she has learned since last chapter, what she ha
 [THE DUPLICATE]
 The duplicate's next action in service of: ${mission}. In full explicit detail. The irreversible damage being done in ${heroine}'s name.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: DARK_MIRROR_SYSTEM }, { role: "user", content: userMsg }], 2400, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1456,7 +1485,13 @@ MATCH ${mNum}
 
 ${continueDir ? continueDir + "." : "The crowd wants more. Another match is arranged."} Write the full match — the lead-up, the fight itself in explicit physical detail, the crowd's demands and reactions, and the consequences for the loser. Each match should escalate from the previous one in some specific way.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: ARENA_MODE_SYSTEM }, { role: "user", content: userMsg }], 2400, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1508,7 +1543,13 @@ SESSION ${sNum}
 
 ${continueDir ? continueDir + "." : `Session ${sNum} proceeds according to schedule. ${handlerName} has noted observations from previous sessions and adjusts the protocol accordingly.`} Write the full session in explicit detail — the protocol application, ${heroine}'s experience of it, ${handlerName}'s clinical observations and adjustments. Include the texture of their interaction — her attempts to communicate with him as a person, his functional responses, what is logged.`;
     }
-    res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache"); res.setHeader("Connection", "keep-alive"); res.setHeader("Access-Control-Allow-Origin", "*");
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) { if (typeof userMsg !== "undefined") (userMsg as string) && (userMsg += "\n\n" + outfitContext); }
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     let fullContent = "";
     fullContent = await doStream(provider, [{ role: "system", content: THE_HANDLER_SYSTEM }, { role: "user", content: userMsg }], 2200, res);
     res.write(`data: ${JSON.stringify({ done: true, text: fullContent })}\n\n`); res.end();
@@ -1567,6 +1608,11 @@ VISITOR ${vNum}
 A new visitor arrives. ${continueDir ? continueDir + "." : "Make this visitor different from the previous ones — different motive, different dynamic, escalating degradation."} Describe their approach, their inspection of ${heroine}, what they do, what they say, and her reactions in full explicit detail.`;
     }
 
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -1644,6 +1690,11 @@ ${sessionName.toUpperCase()} — SESSION ${sNum}
 Continue the training. Compliance has increased since last session — her body remembers what her mind tries to resist. ${continueDir ? continueDir + "." : "This session pushes further — a new command, a new technique, a deeper erosion of her resistance."} Show the session in explicit real-time detail. Something new breaks this session that didn't break before.`;
     }
 
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -1719,6 +1770,11 @@ ${continueDir ? continueDir + "." : ""} ${
       } Write in full, explicit detail.`;
     }
 
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -1791,6 +1847,11 @@ ENCOUNTER ${eNum}
 A new person arrives. ${continueDir ? continueDir + "." : "Make this encounter distinctly different from the previous ones — different type of person, different dynamic, escalating in some specific way."} Write the full encounter in explicit detail: who they are, what they want, what they do with ${heroine}, and how she experiences it. From arrival to departure.`;
     }
 
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -1900,6 +1961,11 @@ ROUND ${roundNum} — ${roundLabel}
 Continue the auction. Bids have escalated significantly. ${continueDir ? `Steer toward: ${continueDir}.` : "Push harder — bigger bids with more extreme attached demands, more graphic descriptions, more desperate villain competition."} The heroine's composure continues to crack under the weight of being treated as merchandise. Maintain all established bidder voices.`;
     }
 
+    const outfitContext = (req.body as Record<string,unknown>).outfitContext as string | undefined;
+    if (outfitContext) {
+      if (typeof userMsg !== "undefined") userMsg += "\n\n" + outfitContext;
+      else if (typeof userMessage !== "undefined") userMessage += "\n\n" + outfitContext;
+    }
     const provider = getProvider(req.body);
 
     res.setHeader("Content-Type", "text/event-stream");

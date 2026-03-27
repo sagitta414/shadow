@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -107,6 +108,8 @@ export default function HeroAuctionMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const finalAuctioneer = customAuctioneer.trim() || auctioneer;
@@ -135,7 +138,7 @@ export default function HeroAuctionMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/hero-auction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroes: allHeroes,
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroes: allHeroes,
           auctioneer: finalAuctioneer,
           bidders: selectedBidders,
           setting,
@@ -277,7 +280,16 @@ export default function HeroAuctionMode({ onBack }: Props) {
           </div>
         )}
 
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#A3E635"
+          accentRgb="163,230,53"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
       </div>
     );
   }

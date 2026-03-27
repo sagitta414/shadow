@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
@@ -50,6 +51,8 @@ export default function MindBreakMode({ onBack }: Props) {
   const [continueDir, setContinueDir] = useState("");
   const [savedId, setSavedId] = useState<string|null>(null);
   const [error, setError] = useState("");
+  const [outfitId, setOutfitId] = useState("");
+  const [outfitDamage, setOutfitDamage] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const phase = Math.min(chapters.length + 1, 5);
 
@@ -71,7 +74,7 @@ export default function MindBreakMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mind-break`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
           breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase,
           chapters: isFirst ? [] : chapters, continueDir, }),
       });
@@ -182,7 +185,16 @@ export default function MindBreakMode({ onBack }: Props) {
           </div>
         )}
         {chapters.length >= 5 && <div style={{ marginTop: "2rem", textAlign: "center", fontFamily: "'Cinzel', serif", color: `rgba(${accRgb},0.5)`, fontSize: "0.7rem", letterSpacing: "3px" }}>— COMPLETE SURRENDER ACHIEVED —</div>}
-        {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
+
+        <OutfitSelector
+          outfitId={outfitId}
+          damage={outfitDamage}
+          onOutfitChange={setOutfitId}
+          onDamageChange={setOutfitDamage}
+          accentColor="#A78BFA"
+          accentRgb="167,139,250"
+        />
+                {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginTop: "1rem", fontFamily: "'Raleway', sans-serif" }}>Error: {error}</div>}
       </div>
     );
   }
