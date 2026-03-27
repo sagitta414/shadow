@@ -18,6 +18,7 @@ export const VENICE_PARAMS = {
   },
   frequency_penalty: 0.15,
   presence_penalty: 0.10,
+  top_p: 0.92,
 };
 
 export function getProvider(_body: unknown): AiProvider {
@@ -28,7 +29,7 @@ export function resolveTokens(base: number, body: unknown): number {
   const b = body as Record<string, unknown>;
   const sl = b?.storyLength as string | undefined;
   if (sl === "short") return Math.round(base * 0.6);
-  if (sl === "long")  return Math.min(Math.round(base * 1.5), 2200);
+  if (sl === "long")  return Math.min(Math.round(base * 1.6), 3000);
   return base;
 }
 
