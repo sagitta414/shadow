@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,15 +10,7 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Supergirl","Captain Marvel","Storm","Jean Grey","Rogue","She-Hulk","Invisible Woman",
-  "Scarlet Witch","Black Canary","Zatanna","Raven","Starfire","Psylocke","Emma Frost","Gamora",
-  "Ahsoka Tano","Rey","Jessica Jones","Silk Spectre","Power Girl","Wasp","Thor (Jane Foster)","Ms Marvel",
-];
-const VILLAINS = [
-  "Lex Luthor","Brainiac","Thanos","Magneto","Doctor Doom","Red Skull","Ra's al Ghul","Baron Zemo",
-  "Sinister","HYDRA Commander","Circe","Enchantress","Loki","Gorilla Grodd","Darkseid","Maxwell Lord",
-];
+
 const SETTINGS = [
   "A sterile laboratory designed specifically to contain and drain her",
   "A villain's private arena — an audience watches her weaken",
@@ -169,6 +164,9 @@ export default function PowerDrainMode({ onBack }: Props) {
           </div>
         </div>
 
+        <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} />
+
+
         {chapters.map((ch, i) => (
           <div key={i}>
             {chapters.length > 1 && <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1rem" }}><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /><span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px" }}>— DRAIN PHASE {i + 1} — {(i + 1) * 20}% SIPHONED —</span><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /></div>}
@@ -178,7 +176,7 @@ export default function PowerDrainMode({ onBack }: Props) {
         {streamingText && streamingText.split("\n").filter(Boolean).map((p, j) => <p key={j} style={{ ...proseSt, opacity: 0.75 }}>{p}</p>)}
         <div ref={bottomRef} />
         {!loading && !continuing && drainLevel < 100 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>NEXT DRAIN PHASE — {Math.min(100, drainLevel + 20)}% TOTAL DRAINED</div>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder="Steer the next phase… (optional)" rows={2} style={textSt(accRgb)} />
             <button onClick={() => generate(false)} disabled={continuing} style={{ width: "100%", padding: "0.85rem", background: `rgba(${accRgb},0.12)`, border: `1px solid rgba(${accRgb},0.4)`, color: acc, borderRadius: "8px", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>
@@ -198,8 +196,7 @@ export default function PowerDrainMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={btnSt(acc, accRgb)}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "2rem 0" }}>CONFIGURE THE DRAIN</h1>
         <Sec title="VILLAIN" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type a villain…" style={inSt(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="SETTING" acc={acc} rgb={accRgb}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
@@ -257,8 +254,7 @@ export default function PowerDrainMode({ onBack }: Props) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="TARGET HEROINE" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{HEROINES.map(h => pill(h, heroine === h, () => pickHeroine(h)))}</div>
-          <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type any heroine…" style={inSt(accRgb)} />
+          <HeroinePicker value={heroine || customHeroine} onChange={name => { pickHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="POWER DETAILS (AUTO-FILLS FOR KNOWN HEROINES)" acc={acc} rgb={accRgb}>
           <textarea value={powers} onChange={e => setPowers(e.target.value)} placeholder="Her powers will auto-fill when you pick a known heroine, or type them here…" rows={6} style={{ ...textSt(accRgb), marginBottom: 0 }} />

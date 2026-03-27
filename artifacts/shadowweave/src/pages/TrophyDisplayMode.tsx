@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,18 +10,7 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman",
-  "Valkyrie","Power Girl","Catwoman","Poison Ivy","Silk Spectre","Hawkgirl",
-];
-const VILLAINS = [
-  "Lex Luthor","Joker","Red Skull","Baron Zemo","Loki","Thanos","Deathstroke","Ra's al Ghul",
-  "Sinister","Magneto","Doctor Doom","Homelander","Darkseid","Kingpin","The Collector",
-  "Mephisto","Apocalypse","Norman Osborn","Maxwell Lord","Green Goblin",
-];
+
 const DISPLAY_SETTINGS = [
   "A locked glass display case in his trophy room",
   "Restrained on a raised platform — centre of his private chambers",
@@ -155,17 +147,21 @@ export default function TrophyDisplayMode({ onBack }: Props) {
           <MetaItem label="VISITORS" value={`${chapters.length}`} rgb={accRgb} />
         </div>
 
+        <ReadingProgressBar current={chapters.length} max={6} accentColor={acc} accentRgb={accRgb} />
+
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <ChapterDivider label={`VISITOR ${i + 1}`} rgb={accRgb} />
             <p style={prosestyle}>{ch}</p>
+            <div style={{ fontSize: "0.58rem", color: `rgba(${accRgb},0.3)`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textAlign: "right", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>{ch.split(/\s+/).filter(Boolean).length.toLocaleString()} words</div>
           </div>
         ))}
         {streamingText && <p style={{ ...prosestyle, opacity: 0.85 }}>{streamingText}</p>}
         <div ref={bottomRef} />
 
         {!loading && !continuing && chapters.length < 6 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>VISITOR {visitorNum} APPROACHES</div>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder="Who is this visitor? What do they want? (optional — leave blank for AI to decide)" rows={2} style={taStyle} />
             <button onClick={() => generate(false)} disabled={continuing} style={continueBtn(accRgb, acc)}>
@@ -187,8 +183,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "0 0 2rem" }}>CONFIGURE THE DISPLAY</h1>
 
         <Section title="CAPTOR VILLAIN" rgb={accRgb}>
-          <div style={pillRow}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type any villain…" style={inputStyle} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Section>
         <Section title="DISPLAY SETTING" rgb={accRgb}>
           <div style={pillRow}>{DISPLAY_SETTINGS.map(s => pill(s, displaySetting === s, () => setDisplaySetting(s)))}</div>
@@ -246,8 +241,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         </div>
       </div>
       <Section title="SELECT HEROINE" rgb={accRgb}>
-        <div style={pillRow}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={inputStyle} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Section>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={primaryBtn(canStep2, accRgb, acc)}>
         CONFIGURE THE DISPLAY →

@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,17 +10,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman","Valkyrie","Power Girl",
-];
-const VILLAINS = [
-  "Lex Luthor","Joker","Red Skull","Baron Zemo","Loki","Thanos","Deathstroke","Ra's al Ghul",
-  "Sinister","Magneto","Doctor Doom","Homelander","Darkseid","Kingpin","The Collector",
-  "Mephisto","Apocalypse","Norman Osborn","Maxwell Lord","Green Goblin","Hela","Carnage",
-];
+
+
 const TENSIONS = [
   { id: "ownership", label: "One wants to own her — the other wants to break her" },
   { id: "purpose",   label: "One wants her for her powers — the other wants her personally" },
@@ -141,6 +135,8 @@ export default function VillainTeamUpMode({ onBack }: Props) {
           <Mi label="PARTNER 2" value={villain2} rgb={accRgb} />
           <Mi label="TENSION" value={TENSIONS.find(t => t.id === tension)?.label ?? tension} rgb={accRgb} />
         </div>
+        <ReadingProgressBar current={chapters.length} max={6} accentColor={acc} accentRgb={accRgb} />
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.25rem" }}>
@@ -149,12 +145,13 @@ export default function VillainTeamUpMode({ onBack }: Props) {
               <div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.18)` }} />
             </div>
             <p style={prose}>{ch}</p>
+            <div style={{ fontSize: "0.58rem", color: `rgba(${accRgb},0.3)`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textAlign: "right", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>{ch.split(/\s+/).filter(Boolean).length.toLocaleString()} words</div>
           </div>
         ))}
         {streamingText && <p style={{ ...prose, opacity: 0.85 }}>{streamingText}</p>}
         <div ref={bottomRef} />
         {!loading && !continuing && chapters.length < 6 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder={`Steer chapter ${chapters.length + 1}… (e.g. "${villain1} and ${villain2} clash over her", "she tries to exploit the rift between them")`} rows={2} style={taS(accRgb)} />
             <button onClick={() => generate(false)} disabled={continuing} style={cBtn(acc, accRgb)}>{continuing ? "WRITING…" : "⚔ NEXT CHAPTER"}</button>
           </div>
@@ -172,10 +169,10 @@ export default function VillainTeamUpMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={bBtn(acc, accRgb)}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "0 0 2rem" }}>CONFIGURE THE ALLIANCE</h1>
         <Sec title="PARTNER 1" rgb={accRgb}>
-          <div style={pr}>{VILLAINS.map(v => pill(v, villain1 === v, () => setVillain1(v), villain2 === v))}</div>
+          <VillainPicker value={villain1} onChange={name => setVillain1(name)} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="PARTNER 2" rgb={accRgb} subtitle="(must be different from Partner 1)">
-          <div style={pr}>{VILLAINS.map(v => pill(v, villain2 === v, () => setVillain2(v), villain1 === v))}</div>
+          <VillainPicker value={villain2} onChange={name => setVillain2(name)} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="CORE TENSION — WHAT THEY DISAGREE ON" rgb={accRgb}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
@@ -235,8 +232,7 @@ export default function VillainTeamUpMode({ onBack }: Props) {
         </div>
       </div>
       <Sec title="SELECT SUBJECT" rgb={accRgb}>
-        <div style={pr}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={inpS(accRgb)} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Sec>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={pBtn(canStep2, accRgb, acc)}>CONFIGURE THE ALLIANCE →</button>
     </div>

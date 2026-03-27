@@ -50,6 +50,12 @@
 - **AiProviderBadge** — fixed bottom-left overlay; shows active engine with glow; click to toggle; Venice=violet, NovelAI=green
 - **Mobile CSS** — Comprehensive mobile responsive styles in `index.css` (safe-area insets, sticky generate button, touch targets, pill scrolling, responsive grids)
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
+- **HeroinePicker** — `src/components/HeroinePicker.tsx` — searchable grid with universe tabs (All/Marvel/DC/CW/StarWars/etc), 180+ heroines from `src/lib/heroines.ts`; replaces pill lists in all 19 specialist modes
+- **VillainPicker** — `src/components/VillainPicker.tsx` — searchable grid with universe tabs, 63 villains from `src/lib/villains.ts`; replaces villain pill lists in all applicable specialist modes
+- **PsycheMeter** — `src/components/PsycheMeter.tsx` — dual sanity/hope meters with expandable event log; used in MindBreakMode
+- **ReadingProgressBar** — `src/components/ReadingProgressBar.tsx` — thin chapter progress bar shown in reading views of all 15 specialist modes
+- **Shared Data Libraries** — `src/lib/heroines.ts` (180+ heroines across 8 universes) + `src/lib/villains.ts` (63 villains across Marvel/DC/CW/TB/PR/SW/Animated)
+- **Reading UX** — Word count badge per chapter, sticky continue button (backdrop-blur), chapter progress bar across all specialist modes
 
 # Workspace
 

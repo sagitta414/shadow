@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,16 +10,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman","Valkyrie","Power Girl",
-];
-const VILLAINS = [
-  "Lex Luthor","Sinister","Doctor Doom","Magneto","Loki","Mephisto","The Collector",
-  "Norman Osborn","Baron Zemo","Maxwell Lord","Ra's al Ghul","Apocalypse",
-];
+
+
 const MISSIONS = [
   "Destroy her heroic reputation — make the public fear and hate her",
   "Assassinate her closest allies while wearing her face",
@@ -164,6 +159,8 @@ export default function DarkMirrorMode({ onBack }: Props) {
           <div><div style={{ fontSize: "0.48rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.15rem" }}>DUPLICATE'S MISSION</div><div style={{ fontSize: "0.72rem", color: "#DDD", maxWidth: "220px" }}>{mission}</div></div>
           <div><div style={{ fontSize: "0.48rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.15rem" }}>ARCHITECT</div><div style={{ fontSize: "0.78rem", color: "#EEE" }}>{fV}</div></div>
         </div>
+        <ReadingProgressBar current={chapters.length} max={6} accentColor={acc} accentRgb={accRgb} />
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.25rem" }}>
@@ -177,7 +174,7 @@ export default function DarkMirrorMode({ onBack }: Props) {
         {streamingText && <div style={{ opacity: 0.85 }}>{renderChapter(streamingText)}</div>}
         <div ref={bottomRef} />
         {!loading && !continuing && chapters.length < 6 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder="What does the duplicate do next? What does the original witness? (optional)" rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "8px", color: "rgba(220,215,245,0.85)", fontFamily: "'Raleway', sans-serif", fontSize: "0.82rem", padding: "0.75rem", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: "0.75rem" }} />
             <button onClick={() => generate(false)} disabled={continuing} style={{ width: "100%", padding: "0.85rem", background: `rgba(${accRgb},0.14)`, border: `1px solid rgba(${accRgb},0.45)`, color: acc, borderRadius: "8px", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>
               {continuing ? "REFLECTING…" : "🪞 NEXT CHAPTER"}
@@ -197,8 +194,7 @@ export default function DarkMirrorMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={bSt}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "0 0 2rem" }}>CONFIGURE THE MIRROR</h1>
         <Sec3 title="VILLAIN / ARCHITECT" rgb={accRgb}>
-          <div style={row}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type any villain…" style={iSt(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec3>
         <Sec3 title="THE DUPLICATE'S MISSION" rgb={accRgb}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "0.5rem" }}>
@@ -256,8 +252,7 @@ export default function DarkMirrorMode({ onBack }: Props) {
         </div>
       </div>
       <Sec3 title="SELECT SUBJECT" rgb={accRgb}>
-        <div style={row}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={iSt(accRgb)} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Sec3>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={pSt(canStep2, accRgb, acc)}>CONFIGURE THE MIRROR →</button>
     </div>

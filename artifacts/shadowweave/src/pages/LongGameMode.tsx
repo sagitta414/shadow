@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,17 +10,7 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman","Valkyrie","Power Girl",
-];
-const VILLAINS = [
-  "Lex Luthor","Baron Zemo","Ra's al Ghul","Sinister","Doctor Doom","Magneto",
-  "Maxwell Lord","Mephisto","Norman Osborn","The Collector","Purple Man","Kingpin",
-  "Thanos","Loki","Deathstroke","Red Skull","Apocalypse",
-];
+
 const ENDGAMES = [
   "Complete psychological dependency — she cannot function without him",
   "Voluntary defection — she switches sides and means it",
@@ -192,6 +185,9 @@ export default function LongGameMode({ onBack }: Props) {
           </div>
         </div>
 
+        <ReadingProgressBar current={chapters.length} max={7} accentColor={acc} accentRgb={accRgb} />
+
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.25rem" }}>
@@ -206,7 +202,7 @@ export default function LongGameMode({ onBack }: Props) {
         <div ref={bottomRef} />
 
         {!loading && !continuing && chapters.length < 7 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>
               {(TIMESTAMPS[chapters.length] ?? "LATER").toUpperCase()}
             </div>
@@ -229,8 +225,7 @@ export default function LongGameMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={bB2}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "0 0 2rem" }}>CONFIGURE THE LONG GAME</h1>
         <Sec2 title="THE PATIENT VILLAIN" rgb={accRgb}>
-          <div style={prr}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type any villain…" style={iS(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec2>
         <Sec2 title="ENDGAME — WHAT HE IS WORKING TOWARD" rgb={accRgb}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
@@ -291,8 +286,7 @@ export default function LongGameMode({ onBack }: Props) {
         </div>
       </div>
       <Sec2 title="SELECT SUBJECT" rgb={accRgb}>
-        <div style={prr}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={iS(accRgb)} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Sec2>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={pB2(canStep2, accRgb, acc)}>CONFIGURE →</button>
     </div>

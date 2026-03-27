@@ -1,3 +1,5 @@
+import HeroinePicker from "../components/HeroinePicker";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,20 +9,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Catwoman","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starfire","Raven","Huntress","She-Hulk","Invisible Woman","Starlight","Kimiko",
-  "Power Girl","Zatanna","Hawkgirl","Vixen","Tigra","Spider-Woman","Wasp","Dazzler",
-  "Ghost-Spider","X-23","Elektra","Gamora","Nebula","Ahsoka Tano","Rey","Leia Organa",
-  "Daenerys Targaryen","Sansa Stark","Silk Spectre","Jessica Jones","Stargirl",
-];
-const VILLAINS = [
-  "Lex Luthor","Thanos","Darkseid","Doctor Doom","Red Skull","Magneto","Loki",
-  "Baron Zemo","Ra's al Ghul","Sinister","HYDRA Commander","Gorilla Grodd",
-  "Deathstroke","Maxwell Lord","Trigon","Circe","The Collector","Enchantress",
-  "The Dark Lord","Black Noir","Homelander","Killgrave","The Governor",
-];
+
+
 const SETTINGS = [
   "A vast underground fortress — multiple cells, one master","An orbiting space station — no rescue possible",
   "A conquered city — he rules openly and absolutely","A hidden island compound — escape is the ocean",
@@ -197,8 +187,7 @@ export default function MassCaptureMode({ onBack }: Props) {
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "2rem 0" }}>CONFIGURE THE MASS CAPTURE</h1>
 
         <Sec title="DOMINANT VILLAIN" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type a villain…" style={inSt(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="SETTING" acc={acc} rgb={accRgb}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>

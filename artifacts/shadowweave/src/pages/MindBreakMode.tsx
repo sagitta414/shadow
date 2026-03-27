@@ -1,21 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
+import HeroinePicker from "../components/HeroinePicker";
+import VillainPicker from "../components/VillainPicker";
+import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
+import ReadingProgressBar from "../components/ReadingProgressBar";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
 
-const POPULAR_HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Catwoman","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Silk Spectre","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-];
-const POPULAR_VILLAINS = [
-  "Lex Luthor","Joker","Red Skull","Baron Zemo","Loki","Thanos","Deathstroke","Ra's al Ghul",
-  "HYDRA Commander","Sinister","Magneto","Doctor Doom","Maxwell Lord","Circe","Ares","Enchantress",
-  "Homelander","Black Noir","The Corinthian","Father","Trigon","Gorilla Grodd",
+const PHASE_PSYCHE: { sanityDelta: number; hopeDelta: number; event: string }[] = [
+  { sanityDelta: -5,  hopeDelta: -8,  event: "Isolated and restrained — the weight of helplessness settles in" },
+  { sanityDelta: -12, hopeDelta: -10, event: "Psychological pressure intensifies — her resistance fractures" },
+  { sanityDelta: -18, hopeDelta: -15, event: "Physical submission — her body betrays her convictions" },
+  { sanityDelta: -22, hopeDelta: -20, event: "Her will wavers — the breaking point is near" },
+  { sanityDelta: -28, hopeDelta: -22, event: "Complete surrender — the last barrier falls" },
 ];
 const SETTINGS = [
   "A sensory-deprivation chamber deep underground",
@@ -65,6 +66,13 @@ export default function MindBreakMode({ onBack }: Props) {
   const finalVillain = customVillain || villain;
   const finalSetting = customSetting || setting;
   const finalBreaking = customBreakingPoint || breakingPoint;
+
+  const psycheLog: PsycheEvent[] = useMemo(() =>
+    chapters.map((_, i) => ({ ...PHASE_PSYCHE[i] ?? PHASE_PSYCHE[PHASE_PSYCHE.length - 1] })),
+    [chapters]
+  );
+  const psycheSanity = 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0);
+  const psycheHope   = 100 + psycheLog.reduce((s, e) => s + e.hopeDelta, 0);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [streamingText, chapters]);
 
@@ -164,12 +172,20 @@ export default function MindBreakMode({ onBack }: Props) {
           ))}
         </div>
 
-        {chapters.map((ch, i) => (
-          <div key={i}>
-            {chapters.length > 1 && <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1rem" }}><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /><span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px", whiteSpace: "nowrap" }}>— PHASE {i + 1}: {PHASE_LABELS[i + 1]?.toUpperCase() ?? "BEYOND"} —</span><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /></div>}
-            {ch.split("\n").filter(Boolean).map((p, j) => <p key={j} style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.02rem", lineHeight: 1.9, color: "rgba(230,225,255,0.85)", marginBottom: "1rem" }}>{p}</p>)}
-          </div>
-        ))}
+        <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} label="PHASES COMPLETE" />
+
+        {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} hope={psycheHope} log={psycheLog} />}
+
+        {chapters.map((ch, i) => {
+          const wc = ch.split(/\s+/).filter(Boolean).length;
+          return (
+            <div key={i}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1rem" }}><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /><span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px", whiteSpace: "nowrap" }}>— PHASE {i + 1}: {PHASE_LABELS[i + 1]?.toUpperCase() ?? "BEYOND"} —</span><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /></div>
+              {ch.split("\n").filter(Boolean).map((p, j) => <p key={j} style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.02rem", lineHeight: 1.9, color: "rgba(230,225,255,0.85)", marginBottom: "1rem" }}>{p}</p>)}
+              <div style={{ fontSize: "0.58rem", color: `rgba(${accRgb},0.3)`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textAlign: "right", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>{wc.toLocaleString()} words</div>
+            </div>
+          );
+        })}
 
         {streamingText && (
           <div>
@@ -180,7 +196,7 @@ export default function MindBreakMode({ onBack }: Props) {
         <div ref={bottomRef} />
 
         {!loading && !continuing && chapters.length < 5 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>PHASE {phase} — {PHASE_LABELS[phase]?.toUpperCase()}</div>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder={`Steer Phase ${phase}... (optional)`} rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "8px", color: "rgba(220,215,245,0.85)", fontFamily: "'Raleway', sans-serif", fontSize: "0.82rem", padding: "0.75rem", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: "0.75rem" }} />
             <button onClick={() => generate(false)} disabled={continuing} style={{ width: "100%", padding: "0.85rem", background: `rgba(${accRgb},0.12)`, border: `1px solid rgba(${accRgb},0.4)`, color: acc, borderRadius: "8px", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>
@@ -254,21 +270,24 @@ export default function MindBreakMode({ onBack }: Props) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
-        <Section title="CAPTIVE HEROINE" rgb={accRgb} acc={acc}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>
-            {POPULAR_HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}
-          </div>
-          <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type any heroine name…" style={inputStyle} />
-        </Section>
+      <Section title="CAPTIVE HEROINE" rgb={accRgb} acc={acc}>
+        <HeroinePicker
+          value={heroine || customHeroine}
+          onChange={name => { setHeroine(name); setCustomHeroine(""); }}
+          accentColor={acc}
+          accentRgb={accRgb}
+        />
+      </Section>
 
-        <Section title="THE BREAKER (VILLAIN)" rgb={accRgb} acc={acc}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>
-            {POPULAR_VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}
-          </div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type any villain name…" style={inputStyle} />
-        </Section>
-      </div>
+      <Section title="THE BREAKER (VILLAIN)" rgb={accRgb} acc={acc}>
+        <VillainPicker
+          value={villain || customVillain}
+          onChange={name => { setVillain(name); setCustomVillain(""); }}
+          accentColor={acc}
+          accentRgb={accRgb}
+          label=""
+        />
+      </Section>
 
       <div style={{ marginTop: "2rem" }}>
         <button onClick={() => { if (finalHeroine && finalVillain) setStep(2); }} disabled={!finalHeroine || !finalVillain} style={{ width: "100%", padding: "1rem", background: finalHeroine && finalVillain ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${finalHeroine && finalVillain ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: finalHeroine && finalVillain ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: finalHeroine && finalVillain ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px", transition: "all 0.2s" }}>

@@ -1,3 +1,5 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,13 +9,7 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman",
-  "Valkyrie","Power Girl","Catwoman","Poison Ivy","Silk Spectre","Hawkgirl",
-];
+
 const TRAINERS = [
   "Lex Luthor","Red Skull","Baron Zemo","Ra's al Ghul","Sinister","Doctor Doom",
   "Magneto","Deathstroke","Maxwell Lord","Norman Osborn","The Controller","Mephisto",
@@ -173,6 +169,9 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
           )}
         </div>
 
+        <ReadingProgressBar current={chapters.length} max={6} accentColor={acc} accentRgb={accRgb} />
+
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.25rem" }}>
@@ -181,13 +180,14 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
               <div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.18)` }} />
             </div>
             <p style={prosestyle}>{ch}</p>
+            <div style={{ fontSize: "0.58rem", color: `rgba(${accRgb},0.3)`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textAlign: "right", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>{ch.split(/\s+/).filter(Boolean).length.toLocaleString()} words</div>
           </div>
         ))}
         {streamingText && <p style={{ ...prosestyle, opacity: 0.85 }}>{streamingText}</p>}
         <div ref={bottomRef} />
 
         {!loading && !continuing && chapters.length < 6 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>
               {SESSIONS[chapters.length]?.label?.toUpperCase() ?? "NEXT SESSION"}
             </div>
@@ -277,8 +277,7 @@ export default function ObedienceTrainingMode({ onBack }: Props) {
         </div>
       </div>
       <Section title="SELECT SUBJECT" rgb={accRgb}>
-        <div style={pillRow}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={inputStyle} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Section>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={primBtn(canStep2, accRgb, acc)}>
         CONFIGURE TRAINING →

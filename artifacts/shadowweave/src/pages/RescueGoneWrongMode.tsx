@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,17 +10,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Catwoman","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Silk Spectre","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Ahsoka Tano","Rey","Leia Organa","Elektra","Gamora","Nebula",
-];
-const VILLAINS = [
-  "Lex Luthor","Joker","Red Skull","Baron Zemo","Loki","Thanos","Deathstroke","Ra's al Ghul",
-  "HYDRA Commander","Sinister","Magneto","Doctor Doom","Homelander","The Dark Lord","Gorilla Grodd",
-  "Darkseid","Trigon","Maxwell Lord","Circe","The Collector","Killgrave","The Governor",
-];
+
+
 const SETTINGS = [
   "An underground fortress — the rescuer walked into a trap",
   "A moving train — no escape when it closes in",
@@ -148,6 +142,8 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
             <div key={l}><div style={{ fontSize: "0.5rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif" }}>{l}</div><div style={{ fontSize: "0.75rem", color: "#EEE", fontFamily: "'Raleway', sans-serif" }}>{v}</div></div>
           ))}
         </div>
+        <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} />
+
         {chapters.map((ch, i) => (
           <div key={i}>
             {chapters.length > 1 && <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1rem" }}><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /><span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px" }}>— CHAPTER {i + 1} —</span><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /></div>}
@@ -157,7 +153,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
         {streamingText && streamingText.split("\n").filter(Boolean).map((p, j) => <p key={j} style={{ ...proseStyle, opacity: 0.75 }}>{p}</p>)}
         <div ref={bottomRef} />
         {!loading && !continuing && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <textarea value={continueDir} onChange={e => setContinueDir(e.target.value)} placeholder="Steer the next chapter… (optional)" rows={2} style={textareaStyle(accRgb)} />
             <button onClick={() => generate(false)} disabled={continuing} style={{ width: "100%", padding: "0.85rem", background: `rgba(${accRgb},0.12)`, border: `1px solid rgba(${accRgb},0.4)`, color: acc, borderRadius: "8px", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px" }}>
               {continuing ? "WRITING..." : `CHAPTER ${chapters.length + 1} →`}
@@ -175,8 +171,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={btnStyle(acc, accRgb)}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "2rem 0" }}>CONFIGURE THE TRAP</h1>
         <Sec title="VILLAIN" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type a villain…" style={inputStyle(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="SETTING" acc={acc} rgb={accRgb}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
@@ -232,12 +227,10 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="CAPTIVE HEROINE (ALREADY HELD)" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{HEROINES.filter(h => h !== (customRescuer || rescuer)).map(h => pill(h, captive === h, () => { setCaptive(h); setCustomCaptive(""); }))}</div>
-          <input value={customCaptive} onChange={e => { setCustomCaptive(e.target.value); setCaptive(""); }} placeholder="Or type a name…" style={inputStyle(accRgb)} />
+          <HeroinePicker value={captive || customCaptive} onChange={name => { setCaptive(name); setCustomCaptive(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="RESCUER HEROINE (WHO FAILS)" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{HEROINES.filter(h => h !== (customCaptive || captive)).map(h => pill(h, rescuer === h, () => { setRescuer(h); setCustomRescuer(""); }))}</div>
-          <input value={customRescuer} onChange={e => { setCustomRescuer(e.target.value); setRescuer(""); }} placeholder="Or type a name…" style={inputStyle(accRgb)} />
+          <HeroinePicker value={rescuer || customRescuer} onChange={name => { setRescuer(name); setCustomRescuer(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
       </div>
       <button onClick={() => { if (fCaptive && fRescuer) setStep(2); }} disabled={!fCaptive || !fRescuer} style={{ marginTop: "2rem", width: "100%", padding: "1rem", background: fCaptive && fRescuer ? `rgba(${accRgb},0.15)` : "rgba(255,255,255,0.03)", border: `1px solid ${fCaptive && fRescuer ? `rgba(${accRgb},0.5)` : "rgba(255,255,255,0.08)"}`, color: fCaptive && fRescuer ? acc : "rgba(200,195,225,0.3)", borderRadius: "10px", cursor: fCaptive && fRescuer ? "pointer" : "not-allowed", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px" }}>

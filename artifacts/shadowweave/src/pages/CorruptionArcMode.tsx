@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import VillainPicker from "../components/VillainPicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,17 +10,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starfire","Raven","Huntress","She-Hulk","Invisible Woman","Power Girl","Stargirl",
-  "Gamora","Ahsoka Tano","Rey","Jessica Jones","Silk Spectre","Starlight","Kimiko",
-];
-const VILLAINS = [
-  "Lex Luthor","Thanos","Darkseid","Doctor Doom","Red Skull","Magneto","Loki","Trigon",
-  "Baron Zemo","Ra's al Ghul","Sinister","Maxwell Lord","Circe","Enchantress",
-  "The Corinthian","The Collector","Killgrave","The Governor","A.I.M. Director",
-];
+
+
 const SETTINGS = [
   "A long-term private facility — he has months to work on her","A hidden throne room — she is kept as his prize",
   "A luxury compound — comfort and pleasure are the weapons","An underground sanctum — ritual and ideology reshape her",
@@ -215,7 +209,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
         <div ref={bottomRef} />
 
         {!loading && !continuing && !isComplete && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.5rem" }}>
               CHAPTER {chapters.length + 1} — LOYALTY {loyalty}% → ~{nextLoyalty}%
             </div>
@@ -243,8 +237,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "2rem 0" }}>CONFIGURE THE FALL</h1>
 
         <Sec title="VILLAIN / CORRUPTOR" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{VILLAINS.map(v => pill(v, villain === v, () => { setVillain(v); setCustomVillain(""); }))}</div>
-          <input value={customVillain} onChange={e => { setCustomVillain(e.target.value); setVillain(""); }} placeholder="Or type a villain…" style={inSt(accRgb)} />
+          <VillainPicker value={villain || customVillain} onChange={name => { setVillain(name); setCustomVillain(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="SETTING" acc={acc} rgb={accRgb}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>{SETTINGS.map(s => pill(s, setting === s, () => setSetting(s)))}</div>
@@ -301,8 +294,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="THE HEROINE" acc={acc} rgb={accRgb}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.75rem" }}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-          <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type any heroine name…" style={inSt(accRgb)} />
+          <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <div>
           <div style={{ background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.15)`, borderRadius: "12px", padding: "1.25rem", marginBottom: "1rem" }}>

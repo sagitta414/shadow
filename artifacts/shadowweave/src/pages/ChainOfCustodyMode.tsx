@@ -1,3 +1,6 @@
+import HeroinePicker from "../components/HeroinePicker";
+import ReadingProgressBar from "../components/ReadingProgressBar";
+import VillainPicker from "../components/VillainPicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,18 +10,8 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman","Valkyrie","Power Girl",
-];
-const VILLAINS = [
-  "Lex Luthor","Joker","Red Skull","Baron Zemo","Loki","Thanos","Deathstroke","Ra's al Ghul",
-  "Sinister","Magneto","Doctor Doom","Homelander","Darkseid","Kingpin","The Collector",
-  "Mephisto","Apocalypse","Norman Osborn","Maxwell Lord","Green Goblin","Hela","Carnage",
-  "Crossbones","Taskmaster","Purple Man","Tombstone","Bullseye","Justin Hammer",
-];
+
+
 const TRANSFER_TYPES = [
   "Sold — financial transaction, no questions asked",
   "Won — the prize in a bet or contest",
@@ -160,6 +153,9 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
           </div>
         </div>
 
+        <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} />
+
+
         {chapters.map((ch, i) => (
           <div key={i}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1.25rem" }}>
@@ -168,13 +164,14 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
               <div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.18)` }} />
             </div>
             <p style={ps}>{ch}</p>
+            <div style={{ fontSize: "0.58rem", color: `rgba(${accRgb},0.3)`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", textAlign: "right", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>{ch.split(/\s+/).filter(Boolean).length.toLocaleString()} words</div>
           </div>
         ))}
         {streamingText && <p style={{ ...ps, opacity: 0.85 }}>{streamingText}</p>}
         <div ref={bottomRef} />
 
         {!loading && !continuing && chapters.length < 6 && (
-          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.4)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ marginTop: "2rem", background: "rgba(0,0,0,0.85)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "12px", padding: "1.5rem", position: "sticky", bottom: "1rem", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "0.6rem", color: `rgba(${accRgb},0.6)`, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.875rem" }}>NEXT TRANSFER — WHO TAKES HER NOW?</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
               {VILLAINS.filter(v => !chain.includes(v)).slice(0, 14).map(v => (
@@ -200,7 +197,7 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={bB(acc, accRgb)}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", margin: "0 0 2rem" }}>CONFIGURE THE CHAIN</h1>
         <Sec title="FIRST CAPTOR" rgb={accRgb}>
-          <div style={prw}>{VILLAINS.map(v => pill(v, firstCaptor === v, () => setFirstCaptor(v)))}</div>
+          <VillainPicker value={firstCaptor} onChange={name => setFirstCaptor(name)} accentColor={acc} accentRgb={accRgb} />
         </Sec>
         <Sec title="HOW SHE IS TRANSFERRED" rgb={accRgb}>
           <div style={prw}>{TRANSFER_TYPES.map(t => pill(t, transferType === t, () => setTransferType(t)))}</div>
@@ -254,8 +251,7 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
         </div>
       </div>
       <Sec title="SELECT SUBJECT" rgb={accRgb}>
-        <div style={prw}>{HEROINES.map(h => pill(h, heroine === h, () => { setHeroine(h); setCustomHeroine(""); }))}</div>
-        <input value={customHeroine} onChange={e => { setCustomHeroine(e.target.value); setHeroine(""); }} placeholder="Or type a custom name…" style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: `1px solid rgba(${accRgb},0.2)`, borderRadius: "8px", color: "rgba(220,215,245,0.85)", fontFamily: "'Raleway', sans-serif", fontSize: "0.8rem", padding: "0.6rem 0.85rem", outline: "none", boxSizing: "border-box", marginTop: "0.5rem" }} />
+        <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
       </Sec>
       <button onClick={() => { if (canStep2) setStep(2); }} disabled={!canStep2} style={pB(canStep2, accRgb, acc)}>CONFIGURE THE CHAIN →</button>
     </div>

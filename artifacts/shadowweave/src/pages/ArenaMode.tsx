@@ -1,3 +1,4 @@
+import HeroinePicker from "../components/HeroinePicker";
 import { useState, useRef, useEffect } from "react";
 import StoryLengthPicker, { type StoryLength } from "../components/StoryLengthPicker";
 import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
@@ -7,13 +8,7 @@ import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAs
 
 interface Props { onBack: () => void; }
 
-const HEROINES = [
-  "Wonder Woman","Black Widow","Supergirl","Scarlet Witch","Captain Marvel","Storm",
-  "Black Canary","Zatanna","Batgirl","Jean Grey","Rogue","Psylocke","Emma Frost",
-  "Starlight","Kimiko","Starfire","Raven","Huntress","She-Hulk","Invisible Woman",
-  "Jessica Jones","Leia Organa","Ahsoka Tano","Black Cat","Spider-Woman","Valkyrie","Power Girl",
-  "Catwoman","Tigra","Firestar","Hawkgirl","Silk Spectre",
-];
+
 const PROMOTERS = [
   "Kingpin","The Collector","Lex Luthor","The Grandmaster","Doctor Doom",
   "Darkseid","Ra's al Ghul","Mephisto","Apocalypse","Baron Zemo",
