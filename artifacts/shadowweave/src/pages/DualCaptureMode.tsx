@@ -258,7 +258,7 @@ export default function DualCaptureMode({ onBack }: Props) {
           <div style={{ fontSize: "0.65rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px", fontFamily: "'Cinzel', serif", marginTop: "0.25rem" }}>DUAL CAPTIVE — SHARED ORDEAL</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <div className="mode-dual-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="FIRST CAPTIVE" acc={acc} rgb={accRgb}>
           <HeroinePicker value={heroine1 || customH1} onChange={name => { setHeroine1(name); setCustomH1(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>

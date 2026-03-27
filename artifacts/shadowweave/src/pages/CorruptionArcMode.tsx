@@ -292,7 +292,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
           <div style={{ fontSize: "0.65rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px", fontFamily: "'Cinzel', serif", marginTop: "0.25rem" }}>LONG-FORM FALL — LOYALTY % METER — UP TO 7 CHAPTERS</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <div className="mode-dual-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="THE HEROINE" acc={acc} rgb={accRgb}>
           <HeroinePicker value={heroine || customHeroine} onChange={name => { setHeroine(name); setCustomHeroine(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>

@@ -225,7 +225,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
           <div style={{ fontSize: "0.65rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px", fontFamily: "'Cinzel', serif", marginTop: "0.25rem" }}>THE RESCUE ATTEMPT FAILS — BOTH FALL</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <div className="mode-dual-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         <Sec title="CAPTIVE HEROINE (ALREADY HELD)" acc={acc} rgb={accRgb}>
           <HeroinePicker value={captive || customCaptive} onChange={name => { setCaptive(name); setCustomCaptive(""); }} accentColor={acc} accentRgb={accRgb} />
         </Sec>

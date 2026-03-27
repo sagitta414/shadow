@@ -174,7 +174,7 @@ export default function DailyChronicle({ onBack }: Props) {
         </div>
 
         {/* ── STATS ROW ── */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"0.8rem", marginBottom:"1.4rem" }}>
+        <div className="chronicle-stats-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"0.8rem", marginBottom:"1.4rem" }}>
           {[
             { value: calendar.length, label:"Total Seals", sub:"days in the archive" },
             { value: generatedCount, label:"Stories Written", sub:`${pct}% completion`, accent:true },
