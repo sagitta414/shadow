@@ -27,7 +27,7 @@ const ICONS = [
 ];
 
 const STATS = [
-  ["9", "Story Modes"],
+  ["27+", "Story Modes"],
   ["181+", "Heroines"],
   ["Venice AI", "Engine"],
   ["Uncensored", "Model"],
