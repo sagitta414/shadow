@@ -47,28 +47,28 @@ const QUICK_VILLAINS = [
 ];
 
 const CELEBRITY_CAPTORS = [
-  { name: "Chris Hemsworth",   category: "Actor",      scheme: "The leading man who plays by his own rules — off camera" },
-  { name: "Jason Momoa",       category: "Actor",      scheme: "The king who never really left the role behind" },
-  { name: "Henry Cavill",      category: "Actor",      scheme: "The man of steel in ways that don't make it to press" },
-  { name: "Idris Elba",        category: "Actor",      scheme: "A voice that expects obedience — and receives it" },
-  { name: "Tom Hardy",         category: "Actor",      scheme: "Intensity that doesn't stop when the cameras do" },
-  { name: "Dwayne Johnson",    category: "Actor",      scheme: "Power that was never just for the screen" },
-  { name: "Michael B. Jordan", category: "Actor",      scheme: "Ambition with no ceiling and no oversight" },
-  { name: "Ryan Reynolds",     category: "Actor",      scheme: "Charm deployed as a weapon — until it isn't charm anymore" },
-  { name: "Dave Bautista",     category: "Actor",      scheme: "Discipline and size applied without apology" },
-  { name: "John Cena",         category: "Actor",      scheme: "You cannot see him — until it is already too late" },
-  { name: "Pedro Pascal",      category: "Actor",      scheme: "The protector who decides what he protects — and what he keeps" },
-  { name: "Oscar Isaac",       category: "Actor",      scheme: "Layered, methodical, with a plan behind every expression" },
-  { name: "Conor McGregor",    category: "Fighter",    scheme: "Precision violence, packaged as entertainment" },
-  { name: "Jon Jones",         category: "Fighter",    scheme: "Controlled aggression — until the cameras leave" },
-  { name: "LeBron James",      category: "Athlete",    scheme: "The greatest closer — in any arena" },
-  { name: "Cristiano Ronaldo", category: "Athlete",    scheme: "Obsessive discipline redirected toward one purpose" },
-  { name: "Bad Bunny",         category: "Music",      scheme: "Cultural dominance translated into something more personal" },
-  { name: "Drake",             category: "Music",      scheme: "The obsessive with the resources to follow through" },
-  { name: "The Weeknd",        category: "Music",      scheme: "Dark fantasies that became operational plans" },
-  { name: "Elon Musk",         category: "Billionaire",scheme: "The wealthiest man alive — with a very specific agenda" },
-  { name: "Jeff Bezos",        category: "Billionaire",scheme: "Empire-builder who decides what is allowed to exist" },
-  { name: "Mark Zuckerberg",   category: "Billionaire",scheme: "Every data point weaponised — including hers" },
+  { name: "Scarlett Johansson", category: "Actress",    scheme: "The spy who never stopped being one — on or off the set" },
+  { name: "Margot Robbie",      category: "Actress",    scheme: "A smile that conceals exactly what it's supposed to" },
+  { name: "Angelina Jolie",     category: "Actress",    scheme: "Collector of broken things — she decides what gets kept" },
+  { name: "Jennifer Lawrence",  category: "Actress",    scheme: "Disarming until the door is closed and the mask comes off" },
+  { name: "Zendaya",            category: "Actress",    scheme: "The patient one — she waits until the leverage is perfect" },
+  { name: "Sydney Sweeney",     category: "Actress",    scheme: "Everyone underestimates her. She relies on it." },
+  { name: "Ana de Armas",       category: "Actress",    scheme: "Fluent in every form of persuasion — she picks the right one" },
+  { name: "Gal Gadot",          category: "Actress",    scheme: "Authority she wore long enough that it became real" },
+  { name: "Brie Larson",        category: "Actress",    scheme: "Conviction applied without compromise or apology" },
+  { name: "Florence Pugh",      category: "Actress",    scheme: "Intensity under the surface — she doesn't telegraph it" },
+  { name: "Megan Fox",          category: "Actress",    scheme: "The distraction was always deliberate. So was everything after." },
+  { name: "Blake Lively",       category: "Actress",    scheme: "Old money composure hiding something much colder" },
+  { name: "Beyoncé",            category: "Music",      scheme: "An empire built on control — this is just another room in it" },
+  { name: "Rihanna",            category: "Music",      scheme: "She built the business. She runs the interrogation the same way." },
+  { name: "Dua Lipa",           category: "Music",      scheme: "The composed one — she already knows the answer before asking" },
+  { name: "Taylor Swift",       category: "Music",      scheme: "She catalogues everything. Every word gets filed and used." },
+  { name: "Ariana Grande",      category: "Music",      scheme: "Small, soft-spoken, and utterly without mercy when necessary" },
+  { name: "Nicki Minaj",        category: "Music",      scheme: "Control through spectacle — and she controls the spectacle" },
+  { name: "Kim Kardashian",     category: "Business",   scheme: "A media empire that runs on leverage. She decides what surfaces." },
+  { name: "Kylie Jenner",       category: "Business",   scheme: "Youngest billionaire — she did not get there by being gentle" },
+  { name: "Kendall Jenner",     category: "Model",      scheme: "Cold, detached, observant — she has been watched her whole life" },
+  { name: "Emily Ratajkowski",  category: "Model",      scheme: "She knows exactly how power moves around her — and how to redirect it" },
 ];
 
 const REALISTIC_CAPTORS = [
@@ -99,12 +99,11 @@ function universeColor(u: string) {
 }
 
 function celebColor(cat: string) {
-  if (cat === "Actor")       return "#F59E0B";
-  if (cat === "Fighter")     return "#EF4444";
-  if (cat === "Athlete")     return "#3B82F6";
-  if (cat === "Music")       return "#A855F7";
-  if (cat === "Billionaire") return "#10B981";
-  return "#F59E0B";
+  if (cat === "Actress")  return "#F472B6";
+  if (cat === "Music")    return "#A855F7";
+  if (cat === "Business") return "#10B981";
+  if (cat === "Model")    return "#60A5FA";
+  return "#F472B6";
 }
 
 function realisticColor(cat: string) {
