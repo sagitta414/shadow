@@ -75,6 +75,8 @@ export default function PublicPropertyMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [exposureLevel, setExposureLevel] = useState("");
   const [anonymityLevel, setAnonymityLevel] = useState("");
+  const [mandatoryDuties, setMandatoryDuties] = useState("");
+  const [identityMarking, setIdentityMarking] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -100,7 +102,7 @@ export default function PublicPropertyMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _exposureLevelMap: Record<string,string> = {"semi_controlled":"Semi-Public / Controlled","fully_public":"Fully Public","identity_partly_known":"Identity Partially Revealed"};
-      const _anonymityLevelMap: Record<string,string> = {"fully_masked":"Fully Masked","civilian_name":"Civilian Name Known","hero_identity_exposed":"Hero Identity Exposed"}; return [exposureLevel ? `Exposure Level: ${_exposureLevelMap[exposureLevel] ?? exposureLevel}` : "", anonymityLevel ? `Anonymity: ${_anonymityLevelMap[anonymityLevel] ?? anonymityLevel}` : ""].filter(Boolean).join("\n"); })(), exposureLevel, anonymityLevel, heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, storyLength, continueDir }),
+      const _anonymityLevelMap: Record<string,string> = {"fully_masked":"Fully Masked","civilian_name":"Civilian Name Known","hero_identity_exposed":"Hero Identity Exposed"}; return [exposureLevel ? `Exposure Level: ${_exposureLevelMap[exposureLevel] ?? exposureLevel}` : "", anonymityLevel ? `Anonymity: ${_anonymityLevelMap[anonymityLevel] ?? anonymityLevel}` : "", mandatoryDuties ? `Mandatory Duties (what she must do for anyone who approaches): ${mandatoryDuties.replace(/_/g," ")}` : "", identityMarking ? `Identity Marking (how she has been visibly marked as property): ${identityMarking.replace(/_/g," ")}` : ""].filter(Boolean).join("\n"); })(), exposureLevel, anonymityLevel, mandatoryDuties, identityMarking, heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -245,6 +247,18 @@ export default function PublicPropertyMode({ onBack }: Props) {
             <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>IDENTITY ANONYMITY</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
               {[{"id":"fully_masked","icon":"😷","label":"Fully Masked"},{"id":"civilian_name","icon":"📋","label":"Civilian Name Known"},{"id":"hero_identity_exposed","icon":"💥","label":"Hero Identity Exposed"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setAnonymityLevel(anonymityLevel === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${anonymityLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:anonymityLevel === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:anonymityLevel === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:anonymityLevel === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>MANDATORY DUTIES</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"serve_anyone_who_asks",icon:"🍸",label:"Serve Anyone Who Asks"},{id:"answer_every_question",icon:"💬",label:"Answer Any Question — No Refusals"},{id:"bow_and_address_formally",icon:"🙇",label:"Bow and Address Each Formally"},{id:"perform_on_demand",icon:"🎭",label:"Perform on Demand"},{id:"sign_repeated_acknowledgments",icon:"📝",label:"Sign Repeated Acknowledgments"},{id:"maintain_cheerful_pretense",icon:"🤫",label:"Maintain Cheerful Pretense"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setMandatoryDuties(mandatoryDuties === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${mandatoryDuties === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:mandatoryDuties === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:mandatoryDuties === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:mandatoryDuties === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>IDENTITY MARKING</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"collar_with_designation",icon:"⛓️",label:"Collar with Designation"},{id:"tagged_visible",icon:"🔖",label:"Tagged — Visible to Those Who Know"},{id:"dictated_outfit",icon:"👗",label:"Dictated Outfit of Availability"},{id:"asset_number",icon:"📋",label:"Refers to Herself by Number"},{id:"branded_ownership",icon:"🪙",label:"Branded Ownership Mark"},{id:"internal_shame_only",icon:"🚫",label:"No Physical Mark — Shame Is Enough"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setIdentityMarking(identityMarking === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${identityMarking === opt.id ? "#F87171" : "rgba(200,195,240,0.15)"}`,background:identityMarking === opt.id ? "rgba(248,113,113,0.16)" : "rgba(255,255,255,0.03)",color:identityMarking === opt.id ? "#F87171" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:identityMarking === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
             </div>
           </div>
           </div>

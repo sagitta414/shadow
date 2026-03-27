@@ -56,6 +56,8 @@ export default function TrophyDisplayMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [visitorInteraction, setVisitorInteraction] = useState("");
   const [displayDuration, setDisplayDuration] = useState("");
+  const [displayPlacard, setDisplayPlacard] = useState("");
+  const [herAwareness, setHerAwareness] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -81,7 +83,7 @@ export default function TrophyDisplayMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _visitorInteractionMap: Record<string,string> = {"observe_only":"Observe Only","limited_contact":"Limited Contact","full_access":"Full Access"};
-      const _displayDurationMap: Record<string,string> = {"single_event":"Single Event","ongoing":"Ongoing Exhibition","rotating":"Rotating Display"}; return [visitorInteraction ? `Visitor Interaction: ${_visitorInteractionMap[visitorInteraction] ?? visitorInteraction}` : "", displayDuration ? `Display Duration: ${_displayDurationMap[displayDuration] ?? displayDuration}` : ""].filter(Boolean).join("\n"); })(), visitorInteraction, displayDuration, heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, storyLength, continueDir }),
+      const _displayDurationMap: Record<string,string> = {"single_event":"Single Event","ongoing":"Ongoing Exhibition","rotating":"Rotating Display"}; return [visitorInteraction ? `Visitor Interaction: ${_visitorInteractionMap[visitorInteraction] ?? visitorInteraction}` : "", displayDuration ? `Display Duration: ${_displayDurationMap[displayDuration] ?? displayDuration}` : "", displayPlacard ? `Display Placard / Label: ${displayPlacard.replace(/_/g," ")}` : "", herAwareness ? `Her Awareness (does she know she is being observed): ${herAwareness.replace(/_/g," ")}` : ""].filter(Boolean).join("\n"); })(), visitorInteraction, displayDuration, displayPlacard, herAwareness, heroine: fH, villain: fV, displaySetting, restraintStyle, visitorTypes, chapters: isFirst ? [] : chapters, visitorNumber: isFirst ? 1 : visitorNum, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -217,6 +219,18 @@ export default function TrophyDisplayMode({ onBack }: Props) {
             <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>DISPLAY DURATION</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
               {[{"id":"single_event","icon":"⏱️","label":"Single Event"},{"id":"ongoing","icon":"📅","label":"Ongoing Exhibition"},{"id":"rotating","icon":"🔄","label":"Rotating Display"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setDisplayDuration(displayDuration === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${displayDuration === opt.id ? "#FBBF24" : "rgba(200,195,240,0.15)"}`,background:displayDuration === opt.id ? "rgba(251,191,36,0.16)" : "rgba(255,255,255,0.03)",color:displayDuration === opt.id ? "#FBBF24" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:displayDuration === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>DISPLAY PLACARD</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"conquered_champion",icon:"🏛️",label:"Conquered Champion"},{id:"former_hero",icon:"⚠️",label:"Former Hero — Retired by Force"},{id:"property_of_captor",icon:"📜",label:"Property of [Captor]"},{id:"warning_to_others",icon:"🎯",label:"Warning to Others"},{id:"defeated_and_retired",icon:"💀",label:"Defeated — Service Ended"},{id:"personal_acquisition",icon:"🌹",label:"Personal Acquisition"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setDisplayPlacard(displayPlacard === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${displayPlacard === opt.id ? "#FBBF24" : "rgba(200,195,240,0.15)"}`,background:displayPlacard === opt.id ? "rgba(251,191,36,0.16)" : "rgba(255,255,255,0.03)",color:displayPlacard === opt.id ? "#FBBF24" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:displayPlacard === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>HER AWARENESS</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"fully_aware_cannot_react",icon:"👁️",label:"Aware — Cannot React"},{id:"aware_and_gagged",icon:"😶",label:"Aware and Gagged"},{id:"semi_conscious",icon:"😴",label:"Semi-Conscious"},{id:"blindfolded_can_hear",icon:"🙈",label:"Blindfolded — Can Hear"},{id:"forced_pretense",icon:"🤐",label:"Forced to Pretend Normalcy"},{id:"conditioned_compliance",icon:"😊",label:"Conditioned to Act Willing"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setHerAwareness(herAwareness === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${herAwareness === opt.id ? "#FBBF24" : "rgba(200,195,240,0.15)"}`,background:herAwareness === opt.id ? "rgba(251,191,36,0.16)" : "rgba(255,255,255,0.03)",color:herAwareness === opt.id ? "#FBBF24" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:herAwareness === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
             </div>
           </div>
           </div>

@@ -57,6 +57,8 @@ export default function BettingPoolMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [audienceType, setAudienceType] = useState("");
   const [commentaryTone, setCommentaryTone] = useState("");
+  const [humiliationWager, setHumiliationWager] = useState("");
+  const [winnerPrize, setWinnerPrize] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,7 @@ export default function BettingPoolMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _audienceTypeMap: Record<string,string> = {"private_syndicate":"Villain Syndicate","paying_spectators":"Paying Spectators","small_elite_group":"Small Elite Group","encrypted_stream":"Encrypted Live Stream","mixed_criminal":"Mixed Criminal Crowd"};
-      const _commentaryToneMap: Record<string,string> = {"crude_betting":"Crude Betting Talk","clinical_scoring":"Clinical Scoring","excited_crowd":"Excited Crowd","silent_tension":"Tense Silence"}; return [audienceType ? `Audience Type: ${_audienceTypeMap[audienceType] ?? audienceType}` : "", commentaryTone ? `Commentary Tone: ${_commentaryToneMap[commentaryTone] ?? commentaryTone}` : ""].filter(Boolean).join("\n"); })(), audienceType, commentaryTone, heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, storyLength, continueDir }),
+      const _commentaryToneMap: Record<string,string> = {"crude_betting":"Crude Betting Talk","clinical_scoring":"Clinical Scoring","excited_crowd":"Excited Crowd","silent_tension":"Tense Silence"}; return [audienceType ? `Audience Type: ${_audienceTypeMap[audienceType] ?? audienceType}` : "", commentaryTone ? `Commentary Tone: ${_commentaryToneMap[commentaryTone] ?? commentaryTone}` : "", humiliationWager ? `Humiliation Wager (what the betters are betting she'll do/endure): ${humiliationWager.replace(/_/g," ")}` : "", winnerPrize ? `Winner's Prize (what the winning better claims): ${winnerPrize.replace(/_/g," ")}` : ""].filter(Boolean).join("\n"); })(), audienceType, commentaryTone, humiliationWager, winnerPrize, heroine: fH, betters, betFormat, setting, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, activeVillain: isFirst ? betters[0] : currentVillain, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -238,6 +240,18 @@ export default function BettingPoolMode({ onBack }: Props) {
             <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>COMMENTARY TONE</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
               {[{"id":"crude_betting","icon":"🎲","label":"Crude Betting Talk"},{"id":"clinical_scoring","icon":"📋","label":"Clinical Scoring"},{"id":"excited_crowd","icon":"📢","label":"Excited Crowd"},{"id":"silent_tension","icon":"🤫","label":"Tense Silence"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCommentaryTone(commentaryTone === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${commentaryTone === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:commentaryTone === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:commentaryTone === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:commentaryTone === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>HUMILIATION WAGER</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"kneel_on_command",icon:"🫳",label:"Kneel on Command"},{id:"call_herself_property",icon:"💬",label:"Calls Herself Their Property"},{id:"beg_for_mercy",icon:"😭",label:"Beg for Mercy — Named & Specific"},{id:"surrender_the_symbol",icon:"👗",label:"Surrender Her Symbol"},{id:"pose_for_record",icon:"📸",label:"Pose for the Record"},{id:"stop_fighting",icon:"🔇",label:"Stop Fighting Entirely"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setHumiliationWager(humiliationWager === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${humiliationWager === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:humiliationWager === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:humiliationWager === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:humiliationWager === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WINNER'S PRIZE</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"undisputed_first_claim",icon:"🏆",label:"Undisputed First Claim"},{id:"names_her_title",icon:"📖",label:"Names Her New Title"},{id:"chooses_next_scene",icon:"🎬",label:"Chooses What Happens Next"},{id:"temporary_ownership",icon:"👑",label:"Temporary Full Ownership"},{id:"public_bragging",icon:"🎙️",label:"Public Bragging Rights"},{id:"permanent_marking",icon:"🔖",label:"Permanent Marking Rights"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setWinnerPrize(winnerPrize === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${winnerPrize === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:winnerPrize === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:winnerPrize === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:winnerPrize === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
             </div>
           </div>
           </div>
