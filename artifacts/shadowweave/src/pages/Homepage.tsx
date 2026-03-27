@@ -86,7 +86,7 @@ function getDailyScenario() {
 }
 
 function PrimaryCard({
-  num, icon, iconImg, tagline, title, desc, stats, features, cta,
+  num, icon, iconImg, tagline, title, desc, stats, cta,
   accent, r, g, b, onClick,
 }: {
   num: string; icon: string; iconImg?: string; tagline: string; title: string; desc: string;
@@ -105,68 +105,56 @@ function PrimaryCard({
       className="hp-primary-card"
       style={{
         position: "relative",
-        borderRadius: "18px",
+        borderRadius: "20px",
         overflow: "hidden",
         cursor: "pointer",
-        height: "340px",
+        height: "400px",
         flexShrink: 0,
-        border: `1px solid ${hov ? `rgba(${rgb},0.7)` : `rgba(${rgb},0.18)` }`,
+        border: `1px solid ${hov ? `rgba(${rgb},0.65)` : `rgba(${rgb},0.15)`}`,
         boxShadow: hov
-          ? `0 0 0 1px rgba(${rgb},0.25), 0 24px 80px rgba(${rgb},0.35), 0 0 120px rgba(${rgb},0.1) inset`
-          : `0 4px 32px rgba(0,0,0,0.6), 0 0 0 0px rgba(${rgb},0)`,
-        transition: "box-shadow 0.35s, border-color 0.35s, transform 0.3s",
-        transform: hov ? "translateY(-5px) scale(1.01)" : "translateY(0) scale(1)",
+          ? `0 0 0 1px rgba(${rgb},0.2), 0 32px 80px rgba(${rgb},0.3), 0 0 100px rgba(${rgb},0.08) inset`
+          : `0 8px 40px rgba(0,0,0,0.7)`,
+        transition: "box-shadow 0.4s, border-color 0.4s, transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",
+        transform: hov ? "translateY(-6px)" : "translateY(0)",
       }}
     >
       {/* Full-bleed background image */}
       {iconImg && (
-        <img
-          src={iconImg}
-          alt={icon}
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover",
-            objectPosition: "center top",
-            opacity: hov ? 0.62 : 0.42,
-            transform: hov ? "scale(1.08)" : "scale(1)",
-            transition: "opacity 0.4s, transform 0.5s ease",
-          }}
-        />
+        <img src={iconImg} alt={icon} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: hov ? 0.6 : 0.35, transform: hov ? "scale(1.06)" : "scale(1)", transition: "opacity 0.5s, transform 0.6s ease" }} />
       )}
 
-      {/* Gradient overlays */}
-      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(4,1,12,0.98) 0%, rgba(4,1,12,0.75) 38%, rgba(4,1,12,0.15) 70%, transparent 100%)` }} />
-      <div style={{ position: "absolute", inset: 0, background: hov ? `radial-gradient(ellipse at 50% 0%, rgba(${rgb},0.18) 0%, transparent 65%)` : "none", transition: "opacity 0.4s" }} />
+      {/* Multi-stop gradient overlay */}
+      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(4,1,14,1) 0%, rgba(4,1,14,0.92) 25%, rgba(4,1,14,0.55) 55%, rgba(4,1,14,0.1) 80%, transparent 100%)` }} />
+      <div style={{ position: "absolute", inset: 0, background: hov ? `radial-gradient(ellipse at 50% 0%, rgba(${rgb},0.14) 0%, transparent 60%)` : "none", transition: "opacity 0.5s" }} />
 
-      {/* Top shimmer line */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${rgb},${hov ? 1 : 0.4}) 40%, rgba(${rgb},${hov ? 1 : 0.4}) 60%, transparent)`, transition: "opacity 0.4s" }} />
+      {/* Top accent line */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, transparent 0%, rgba(${rgb},${hov ? 0.95 : 0.35}) 30%, rgba(${rgb},${hov ? 0.95 : 0.35}) 70%, transparent 100%)`, transition: "opacity 0.4s" }} />
 
-      {/* Tagline badge top-right */}
-      <div style={{ position: "absolute", top: "1rem", right: "1rem", fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "3px", color: `rgba(${rgb},${hov ? 0.9 : 0.55})`, textTransform: "uppercase", background: `rgba(${rgb},0.1)`, border: `1px solid rgba(${rgb},0.2)`, borderRadius: "30px", padding: "3px 10px", backdropFilter: "blur(8px)", transition: "color 0.3s" }}>{tagline}</div>
-
-      {/* Roman numeral watermark */}
-      <div style={{ position: "absolute", top: "0.8rem", left: "1.1rem", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 900, color: `rgba(${rgb},${hov ? 0.55 : 0.28})`, letterSpacing: "2px", transition: "color 0.35s" }}>{num}</div>
+      {/* Top metadata */}
+      <div style={{ position: "absolute", top: "1.1rem", left: "1.2rem", right: "1.2rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.88rem", fontWeight: 900, color: `rgba(${rgb},${hov ? 0.6 : 0.22})`, letterSpacing: "2px", transition: "color 0.4s" }}>{num}</span>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "3px", color: `rgba(${rgb},${hov ? 0.85 : 0.45})`, textTransform: "uppercase", background: `rgba(${rgb},0.1)`, border: `1px solid rgba(${rgb},${hov ? 0.35 : 0.15})`, borderRadius: "30px", padding: "4px 12px", backdropFilter: "blur(12px)", transition: "all 0.35s" }}>{tagline}</span>
+      </div>
 
       {/* Bottom content */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.4rem 1.5rem 1.3rem" }}>
-        <h2 style={{ margin: "0 0 0.4rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.1rem, 2vw, 1.45rem)", fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.1, color: hov ? "#FFF" : `rgba(230,225,255,0.88)`, transition: "color 0.3s", textShadow: hov ? `0 0 40px rgba(${rgb},0.8)` : "none" }}>{title}</h2>
-        <p style={{ margin: "0 0 0.9rem", fontSize: "0.68rem", color: hov ? "rgba(220,215,240,0.55)" : "rgba(200,195,225,0.35)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.65, transition: "color 0.3s" }}>{desc}</p>
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.75rem 1.6rem 1.5rem" }}>
+        <h2 style={{ margin: "0 0 0.55rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(1.2rem, 2.2vw, 1.6rem)", fontWeight: 900, letterSpacing: "0.07em", lineHeight: 1.05, color: hov ? "#FFF" : "rgba(235,230,255,0.9)", transition: "color 0.3s, text-shadow 0.3s", textShadow: hov ? `0 0 50px rgba(${rgb},0.7)` : "none" }}>{title}</h2>
+        <p style={{ margin: "0 0 1.1rem", fontSize: "0.7rem", color: hov ? "rgba(220,215,245,0.6)" : "rgba(200,195,230,0.32)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.7, transition: "color 0.3s" }}>{desc}</p>
 
-        {/* Stats row */}
-        <div style={{ display: "flex", gap: "1.2rem", marginBottom: "0.9rem", paddingBottom: "0.75rem", borderBottom: `1px solid rgba(${rgb},${hov ? 0.2 : 0.08})`, transition: "border-color 0.3s" }}>
+        {/* Stats */}
+        <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem", paddingBottom: "0.85rem", borderBottom: `1px solid rgba(${rgb},${hov ? 0.18 : 0.07})`, transition: "border-color 0.3s" }}>
           {stats.map(([v, l]) => (
             <div key={l}>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: hov ? accent : `rgba(${rgb},0.75)`, lineHeight: 1, transition: "color 0.3s", textShadow: hov ? `0 0 20px rgba(${rgb},0.9)` : "none" }}>{v}</div>
-              <div style={{ fontSize: "0.38rem", color: `rgba(${rgb},0.38)`, letterSpacing: "2px", textTransform: "uppercase", marginTop: "3px" }}>{l}</div>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.1rem", fontWeight: 900, color: hov ? accent : `rgba(${rgb},0.7)`, lineHeight: 1, transition: "color 0.3s, text-shadow 0.3s", textShadow: hov ? `0 0 24px rgba(${rgb},0.8)` : "none" }}>{v}</div>
+              <div style={{ fontSize: "0.37rem", color: `rgba(${rgb},0.4)`, letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "4px", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{l}</div>
             </div>
           ))}
         </div>
 
         {/* CTA */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.62rem 1rem", background: hov ? `rgba(${rgb},0.18)` : `rgba(${rgb},0.07)`, border: `1px solid ${hov ? `rgba(${rgb},0.55)` : `rgba(${rgb},0.14)`}`, borderRadius: "10px", transition: "all 0.3s", backdropFilter: "blur(10px)" }}>
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "2.5px", textTransform: "uppercase", color: hov ? accent : `rgba(${rgb},0.55)`, transition: "color 0.3s", fontWeight: 700, textShadow: hov ? `0 0 16px rgba(${rgb},1)` : "none" }}>{cta}</span>
-          <span style={{ color: hov ? accent : `rgba(${rgb},0.3)`, transition: "all 0.3s", fontSize: "0.9rem", transform: hov ? "translateX(4px)" : "none", display: "inline-block", textShadow: hov ? `0 0 12px rgba(${rgb},1)` : "none" }}>→</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 1.1rem", background: hov ? `rgba(${rgb},0.2)` : `rgba(${rgb},0.06)`, border: `1px solid ${hov ? `rgba(${rgb},0.6)` : `rgba(${rgb},0.12)`}`, borderRadius: "12px", transition: "all 0.3s", backdropFilter: "blur(16px)" }}>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "2.5px", textTransform: "uppercase", color: hov ? accent : `rgba(${rgb},0.5)`, transition: "color 0.3s", fontWeight: 700, textShadow: hov ? `0 0 18px rgba(${rgb},0.9)` : "none" }}>{cta}</span>
+          <span style={{ color: hov ? accent : `rgba(${rgb},0.25)`, transition: "all 0.3s", fontSize: "1rem", transform: hov ? "translateX(5px)" : "none", display: "inline-block", textShadow: hov ? `0 0 14px rgba(${rgb},1)` : "none" }}>→</span>
         </div>
       </div>
     </div>
@@ -186,38 +174,43 @@ function SubCard({ icon, iconImg, title, desc, accent, r, g, b, badge, onClick }
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative",
-        background: hov ? `rgba(${rgb},0.1)` : "rgba(8,3,18,0.7)",
-        border: `1px solid ${hov ? `rgba(${rgb},0.5)` : `rgba(${rgb},0.12)`}`,
-        borderRadius: "12px",
-        padding: "0.75rem 0.9rem",
+        background: hov ? `rgba(${rgb},0.09)` : "rgba(6,2,16,0.75)",
+        border: `1px solid ${hov ? `rgba(${rgb},0.45)` : `rgba(${rgb},0.1)`}`,
+        borderRadius: "14px",
+        padding: "0.95rem 1rem 0.95rem 1.1rem",
         cursor: "pointer",
-        transition: "all 0.22s ease",
+        transition: "all 0.25s ease",
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
-        gap: "0.7rem",
-        boxShadow: hov ? `0 4px 24px rgba(${rgb},0.18), 0 0 0 1px rgba(${rgb},0.08)` : "none",
-        backdropFilter: "blur(8px)",
+        gap: "0.85rem",
+        boxShadow: hov ? `0 8px 30px rgba(${rgb},0.16)` : "none",
+        backdropFilter: "blur(12px)",
+        transform: hov ? "translateX(2px)" : "translateX(0)",
       }}
     >
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", background: hov ? `linear-gradient(to bottom, transparent, rgba(${rgb},0.9), transparent)` : `rgba(${rgb},0.2)`, transition: "all 0.25s", borderRadius: "12px 0 0 12px" }} />
+      {/* Left accent bar */}
+      <div style={{ position: "absolute", left: 0, top: "15%", bottom: "15%", width: "3px", background: hov ? `linear-gradient(to bottom, transparent, ${accent}, transparent)` : `rgba(${rgb},0.18)`, transition: "all 0.3s", borderRadius: "0 2px 2px 0" }} />
 
-      <div style={{ width: "38px", height: "38px", borderRadius: "10px", overflow: "hidden", border: `1px solid rgba(${rgb},${hov ? 0.4 : 0.15})`, flexShrink: 0, transition: "border-color 0.25s, box-shadow 0.25s", boxShadow: hov ? `0 0 16px rgba(${rgb},0.5)` : "none" }}>
+      {/* Thumbnail */}
+      <div style={{ width: "46px", height: "46px", borderRadius: "12px", overflow: "hidden", border: `1px solid rgba(${rgb},${hov ? 0.5 : 0.14})`, flexShrink: 0, transition: "all 0.25s", boxShadow: hov ? `0 0 20px rgba(${rgb},0.4)` : "none" }}>
         {iconImg
-          ? <img src={iconImg} alt={icon} style={{ width: "38px", height: "38px", objectFit: "cover", display: "block" }} />
-          : <div style={{ width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", background: `rgba(${rgb},0.1)` }}>{icon}</div>
+          ? <img src={iconImg} alt={icon} style={{ width: "46px", height: "46px", objectFit: "cover", display: "block" }} />
+          : <div style={{ width: "46px", height: "46px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", background: `rgba(${rgb},0.1)` }}>{icon}</div>
         }
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.14rem" }}>
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.7rem", fontWeight: 700, color: hov ? "#FFF" : `rgba(225,220,245,0.72)`, transition: "color 0.22s", letterSpacing: "0.02em" }}>{title}</span>
-          {badge && <span style={{ fontSize: "0.36rem", letterSpacing: "1.5px", padding: "2px 6px", borderRadius: "4px", background: `rgba(${rgb},0.18)`, color: accent, fontFamily: "'Cinzel', serif", textTransform: "uppercase", flexShrink: 0, border: `1px solid rgba(${rgb},0.22)` }}>{badge}</span>}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.74rem", fontWeight: 700, color: hov ? "#FFF" : "rgba(230,225,255,0.75)", transition: "color 0.22s", letterSpacing: "0.04em" }}>{title}</span>
+          {badge && <span style={{ fontSize: "0.38rem", letterSpacing: "1.5px", padding: "2px 7px", borderRadius: "6px", background: `rgba(${rgb},0.18)`, color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase", flexShrink: 0, border: `1px solid rgba(${rgb},0.25)` }}>{badge}</span>}
         </div>
-        <div style={{ fontSize: "0.6rem", color: "rgba(200,195,225,0.3)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.45, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{desc}</div>
+        <div style={{ fontSize: "0.62rem", color: "rgba(200,195,225,0.28)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{desc}</div>
       </div>
 
-      <span style={{ fontSize: "0.7rem", color: hov ? accent : "rgba(255,255,255,0.1)", transition: "all 0.22s", flexShrink: 0, transform: hov ? "translateX(3px)" : "none", display: "inline-block", textShadow: hov ? `0 0 10px rgba(${rgb},1)` : "none" }}>→</span>
+      <div style={{ flexShrink: 0, width: "24px", height: "24px", borderRadius: "8px", background: hov ? `rgba(${rgb},0.18)` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.22s" }}>
+        <span style={{ fontSize: "0.75rem", color: hov ? accent : `rgba(${rgb},0.2)`, transition: "all 0.22s", transform: hov ? "translateX(2px)" : "none", display: "inline-block" }}>→</span>
+      </div>
     </div>
   );
 }
@@ -233,15 +226,15 @@ function ToolTile({ icon, title, desc, hex, r, g, b, onClick }: {
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{ position: "relative", background: hov ? `rgba(${rgb},0.1)` : "rgba(6,2,14,0.6)", border: `1px solid ${hov ? `rgba(${rgb},0.4)` : `rgba(${rgb},0.1)`}`, borderRadius: "12px", padding: "0.85rem 1rem", cursor: "pointer", transition: "all 0.22s", display: "flex", alignItems: "center", gap: "0.7rem", overflow: "hidden", backdropFilter: "blur(8px)", boxShadow: hov ? `0 0 24px rgba(${rgb},0.15)` : "none" }}
+      style={{ position: "relative", background: hov ? `rgba(${rgb},0.09)` : "rgba(5,1,14,0.7)", border: `1px solid ${hov ? `rgba(${rgb},0.38)` : `rgba(${rgb},0.09)`}`, borderRadius: "14px", padding: "1rem 1.1rem", cursor: "pointer", transition: "all 0.25s cubic-bezier(0.25,0.46,0.45,0.94)", display: "flex", alignItems: "center", gap: "0.85rem", overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: hov ? `0 8px 28px rgba(${rgb},0.14)` : "none", transform: hov ? "translateY(-2px)" : "none" }}
     >
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "2px", background: hov ? hex : "transparent", transition: "background 0.25s", borderRadius: "12px 0 0 12px" }} />
-      <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: `rgba(${rgb},${hov ? 0.15 : 0.07})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 8px rgba(${rgb},0.7))` : "none" }}>{icon}</div>
+      <div style={{ position: "absolute", left: 0, top: "20%", bottom: "20%", width: "2px", background: hov ? `linear-gradient(to bottom, transparent, ${hex}, transparent)` : "transparent", transition: "all 0.3s", borderRadius: "0 2px 2px 0" }} />
+      <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: hov ? `rgba(${rgb},0.18)` : `rgba(${rgb},0.07)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.05rem", flexShrink: 0, transition: "all 0.25s", filter: hov ? `drop-shadow(0 0 10px rgba(${rgb},0.75))` : "none", border: `1px solid rgba(${rgb},${hov ? 0.3 : 0.07})` }}>{icon}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.7rem", fontWeight: 700, color: hov ? "#FFF" : "rgba(220,215,240,0.52)", letterSpacing: "0.03em", transition: "color 0.25s", marginBottom: "0.15rem" }}>{title}</div>
-        <div style={{ fontSize: "0.61rem", color: "rgba(200,195,225,0.22)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{desc}</div>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: hov ? "#FFF" : "rgba(220,215,245,0.55)", letterSpacing: "0.03em", transition: "color 0.25s", marginBottom: "0.2rem" }}>{title}</div>
+        <div style={{ fontSize: "0.6rem", color: "rgba(200,195,225,0.22)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.45, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{desc}</div>
       </div>
-      <span style={{ fontSize: "0.75rem", color: hov ? `rgba(${rgb},0.7)` : "rgba(255,255,255,0.07)", transition: "all 0.25s", flexShrink: 0 }}>→</span>
+      <span style={{ fontSize: "0.7rem", color: hov ? `rgba(${rgb},0.7)` : "rgba(255,255,255,0.06)", transition: "all 0.25s", flexShrink: 0, transform: hov ? "translateX(3px)" : "none", display: "inline-block" }}>→</span>
     </div>
   );
 }
@@ -359,61 +352,64 @@ function SpecialistChip({ icon, title, badge, accent, r, g, b, completed, onClic
         position: "relative",
         display: "flex",
         alignItems: "center",
-        gap: "0.5rem",
-        padding: "0.52rem 0.7rem 0.52rem 0.85rem",
-        background: hov ? `rgba(${rgb},0.12)` : `rgba(${rgb},0.045)`,
-        border: `1px solid rgba(${rgb},${hov ? 0.5 : 0.16})`,
-        borderLeft: `3px solid ${hov ? accent : `rgba(${rgb},0.35)`}`,
-        borderRadius: "9px",
+        gap: "0.65rem",
+        padding: "0.65rem 0.85rem 0.65rem 0.95rem",
+        background: hov ? `rgba(${rgb},0.11)` : `rgba(${rgb},0.035)`,
+        border: `1px solid rgba(${rgb},${hov ? 0.45 : 0.13})`,
+        borderLeft: `3px solid ${hov ? accent : `rgba(${rgb},0.28)`}`,
+        borderRadius: "11px",
         cursor: "pointer",
         textAlign: "left",
-        transition: "all 0.2s cubic-bezier(0.25,0.46,0.45,0.94)",
-        transform: hov ? "translateY(-2px)" : "translateY(0)",
-        boxShadow: hov ? `0 6px 20px rgba(${rgb},0.2)` : "none",
+        transition: "all 0.22s cubic-bezier(0.25,0.46,0.45,0.94)",
+        transform: hov ? "translateX(3px)" : "translateX(0)",
+        boxShadow: hov ? `0 4px 22px rgba(${rgb},0.18)` : "none",
         width: "100%",
         overflow: "hidden",
+        backdropFilter: "blur(8px)",
       }}
     >
-      {/* Icon + completion badge */}
+      {/* Icon */}
       <div style={{ position: "relative", flexShrink: 0 }}>
         <div style={{
-          width: "28px", height: "28px", borderRadius: "7px",
-          background: hov ? `rgba(${rgb},0.2)` : (completed ? `rgba(${rgb},0.14)` : `rgba(${rgb},0.09)`),
+          width: "32px", height: "32px", borderRadius: "9px",
+          background: hov ? `rgba(${rgb},0.22)` : (completed ? `rgba(${rgb},0.13)` : `rgba(${rgb},0.07)`),
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "0.9rem", transition: "all 0.2s",
-          filter: hov ? `drop-shadow(0 0 6px rgba(${rgb},0.8))` : (completed ? `drop-shadow(0 0 4px rgba(${rgb},0.45))` : "none"),
-          border: `1px solid rgba(${rgb},${hov ? 0.35 : completed ? 0.28 : 0.12})`,
+          fontSize: "1rem", transition: "all 0.22s",
+          filter: hov ? `drop-shadow(0 0 8px rgba(${rgb},0.85))` : (completed ? `drop-shadow(0 0 4px rgba(${rgb},0.4))` : "none"),
+          border: `1px solid rgba(${rgb},${hov ? 0.4 : completed ? 0.25 : 0.1})`,
         }}>{icon}</div>
         {completed && (
           <div style={{
-            position: "absolute", top: "-4px", right: "-4px",
-            width: "10px", height: "10px", borderRadius: "50%",
-            background: accent,
-            border: "1.5px solid rgba(4,1,12,0.9)",
-            boxShadow: `0 0 6px ${accent}`,
+            position: "absolute", top: "-3px", right: "-3px",
+            width: "11px", height: "11px", borderRadius: "50%",
+            background: accent, border: "1.5px solid rgba(4,1,14,0.95)",
+            boxShadow: `0 0 7px ${accent}`,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "0.35rem", color: "#000", fontWeight: 900,
+            fontSize: "0.38rem", color: "#000", fontWeight: 900,
           }}>✓</div>
         )}
       </div>
+
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.02em",
-          color: hov ? "#FFF" : `rgba(225,220,248,0.68)`, transition: "color 0.2s",
+          fontFamily: "'Cinzel', serif", fontSize: "0.66rem", fontWeight: 700, letterSpacing: "0.03em",
+          color: hov ? "#FFF" : "rgba(228,223,252,0.72)", transition: "color 0.2s",
           lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
         }}>{title}</div>
         <div style={{
-          fontSize: "0.4rem", letterSpacing: "1.5px", color: hov ? accent : `rgba(${rgb},0.45)`,
-          fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", marginTop: "2px",
+          fontSize: "0.41rem", letterSpacing: "1.5px", color: hov ? accent : `rgba(${rgb},0.4)`,
+          fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", marginTop: "3px",
           transition: "color 0.2s", fontWeight: 700,
         }}>{badge}</div>
       </div>
+
       {/* Arrow */}
       <span style={{
-        fontSize: "0.6rem", color: hov ? accent : `rgba(${rgb},0.2)`,
-        flexShrink: 0, transition: "all 0.2s",
-        transform: hov ? "translateX(2px)" : "none", display: "inline-block",
+        fontSize: "0.65rem", color: hov ? accent : `rgba(${rgb},0.18)`,
+        flexShrink: 0, transition: "all 0.22s",
+        transform: hov ? "translateX(3px)" : "none", display: "inline-block",
+        textShadow: hov ? `0 0 10px rgba(${rgb},0.9)` : "none",
       }}>→</span>
     </button>
   );
@@ -450,10 +446,10 @@ function RecentModeChip({ rm, onClick }: { rm: RecentMode; onClick: () => void }
 
 function SectionLabel({ label, r, g, b }: { label: string; r: number; g: number; b: number }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", margin: "0.4rem 0 0.5rem" }}>
-      <div style={{ width: "20px", height: "1px", background: `rgba(${r},${g},${b},0.4)` }} />
-      <span style={{ fontSize: "0.4rem", letterSpacing: "4px", textTransform: "uppercase", color: `rgba(${r},${g},${b},0.5)`, fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>{label}</span>
-      <div style={{ flex: 1, height: "1px", background: `linear-gradient(90deg, rgba(${r},${g},${b},0.22), transparent)` }} />
+    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "0.85rem 0 0.6rem" }}>
+      <div style={{ width: "4px", height: "16px", borderRadius: "2px", background: `linear-gradient(to bottom, rgba(${r},${g},${b},0.85), rgba(${r},${g},${b},0.2))`, flexShrink: 0 }} />
+      <span style={{ fontSize: "0.44rem", letterSpacing: "4px", textTransform: "uppercase", color: `rgba(${r},${g},${b},0.7)`, fontWeight: 700, fontFamily: "'Montserrat', sans-serif", whiteSpace: "nowrap" }}>{label}</span>
+      <div style={{ flex: 1, height: "1px", background: `linear-gradient(90deg, rgba(${r},${g},${b},0.2), transparent)` }} />
     </div>
   );
 }
@@ -769,7 +765,7 @@ export default function Homepage(props: HomepageProps) {
       )}
 
       {/* ─── THREE COLUMNS ─── */}
-      <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.4rem", padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.14s ease both" : "none" }}>
+      <div className="hp-pad hp-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.6rem", padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.14s ease both" : "none" }}>
 
         {/* ══ COL 1: HEROINE FORGE + SPECIALIST MODES ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
@@ -782,7 +778,7 @@ export default function Homepage(props: HomepageProps) {
             onClick={props.onSuperheroMode}
           />
           <SectionLabel label="Specialist Modes" r={168} g={85} b={247} />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
             <SpecialistChip icon="🌀" title="Mind Break" badge="Psych · 5 phases" accent="#C084FC" r={192} g={132} b={252} completed={completedModes.includes("Mind Break Chamber")} onClick={props.onMindBreak} />
             <SpecialistChip icon="⛓" title="Two Heroines" badge="Duo · Shared Cell" accent="#34D399" r={52} g={211} b={153} completed={completedModes.includes("Two Heroines One Cell")} onClick={props.onDualCapture} />
             <SpecialistChip icon="🕸" title="Rescue Gone Wrong" badge="Trap · Ambush" accent="#FB923C" r={251} g={146} b={60} completed={completedModes.includes("Rescue Gone Wrong")} onClick={props.onRescueGoneWrong} />
