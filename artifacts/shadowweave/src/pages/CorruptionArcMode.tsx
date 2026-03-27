@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -94,7 +95,7 @@ export default function CorruptionArcMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/corruption-arc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fHeroine, villain: fVillain, setting, corruptionMethod: fMethod, chapters: isFirst ? [] : chapters, continueDir }),
         signal: ctrl.signal,
       });
       const reader = resp.body!.getReader();

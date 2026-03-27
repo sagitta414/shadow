@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 
 const CATEGORIES = [
   { id: "betrayal",    icon: "🗡", label: "Betrayal",     desc: "A trusted ally turns" },
@@ -27,7 +28,7 @@ export default function PlotTwistInjector() {
       const res = await fetch("/api/plot-twist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category: selected }),
+        body: JSON.stringify({ provider: getAiProvider(), category: selected }),
       });
       const data = await res.json();
       setTwist(data.twist ?? "The story breaks — nothing is what it seemed.");

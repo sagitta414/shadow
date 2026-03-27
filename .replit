@@ -29,3 +29,5 @@ timeoutMs = 20000
 
 [userenv.shared]
 VENICE_API_KEY = "VENICE_ADMIN_KEY_FS141xKqKaUt8ImKl8rNJ88XVSqe9yAMX_ZhsgGLOR"
+NOVELAI_API_KEY = "pst-h87XpeQ4Sc5S0NZy7whc3qfI1cNm5ojiSzveRBkthK2FAPl5Z21onCgqPzTAD0Ji"
+ADMIN_KEY = "shadow-admin-2026"

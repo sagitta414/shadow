@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -91,7 +92,7 @@ export default function LongGameMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/long-game`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, villain: fV, endgame, coverStory, setting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1, timestamp: isFirst ? TIMESTAMPS[0] : timestamp, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

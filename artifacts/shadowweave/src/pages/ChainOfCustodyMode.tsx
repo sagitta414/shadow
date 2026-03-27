@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -71,7 +72,7 @@ export default function ChainOfCustodyMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/chain-of-custody`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fH, currentCaptor: isFirst ? firstCaptor : (fNext || ""), previousChain: isFirst ? [] : chain, transferType, firstSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1 }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, currentCaptor: isFirst ? firstCaptor : (fNext || ""), previousChain: isFirst ? [] : chain, transferType, firstSetting, chapters: isFirst ? [] : chapters, chapterNumber: isFirst ? 1 : chapters.length + 1 }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

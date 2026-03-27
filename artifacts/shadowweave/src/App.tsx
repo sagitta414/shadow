@@ -49,6 +49,7 @@ import SessionTimer from "./components/SessionTimer";
 import NightmareOverlay from "./components/NightmareOverlay";
 import PlotTwistInjector from "./components/PlotTwistInjector";
 import WelcomeCard from "./components/WelcomeCard";
+import AiProviderBadge from "./components/AiProviderBadge";
 import { recordStoryDay } from "./lib/streak";
 import { recordModeVisit } from "./lib/recentModes";
 
@@ -229,6 +230,7 @@ function AppInner() {
           <AchievementToastManager />
           {STORY_MODE_PAGES.has(page) && <SessionTimer key={page} pageKey={page} />}
           {STORY_MODE_PAGES.has(page) && <PlotTwistInjector />}
+          <AiProviderBadge />
         </>
       )}
 

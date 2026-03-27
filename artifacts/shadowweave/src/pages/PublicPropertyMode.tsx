@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -93,7 +94,7 @@ export default function PublicPropertyMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/public-property`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, orchestrator: fO, exposureMethod, accessTerms, location, encounterPool, chapters: isFirst ? [] : chapters, encounterNumber: isFirst ? 1 : encounterNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

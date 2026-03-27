@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { useIsMobile } from "../hooks/useIsMobile";
 
 interface Props {
@@ -97,12 +98,10 @@ export default function InterrogationRoom({ onBack }: Props) {
       const res = await fetch("/api/story/interrogation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          heroine: heroineName.trim(),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: heroineName.trim(),
           villain: villainLabel,
           weaknesses: weaknessNotes.trim() || undefined,
-          messages: msgs,
-        }),
+          messages: msgs, }),
       });
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
       const reader = res.body.getReader();

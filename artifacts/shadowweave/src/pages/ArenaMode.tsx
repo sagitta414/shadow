@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -78,7 +79,7 @@ export default function ArenaMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/arena-mode`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), fighters: allFighters, promoter, crowdType, powerSuppression, stakes, chapters: isFirst ? [] : chapters, matchNumber: isFirst ? 1 : matchNum, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

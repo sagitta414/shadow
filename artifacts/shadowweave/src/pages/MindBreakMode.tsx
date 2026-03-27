@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -70,11 +71,9 @@ export default function MindBreakMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mind-break`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
+        body: JSON.stringify({ provider: getAiProvider(), heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
           breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase,
-          chapters: isFirst ? [] : chapters, continueDir,
-        }),
+          chapters: isFirst ? [] : chapters, continueDir, }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

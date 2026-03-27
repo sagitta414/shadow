@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 
 interface HistoryEntry {
   scene: string;
@@ -26,7 +27,7 @@ async function generateScene(
   const res = await fetch(`/api/story/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ characterParams, history, chosenAction }),
+    body: JSON.stringify({ provider: getAiProvider(), characterParams, history, chosenAction }),
   });
 
   if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 
 interface CaptorLogicProps {
   onBack: () => void;
@@ -92,7 +93,7 @@ export default function CaptorLogic({ onBack }: CaptorLogicProps) {
       const res = await fetch("/api/story/captor-logic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rules: filledRules, goals: filledGoals, situation, captorProfile }),
+        body: JSON.stringify({ provider: getAiProvider(), rules: filledRules, goals: filledGoals, situation, captorProfile }),
       });
 
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);

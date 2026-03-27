@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -73,7 +74,7 @@ export default function RescueGoneWrongMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/rescue-failed`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), captive: fCaptive, rescuer: fRescuer, villain: fVillain, setting, failReason: fFail, chapters: isFirst ? [] : chapters, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

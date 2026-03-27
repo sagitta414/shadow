@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -72,7 +73,7 @@ export default function TheHandlerMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/the-handler`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, handlerType, handlerName: handlerDisplayName, handlerDesc: fHT?.desc ?? "", facility, protocol, chapters: isFirst ? [] : chapters, sessionNumber: isFirst ? 1 : chapters.length + 1, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

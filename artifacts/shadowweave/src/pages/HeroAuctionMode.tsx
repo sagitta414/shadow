@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -134,16 +135,14 @@ export default function HeroAuctionMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/hero-auction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          heroes: allHeroes,
+        body: JSON.stringify({ provider: getAiProvider(), heroes: allHeroes,
           auctioneer: finalAuctioneer,
           bidders: selectedBidders,
           setting,
           auctionType,
           chapters: isFirst ? [] : chapters,
           roundNumber: isFirst ? 1 : roundNum,
-          continueDir,
-        }),
+          continueDir, }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

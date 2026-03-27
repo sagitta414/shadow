@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
 
 interface Props { onBack: () => void; }
@@ -91,7 +92,7 @@ export default function ShowcaseMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/showcase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
+        body: JSON.stringify({ provider: getAiProvider(), heroine: fH, director: fD, occasion, audience, directives, chapters: isFirst ? [] : chapters, phaseNumber: isFirst ? 1 : phaseIdx + 1, phaseName: isFirst ? PHASES[0] : PHASES[phaseIdx] ?? "Final Phase", continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();

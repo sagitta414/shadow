@@ -27,7 +27,9 @@
 - **Recently Visited Modes** — homepage "Jump Back In" chip row (last 6 modes); tracked via `sw_recent_modes_v1`; powered by `lib/recentModes.ts`
 - **Studio Stats Bar** — homepage live stats (total stories, words, heroines used, modes tried) computed from archive; visible once ≥1 story exists
 - **Star Ratings** — 1–5 star rating on each archived story; shown in card header; sortable; "Top Rated" sort option in archive
-- **Venice AI** — `venice-uncensored-role-play` model for all 11 story endpoints; `lustify-v7` for portraits; zero safety restrictions
+- **Dual AI Providers** — Venice AI (`venice-uncensored-role-play`) or NovelAI (`kayra-v1`); toggled via bottom-left badge; persisted to `sw_ai_provider_v1` localStorage; all 27 story endpoints + soundboard + plottwist support both providers
+- **Anti-Repetition** — `frequency_penalty: 0.42` + `presence_penalty: 0.32` baked into all Venice calls via `lib/ai.ts`
+- **AiProviderBadge** — fixed bottom-left overlay; shows active engine with glow; click to toggle; Venice=violet, NovelAI=green
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
 
 # Workspace

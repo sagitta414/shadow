@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getAiProvider } from "../lib/aiProvider";
 
 interface SoundingBoardProps {
   onBack: () => void;
@@ -76,11 +77,9 @@ export default function SoundingBoard({ onBack }: SoundingBoardProps) {
       const res = await fetch("/api/story/soundboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
+        body: JSON.stringify({ provider: getAiProvider(), message: text,
           history,
-          systemPrompt: systemWithContext,
-        }),
+          systemPrompt: systemWithContext, }),
       });
 
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
