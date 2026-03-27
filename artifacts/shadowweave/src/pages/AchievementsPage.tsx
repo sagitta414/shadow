@@ -31,18 +31,18 @@ function AchievementCard({ ach, unlocked, unlockedAt, state }: {
       style={{
         position: "relative",
         background: unlocked
-          ? (hov ? `rgba(${pal.rgb}, 0.11)` : `rgba(${pal.rgb}, 0.07)`)
-          : "rgba(8,3,18,0.65)",
+          ? (hov ? `rgba(${pal.rgb}, 0.2)` : `rgba(${pal.rgb}, 0.13)`)
+          : "rgba(22,12,42,0.88)",
         border: `1px solid ${unlocked
-          ? (hov ? `rgba(${pal.rgb}, 0.6)` : `rgba(${pal.rgb}, 0.22)`)
-          : "rgba(255,255,255,0.05)"}`,
+          ? (hov ? `rgba(${pal.rgb}, 0.65)` : `rgba(${pal.rgb}, 0.3)`)
+          : "rgba(255,255,255,0.1)"}`,
         borderRadius: "14px",
         padding: "1rem 1.1rem",
         transition: "all 0.22s ease",
         transform: hov && unlocked ? "translateY(-3px)" : "none",
         boxShadow: hov && unlocked ? `0 8px 28px ${pal.glow}` : "none",
-        opacity: unlocked ? 1 : 0.48,
-        backdropFilter: "blur(10px)",
+        opacity: unlocked ? 1 : 0.75,
+        backdropFilter: "blur(14px)",
         overflow: "hidden",
         display: "flex",
         gap: "0.85rem",
@@ -73,7 +73,7 @@ function AchievementCard({ ach, unlocked, unlockedAt, state }: {
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem", flexWrap: "wrap" }}>
           <span style={{
             fontFamily: "'Cinzel', serif", fontSize: "0.75rem", fontWeight: 700,
-            color: unlocked ? (hov ? "#FFF" : `rgba(230,225,255,0.88)`) : "rgba(180,175,210,0.4)",
+            color: unlocked ? (hov ? "#FFF" : `rgba(235,230,255,0.92)`) : "rgba(200,195,230,0.72)",
             transition: "color 0.22s", letterSpacing: "0.02em",
           }}>
             {hidden ? "???" : ach.title}
@@ -100,13 +100,13 @@ function AchievementCard({ ach, unlocked, unlockedAt, state }: {
           )}
         </div>
 
-        <div style={{ fontSize: "0.6rem", color: hidden ? "rgba(150,145,180,0.25)" : (unlocked ? "rgba(210,205,240,0.45)" : "rgba(160,155,190,0.28)"), fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, marginBottom: prog ? "0.6rem" : "0.2rem" }}>
+        <div style={{ fontSize: "0.6rem", color: hidden ? "rgba(160,155,195,0.45)" : (unlocked ? "rgba(220,215,250,0.72)" : "rgba(185,180,215,0.62)"), fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, marginBottom: prog ? "0.6rem" : "0.2rem" }}>
           {hidden ? "Complete hidden conditions to reveal this achievement." : ach.desc}
         </div>
 
         {/* Lore (only when unlocked) */}
         {unlocked && !hidden && (
-          <div style={{ fontSize: "0.57rem", color: `rgba(${pal.rgb}, 0.5)`, fontFamily: "'Raleway', sans-serif", fontStyle: "italic", lineHeight: 1.45, marginBottom: prog ? "0.6rem" : 0 }}>
+          <div style={{ fontSize: "0.57rem", color: `rgba(${pal.rgb}, 0.78)`, fontFamily: "'Raleway', sans-serif", fontStyle: "italic", lineHeight: 1.45, marginBottom: prog ? "0.6rem" : 0 }}>
             "{ach.lore}"
           </div>
         )}
@@ -115,8 +115,8 @@ function AchievementCard({ ach, unlocked, unlockedAt, state }: {
         {prog && !unlocked && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
-              <span style={{ fontSize: "0.4rem", color: "rgba(180,175,210,0.3)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Progress</span>
-              <span style={{ fontSize: "0.4rem", color: `rgba(${pal.rgb}, 0.4)`, fontFamily: "'Cinzel', serif" }}>{prog[0].toLocaleString()} / {prog[1].toLocaleString()}</span>
+              <span style={{ fontSize: "0.4rem", color: "rgba(190,185,220,0.6)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Progress</span>
+              <span style={{ fontSize: "0.4rem", color: `rgba(${pal.rgb}, 0.72)`, fontFamily: "'Cinzel', serif" }}>{prog[0].toLocaleString()} / {prog[1].toLocaleString()}</span>
             </div>
             <div style={{ height: "3px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${Math.min(100, (prog[0] / prog[1]) * 100)}%`, background: `linear-gradient(90deg, rgba(${pal.rgb},0.5), rgba(${pal.rgb},0.8))`, borderRadius: "2px", transition: "width 0.5s ease" }} />
@@ -126,7 +126,7 @@ function AchievementCard({ ach, unlocked, unlockedAt, state }: {
 
         {/* Unlock date */}
         {unlocked && unlockedAt && (
-          <div style={{ marginTop: "0.3rem", fontSize: "0.38rem", color: "rgba(150,145,180,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>
+          <div style={{ marginTop: "0.3rem", fontSize: "0.38rem", color: "rgba(170,165,200,0.55)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>
             UNLOCKED {new Date(unlockedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }).toUpperCase()}
           </div>
         )}
