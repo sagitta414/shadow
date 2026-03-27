@@ -16,6 +16,13 @@ const SETTINGS = [
   "A hidden fortress — no way out","A luxury prison above the clouds",
   "An underground arena","A deserted island compound","A stolen S.H.I.E.L.D. helicarrier bay",
   "A dungeon beneath a conquered city","A bunker surviving a warzone above",
+  "A villain's private estate — staff loyal to him, no allies for them",
+  "A live recording facility — their captivity is streamed as entertainment",
+  "An underground vault beneath a city they once protected",
+  "A floating platform in international waters — no jurisdiction, no rescue",
+  "A villain syndicate hall — many witnesses, zero sympathy",
+  "Their former hero base — repurposed and defiled by their captor",
+  "A clinical processing facility — they are catalogued and handled like inventory",
 ];
 const DYNAMICS = [
   "Allies who protect each other fiercely",
@@ -25,6 +32,13 @@ const DYNAMICS = [
   "One breaks first and is made to help break the other",
   "Deep trust — but the villain exploits their bond as a weapon",
   "Strangers — they must build trust fast or both fall",
+  "Stripped and compared aloud — their captor rates them against each other openly",
+  "One has already broken — she is used to demonstrate what awaits the other",
+  "Forced to compete for better treatment — only one can earn mercy",
+  "One watches while the other is processed — then they swap",
+  "Their shared history is weaponised — he knows exactly what hurts each of them",
+  "He pits them against each other — the one who resists more suffers more",
+  "Reduced to numbered subjects — all history between them administratively overwritten",
 ];
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -52,6 +66,9 @@ export default function DualCaptureMode({ onBack }: Props) {
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
   const [heroineRelationship, setHeroineRelationship] = useState("");
   const [communicationStatus, setCommunicationStatus] = useState("");
+  const [captorMethod, setCaptorMethod] = useState("");
+  const [bondWeaponised, setBondWeaponised] = useState("");
+  const [whoBreaksFirst, setWhoBreaksFirst] = useState("");
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -72,7 +89,10 @@ export default function DualCaptureMode({ onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _heroineRelationshipMap: Record<string,string> = {"rivals":"Rivals","close_allies":"Close Allies","teammates":"Teammates","strangers":"Strangers","former_enemies":"Former Enemies"};
-      const _communicationStatusMap: Record<string,string> = {"yes_freely":"Yes — Freely","yes_limited":"Yes — Limited","no_separated":"No — Separated","forced_to_watch":"Forced to Watch Each Other"}; return [heroineRelationship ? `Heroine Relationship: ${_heroineRelationshipMap[heroineRelationship] ?? heroineRelationship}` : "", communicationStatus ? `Can They Communicate?: ${_communicationStatusMap[communicationStatus] ?? communicationStatus}` : ""].filter(Boolean).join("\n"); })(), heroineRelationship, communicationStatus, heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
+      const _communicationStatusMap: Record<string,string> = {"yes_freely":"Yes — Freely","yes_limited":"Yes — Limited","no_separated":"No — Separated","forced_to_watch":"Forced to Watch Each Other"}; const _captorMethodMap: Record<string,string> = {"sequential":"Sequential — Full Attention to Each in Turn","comparative":"Comparative — Rates Them Against Each Other Aloud","audience":"Audience — One Watches While He Deals With the Other","alternating":"Alternating — Switches Between Them Unpredictably","competitive":"Competitive — Makes Them Compete for Mercy"};
+      const _bondWeaponisedMap: Record<string,string> = {"threatened":"Threatened — Harm to One Buys Compliance from the Other","witnessed":"Witnessed — Each Must Watch What Happens to the Other","turned":"Turned — He Makes One Betray the Other","dependence":"Dependence — Only by Cooperating With Him Can They Help Each Other","vocal":"Vocal — One Is Made to Instruct the Other What to Do"};
+      const _whoBreaksFirstMap: Record<string,string> = {"heroine1_first":"First Captive Breaks First","heroine2_first":"Second Captive Breaks First","simultaneous":"Both Break at the Same Moment","neither_completely":"Neither Breaks Completely — Resistance Holds"};
+      return [heroineRelationship ? `Heroine Relationship: ${_heroineRelationshipMap[heroineRelationship] ?? heroineRelationship}` : "", communicationStatus ? `Can They Communicate?: ${_communicationStatusMap[communicationStatus] ?? communicationStatus}` : "", captorMethod ? `How the Captor Handles Two Captives: ${_captorMethodMap[captorMethod] ?? captorMethod}` : "", bondWeaponised ? `How Their Bond Is Weaponised: ${_bondWeaponisedMap[bondWeaponised] ?? bondWeaponised}` : "", whoBreaksFirst ? `Who Breaks First: ${_whoBreaksFirstMap[whoBreaksFirst] ?? whoBreaksFirst}` : ""].filter(Boolean).join("\n"); })(), heroineRelationship, communicationStatus, captorMethod, bondWeaponised, whoBreaksFirst, heroine1: fH1, heroine2: fH2, villain: fV, setting, dynamic, chapters: isFirst ? [] : chapters, storyLength, continueDir }),
       });
       const reader = resp.body!.getReader();
       const dec = new TextDecoder();
@@ -197,6 +217,24 @@ export default function DualCaptureMode({ onBack }: Props) {
             <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>CAN THEY COMMUNICATE?</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
               {[{"id":"yes_freely","icon":"💬","label":"Yes — Freely"},{"id":"yes_limited","icon":"🤫","label":"Yes — Limited / Watched"},{"id":"no_separated","icon":"🚫","label":"No — Kept Separated"},{"id":"forced_to_watch","icon":"👁️","label":"Forced to Watch Each Other"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCommunicationStatus(communicationStatus === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${communicationStatus === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:communicationStatus === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:communicationStatus === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:communicationStatus === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>HOW HE HANDLES HAVING TWO</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"sequential",icon:"🎯",label:"Sequential — Full Attention to Each in Turn"},{id:"comparative",icon:"⚖️",label:"Comparative — Rates Them Against Each Other Aloud"},{id:"audience",icon:"🎭",label:"Audience — One Watches While He Deals With the Other"},{id:"alternating",icon:"🔀",label:"Alternating — Switches Between Them Unpredictably"},{id:"competitive",icon:"🏆",label:"Competitive — Makes Them Compete for His Mercy"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setCaptorMethod(captorMethod === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${captorMethod === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:captorMethod === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:captorMethod === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:captorMethod === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0.875rem"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>HOW THEIR BOND IS WEAPONISED</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"threatened",icon:"😢",label:"Threatened — Harm to One Buys Compliance from the Other"},{id:"witnessed",icon:"👁️",label:"Witnessed — Each Must Watch What Happens to the Other"},{id:"turned",icon:"💔",label:"Turned — He Makes One Betray the Other"},{id:"dependence",icon:"🤝",label:"Dependence — Only Through Him Can They Protect Each Other"},{id:"vocal",icon:"🗣️",label:"Vocal — One Is Made to Instruct the Other"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setBondWeaponised(bondWeaponised === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${bondWeaponised === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:bondWeaponised === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:bondWeaponised === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:bondWeaponised === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+            </div>
+          </div>
+          <div style={{marginBottom:"0"}}>
+            <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>WHO BREAKS FIRST</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
+              {[{id:"heroine1_first",icon:"💧",label:"First Captive — She Breaks First"},{id:"heroine2_first",icon:"💧",label:"Second Captive — She Breaks First"},{id:"simultaneous",icon:"⚡",label:"Both Break at the Same Moment"},{id:"neither_completely",icon:"🔥",label:"Neither Breaks Completely — Resistance Holds"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setWhoBreaksFirst(whoBreaksFirst === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${whoBreaksFirst === opt.id ? "#F472B6" : "rgba(200,195,240,0.15)"}`,background:whoBreaksFirst === opt.id ? "rgba(244,114,182,0.16)" : "rgba(255,255,255,0.03)",color:whoBreaksFirst === opt.id ? "#F472B6" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:whoBreaksFirst === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
             </div>
           </div>
           </div>
