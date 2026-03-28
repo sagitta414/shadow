@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
-import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
+import { getUnlockCount, getTotalXP } from "../lib/achievements";
 import { getTopVillains, type VillainStat } from "../lib/infamy";
 import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { getRecentModes, type RecentMode } from "../lib/recentModes";
 import { getArchive } from "../lib/archive";
 
 interface HomepageProps {
@@ -497,15 +496,47 @@ function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, on
   );
 }
 
-// ── RECENT CHIP ───────────────────────────────────────────────────────────────
-function RecentModeChip({ rm, onClick }: { rm: RecentMode; onClick: () => void }) {
+// ── SUB-MODE CARD ─────────────────────────────────────────────────────────────
+function SubModeCard({ icon, title, badge, accent, r, g, b, onClick }: {
+  icon: string; title: string; badge: string; accent: string;
+  r: number; g: number; b: number; onClick: () => void;
+}) {
   const [hov, setHov] = useState(false);
+  const rgb = `${r},${g},${b}`;
   return (
-    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.35rem 0.85rem", background: hov ? "rgba(168,85,247,0.18)" : "rgba(168,85,247,0.07)", border: `1px solid ${hov ? "rgba(168,85,247,0.55)" : "rgba(168,85,247,0.2)"}`, borderRadius: "30px", cursor: "pointer", transition: "all 0.2s", boxShadow: hov ? "0 0 18px rgba(168,85,247,0.22)" : "none" }}>
-      <span style={{ fontSize: "0.75rem" }}>{rm.icon}</span>
-      <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", color: hov ? "rgba(222,192,255,0.95)" : "rgba(192,132,252,0.68)", letterSpacing: "0.5px", fontWeight: 700, whiteSpace: "nowrap", transition: "color 0.2s" }}>{rm.label}</span>
-    </button>
+    <div onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        display: "flex", alignItems: "center", gap: "0.8rem",
+        padding: "0.72rem 0.95rem",
+        background: hov ? `rgba(${rgb},0.11)` : "rgba(5,2,14,0.78)",
+        border: `1px solid ${hov ? `rgba(${rgb},0.48)` : `rgba(${rgb},0.09)`}`,
+        borderRadius: "14px", cursor: "pointer",
+        transition: "all 0.26s cubic-bezier(0.22,1,0.36,1)",
+        transform: hov ? "translateY(-2px)" : "none",
+        boxShadow: hov ? `0 8px 28px rgba(${rgb},0.22), 0 0 0 1px rgba(${rgb},0.08)` : "none",
+        backdropFilter: "blur(16px)", position: "relative", overflow: "hidden",
+      }}>
+      {/* Left glow line */}
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "2px", background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.75 : 0.1}) 40%, rgba(${rgb},${hov ? 0.75 : 0.1}) 60%, transparent)`, transition: "all 0.26s" }} />
+      {/* Shimmer on hover */}
+      {hov && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.03) 50%, transparent 65%)", animation: "shimmerSweep 0.7s ease forwards", pointerEvents: "none" }} />}
+      {/* Icon box */}
+      <div style={{
+        width: "34px", height: "34px", borderRadius: "9px", flexShrink: 0,
+        background: hov ? `rgba(${rgb},0.22)` : `rgba(${rgb},0.06)`,
+        border: `1px solid rgba(${rgb},${hov ? 0.42 : 0.1})`,
+        display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem",
+        filter: hov ? `drop-shadow(0 0 8px rgba(${rgb},0.9))` : "none",
+        boxShadow: hov ? `0 0 18px rgba(${rgb},0.28)` : "none",
+        transition: "all 0.22s",
+      }}>{icon}</div>
+      {/* Text */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.66rem", fontWeight: 700, color: hov ? "#fff" : "rgba(216,210,252,0.68)", letterSpacing: "0.03em", transition: "color 0.2s", textShadow: hov ? `0 0 20px rgba(${rgb},0.7)` : "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
+        <div style={{ fontSize: "0.33rem", letterSpacing: "2px", color: hov ? `rgba(${rgb},0.68)` : `rgba(${rgb},0.28)`, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase", marginTop: "2px", transition: "color 0.2s" }}>{badge}</div>
+      </div>
+      <span style={{ fontSize: "0.55rem", color: hov ? `rgba(${rgb},0.85)` : `rgba(${rgb},0.18)`, transition: "color 0.2s", flexShrink: 0, textShadow: hov ? `0 0 10px rgba(${rgb},0.8)` : "none" }}>→</span>
+    </div>
   );
 }
 
@@ -514,16 +545,13 @@ export default function Homepage(props: HomepageProps) {
   const isMobile = useIsMobile(768);
   const [mounted, setMounted] = useState(false);
   const [showDice, setShowDice] = useState(false);
-  const [activeTab, setActiveTab] = useState("all");
   const [streak] = useState(() => getStreak());
-  const [completedModes] = useState(() => getCompletedModes());
   const [achCount] = useState(() => getUnlockCount());
   const [achXP] = useState(() => getTotalXP());
   const [topVillains] = useState<VillainStat[]>(() => getTopVillains(5));
   const [activitySlots] = useState(() => buildActivitySlots(91));
   const [activitySet] = useState(() => getWritingActivitySet(91));
   const activeDays = activitySet.size;
-  const [recentModes] = useState<RecentMode[]>(() => getRecentModes());
   const [archiveStats] = useState(() => {
     const archive = getArchive();
     const totalWords = archive.reduce((sum, s) => sum + s.wordCount, 0);
@@ -534,31 +562,6 @@ export default function Homepage(props: HomepageProps) {
   useEffect(() => { const t = setTimeout(() => setMounted(true), 60); return () => clearTimeout(t); }, []);
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-
-  const allModes = [
-    { id: "forge",    icon: "⚔", title: "HEROINE FORGE", desc: "181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller.", badge: "Core Mode · 8 Universes", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onSuperheroMode, tag: "Flagship", size: "large" as const, cat: "forge" },
-    { id: "int",      icon: "🔦", title: "INTERROGATION ROOM", desc: "Psychological pressure chamber. Extract information through fear, isolation, and manipulation.", badge: "Psych · High Tension", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onInterrogationRoom, cat: "capture", img: "/icons/interrogation-room.png" },
-    { id: "celeb",    icon: "🎬", title: "CELEBRITY CAPTURE", desc: "Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall.", badge: "Celebrity · Premium", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onCelebrityMode, tag: "Premium", cat: "celebrity" },
-    { id: "daily",    icon: "📅", title: "DAILY SCENARIO", desc: "A fresh AI-crafted scenario every 24 hours. New heroine, captor, and setting at midnight.", badge: "Daily · Refreshes 00:00", accent: "#FCD34D", r: 251, g: 191, b: 36, onClick: props.onDailyScenario, cat: "all" },
-    { id: "mb",       icon: "🌀", title: "MIND BREAK", desc: "Five-phase psychological deconstruction. Patience, trust, isolation, dependency, and surrender.", badge: "5 Phases · Deep Psych", accent: "#C084FC", r: 192, g: 132, b: 252, onClick: props.onMindBreak, cat: "capture" },
-    { id: "dc",       icon: "⛓", title: "DUAL CAPTURE", desc: "Two heroines, one cell. A shared ordeal that tests loyalty, friendship, and individual resolve.", badge: "Duo · Shared Cell", accent: "#34D399", r: 52,  g: 211, b: 153, onClick: props.onDualCapture, cat: "capture" },
-    { id: "rgw",      icon: "🕸", title: "RESCUE GONE WRONG", desc: "The rescue team walks into a trap. Ambush, betrayal, and a reversal that no one anticipated.", badge: "Trap · Ambush", accent: "#FB923C", r: 251, g: 146, b: 60, onClick: props.onRescueGoneWrong, cat: "capture" },
-    { id: "pd",       icon: "⚡", title: "POWER DRAIN", desc: "A metahuman's abilities slowly suppressed. Watch the power fade and the heroine adapt.", badge: "Meter · Drain Arc", accent: "#60A5FA", r: 96,  g: 165, b: 250, onClick: props.onPowerDrain, cat: "capture" },
-    { id: "mc",       icon: "🗡", title: "MASS CAPTURE", desc: "Three to five heroines swept up in one coordinated operation. Logistics of scale.", badge: "Group · 3–5 Heroines", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onMassCapture, cat: "capture" },
-    { id: "ca",       icon: "🌑", title: "CORRUPTION ARC", desc: "Seven chapters. A heroine slowly turned. Ideology, identity, and the point of no return.", badge: "7 Chapters · Arc", accent: "#F472B6", r: 244, g: 114, b: 182, onClick: props.onCorruptionArc, cat: "capture" },
-    { id: "ha",       icon: "⚖", title: "HERO AUCTION", desc: "A captured superhuman put up for bid. High stakes, dark buyers, and a gavel that decides fate.", badge: "Bid · Live Auction", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onHeroAuction, cat: "celebrity" },
-    { id: "td",       icon: "👁", title: "TROPHY DISPLAY", desc: "The heroine as a prize. Visits, viewers, and a captor proud of their collection.", badge: "Display · Public", accent: "#EF4444", r: 239, g: 68, b: 68, onClick: props.onTrophyDisplay, cat: "celebrity" },
-    { id: "ot",       icon: "📋", title: "OBEDIENCE TRAINING", desc: "Session-based compliance arc. Rewards, punishments, routines, and measured progress.", badge: "Session · Tracked", accent: "#2DD4BF", r: 45,  g: 212, b: 191, onClick: props.onObedienceTraining, cat: "capture" },
-    { id: "show",     icon: "🎭", title: "THE SHOWCASE", desc: "A staged performance. The heroine on display before an audience, every movement scrutinised.", badge: "Staged · Audience", accent: "#E879F9", r: 232, g: 121, b: 249, onClick: props.onShowcase, cat: "celebrity" },
-    { id: "pp",       icon: "🔓", title: "PUBLIC PROPERTY", desc: "Jurisdiction removed. The heroine declared shared — open to any who find her.", badge: "Exposed · Open Access", accent: "#FBBF24", r: 251, g: 191, b: 36, onClick: props.onPublicProperty, cat: "celebrity" },
-    { id: "bp",       icon: "🎲", title: "BETTING POOL", desc: "Gamblers wager on outcomes while the heroine fights to influence the odds in her favour.", badge: "Wager · Live Odds", accent: "#34D399", r: 52,  g: 211, b: 153, onClick: props.onBettingPool, cat: "celebrity" },
-    { id: "vtu",      icon: "🤝", title: "VILLAIN TEAM-UP", desc: "Two villains. One captive. Irreconcilable differences between the captors create chaos.", badge: "Duo Villain · Conflict", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onVillainTeamUp, cat: "capture" },
-    { id: "coc",      icon: "🔗", title: "CHAIN OF CUSTODY", desc: "The heroine transferred through multiple hands. Each captor adds a chapter to the story.", badge: "Transfer · Multi-Arc", accent: "#60A5FA", r: 96,  g: 165, b: 250, onClick: props.onChainOfCustody, cat: "capture" },
-    { id: "lg",       icon: "⏳", title: "THE LONG GAME", desc: "Months compressed into chapters. A slow burn narrative across seasons of captivity.", badge: "Long Burn · Chapters", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onLongGame, cat: "capture" },
-    { id: "dm",       icon: "🪞", title: "DARK MIRROR", desc: "The heroine confronts an evil version of herself. Identity fractures in the encounter.", badge: "Duality · Psychological", accent: "#E879F9", r: 232, g: 121, b: 249, onClick: props.onDarkMirror, cat: "capture" },
-    { id: "am",       icon: "🏛", title: "ARENA MODE", desc: "Pit multiple heroines against each other under villain-enforced rules. Only one stands.", badge: "Combat · Versus", accent: "#EF4444", r: 239, g: 68, b: 68, onClick: props.onArenaMode, cat: "capture" },
-    { id: "th",       icon: "🕵", title: "THE HANDLER", desc: "A clandestine operative assigned to manage the heroine. Covert. Personal. Possessive.", badge: "Covert · Intimate", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onTheHandler, cat: "capture" },
-  ];
 
   const toolModes = [
     { id: "cp", icon: "🏰", title: "CAPTOR PORTAL", desc: "Full customisation suite for your captor character. Build a villain from the ground up.", badge: "Customise · Build", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onCaptorPortal },
@@ -571,37 +574,6 @@ export default function Homepage(props: HomepageProps) {
     { id: "vb", icon: "🔮", title: "VILLAIN BUILDER", desc: "Craft a fully original villain from scratch with personality, powers, and backstory.", badge: "Custom · Original", accent: "#60A5FA", r: 96,  g: 165, b: 250, onClick: props.onVillainBuilder },
     { id: "rm", icon: "🕸", title: "RELATIONSHIP MAP", desc: "Map alliances, rivalries, and grudges across your entire cast of characters.", badge: "Network · Web", accent: "#34D399", r: 52,  g: 211, b: 153, onClick: props.onRelationshipMap },
   ];
-
-  const tabs = [
-    { id: "all",      label: "All Modes",    icon: "◈" },
-    { id: "forge",    label: "Forge",        icon: "⚔" },
-    { id: "capture",  label: "Capture",      icon: "⛓" },
-    { id: "celebrity",label: "Celebrity",    icon: "🎬" },
-    { id: "tools",    label: "Tools",        icon: "⚙" },
-  ];
-
-  const visibleModes = activeTab === "tools"
-    ? []
-    : activeTab === "all"
-      ? allModes
-      : allModes.filter(m => m.cat === activeTab || m.cat === "all");
-
-  const PAGE_MAP: Record<string, keyof HomepageProps> = {
-    "superhero-mode": "onSuperheroMode", "celebrity-mode": "onCelebrityMode",
-    "daily-scenario": "onDailyScenario", "character-params": "onEnter",
-    "mind-break": "onMindBreak", "dual-capture": "onDualCapture",
-    "rescue-gone-wrong": "onRescueGoneWrong", "power-drain": "onPowerDrain",
-    "mass-capture": "onMassCapture", "corruption-arc": "onCorruptionArc",
-    "hero-auction": "onHeroAuction", "trophy-display": "onTrophyDisplay",
-    "obedience-training": "onObedienceTraining", "showcase": "onShowcase",
-    "public-property": "onPublicProperty", "betting-pool": "onBettingPool",
-    "villain-team-up": "onVillainTeamUp", "chain-of-custody": "onChainOfCustody",
-    "long-game": "onLongGame", "dark-mirror": "onDarkMirror",
-    "arena-mode": "onArenaMode", "the-handler": "onTheHandler",
-    "interrogation-room": "onInterrogationRoom", "captor-home": "onCaptorPortal",
-    "captor-logic": "onCaptorLogic", "scenario-generator": "onScenarioGenerator",
-    "character-mapper": "onCharacterMapper", "sounding-board": "onSoundingBoard",
-  };
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "transparent" }}>
@@ -628,7 +600,7 @@ export default function Homepage(props: HomepageProps) {
         @keyframes chipIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
         .hp-card-animate { animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
         .hp-chip-animate { animation: chipIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
-        @media (max-width: 900px) { .hp-grid { grid-template-columns: 1fr 1fr !important; } .hp-hero-stats { flex-wrap: wrap !important; } .hp-feat-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 900px) { .hp-grid { grid-template-columns: 1fr 1fr !important; } .hp-hero-stats { flex-wrap: wrap !important; } .hp-feat-grid { grid-template-columns: 1fr !important; } .hp-sub-grid { grid-template-columns: repeat(2,1fr) !important; } }
         @media (max-width: 640px) { .hp-grid { grid-template-columns: 1fr !important; } .hp-tabs { gap: 0.35rem !important; } .hp-tabs button { padding: 0.55rem 0.8rem !important; font-size: 0.5rem !important; } .hp-feat-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 480px) { .hp-pad { padding-left: 0.9rem !important; padding-right: 0.9rem !important; } }
       `}</style>
@@ -677,194 +649,150 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </nav>
 
-      {/* ══ HERO SECTION ══════════════════════════════════════════════════════════ */}
-      <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "2.5rem 1rem 1.8rem" : "3.2rem 2rem 2rem", textAlign: "center", overflow: "hidden" }}>
-        {/* Spotlight beams */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "2px", height: "100%", background: "linear-gradient(to bottom, rgba(168,85,247,0.35) 0%, rgba(168,85,247,0.04) 60%, transparent 100%)", filter: "blur(1px)" }} />
-          <div style={{ position: "absolute", top: 0, left: "50%", marginLeft: "-200px", width: "400px", height: "320px", background: "radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.22) 0%, transparent 70%)", animation: "beamPulse 4s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 0, left: "30%", width: "0", height: "0", borderLeft: "280px solid transparent", borderRight: "280px solid transparent", borderTop: "420px solid rgba(168,85,247,0.03)", filter: "blur(8px)", animation: "beamPulse 6s ease-in-out infinite 1s" }} />
-          <div style={{ position: "absolute", top: 0, left: "55%", width: "0", height: "0", borderLeft: "220px solid transparent", borderRight: "220px solid transparent", borderTop: "340px solid rgba(220,40,90,0.025)", filter: "blur(10px)", animation: "beamPulse 7s ease-in-out infinite 2s" }} />
-          {/* Floating particles */}
-          {[
-            { top: "20%", left: "12%", s: "6px", d: "3s" }, { top: "55%", left: "8%", s: "4px", d: "5s" },
-            { top: "30%", left: "88%", s: "5px", d: "4s" }, { top: "65%", left: "85%", s: "7px", d: "6s" },
-            { top: "45%", left: "22%", s: "3px", d: "3.5s" }, { top: "15%", left: "75%", s: "4px", d: "4.5s" },
-            { top: "70%", left: "60%", s: "5px", d: "5.5s" }, { top: "25%", left: "50%", s: "3px", d: "2.5s" },
-          ].map((p, i) => (
-            <div key={i} style={{ position: "absolute", top: p.top, left: p.left, width: p.s, height: p.s, borderRadius: "50%", background: i % 2 === 0 ? "rgba(168,85,247,0.55)" : "rgba(251,191,36,0.45)", boxShadow: `0 0 ${parseInt(p.s) * 3}px ${i % 2 === 0 ? "rgba(168,85,247,0.8)" : "rgba(251,191,36,0.7)"}`, animation: `particleFloat ${p.d} ease-in-out infinite`, animationDelay: `${i * 0.4}s` }} />
-          ))}
+      {/* ══ DAILY CHRONICLE ════════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "1.4rem 1rem 1.2rem" : "1.4rem 2rem 1.2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.58s 0.05s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.85rem" }}>
+          <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(251,191,36,0.9), rgba(251,191,36,0.1))", boxShadow: "0 0 10px rgba(251,191,36,0.4)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.55)", textTransform: "uppercase", fontWeight: 700 }}>Daily Chronicle</span>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.18), transparent)" }} />
+          <span style={{ fontSize: "0.36rem", letterSpacing: "2px", color: "rgba(200,200,220,0.22)", fontFamily: "'Montserrat', sans-serif" }}>{today}</span>
         </div>
+        <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
+      </div>
 
-        {/* Eyebrow */}
-        <div style={{ fontSize: "0.46rem", letterSpacing: "9px", color: "rgba(168,85,247,0.5)", fontFamily: "'Cinzel', serif", marginBottom: "1rem", textTransform: "uppercase", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.05s ease both" : "none" }}>Professional Dark Narrative Studio</div>
-
-        {/* Main title */}
-        <h1 style={{ margin: "0 0 0.5rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(2.2rem, 7vw, 5rem)", fontWeight: 900, letterSpacing: "0.12em", background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 28%, #FFFFFF 50%, #E8B830 72%, #F5D67A 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "hdrShimmer 6s linear infinite, titleReveal 0.9s cubic-bezier(0.22,1,0.36,1) both", lineHeight: 1.05, opacity: mounted ? 1 : 0 }}>CHOOSE YOUR MODE</h1>
-
-        {/* Subtitle */}
-        <p style={{ margin: "0 0 1.6rem", fontSize: "0.78rem", color: "rgba(200,195,240,0.35)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2.5px", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.7s 0.2s ease both" : "none" }}>Venice AI · Fully Uncensored · Adults Only · Dark Narrative Studio</p>
-
-        {/* Floating stat pills */}
-        <div className="hp-hero-stats" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.65rem", marginTop: "0", flexWrap: "wrap", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.28s ease both" : "none" }}>
+      {/* ══ USER STATS ═════════════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 1.5rem" : "0 2rem 1.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.58s 0.12s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.85rem" }}>
+          <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(168,85,247,0.85), rgba(168,85,247,0.1))", boxShadow: "0 0 8px rgba(168,85,247,0.3)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(168,85,247,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Your Record</span>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.15), transparent)" }} />
+        </div>
+        <div style={{ display: "flex", gap: "0.65rem", flexWrap: "wrap" }}>
           {[
-            { v: "27+", l: "Story Modes", c: "168,85,247", d: "0s" },
-            { v: "181+", l: "Heroines", c: "251,191,36", d: "0.06s" },
-            { v: "8", l: "Universes", c: "52,211,153", d: "0.12s" },
-            { v: "Venice AI", l: "Powered By", c: "248,113,113", d: "0.18s" },
-            { v: "100%", l: "Uncensored", c: "232,121,249", d: "0.24s" },
-          ].map(({ v, l, c, d }) => (
-            <div key={l} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.55rem 1.1rem", background: `rgba(${c},0.06)`, border: `1px solid rgba(${c},0.18)`, borderRadius: "40px", backdropFilter: "blur(16px)", animation: mounted ? `statPop 0.5s ${d} cubic-bezier(0.22,1,0.36,1) both` : "none", gap: "1px" }}>
-              <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.88rem", fontWeight: 900, color: `rgba(${c},0.9)`, textShadow: `0 0 20px rgba(${c},0.35)`, letterSpacing: "1px" }}>{v}</span>
-              <span style={{ fontSize: "0.38rem", letterSpacing: "2.5px", color: `rgba(${c},0.38)`, fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", fontWeight: 700 }}>{l}</span>
+            { v: streak.count >= 1 ? `${streak.count}🔥` : "—",     l: "Day Streak", c: "245,158,11" },
+            { v: archiveStats.total > 0 ? `${archiveStats.total}` : "0", l: "Stories",  c: "168,85,247" },
+            { v: archiveStats.totalWords >= 1000 ? `${(archiveStats.totalWords/1000).toFixed(1)}k` : `${archiveStats.totalWords}`, l: "Words",    c: "251,191,36" },
+            { v: `${archiveStats.uniqueHeroines}`,  l: "Heroines",   c: "249,115,22" },
+            { v: `${archiveStats.modesTried}`,      l: "Modes",      c: "52,211,153"  },
+            { v: achXP > 0 ? `${achXP}` : "0",     l: "XP",         c: "232,121,249" },
+          ].map(({ v, l, c }, idx) => (
+            <div key={l} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.55rem 1.1rem", background: `rgba(${c},0.055)`, border: `1px solid rgba(${c},0.14)`, borderRadius: "40px", backdropFilter: "blur(16px)", gap: "1px", animation: mounted ? `statPop 0.5s ${idx * 0.06}s cubic-bezier(0.22,1,0.36,1) both` : "none" }}>
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.9rem", fontWeight: 900, color: `rgba(${c},0.88)`, textShadow: `0 0 18px rgba(${c},0.3)`, letterSpacing: "0.5px" }}>{v}</span>
+              <span style={{ fontSize: "0.36rem", letterSpacing: "2.5px", color: `rgba(${c},0.36)`, fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", fontWeight: 700 }}>{l}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ══ FEATURED MODES ════════════════════════════════════════════════════════ */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.68s 0.34s ease both" : "none" }}>
+      {/* ══ CHOOSE YOUR MODE ═══════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 2rem" : "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.62s 0.2s ease both" : "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.1rem" }}>
           <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(251,191,36,0.9), rgba(251,191,36,0.1))", boxShadow: "0 0 10px rgba(251,191,36,0.4)" }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Featured Modes</span>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Choose Your Mode</span>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.18), transparent)" }} />
         </div>
         <div className="hp-feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.2rem" }}>
-          <FeaturedCard
-            title="HEROINE FORGE"
-            desc="181+ heroines across 8 universes. Choose your captor, set the scene, generate a fully uncensored multi-chapter dark thriller."
-            badge="Core Mode · Flagship"
-            stat="181+ Heroines"
-            accent="#C084FC" r={168} g={85} b={247}
-            onClick={props.onSuperheroMode}
-            img="/icons/heroine-forge.png"
-          />
-          <FeaturedCard
-            title="CELEBRITY CAPTURE"
-            desc="Real-world fame meets dark fantasy. Celebrities and villains in an uncensored narrative that shatters the fourth wall."
-            badge="Celebrity · Adults Only"
-            stat="100% Uncensored"
-            accent="#FCA311" r={252} g={163} b={17}
-            onClick={props.onCelebrityMode}
-            img="/icons/celebrity-captive.png"
-          />
-          <FeaturedCard
-            title="CUSTOM SCENARIO"
-            desc="Build any premise from scratch. Your heroine, your captor, your rules. No filters. No limits. Pure dark narrative."
-            badge="Custom · No Limits"
-            stat="Infinite Scenarios"
-            accent="#34D399" r={52} g={211} b={153}
-            onClick={props.onScenarioGenerator}
-            img="/icons/custom-scenario.png"
-          />
+          <FeaturedCard title="HEROINE FORGE" desc="181+ heroines across 8 universes. Choose your captor, set the scene, generate a fully uncensored multi-chapter dark thriller." badge="Core Mode · Flagship" stat="181+ Heroines" accent="#C084FC" r={168} g={85} b={247} onClick={props.onSuperheroMode} img="/icons/heroine-forge.png" />
+          <FeaturedCard title="CELEBRITY CAPTURE" desc="Real-world fame meets dark fantasy. Celebrities and villains in an uncensored narrative that shatters the fourth wall." badge="Celebrity · Adults Only" stat="100% Uncensored" accent="#FCA311" r={252} g={163} b={17} onClick={props.onCelebrityMode} img="/icons/celebrity-captive.png" />
+          <FeaturedCard title="CUSTOM SCENARIO" desc="Build any premise from scratch. Your heroine, your captor, your rules. No filters. No limits. Pure dark narrative." badge="Custom · No Limits" stat="Infinite Scenarios" accent="#34D399" r={52} g={211} b={153} onClick={props.onScenarioGenerator} img="/icons/custom-scenario.png" />
         </div>
-
-        {/* ── Quick actions below featured ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.8rem", marginTop: "1.5rem", flexWrap: "wrap" }}>
-          <button onClick={props.onSurpriseMe} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.8rem", background: "rgba(168,85,247,0.12)", border: "1.5px solid rgba(168,85,247,0.4)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s", animation: "surpriseGlow 3.5s ease-in-out infinite" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.28)"; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 45px rgba(168,85,247,0.4)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(168,85,247,0.12)"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+          <button onClick={props.onSurpriseMe} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.8rem", background: "rgba(168,85,247,0.12)", border: "1.5px solid rgba(168,85,247,0.4)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s", animation: "surpriseGlow 3.5s ease-in-out infinite" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.28)"; e.currentTarget.style.transform = "translateY(-3px)"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(168,85,247,0.12)"; e.currentTarget.style.transform = "none"; }}>
             <span style={{ fontSize: "1rem" }}>⚡</span>
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2.5px", color: "rgba(200,160,255,0.88)", textTransform: "uppercase" }}>Surprise Me</span>
           </button>
-          <button onClick={() => setShowDice(true)} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(96,165,250,0.08)", border: "1.5px solid rgba(96,165,250,0.25)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(96,165,250,0.18)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(96,165,250,0.08)"; e.currentTarget.style.transform = "none"; }}>
+          <button onClick={() => setShowDice(true)} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(96,165,250,0.08)", border: "1.5px solid rgba(96,165,250,0.25)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(96,165,250,0.18)"; e.currentTarget.style.transform = "translateY(-3px)"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(96,165,250,0.08)"; e.currentTarget.style.transform = "none"; }}>
             <span style={{ fontSize: "0.9rem" }}>⚄</span>
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", color: "rgba(140,168,255,0.8)", textTransform: "uppercase" }}>Story Dice</span>
           </button>
-          <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(34,197,94,0.06)", border: "1.5px solid rgba(34,197,94,0.22)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(34,197,94,0.14)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(34,197,94,0.06)"; e.currentTarget.style.transform = "none"; }}>
+          <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(34,197,94,0.06)", border: "1.5px solid rgba(34,197,94,0.22)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(34,197,94,0.14)"; e.currentTarget.style.transform = "translateY(-3px)"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(34,197,94,0.06)"; e.currentTarget.style.transform = "none"; }}>
             <span style={{ fontSize: "0.9rem" }}>◈</span>
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", color: "rgba(100,220,140,0.75)", textTransform: "uppercase" }}>Story Archive</span>
           </button>
         </div>
       </div>
 
-      {/* ── JUMP BACK IN ── */}
-      {recentModes.length > 0 && (
-        <div className="hp-pad" style={{ padding: "0 2rem 1.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.4s ease both" : "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.7rem" }}>
-            <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(168,85,247,0.85), rgba(168,85,247,0.1))", boxShadow: "0 0 8px rgba(168,85,247,0.3)" }} />
-            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(168,85,247,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Jump Back In</span>
-            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.15), transparent)" }} />
+      {/* ══ HEROINE FORGE · SPECIALIST MODES ══════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 1.8rem" : "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.62s 0.28s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.95rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(192,132,252,1), rgba(192,132,252,0.08))", boxShadow: "0 0 14px rgba(192,132,252,0.6)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(192,132,252,0.65)", textTransform: "uppercase", fontWeight: 700 }}>Heroine Forge · Specialist Modes</span>
+          <div style={{ padding: "0.18rem 0.65rem", background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.35rem", letterSpacing: "2px", color: "rgba(192,132,252,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>14 MODES</span>
           </div>
-          <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap" }}>
-            {recentModes.map((rm, i) => (
-              <div key={rm.page} className="hp-chip-animate" style={{ animationDelay: `${i * 0.04}s` }}>
-                <RecentModeChip rm={rm} onClick={() => { const k = PAGE_MAP[rm.page]; if (k) (props[k] as () => void)(); }} />
-              </div>
-            ))}
-          </div>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.18), transparent)" }} />
         </div>
-      )}
-
-      {/* ── DAILY DISPATCH ── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2.2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.42s ease both" : "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.8rem" }}>
-          <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(251,191,36,0.85), rgba(251,191,36,0.1))", boxShadow: "0 0 8px rgba(251,191,36,0.35)" }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Today's Ritual</span>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.18), transparent)" }} />
+        <div className="hp-sub-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0.52rem" }}>
+          {([
+            { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension",   r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onInterrogationRoom },
+            { icon: "🌀", title: "MIND BREAK",         badge: "5 Phases · Deep Psych",  r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onMindBreak },
+            { icon: "⛓", title: "DUAL CAPTURE",       badge: "Duo · Shared Cell",      r: 52,  g: 211, b: 153, accent: "#34D399", onClick: props.onDualCapture },
+            { icon: "🕸", title: "RESCUE GONE WRONG",  badge: "Trap · Ambush",          r: 251, g: 146, b: 60,  accent: "#FB923C", onClick: props.onRescueGoneWrong },
+            { icon: "⚡", title: "POWER DRAIN",         badge: "Meter · Drain Arc",      r: 96,  g: 165, b: 250, accent: "#60A5FA", onClick: props.onPowerDrain },
+            { icon: "🗡", title: "MASS CAPTURE",       badge: "Group · 3–5 Heroines",   r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onMassCapture },
+            { icon: "🌑", title: "CORRUPTION ARC",     badge: "7 Chapters · Arc",        r: 244, g: 114, b: 182, accent: "#F472B6", onClick: props.onCorruptionArc },
+            { icon: "📋", title: "OBEDIENCE TRAINING", badge: "Session · Tracked",       r: 45,  g: 212, b: 191, accent: "#2DD4BF", onClick: props.onObedienceTraining },
+            { icon: "🤝", title: "VILLAIN TEAM-UP",    badge: "Duo Villain · Conflict",  r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onVillainTeamUp },
+            { icon: "🔗", title: "CHAIN OF CUSTODY",   badge: "Transfer · Multi-Arc",    r: 96,  g: 165, b: 250, accent: "#60A5FA", onClick: props.onChainOfCustody },
+            { icon: "⏳", title: "THE LONG GAME",      badge: "Long Burn · Chapters",    r: 168, g: 85,  b: 247, accent: "#C084FC", onClick: props.onLongGame },
+            { icon: "🪞", title: "DARK MIRROR",        badge: "Duality · Psych",         r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onDarkMirror },
+            { icon: "🏛", title: "ARENA MODE",         badge: "Combat · Versus",         r: 239, g: 68,  b: 68,  accent: "#EF4444", onClick: props.onArenaMode },
+            { icon: "🕵", title: "THE HANDLER",        badge: "Covert · Intimate",       r: 252, g: 163, b: 17,  accent: "#FCA311", onClick: props.onTheHandler },
+          ] as const).map((m, i) => (
+            <div key={m.title} className="hp-card-animate" style={{ animationDelay: `${i * 0.03}s` }}>
+              <SubModeCard {...m} />
+            </div>
+          ))}
         </div>
-        <DailyDispatch heroine={heroine} villain={villain} setting={setting} title={dailyTitle} today={today} onGenerate={props.onDailyScenario} onChronicle={props.onDailyChronicle} />
       </div>
 
-      {/* ══ MODE CATALOGUE ════════════════════════════════════════════════════════ */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.7s 0.45s ease both" : "none" }}>
-        {/* Section header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.2rem" }}>
-          <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(168,85,247,0.9), rgba(168,85,247,0.1))", boxShadow: "0 0 10px rgba(168,85,247,0.4)" }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(168,85,247,0.55)", textTransform: "uppercase", fontWeight: 700 }}>Mode Catalogue</span>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.2), transparent)" }} />
-        </div>
-
-        {/* Tab bar */}
-        <div className="hp-tabs" style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-          {tabs.map(tab => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1.1rem", background: active ? "rgba(168,85,247,0.22)" : "rgba(168,85,247,0.05)", border: `1px solid ${active ? "rgba(168,85,247,0.65)" : "rgba(168,85,247,0.14)"}`, borderRadius: "40px", cursor: "pointer", transition: "all 0.22s", boxShadow: active ? "0 0 22px rgba(168,85,247,0.25)" : "none", position: "relative" }}
-                onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(168,85,247,0.12)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.35)"; } }}
-                onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "rgba(168,85,247,0.05)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.14)"; } }}
-              >
-                <span style={{ fontSize: "0.8rem" }}>{tab.icon}</span>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "1.5px", color: active ? "rgba(220,190,255,0.95)" : "rgba(168,85,247,0.52)", transition: "color 0.2s", whiteSpace: "nowrap" }}>{tab.label}</span>
-                {active && <div style={{ position: "absolute", bottom: "-1px", left: "20%", right: "20%", height: "2px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.9), transparent)", borderRadius: "2px", boxShadow: "0 0 10px rgba(168,85,247,0.6)" }} />}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Mode grid — Story Modes */}
-        {activeTab !== "tools" && (
-          <div className="hp-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.9rem" }}>
-            {visibleModes.map((m, i) => (
-              <div key={m.id} className="hp-card-animate" style={{ animationDelay: `${i * 0.04}s`, gridColumn: (m.size === "large" && !isMobile) ? "span 1" : undefined }}>
-                <ModeCard {...m} size={m.size ?? "normal"} />
-              </div>
-            ))}
+      {/* ══ CELEBRITY CAPTURE · SCENARIOS ═════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 1.8rem" : "0 2rem 1.8rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.62s 0.34s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.95rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(252,163,17,1), rgba(252,163,17,0.08))", boxShadow: "0 0 14px rgba(252,163,17,0.5)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(252,163,17,0.65)", textTransform: "uppercase", fontWeight: 700 }}>Celebrity Capture · Scenarios</span>
+          <div style={{ padding: "0.18rem 0.65rem", background: "rgba(252,163,17,0.08)", border: "1px solid rgba(252,163,17,0.2)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.35rem", letterSpacing: "2px", color: "rgba(252,163,17,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>5 MODES</span>
           </div>
-        )}
-
-        {/* Tools grid */}
-        {activeTab === "tools" && (
-          <div className="hp-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.9rem" }}>
-            {toolModes.map((m, i) => (
-              <div key={m.id} className="hp-card-animate" style={{ animationDelay: `${i * 0.045}s` }}>
-                <ModeCard {...m} />
-              </div>
-            ))}
-          </div>
-        )}
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(252,163,17,0.18), transparent)" }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(5,1fr)", gap: "0.52rem" }}>
+          {([
+            { icon: "⚖", title: "HERO AUCTION",    badge: "Bid · Live Auction",    r: 252, g: 163, b: 17,  accent: "#FCA311", onClick: props.onHeroAuction },
+            { icon: "👁", title: "TROPHY DISPLAY",  badge: "Display · Public",      r: 239, g: 68,  b: 68,  accent: "#EF4444", onClick: props.onTrophyDisplay },
+            { icon: "🎭", title: "THE SHOWCASE",    badge: "Staged · Audience",     r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onShowcase },
+            { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", r: 251, g: 191, b: 36,  accent: "#FBBF24", onClick: props.onPublicProperty },
+            { icon: "🎲", title: "BETTING POOL",    badge: "Wager · Live Odds",     r: 52,  g: 211, b: 153, accent: "#34D399", onClick: props.onBettingPool },
+          ] as const).map((m, i) => (
+            <div key={m.title} className="hp-card-animate" style={{ animationDelay: `${i * 0.045}s` }}>
+              <SubModeCard {...m} />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* ── ACTIVITY + STATS ── */}
-      <div className="hp-pad" style={{ padding: "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.5s ease both" : "none", display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-        <div style={{ flex: "2 1 400px", padding: "0.9rem 1.3rem", background: "rgba(5,2,13,0.88)", border: "1px solid rgba(34,197,94,0.1)", borderRadius: "18px", backdropFilter: "blur(16px)" }}>
+      {/* ══ STUDIO TOOLS ═══════════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 2rem" : "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.62s 0.4s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.95rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(52,211,153,1), rgba(52,211,153,0.08))", boxShadow: "0 0 14px rgba(52,211,153,0.45)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(52,211,153,0.62)", textTransform: "uppercase", fontWeight: 700 }}>Studio Tools</span>
+          <div style={{ padding: "0.18rem 0.65rem", background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.18)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.35rem", letterSpacing: "2px", color: "rgba(52,211,153,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>9 TOOLS</span>
+          </div>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(52,211,153,0.15), transparent)" }} />
+        </div>
+        <div className="hp-sub-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.52rem" }}>
+          {toolModes.map((m, i) => (
+            <div key={m.id} className="hp-card-animate" style={{ animationDelay: `${i * 0.035}s` }}>
+              <SubModeCard icon={m.icon} title={m.title} badge={m.badge} accent={m.accent} r={m.r} g={m.g} b={m.b} onClick={m.onClick} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ WRITING ACTIVITY ═══════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 2rem" : "0 2rem 2rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.46s ease both" : "none" }}>
+        <div style={{ padding: "0.9rem 1.3rem", background: "rgba(5,2,13,0.88)", border: "1px solid rgba(34,197,94,0.1)", borderRadius: "18px", backdropFilter: "blur(16px)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.65rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
               <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 10px rgba(34,197,94,0.75)", animation: "pulseDot 2.5s ease-in-out infinite" }} />
@@ -885,27 +813,11 @@ export default function Homepage(props: HomepageProps) {
             })}
           </div>
         </div>
-        {archiveStats.total > 0 && (
-          <div style={{ flex: "1 1 260px", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {[
-              { value: archiveStats.total.toString(), label: "Stories Written", color: "168,85,247", icon: "📖" },
-              { value: archiveStats.totalWords >= 1000 ? `${(archiveStats.totalWords / 1000).toFixed(1)}k` : archiveStats.totalWords.toString(), label: "Total Words", color: "251,191,36", icon: "✍" },
-              { value: archiveStats.uniqueHeroines.toString(), label: "Heroines Used", color: "249,115,22", icon: "⚡" },
-              { value: archiveStats.modesTried.toString(), label: "Modes Tried", color: "52,211,153", icon: "🎭" },
-            ].map(({ value, label, color, icon }) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.55rem 0.9rem", background: "rgba(5,2,13,0.78)", border: `1px solid rgba(${color},0.1)`, borderRadius: "12px", backdropFilter: "blur(12px)" }}>
-                <span style={{ fontSize: "0.78rem" }}>{icon}</span>
-                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: `rgba(${color},0.9)`, textShadow: `0 0 18px rgba(${color},0.3)`, minWidth: "36px" }}>{value}</div>
-                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "2px", color: `rgba(${color},0.33)`, textTransform: "uppercase", fontWeight: 700 }}>{label}</div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* ── INFAMY BOARD ── */}
+      {/* ══ INFAMY BOARD ═══════════════════════════════════════════════════════════ */}
       {topVillains.length > 0 && (
-        <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.52s ease both" : "none" }}>
+        <div className="hp-pad" style={{ padding: isMobile ? "0 1rem 2.5rem" : "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.52s ease both" : "none" }}>
           <div style={{ border: "1px solid rgba(239,68,68,0.12)", borderRadius: "20px", overflow: "hidden", background: "rgba(5,2,14,0.9)", backdropFilter: "blur(20px)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 1.5rem", borderBottom: "1px solid rgba(239,68,68,0.07)", background: "rgba(239,68,68,0.035)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -932,7 +844,6 @@ export default function Homepage(props: HomepageProps) {
         </div>
       )}
 
-      {/* Footer gap */}
       <div style={{ height: "2rem" }} />
     </div>
   );
