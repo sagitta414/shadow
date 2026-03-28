@@ -6,6 +6,8 @@ import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { getArchive } from "../lib/archive";
 
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 interface HomepageProps {
   onEnter: () => void;
   onCaptorPortal: () => void;
@@ -89,10 +91,10 @@ function getDailyScenario() {
 
 // ── HERO CARD (the three flagship modes) ──────────────────────────────────────
 function HeroCard({
-  title, desc, badge, tag, accent, r, g, b, onClick, gradient, stat,
+  title, desc, badge, tag, accent, r, g, b, onClick, gradient, stat, imgSrc,
 }: {
   title: string; desc: string; badge: string; tag: string; accent: string; stat: string;
-  r: number; g: number; b: number; onClick: () => void; gradient: string;
+  r: number; g: number; b: number; onClick: () => void; gradient: string; imgSrc?: string;
 }) {
   const [hov, setHov] = useState(false);
   const rgb = `${r},${g},${b}`;
@@ -112,12 +114,27 @@ function HeroCard({
         transform: hov ? "translateY(-10px) scale(1.018)" : "none",
       }}
     >
+      {/* AI-generated background image */}
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt=""
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center top",
+            opacity: hov ? 0.55 : 0.38,
+            transition: "opacity 0.5s",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
       {/* Background gradient */}
       <div style={{
         position: "absolute", inset: 0,
         background: gradient,
         transition: "opacity 0.5s",
-        opacity: hov ? 1 : 0.7,
+        opacity: hov ? 0.72 : 0.85,
       }} />
 
       {/* Noise texture overlay */}
@@ -517,6 +534,7 @@ export default function Homepage(props: HomepageProps) {
             r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
             gradient="radial-gradient(ellipse at 60% 20%, rgba(90,0,180,0.85) 0%, rgba(30,0,80,0.92) 45%, rgba(4,1,14,0.98) 100%)"
+            imgSrc={`${BASE}/heroes/card-heroine-forge.png`}
           />
           <HeroCard
             title="CELEBRITY CAPTURE"
@@ -528,6 +546,7 @@ export default function Homepage(props: HomepageProps) {
             r={252} g={163} b={17}
             onClick={props.onCelebrityMode}
             gradient="radial-gradient(ellipse at 55% 25%, rgba(160,80,0,0.88) 0%, rgba(80,30,0,0.93) 45%, rgba(4,1,12,0.98) 100%)"
+            imgSrc={`${BASE}/heroes/card-celebrity-capture.png`}
           />
           <HeroCard
             title="CUSTOM SCENARIO"
@@ -539,6 +558,7 @@ export default function Homepage(props: HomepageProps) {
             r={52} g={211} b={153}
             onClick={props.onScenarioGenerator}
             gradient="radial-gradient(ellipse at 50% 20%, rgba(0,90,70,0.88) 0%, rgba(0,35,30,0.93) 45%, rgba(2,4,12,0.98) 100%)"
+            imgSrc={`${BASE}/heroes/card-custom-scenario.png`}
           />
         </div>
       </div>
