@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
 import { getUnlockCount, getTotalXP } from "../lib/achievements";
@@ -313,7 +313,9 @@ export default function Homepage(props: HomepageProps) {
   const isMobile = useIsMobile(768);
   const [mounted, setMounted] = useState(false);
   const [showDice, setShowDice] = useState(false);
-  const [showAllModes, setShowAllModes] = useState(false);
+  const [carouselIdx, setCarouselIdx] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const [clock, setClock] = useState("");
   const [streak] = useState(() => getStreak());
   const [achCount] = useState(() => getUnlockCount());
@@ -342,33 +344,43 @@ export default function Homepage(props: HomepageProps) {
     tick(); const id = setInterval(tick, 1000); return () => clearInterval(id);
   }, []);
 
+  const advanceCarousel = useCallback((dir: 1 | -1, total: number) => {
+    setCarouselIdx(i => (i + dir + total) % total);
+  }, []);
+
+  useEffect(() => {
+    if (carouselPaused) return;
+    const t = setInterval(() => setCarouselIdx(i => (i + 1) % 23), 4200);
+    return () => clearInterval(t);
+  }, [carouselPaused]);
+
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const specialtyModes = [
-    { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onInterrogationRoom },
-    { icon: "🌀", title: "MIND BREAK", badge: "5 Phases · Deep Psych", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onMindBreak },
-    { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDualCapture },
-    { icon: "🕸", title: "RESCUE GONE WRONG", badge: "Trap · Ambush", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onRescueGoneWrong },
-    { icon: "⚡", title: "POWER DRAIN", badge: "Meter · Drain Arc", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onPowerDrain },
-    { icon: "🗡", title: "MASS CAPTURE", badge: "Group · 3–5 Heroines", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onMassCapture },
-    { icon: "🌑", title: "CORRUPTION ARC", badge: "7 Chapters · Arc", r: 244, g: 114, b: 182, accent: "#F472B6", onClick: props.onCorruptionArc },
-    { icon: "📋", title: "OBEDIENCE TRAINING", badge: "Session · Tracked", r: 45, g: 212, b: 191, accent: "#2DD4BF", onClick: props.onObedienceTraining },
-    { icon: "🤝", title: "VILLAIN TEAM-UP", badge: "Duo Villain · Conflict", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onVillainTeamUp },
-    { icon: "🔗", title: "CHAIN OF CUSTODY", badge: "Transfer · Multi-Arc", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onChainOfCustody },
-    { icon: "⏳", title: "THE LONG GAME", badge: "Long Burn · Chapters", r: 168, g: 85, b: 247, accent: "#C084FC", onClick: props.onLongGame },
-    { icon: "🪞", title: "DARK MIRROR", badge: "Duality · Psych", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onDarkMirror },
-    { icon: "🏛", title: "ARENA MODE", badge: "Combat · Versus", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onArenaMode },
-    { icon: "🕵", title: "THE HANDLER", badge: "Covert · Intimate", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onTheHandler },
-    { icon: "⚖", title: "HERO AUCTION", badge: "Bid · Live Auction", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onHeroAuction },
-    { icon: "👁", title: "TROPHY DISPLAY", badge: "Display · Public", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onTrophyDisplay },
-    { icon: "🎭", title: "THE SHOWCASE", badge: "Staged · Audience", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onShowcase },
-    { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onPublicProperty },
-    { icon: "🎲", title: "BETTING POOL", badge: "Wager · Live Odds", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onBettingPool },
-    { icon: "⟳", title: "TIME LOOP", badge: "Loop · Villain Knows All", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onTimeLoop },
-    { icon: "◈", title: "DREAM SEQUENCE", badge: "5 Depths · Nightmare", r: 167, g: 139, b: 250, accent: "#A78BFA", onClick: props.onDreamSequence },
-    { icon: "⟴", title: "SEQUEL GENERATOR", badge: "Archive · New Chapter", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onSequelGenerator },
-    { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation },
+    { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension", desc: "Bright lights, tight restraints. The villain breaks her spirit one question at a time — or tries to.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onInterrogationRoom, img: `${BASE}/heroes/mode-interrogation-room.png` },
+    { icon: "🌀", title: "MIND BREAK", badge: "5 Phases · Deep Psych", desc: "Five-phase descent into psychological submission. Her will fractures layer by layer until nothing remains.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onMindBreak, img: `${BASE}/heroes/mode-mind-break.png` },
+    { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", desc: "Two heroines, one cell. Shared captivity breeds desperation — and bonds neither expected.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDualCapture, img: `${BASE}/heroes/mode-dual-capture.png` },
+    { icon: "🕸", title: "RESCUE GONE WRONG", badge: "Trap · Ambush", desc: "The cavalry never comes. The trap springs and the would-be rescuer becomes the villain's newest prize.", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onRescueGoneWrong, img: `${BASE}/heroes/mode-rescue-gone-wrong.png` },
+    { icon: "⚡", title: "POWER DRAIN", badge: "Meter · Drain Arc", desc: "Watch the meter fall. Her abilities bleed out with every passing hour as control shifts to the villain.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onPowerDrain, img: `${BASE}/heroes/mode-power-drain.png` },
+    { icon: "🗡", title: "MASS CAPTURE", badge: "Group · 3–5 Heroines", desc: "Three to five heroines swept up in one operation. The villain's greatest conquest — delivered all at once.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onMassCapture, img: `${BASE}/heroes/mode-mass-capture.png` },
+    { icon: "🌑", title: "CORRUPTION ARC", badge: "7 Chapters · Arc", desc: "Seven chapters. One slow-burn transformation from defiance to devotion the heroine never saw coming.", r: 244, g: 114, b: 182, accent: "#F472B6", onClick: props.onCorruptionArc, img: `${BASE}/heroes/mode-corruption-arc.png` },
+    { icon: "📋", title: "OBEDIENCE TRAINING", badge: "Session · Tracked", desc: "Structured sessions, tracked progress. The villain reshapes behavior with clinical precision and patience.", r: 45, g: 212, b: 191, accent: "#2DD4BF", onClick: props.onObedienceTraining, img: `${BASE}/heroes/mode-obedience-training.png` },
+    { icon: "🤝", title: "VILLAIN TEAM-UP", badge: "Duo Villain · Conflict", desc: "Two villains, one objective. The heroine faces double the cunning and not a shred of mercy between them.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onVillainTeamUp, img: `${BASE}/heroes/mode-villain-team-up.png` },
+    { icon: "🔗", title: "CHAIN OF CUSTODY", badge: "Transfer · Multi-Arc", desc: "Passed between captors. Each handler leaves their mark before the transfer. None leave empty-handed.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onChainOfCustody, img: `${BASE}/heroes/mode-chain-of-custody.png` },
+    { icon: "⏳", title: "THE LONG GAME", badge: "Long Burn · Chapters", desc: "Months of slow manipulation. No rush, no force — just patience, proximity, and inevitability.", r: 168, g: 85, b: 247, accent: "#C084FC", onClick: props.onLongGame, img: `${BASE}/heroes/mode-the-long-game.png` },
+    { icon: "🪞", title: "DARK MIRROR", badge: "Duality · Psych", desc: "Face to face with her own darkness. Is the villain truly the opposite — or simply what she'd become?", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onDarkMirror, img: `${BASE}/heroes/mode-dark-mirror.png` },
+    { icon: "🏛", title: "ARENA MODE", badge: "Combat · Versus", desc: "Combat as spectacle. The villain pits the heroine against impossible odds while a crowd watches and bets.", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onArenaMode, img: `${BASE}/heroes/mode-arena-mode.png` },
+    { icon: "🕵", title: "THE HANDLER", badge: "Covert · Intimate", desc: "Control through closeness. The villain gets close enough that escape starts to feel like betrayal.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onTheHandler, img: `${BASE}/heroes/mode-the-handler.png` },
+    { icon: "⚖", title: "HERO AUCTION", badge: "Bid · Live Auction", desc: "The highest bidder gets everything. Rising stakes, live bids, one inevitable outcome on the auction block.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onHeroAuction, img: `${BASE}/heroes/mode-hero-auction.png` },
+    { icon: "👁", title: "TROPHY DISPLAY", badge: "Display · Public", desc: "Victory displayed for all to see. The heroine becomes the centerpiece of the villain's prized collection.", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onTrophyDisplay, img: `${BASE}/heroes/mode-trophy-display.png` },
+    { icon: "🎭", title: "THE SHOWCASE", badge: "Staged · Audience", desc: "Staged for an audience. Every movement choreographed, every reaction studied and savored by the crowd.", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onShowcase, img: `${BASE}/heroes/mode-the-showcase.png` },
+    { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", desc: "Exposed, available, owned. The villain strips away every boundary while the world watches and does nothing.", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onPublicProperty, img: `${BASE}/heroes/mode-public-property.png` },
+    { icon: "🎲", title: "BETTING POOL", badge: "Wager · Live Odds", desc: "Her fate decided by strangers placing bets in real time. Live odds, rising wagers, one winner takes all.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onBettingPool, img: `${BASE}/heroes/mode-betting-pool.png` },
+    { icon: "⟳", title: "TIME LOOP", badge: "Loop · Villain Knows All", desc: "She resets. He remembers. Each loop teaches the villain exactly how to break her a little bit faster.", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onTimeLoop, img: `${BASE}/heroes/mode-time-loop.png` },
+    { icon: "◈", title: "DREAM SEQUENCE", badge: "5 Depths · Nightmare", desc: "Five depths of nightmare. The villain reaches her where she feels safest — in sleep — and remakes her.", r: 167, g: 139, b: 250, accent: "#A78BFA", onClick: props.onDreamSequence, img: `${BASE}/heroes/mode-dream-sequence.png` },
+    { icon: "⟴", title: "SEQUEL GENERATOR", badge: "Archive · New Chapter", desc: "A story from your archive earns a new chapter. The villain returns, wiser and far more prepared than before.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onSequelGenerator, img: `${BASE}/heroes/mode-sequel-generator.png` },
+    { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
   ];
 
   const studioTools = [
@@ -652,66 +664,135 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </div>
 
-      {/* ══ SPECIALTY MODES — ACCORDION ════════════════════════════════════════ */}
+      {/* ══ SPECIALIST MODES — CAROUSEL ════════════════════════════════════════ */}
       <div style={{
-        padding: isMobile ? "1.4rem 1rem 0" : "1.8rem 2.5rem 0",
+        padding: isMobile ? "1.6rem 0 0" : "2rem 0 0",
         position: "relative", zIndex: 2,
         opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.34s ease both" : "none",
       }}>
-        {/* Toggle header */}
-        <button onClick={() => setShowAllModes(v => !v)} style={{
-          width: "100%", display: "flex", alignItems: "center", gap: "0.75rem",
-          padding: "0.85rem 1.2rem", borderRadius: showAllModes ? "16px 16px 0 0" : "16px",
-          background: showAllModes ? "rgba(168,85,247,0.1)" : "rgba(4,1,12,0.78)",
-          border: `1px solid rgba(168,85,247,${showAllModes ? 0.38 : 0.1})`,
-          borderBottom: showAllModes ? "1px solid rgba(168,85,247,0.15)" : undefined,
-          cursor: "pointer", transition: "all 0.28s", backdropFilter: "blur(18px)",
-        }}
-          onMouseEnter={e => { if (!showAllModes) { e.currentTarget.style.background = "rgba(168,85,247,0.07)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.22)"; } }}
-          onMouseLeave={e => { if (!showAllModes) { e.currentTarget.style.background = "rgba(4,1,12,0.78)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.1)"; } }}>
-          <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(192,132,252,0.95), rgba(192,132,252,0.08))", boxShadow: "0 0 10px rgba(192,132,252,0.5)", flexShrink: 0 }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4px", color: "rgba(192,132,252,0.62)", textTransform: "uppercase", fontWeight: 700 }}>Heroine Forge · Specialist Modes</span>
-          <div style={{ padding: "0.15rem 0.6rem", background: "rgba(168,85,247,0.07)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: "18px" }}>
-            <span style={{ fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(192,132,252,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>19 MODES</span>
+        {/* Section header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: isMobile ? "0 1rem 1.1rem" : "0 2.5rem 1.2rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(192,132,252,0.95), rgba(192,132,252,0.08))", boxShadow: "0 0 12px rgba(192,132,252,0.5)", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(192,132,252,0.72)", textTransform: "uppercase", fontWeight: 700 }}>Specialist Modes</span>
+          <div style={{ padding: "0.18rem 0.7rem", background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(192,132,252,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>23 MODES</span>
           </div>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.14), transparent)" }} />
-          <span style={{
-            fontSize: "0.9rem", color: "rgba(192,132,252,0.5)",
-            transform: showAllModes ? "rotate(180deg)" : "none",
-            transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
-            display: "inline-block",
-          }}>⌄</span>
-        </button>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.18), transparent)" }} />
+          {/* Dot indicators */}
+          <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
+            {specialtyModes.slice(0, isMobile ? 8 : 12).map((_, i) => (
+              <button key={i} onClick={() => setCarouselIdx(i)} style={{ width: i === carouselIdx % (isMobile ? 8 : 12) ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === carouselIdx % (isMobile ? 8 : 12) ? "rgba(192,132,252,0.85)" : "rgba(192,132,252,0.22)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", flexShrink: 0 }} />
+            ))}
+          </div>
+        </div>
 
-        {/* Accordion content */}
-        {showAllModes && (
-          <div className="ac-in" style={{
-            padding: "1.1rem",
-            background: "rgba(4,1,12,0.78)",
-            border: "1px solid rgba(168,85,247,0.1)", borderTop: "none",
-            borderRadius: "0 0 16px 16px",
-            backdropFilter: "blur(18px)",
+        {/* Carousel track */}
+        <div
+          ref={carouselRef}
+          style={{ overflow: "hidden", position: "relative" }}
+          onMouseEnter={() => setCarouselPaused(true)}
+          onMouseLeave={() => setCarouselPaused(false)}
+        >
+          <div style={{
+            display: "flex", gap: "0.9rem",
+            transform: `translateX(calc(-${carouselIdx} * (${isMobile ? "82vw" : "298px"} + 0.9rem)))`,
+            transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+            paddingLeft: isMobile ? "1rem" : "2.5rem",
+            paddingRight: isMobile ? "1rem" : "2.5rem",
+            paddingBottom: "0.5rem",
           }}>
-            {/* Specialty modes */}
-            <div style={{ fontSize: "0.32rem", letterSpacing: "3.5px", color: "rgba(192,132,252,0.32)", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.7rem", paddingLeft: "0.2rem" }}>Specialty Modes</div>
-            <div className="hp-sub" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.45rem", marginBottom: "1.1rem" }}>
-              {specialtyModes.map((m, i) => (
-                <div key={m.title} className="cm-in" style={{ animationDelay: `${i * 0.025}s` }}>
-                  <CompactMode {...m} />
+            {specialtyModes.map((m, i) => {
+              const isActive = i === carouselIdx;
+              return (
+                <div
+                  key={m.title}
+                  onClick={m.onClick}
+                  style={{
+                    flex: `0 0 ${isMobile ? "82vw" : "292px"}`,
+                    width: isMobile ? "82vw" : "292px",
+                    height: isMobile ? "370px" : "390px",
+                    borderRadius: "20px", overflow: "hidden",
+                    position: "relative", cursor: "pointer",
+                    border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`,
+                    boxShadow: isActive ? `0 12px 48px rgba(${m.r},${m.g},${m.b},0.28), 0 0 0 1px rgba(${m.r},${m.g},${m.b},0.12)` : "none",
+                    transform: isActive ? "scale(1.02)" : "scale(0.97)",
+                    transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.55s, box-shadow 0.55s",
+                    background: "rgba(4,1,12,0.9)",
+                  }}
+                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLDivElement).style.transform = "scale(1.0)"; } (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},0.55)`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = isActive ? "scale(1.02)" : "scale(0.97)"; (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`; }}
+                >
+                  {/* Background image */}
+                  <img
+                    src={m.img} alt={m.title}
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.55, transition: "opacity 0.3s" }}
+                  />
+                  {/* Gradient overlay */}
+                  <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(${m.r},${m.g},${m.b},0.05) 0%, rgba(4,1,12,0.45) 38%, rgba(4,1,12,0.92) 65%, rgba(4,1,12,0.99) 100%)` }} />
+                  {/* Accent top bar */}
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${m.r},${m.g},${m.b},${isActive ? 0.9 : 0.3}), transparent)`, transition: "opacity 0.4s" }} />
+
+                  {/* Content */}
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: "1.25rem 1.35rem" }}>
+                    {/* Badge */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "auto" }}>
+                      <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", color: m.accent, fontFamily: "'Cinzel', serif", background: `rgba(${m.r},${m.g},${m.b},0.1)`, border: `1px solid rgba(${m.r},${m.g},${m.b},0.28)`, borderRadius: "20px", padding: "0.22rem 0.7rem" }}>{m.badge}</span>
+                      <span style={{ fontSize: "1.2rem", opacity: 0.7 }}>{m.icon}</span>
+                    </div>
+
+                    {/* Bottom content */}
+                    <div>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#F4F0FF", letterSpacing: "0.5px", marginBottom: "0.6rem", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>{m.title}</div>
+                      <p style={{ fontSize: "0.78rem", color: "rgba(215,208,245,0.72)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, margin: "0 0 1.1rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{m.desc}</p>
+                      <button
+                        onClick={e => { e.stopPropagation(); m.onClick(); }}
+                        style={{ display: "block", width: "100%", padding: "0.7rem", background: `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`, border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.55 : 0.3})`, borderRadius: "12px", color: m.accent, fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "3px", cursor: "pointer", transition: "all 0.22s", textTransform: "uppercase" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},0.3)`; e.currentTarget.style.boxShadow = `0 0 20px rgba(${m.r},${m.g},${m.b},0.3)`; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`; e.currentTarget.style.boxShadow = "none"; }}
+                      >ENTER MODE</button>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-            {/* Studio tools */}
-            <div style={{ fontSize: "0.32rem", letterSpacing: "3.5px", color: "rgba(52,211,153,0.32)", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.7rem", paddingLeft: "0.2rem", borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: "1rem" }}>Studio Tools</div>
-            <div className="hp-tools" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.45rem" }}>
-              {studioTools.map((m, i) => (
-                <div key={m.title} className="cm-in" style={{ animationDelay: `${(specialtyModes.length + i) * 0.02}s` }}>
-                  <CompactMode {...m} />
-                </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+
+          {/* Left arrow */}
+          <button
+            onClick={() => advanceCarousel(-1, specialtyModes.length)}
+            style={{ position: "absolute", left: isMobile ? "0.25rem" : "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
+          >‹</button>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => advanceCarousel(1, specialtyModes.length)}
+            style={{ position: "absolute", right: isMobile ? "0.25rem" : "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
+          >›</button>
+        </div>
+      </div>
+
+      {/* ══ STUDIO TOOLS ════════════════════════════════════════════════════════ */}
+      <div style={{
+        padding: isMobile ? "1.4rem 1rem 0" : "1.8rem 2.5rem 0",
+        position: "relative", zIndex: 2,
+        opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.38s ease both" : "none",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.85rem" }}>
+          <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(52,211,153,0.9), rgba(52,211,153,0.06))", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4px", color: "rgba(52,211,153,0.55)", textTransform: "uppercase", fontWeight: 700 }}>Studio Tools</span>
+        </div>
+        <div className="hp-tools" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.45rem" }}>
+          {studioTools.map((m, i) => (
+            <div key={m.title} className="cm-in" style={{ animationDelay: `${i * 0.02}s` }}>
+              <CompactMode {...m} />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div style={{ height: "2.5rem" }} />
