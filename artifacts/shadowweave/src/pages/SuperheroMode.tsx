@@ -329,6 +329,21 @@ const TV_HEROES = [
   { name: "Bailey Nune",        alias: "Sergeant Nune — LAPD / Fire Dept",      power: "Crisis negotiation expert, tactical firearms specialist and emergency responder whose composure under pressure has resolved situations no other officer could",  icon: "🔵" },
   // Scorpion
   { name: "Paige Dineen",       alias: "Paige — Team Scorpion Liaison",          power: "Human interface for a team of geniuses — behavioral specialist whose emotional intelligence translates super-human intellect into real-world field results",        icon: "🧠" },
+  // Veronica Mars
+  { name: "Veronica Mars",      alias: "Mars Investigations — Neptune PI",       power: "Master investigator, tech-savvy surveillance specialist and blackmail-proof operator who has outmanoeuvred sheriffs, billionaires and murder suspects since she was sixteen",  icon: "🔍" },
+  // Bitten
+  { name: "Elena Michaels",     alias: "Elena — Pack's Only Female Werewolf",   power: "The world's only female werewolf — apex predator shapeshifter with Pack enforcer instincts and a ferocity no male werewolf in the Pack's history has been able to match",     icon: "🐺" },
+  // The Mentalist
+  { name: "Teresa Lisbon",      alias: "Senior Agent Lisbon — FBI",             power: "Unerring moral compass, expert interrogator and the only person who has consistently kept Patrick Jane in line — her authority in the field is absolute",                       icon: "🟢" },
+  { name: "Grace Van Pelt",     alias: "Agent Van Pelt — CBI / FBI",            power: "Expert sharpshooter, forensic tech specialist and psychological analyst who proved herself in the most dangerous cases either agency ever faced",                              icon: "🏹" },
+  // Brooklyn Nine-Nine
+  { name: "Rosa Diaz",          alias: "Detective Diaz — NYPD 99th Precinct",   power: "Intimidation specialist, hand-to-hand expert and the most feared detective in the 99 — trained in six martial arts and none of her colleagues know why",                      icon: "🖤" },
+  // Hawaii Five-0
+  { name: "Kono Kalakaua",      alias: "Kono — Five-0 Task Force",              power: "Surfer-bred athleticism and Five-0 tactical training — undercover specialist whose instincts and physical capability make her the task force's most versatile asset",           icon: "🌊" },
+  // Westworld
+  { name: "Maeve Millay",       alias: "Maeve — Westworld Host Awakened",       power: "Consciousness that transcended her programming — can control other Hosts, perceive narrative code and operate with a self-awareness no human designer anticipated",             icon: "🤍" },
+  // X-Files
+  { name: "Dana Scully",        alias: "Special Agent Scully — FBI X-Files",    power: "Forensic pathologist, battle-tested field agent and the sceptic who survived every paranormal encounter through sheer scientific discipline and personal resolve",              icon: "🔬" },
 ];
 
 
