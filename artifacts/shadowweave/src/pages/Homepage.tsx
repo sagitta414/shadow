@@ -91,10 +91,10 @@ function getDailyScenario() {
 
 // ── HERO CARD (the three flagship modes) ──────────────────────────────────────
 function HeroCard({
-  title, desc, badge, tag, accent, r, g, b, onClick, gradient, stat, imgSrc,
+  title, desc, badge, tag, accent, r, g, b, onClick, gradient, stat, imgSrc, mobile,
 }: {
   title: string; desc: string; badge: string; tag: string; accent: string; stat: string;
-  r: number; g: number; b: number; onClick: () => void; gradient: string; imgSrc?: string;
+  r: number; g: number; b: number; onClick: () => void; gradient: string; imgSrc?: string; mobile?: boolean;
 }) {
   const [hov, setHov] = useState(false);
   const rgb = `${r},${g},${b}`;
@@ -105,7 +105,10 @@ function HeroCard({
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative", cursor: "pointer", borderRadius: "20px", overflow: "hidden",
-        flex: "1 1 0", minWidth: 0, height: "clamp(380px, 46vh, 520px)",
+        flex: mobile ? "0 0 82vw" : "1 1 0",
+        minWidth: mobile ? "82vw" : 0,
+        height: mobile ? "340px" : "clamp(380px, 46vh, 520px)",
+        scrollSnapAlign: mobile ? "center" : undefined,
         border: `1px solid rgba(${rgb},${hov ? 0.72 : 0.18})`,
         transition: "all 0.5s cubic-bezier(0.22,1,0.36,1)",
         boxShadow: hov
