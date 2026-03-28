@@ -11,12 +11,12 @@ import { saveStoryToArchive, exportStoryAsTXT, exportStoryAsPDF } from "../lib/a
 
 interface Props { onBack: () => void; }
 
-const PHASE_PSYCHE: { sanityDelta: number; hopeDelta: number; event: string }[] = [
-  { sanityDelta: -5,  hopeDelta: -8,  event: "Isolated and restrained — the weight of helplessness settles in" },
-  { sanityDelta: -12, hopeDelta: -10, event: "Psychological pressure intensifies — her resistance fractures" },
-  { sanityDelta: -18, hopeDelta: -15, event: "Physical submission — her body betrays her convictions" },
-  { sanityDelta: -22, hopeDelta: -20, event: "Her will wavers — the breaking point is near" },
-  { sanityDelta: -28, hopeDelta: -22, event: "Complete surrender — the last barrier falls" },
+const PHASE_PSYCHE: { sanityDelta: number; resistanceDelta: number; event: string }[] = [
+  { sanityDelta: -5,  resistanceDelta: -8,  event: "Isolated and restrained — the weight of helplessness settles in" },
+  { sanityDelta: -12, resistanceDelta: -10, event: "Psychological pressure intensifies — her will fractures" },
+  { sanityDelta: -18, resistanceDelta: -15, event: "Physical submission — her body betrays her convictions" },
+  { sanityDelta: -22, resistanceDelta: -20, event: "Her will wavers — the breaking point draws near" },
+  { sanityDelta: -28, resistanceDelta: -22, event: "Complete surrender — the last barrier falls" },
 ];
 const SETTINGS = [
   "A sensory-deprivation chamber deep underground",
@@ -71,8 +71,8 @@ export default function MindBreakMode({ onBack }: Props) {
     chapters.map((_, i) => ({ ...PHASE_PSYCHE[i] ?? PHASE_PSYCHE[PHASE_PSYCHE.length - 1] })),
     [chapters]
   );
-  const psycheSanity = 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0);
-  const psycheHope   = 100 + psycheLog.reduce((s, e) => s + e.hopeDelta, 0);
+  const psycheSanity     = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
+  const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [streamingText, chapters]);
 
@@ -174,7 +174,7 @@ export default function MindBreakMode({ onBack }: Props) {
 
         <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} label="PHASES COMPLETE" />
 
-        {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} hope={psycheHope} log={psycheLog} />}
+        {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={finalHeroine || undefined} />}
 
         {chapters.map((ch, i) => {
           const wc = ch.split(/\s+/).filter(Boolean).length;

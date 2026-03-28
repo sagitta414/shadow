@@ -1,6 +1,6 @@
 import { Router } from "express";
 import OpenAI from "openai";
-import { streamChat, getProvider, trimHistory, VENICE_PARAMS, resolveTokens, type AiProvider } from "../lib/ai";
+import { streamChat, completeChat, getProvider, trimHistory, VENICE_PARAMS, resolveTokens, type AiProvider } from "../lib/ai";
 
 const router = Router();
 
@@ -2149,6 +2149,67 @@ Continue the auction. Bids have escalated significantly. ${continueDir ? `Steer 
     const message = err instanceof Error ? err.message : "Unknown error";
     res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
     res.end();
+  }
+});
+
+router.post("/story/psyche-update", async (req, res) => {
+  try {
+    const { chapterText, heroineName, currentSanity = 100, currentResistance = 100 } = req.body as {
+      chapterText: string;
+      heroineName?: string;
+      currentSanity?: number;
+      currentResistance?: number;
+    };
+
+    if (!chapterText || typeof chapterText !== "string") {
+      res.status(400).json({ error: "chapterText is required" });
+      return;
+    }
+
+    const truncated = chapterText.slice(0, 2000);
+    const heroName = heroineName || "the heroine";
+
+    const systemPrompt = `You are a narrative psychology analyst for dark fiction. Analyze the chapter and return ONLY a JSON object with no other text.
+
+Evaluate the psychological impact on ${heroName} (current state: sanity ${currentSanity}/100, resistance ${currentResistance}/100).
+
+Return exactly:
+{"sanityDelta": <integer -35 to 0>, "resistanceDelta": <integer -30 to 0>, "event": "<8 to 15 words describing the key psychological event in past tense>"}
+
+Rules:
+- sanityDelta: how much mental stability was lost (0 if nothing sanity-breaking; up to -35 for severe trauma)
+- resistanceDelta: how much will to resist was lost (0 if resistance held firm; up to -30 if will was actively broken)
+- Scale impacts realistically — early chapters hurt less than later ones
+- event: concise, third-person past-tense description of the psychological turning point
+- Return ONLY the JSON. No markdown, no explanation.`;
+
+    const raw = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Chapter:\n\n${truncated}` },
+      ],
+      maxTokens: 130,
+      temperature: 0.35,
+    });
+
+    let parsed: { sanityDelta: number; resistanceDelta: number; event: string };
+    try {
+      const match = raw.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(match?.[0] ?? raw);
+    } catch {
+      parsed = { sanityDelta: -10, resistanceDelta: -8, event: "The ordeal carved another scar into her psyche" };
+    }
+
+    const sanityDelta = Math.max(-35, Math.min(0, Math.round(Number(parsed.sanityDelta) || -10)));
+    const resistanceDelta = Math.max(-30, Math.min(0, Math.round(Number(parsed.resistanceDelta) || -8)));
+    const event = typeof parsed.event === "string" && parsed.event.length > 3
+      ? parsed.event
+      : "The ordeal carved another scar into her psyche";
+
+    res.json({ sanityDelta, resistanceDelta, event });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: message });
   }
 });
 

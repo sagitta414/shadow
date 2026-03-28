@@ -3,136 +3,162 @@ import { useState } from "react";
 export interface PsycheEvent {
   event: string;
   sanityDelta: number;
-  hopeDelta: number;
+  hopeDelta?: number;
+  resistanceDelta?: number;
 }
 
 export interface PsycheMeterProps {
   sanity: number;
-  hope: number;
+  hope?: number;
+  resistance?: number;
   log: PsycheEvent[];
+  heroineName?: string | string[];
 }
 
-export default function PsycheMeter({ sanity, hope, log }: PsycheMeterProps) {
-  const [expanded, setExpanded] = useState(true);
+export default function PsycheMeter({ sanity, hope, resistance, log, heroineName }: PsycheMeterProps) {
+  const [expanded, setExpanded] = useState(false);
 
-  function meterColor(val: number): string {
-    if (val >= 70) return "#22cc66";
-    if (val >= 45) return "#ccaa22";
-    if (val >= 25) return "#cc6622";
+  const res = resistance ?? hope ?? 100;
+  const sClamp = Math.max(0, Math.min(100, sanity));
+  const rClamp = Math.max(0, Math.min(100, res));
+
+  const names = heroineName
+    ? Array.isArray(heroineName) ? heroineName : [heroineName]
+    : [];
+
+  function sanityColor(v: number): string {
+    if (v >= 70) return "#44cc77";
+    if (v >= 45) return "#e0a030";
+    if (v >= 25) return "#e05520";
     return "#cc2222";
   }
-
-  function sanityLabel(val: number): string {
-    if (val >= 80) return "Composed";
-    if (val >= 60) return "Strained";
-    if (val >= 40) return "Fractured";
-    if (val >= 20) return "Unraveling";
+  function resistColor(v: number): string {
+    if (v >= 70) return "#9d5cee";
+    if (v >= 45) return "#c8a030";
+    if (v >= 25) return "#887799";
+    return "#553366";
+  }
+  function sanityLabel(v: number): string {
+    if (v >= 85) return "Composed";
+    if (v >= 65) return "Strained";
+    if (v >= 45) return "Fractured";
+    if (v >= 25) return "Unraveling";
+    if (v >= 10) return "Breaking";
+    return "Shattered";
+  }
+  function resistLabel(v: number): string {
+    if (v >= 80) return "Defiant";
+    if (v >= 60) return "Straining";
+    if (v >= 40) return "Faltering";
+    if (v >= 20) return "Crumbling";
+    if (v >= 8)  return "Breaking";
     return "Broken";
   }
-
-  function hopeLabel(val: number): string {
-    if (val >= 75) return "Resolute";
-    if (val >= 50) return "Flickering";
-    if (val >= 30) return "Dimming";
-    if (val >= 15) return "Fading";
-    return "Extinguished";
-  }
-
-  function deltaStr(n: number) {
-    return n >= 0 ? `+${n}` : `${n}`;
-  }
+  function deltaStr(n: number): string { return n > 0 ? `+${n}` : `${n}`; }
 
   const last = log[log.length - 1];
+  const lastRD = last ? (last.resistanceDelta ?? last.hopeDelta ?? 0) : 0;
+
+  const sc = sanityColor(sClamp);
+  const rc = resistColor(rClamp);
 
   return (
-    <div style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", marginBottom: "1.5rem", overflow: "hidden", transition: "all 0.3s ease" }}>
-      <button onClick={() => setExpanded(!expanded)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 1.25rem", background: "none", border: "none", cursor: "pointer", color: "inherit", gap: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
-          <span className="font-cinzel" style={{ fontSize: "0.6rem", color: "rgba(184,134,11,0.7)", letterSpacing: "3px", textTransform: "uppercase", flexShrink: 0 }}>
-            Psychological State
-          </span>
-          <div style={{ display: "flex", gap: "1rem", flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1 }}>
-              <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", flexShrink: 0 }}>SANITY</span>
-              <div style={{ flex: 1, height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden", maxWidth: "100px" }}>
-                <div style={{ width: `${sanity}%`, height: "100%", background: meterColor(sanity), borderRadius: "2px", transition: "width 0.6s ease, background 0.6s ease", boxShadow: `0 0 6px ${meterColor(sanity)}` }} />
+    <div style={{
+      background: "linear-gradient(135deg, rgba(8,4,16,0.97), rgba(16,8,28,0.94))",
+      backdropFilter: "blur(28px)",
+      border: "1px solid rgba(255,255,255,0.06)",
+      borderRadius: "20px",
+      marginBottom: "1.75rem",
+      overflow: "hidden",
+      boxShadow: "0 8px 48px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.04)",
+      position: "relative",
+    }}>
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+        background: `linear-gradient(90deg, transparent 0%, ${sc}aa 30%, ${rc}aa 70%, transparent 100%)`,
+        transition: "background 1.2s ease",
+      }} />
+
+      <button
+        onClick={() => setExpanded(e => !e)}
+        style={{ width: "100%", background: "none", border: "none", cursor: "pointer", color: "inherit", padding: "1.1rem 1.35rem", textAlign: "left" }}
+      >
+        {names.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1rem" }}>
+            <div style={{ width: "3px", height: "16px", background: sc, borderRadius: "2px", boxShadow: `0 0 10px ${sc}`, flexShrink: 0, transition: "background 1.2s ease, box-shadow 1.2s ease" }} />
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.74rem", letterSpacing: "2.5px", color: "rgba(225,220,248,0.88)", textTransform: "uppercase", textShadow: `0 0 24px ${sc}33` }}>
+              {names.join("  ·  ")}
+            </span>
+            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,255,255,0.05), transparent)" }} />
+            <span style={{ fontSize: "0.5rem", color: "rgba(200,200,220,0.18)", letterSpacing: "1.5px", fontFamily: "'Montserrat', sans-serif" }}>
+              {expanded ? "▲ COLLAPSE" : "▼ LOG"}
+            </span>
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+          {[
+            { label: "SANITY", color: sc, clamp: sClamp, bg: `linear-gradient(90deg, #330a0a, ${sc})`, stateLabel: sanityLabel(sClamp), lo: "BROKEN", hi: "STABLE" },
+            { label: "RESISTANCE", color: rc, clamp: rClamp, bg: `linear-gradient(90deg, #1a0a2a, ${rc})`, stateLabel: resistLabel(rClamp), lo: "BROKEN", hi: "HOLDING" },
+          ].map(({ label, color, clamp, bg, stateLabel, lo, hi }) => (
+            <div key={label}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.45rem" }}>
+                <span style={{ fontSize: "0.54rem", color: "rgba(200,200,220,0.32)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px" }}>{label}</span>
+                <span style={{ fontSize: "0.66rem", color: color, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "1px", transition: "color 1.2s ease" }}>{stateLabel}</span>
               </div>
-              <span style={{ fontSize: "0.7rem", color: meterColor(sanity), fontFamily: "'Cinzel', serif", fontWeight: 700, flexShrink: 0, minWidth: "28px" }}>{sanity}</span>
+              <div style={{ height: "11px", background: "rgba(255,255,255,0.04)", borderRadius: "6px", overflow: "hidden", position: "relative" }}>
+                <div style={{
+                  width: `${clamp}%`, height: "100%",
+                  background: bg,
+                  borderRadius: "6px",
+                  transition: "width 1s cubic-bezier(0.23,1,0.32,1)",
+                  boxShadow: `0 0 14px ${color}77`,
+                  position: "relative",
+                }}>
+                  {clamp > 3 && (
+                    <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "4px", background: color, boxShadow: `0 0 10px ${color}`, borderRadius: "0 6px 6px 0" }} />
+                  )}
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.32rem" }}>
+                <span style={{ fontSize: "0.53rem", color: "rgba(200,200,220,0.13)", fontFamily: "'Montserrat', sans-serif" }}>{lo}</span>
+                <span style={{ fontSize: "0.62rem", color: color, fontFamily: "'Cinzel', serif", fontWeight: 700, transition: "color 1.2s ease" }}>{clamp}</span>
+                <span style={{ fontSize: "0.53rem", color: "rgba(200,200,220,0.13)", fontFamily: "'Montserrat', sans-serif" }}>{hi}</span>
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1 }}>
-              <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", flexShrink: 0 }}>HOPE</span>
-              <div style={{ flex: 1, height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden", maxWidth: "100px" }}>
-                <div style={{ width: `${hope}%`, height: "100%", background: "#4a90d9", borderRadius: "2px", transition: "width 0.6s ease", boxShadow: "0 0 6px rgba(74,144,217,0.6)" }} />
-              </div>
-              <span style={{ fontSize: "0.7rem", color: "#4a90d9", fontFamily: "'Cinzel', serif", fontWeight: 700, flexShrink: 0, minWidth: "28px" }}>{hope}</span>
+          ))}
+        </div>
+
+        {last && (
+          <div style={{ marginTop: "0.9rem", padding: "0.5rem 0.9rem", background: "rgba(255,255,255,0.02)", borderRadius: "9px", border: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+            <span style={{ fontSize: "0.7rem", color: "rgba(220,215,245,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.45, flex: 1 }}>{last.event}</span>
+            <div style={{ display: "flex", gap: "0.8rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.6rem", color: sc, fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>S {deltaStr(last.sanityDelta)}</span>
+              <span style={{ fontSize: "0.6rem", color: rc, fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>R {deltaStr(lastRD)}</span>
             </div>
           </div>
-        </div>
-        <span style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.25)", flexShrink: 0 }}>{expanded ? "▲" : "▼"}</span>
+        )}
       </button>
 
       {expanded && (
-        <div style={{ padding: "0 1.25rem 1.25rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", paddingTop: "1rem" }}>
-            {/* Sanity */}
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
-                <span className="font-cinzel" style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.4)", letterSpacing: "2px" }}>SANITY</span>
-                <span style={{ fontSize: "0.65rem", color: meterColor(sanity), fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{sanityLabel(sanity)}</span>
-              </div>
-              <div style={{ height: "8px", background: "rgba(255,255,255,0.06)", borderRadius: "4px", overflow: "hidden", marginBottom: "0.35rem" }}>
-                <div style={{ width: `${Math.max(0, Math.min(100, sanity))}%`, height: "100%", background: `linear-gradient(90deg, #cc2222, ${meterColor(sanity)})`, borderRadius: "4px", transition: "width 0.8s cubic-bezier(0.23,1,0.32,1)", boxShadow: `0 0 10px ${meterColor(sanity)}66` }} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif" }}>Breaking</span>
-                <span style={{ fontSize: "0.75rem", color: meterColor(sanity), fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{Math.max(0, Math.min(100, sanity))}/100</span>
-                <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif" }}>Stable</span>
-              </div>
-            </div>
-
-            {/* Hope */}
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
-                <span className="font-cinzel" style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.4)", letterSpacing: "2px" }}>HOPE</span>
-                <span style={{ fontSize: "0.65rem", color: "#4a90d9", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{hopeLabel(hope)}</span>
-              </div>
-              <div style={{ height: "8px", background: "rgba(255,255,255,0.06)", borderRadius: "4px", overflow: "hidden", marginBottom: "0.35rem" }}>
-                <div style={{ width: `${Math.max(0, Math.min(100, hope))}%`, height: "100%", background: "linear-gradient(90deg, #1a3a6b, #4a90d9)", borderRadius: "4px", transition: "width 0.8s cubic-bezier(0.23,1,0.32,1)", boxShadow: "0 0 10px rgba(74,144,217,0.4)" }} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif" }}>Gone</span>
-                <span style={{ fontSize: "0.75rem", color: "#4a90d9", fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{Math.max(0, Math.min(100, hope))}/100</span>
-                <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.2)", fontFamily: "'Montserrat', sans-serif" }}>Burning</span>
-              </div>
-            </div>
+        <div style={{ padding: "0 1.35rem 1.35rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+          <div style={{ fontSize: "0.5rem", color: "rgba(200,200,220,0.18)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", paddingTop: "0.9rem", marginBottom: "0.65rem" }}>
+            Psychological Event Log
           </div>
-
-          {/* Last event */}
-          {last && (
-            <div style={{ marginTop: "1rem", padding: "0.75rem 1rem", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
-              <div style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", marginBottom: "0.35rem" }}>LATEST EVENT</div>
-              <div style={{ fontSize: "0.78rem", color: "rgba(220,215,245,0.7)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.5, marginBottom: "0.4rem" }}>{last.event}</div>
-              <div style={{ display: "flex", gap: "1rem" }}>
-                <span style={{ fontSize: "0.65rem", color: meterColor(sanity), fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>SANITY {deltaStr(last.sanityDelta)}</span>
-                <span style={{ fontSize: "0.65rem", color: "#4a90d9", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>HOPE {deltaStr(last.hopeDelta)}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Full log */}
-          {log.length > 1 && (
-            <div style={{ marginTop: "0.75rem", maxHeight: "120px", overflowY: "auto" }}>
-              {[...log].reverse().slice(1).map((entry, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.3rem 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                  <span style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Raleway', sans-serif", flex: 1, marginRight: "1rem" }}>{entry.event}</span>
-                  <div style={{ display: "flex", gap: "0.75rem", flexShrink: 0 }}>
-                    <span style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif" }}>S {deltaStr(entry.sanityDelta)}</span>
-                    <span style={{ fontSize: "0.6rem", color: "rgba(74,144,217,0.5)", fontFamily: "'Montserrat', sans-serif" }}>H {deltaStr(entry.hopeDelta)}</span>
+          <div style={{ maxHeight: "170px", overflowY: "auto" }}>
+            {[...log].reverse().map((entry, i) => {
+              const rd = entry.resistanceDelta ?? entry.hopeDelta ?? 0;
+              return (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "0.38rem 0", borderBottom: "1px solid rgba(255,255,255,0.03)", gap: "1rem" }}>
+                  <span style={{ fontSize: "0.69rem", color: "rgba(200,200,220,0.42)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4, flex: 1 }}>{entry.event}</span>
+                  <div style={{ display: "flex", gap: "0.6rem", flexShrink: 0 }}>
+                    <span style={{ fontSize: "0.58rem", color: entry.sanityDelta < 0 ? "#cc4444" : "#44aa66", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>S {deltaStr(entry.sanityDelta)}</span>
+                    <span style={{ fontSize: "0.58rem", color: rd < 0 ? "#aa44bb" : "#886699", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>R {deltaStr(rd)}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

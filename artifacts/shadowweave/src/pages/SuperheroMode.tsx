@@ -7,6 +7,7 @@ import CustomHeroineModal from "../components/CustomHeroineModal";
 import { getPreset, savePreset } from "../lib/presets";
 import { useTheme } from "../context/ThemeContext";
 import { VILLAINS } from "../lib/villains";
+import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -720,6 +721,31 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
+  const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
+  const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
+  const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
+  const heroineNames = selectedHeroes.map(h => h.name);
+
+  async function updatePsyche(chapterText: string, currentLog: PsycheEvent[]) {
+    try {
+      const currentSanity = Math.max(0, 100 + currentLog.reduce((s, e) => s + e.sanityDelta, 0));
+      const currentResistance = Math.max(0, 100 + currentLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
+      const res = await fetch("/api/story/psyche-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chapterText: chapterText.slice(0, 2500),
+          heroineName: heroineNames.join(" & ") || undefined,
+          currentSanity,
+          currentResistance,
+        }),
+      });
+      if (!res.ok) return;
+      const data = await res.json() as { sanityDelta: number; resistanceDelta: number; event: string };
+      setPsycheLog(prev => [...prev, { sanityDelta: data.sanityDelta, resistanceDelta: data.resistanceDelta, event: data.event }]);
+    } catch { }
+  }
+
   function stopGeneration() {
     abortRef.current?.abort();
   }
@@ -926,6 +952,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     abortRef.current = ctrl;
     setLoading(true);
     setChapters([]);
+    setPsycheLog([]);
     setStreamingText("");
     setError("");
     let accumulated = "";
@@ -936,9 +963,10 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       }, ctrl.signal);
       setChapters([full]);
       autoSaveChapters([full]);
+      updatePsyche(full, []);
     } catch (e) {
       if (isAbort(e)) {
-        if (accumulated.trim()) { setChapters([accumulated]); autoSaveChapters([accumulated]); }
+        if (accumulated.trim()) { setChapters([accumulated]); autoSaveChapters([accumulated]); updatePsyche(accumulated, []); }
       } else {
         setError(e instanceof Error ? e.message : "Story generation failed");
       }
@@ -975,6 +1003,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       setChapters(newChapters);
       setContinuePrompt("");
       setChapterFocusTags([]);
+      updatePsyche(full, psycheLog);
       if (savedId) {
         updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
       } else {
@@ -985,6 +1014,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         if (accumulated.trim()) {
           const newChapters = [...chapters, accumulated];
           setChapters(newChapters);
+          updatePsyche(accumulated, psycheLog);
           if (savedId) {
             updateArchiveStory(savedId, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
           } else {
@@ -2307,6 +2337,16 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </div>
               <button onClick={stopGeneration} style={{ padding: "0.4rem 1.25rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
             </div>
+          )}
+
+          {/* Heroine Status */}
+          {psycheLog.length > 0 && (
+            <PsycheMeter
+              sanity={psycheSanity}
+              resistance={psycheResistance}
+              log={psycheLog}
+              heroineName={heroineNames}
+            />
           )}
 
           {/* Chapters */}
