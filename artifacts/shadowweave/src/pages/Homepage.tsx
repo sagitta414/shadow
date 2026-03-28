@@ -377,7 +377,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "💬", title: "SOUNDING BOARD", badge: "AI Partner · Brainstorm", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onSoundingBoard },
     { icon: "⚙", title: "CAPTOR LOGIC", badge: "Psych Profile · Deep", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onCaptorLogic },
     { icon: "📚", title: "STORY ARCS", badge: "Arcs · Structured", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onStoryArcs },
-    { icon: "📁", title: "HEROINE DOSSIER", badge: "212+ Profiles", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onHeroineDossier },
+    { icon: "📁", title: "HEROINE DOSSIER", badge: "210+ Profiles", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onHeroineDossier },
     { icon: "🔮", title: "VILLAIN BUILDER", badge: "Custom · Original", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onVillainBuilder },
     { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap },
   ];
@@ -432,7 +432,7 @@ export default function Homepage(props: HomepageProps) {
         {/* Stats — desktop only */}
         {!isMobile && (
           <div style={{ display: "flex", gap: "2.2rem", alignItems: "center" }}>
-            {[["31+", "Story Modes"], ["212+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
+            {[["31+", "Story Modes"], ["210+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
               <div key={l} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "rgba(230,190,60,0.82)", lineHeight: 1, fontFamily: "'Cinzel', serif" }}>{v}</div>
                 <div style={{ fontSize: "0.36rem", color: "rgba(200,200,220,0.26)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "2px", fontFamily: "'Montserrat', sans-serif" }}>{l}</div>
@@ -526,10 +526,10 @@ export default function Homepage(props: HomepageProps) {
         <div className="hp-hero" style={{ display: "flex", gap: "1.1rem" }}>
           <HeroCard
             title="HEROINE FORGE"
-            desc="212+ heroines across 8 universes. Choose your captor, set the scene, and generate a fully uncensored multi-chapter dark thriller."
+            desc="210+ heroines across 8 universes. Choose your captor, set the scene, and generate a fully uncensored multi-chapter dark thriller."
             badge="Core Mode · Flagship"
             tag="Dark Fiction Engine"
-            stat="212+ Heroines"
+            stat="210+ Heroines"
             accent="#C084FC"
             r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
