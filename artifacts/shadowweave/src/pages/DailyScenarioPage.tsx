@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive } from "../lib/archive";
+import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 import {
   getDailyEntryForToday,
   saveDailyEntry,
@@ -105,6 +106,23 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const [chapters, setChapters] = useState<string[]>([]);
+  const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
+  const psycheLogRef = useRef<PsycheEvent[]>([]);
+  const psycheChapRef = useRef(0);
+  useEffect(() => { psycheLogRef.current = psycheLog; }, [psycheLog]);
+  useEffect(() => {
+    if (chapters.length === 0) { psycheChapRef.current = 0; setPsycheLog([]); return; }
+    if (chapters.length <= psycheChapRef.current) return;
+    psycheChapRef.current = chapters.length;
+    const _ch = chapters[chapters.length - 1]; if (!_ch?.trim()) return;
+    const _log = psycheLogRef.current;
+    const _s = Math.max(0, 100 + _log.reduce((a, e) => a + e.sanityDelta, 0));
+    const _r = Math.max(0, 100 + _log.reduce((a, e) => a + (e.resistanceDelta ?? 0), 0));
+    fetch("/api/story/psyche-update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chapterText: _ch.slice(0, 2500), heroineName: heroine.name, currentSanity: _s, currentResistance: _r }) })
+      .then(r => r.ok ? r.json() : null).then((d: { sanityDelta: number; resistanceDelta: number; event: string } | null) => { if (d) setPsycheLog(prev => [...prev, { sanityDelta: d.sanityDelta, resistanceDelta: d.resistanceDelta, event: d.event }]); }).catch(() => {});
+  }, [chapters]);
+  const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
+  const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [continuing, setContinuing] = useState(false);
@@ -313,6 +331,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
           </div>
         )}
 
+        {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={heroine.name} />}
         <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.05rem", lineHeight: 1.9, color: "rgba(228,222,210,0.85)" }}>
           {chapters.map((chapter, ci) => (
             <div key={ci}>
