@@ -225,6 +225,7 @@ export const ALL_HEROINES: Heroine[] = [
   { universe: "TV", name: "Dana Scully",        alias: "Special Agent — FBI X-Files",   power: "Forensic pathologist & battle-tested field agent",   icon: "🔬" },
   { universe: "TV", name: "Bryce Larkin",       alias: "Agent Larkin — NSA/CIA",        power: "Intersect-class operative & lethal combatant",       icon: "🔫" },
   { universe: "TV", name: "Grace Van Pelt",     alias: "Agent Van Pelt — CBI",          power: "Tech analyst, sharpshooter & psychological insight", icon: "🏹" },
+  { universe: "TV", name: "Paige Dineen",      alias: "Team Scorpion Liaison",          power: "Behavioral specialist & human interface for genius",  icon: "🧠" },
 ];
 
 export const HEROINE_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "Animated", "SW", "TV"] as const;
