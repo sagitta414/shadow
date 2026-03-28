@@ -319,6 +319,11 @@ export default function Homepage(props: HomepageProps) {
   const touchStartX = useRef<number>(0);
   const touchDeltaX = useRef<number>(0);
   const [dragOffset, setDragOffset] = useState(0);
+  const [studioIdx, setStudioIdx] = useState(0);
+  const [studioPaused, setStudioPaused] = useState(false);
+  const studioTouchStartX = useRef<number>(0);
+  const studioTouchDeltaX = useRef<number>(0);
+  const [studioDragOffset, setStudioDragOffset] = useState(0);
   const [clock, setClock] = useState("");
   const [streak] = useState(() => getStreak());
   const [achCount] = useState(() => getUnlockCount());
@@ -351,11 +356,21 @@ export default function Homepage(props: HomepageProps) {
     setCarouselIdx(i => (i + dir + total) % total);
   }, []);
 
+  const advanceStudio = useCallback((dir: 1 | -1, total: number) => {
+    setStudioIdx(i => (i + dir + total) % total);
+  }, []);
+
   useEffect(() => {
     if (carouselPaused) return;
     const t = setInterval(() => setCarouselIdx(i => (i + 1) % 23), 4200);
     return () => clearInterval(t);
   }, [carouselPaused]);
+
+  useEffect(() => {
+    if (studioPaused) return;
+    const t = setInterval(() => setStudioIdx(i => (i + 1) % 8), 5500);
+    return () => clearInterval(t);
+  }, [studioPaused]);
 
   const { heroine, villain, setting, title: dailyTitle } = getDailyScenario();
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -387,14 +402,14 @@ export default function Homepage(props: HomepageProps) {
   ];
 
   const studioTools = [
-    { icon: "🏰", title: "CAPTOR PORTAL", badge: "Customise · Build", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onCaptorPortal },
-    { icon: "🗺", title: "CHARACTER MAPPER", badge: "Visualise · Network", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onCharacterMapper },
-    { icon: "💬", title: "SOUNDING BOARD", badge: "AI Partner · Brainstorm", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onSoundingBoard },
-    { icon: "⚙", title: "CAPTOR LOGIC", badge: "Psych Profile · Deep", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onCaptorLogic },
-    { icon: "📚", title: "STORY ARCS", badge: "Arcs · Structured", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onStoryArcs },
-    { icon: "📁", title: "HEROINE DOSSIER", badge: "210+ Profiles", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onHeroineDossier },
-    { icon: "🔮", title: "VILLAIN BUILDER", badge: "Custom · Original", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onVillainBuilder },
-    { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap },
+    { icon: "🏰", title: "CAPTOR PORTAL", badge: "Customise · Build", desc: "Design your ideal captor from the ground up — profile, methods, parameters, and the full architecture of their control.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onCaptorPortal, img: `${BASE}/heroes/tool-captor-portal.png` },
+    { icon: "🗺", title: "CHARACTER MAPPER", badge: "Visualise · Network", desc: "Chart every connection in your story universe. Loyalty, tension, power, betrayal — all mapped as a living visual web.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onCharacterMapper, img: `${BASE}/heroes/tool-character-mapper.png` },
+    { icon: "💬", title: "SOUNDING BOARD", badge: "AI Partner · Brainstorm", desc: "Pitch your scenario to a strategic AI partner. Get plot angles, narrative pressure-testing, and creative feedback.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onSoundingBoard, img: `${BASE}/heroes/tool-sounding-board.png` },
+    { icon: "⚙", title: "CAPTOR LOGIC", badge: "Psych Profile · Deep", desc: "Build a clinical psychological profile. Map the captor's motivations, methods, and pressure points in forensic detail.", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onCaptorLogic, img: `${BASE}/heroes/tool-captor-logic.png` },
+    { icon: "📚", title: "STORY ARCS", badge: "Arcs · Structured", desc: "Structure multi-chapter campaigns. Define arcs, track progress, and build consistent narrative threads across every story.", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onStoryArcs, img: `${BASE}/heroes/tool-story-arcs.png` },
+    { icon: "📁", title: "HEROINE DOSSIER", badge: "210+ Profiles", desc: "Browse 210+ captured heroines. Full profiles, powers, aliases, and backstories — select the perfect target with one tap.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onHeroineDossier, img: `${BASE}/heroes/tool-heroine-dossier.png` },
+    { icon: "🔮", title: "VILLAIN BUILDER", badge: "Custom · Original", desc: "Create a completely original villain from scratch — appearance, psychology, history, and the darkness that made them.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onVillainBuilder, img: `${BASE}/heroes/tool-villain-builder.png` },
+    { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", desc: "Plot who controls whom, who wants what, and who is expendable. Every dynamic laid bare in a single power-web.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap, img: `${BASE}/heroes/tool-relationship-map.png` },
   ];
 
   return (
@@ -812,23 +827,144 @@ export default function Homepage(props: HomepageProps) {
         )}
       </div>
 
-      {/* ══ STUDIO TOOLS ════════════════════════════════════════════════════════ */}
+      {/* ══ STUDIO TOOLS — CAROUSEL ═════════════════════════════════════════════ */}
       <div style={{
-        padding: isMobile ? "1.4rem 1rem 0" : "1.8rem 2.5rem 0",
+        padding: isMobile ? "1.6rem 0 0" : "2rem 0 0",
         position: "relative", zIndex: 2,
-        opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.38s ease both" : "none",
+        opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.42s ease both" : "none",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.85rem" }}>
-          <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(52,211,153,0.9), rgba(52,211,153,0.06))", flexShrink: 0 }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4px", color: "rgba(52,211,153,0.55)", textTransform: "uppercase", fontWeight: 700 }}>Studio Tools</span>
-        </div>
-        <div className="hp-tools" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.45rem" }}>
-          {studioTools.map((m, i) => (
-            <div key={m.title} className="cm-in" style={{ animationDelay: `${i * 0.02}s` }}>
-              <CompactMode {...m} />
+        {/* Section header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: isMobile ? "0 1rem 1.1rem" : "0 2.5rem 1.2rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(52,211,153,0.95), rgba(52,211,153,0.08))", boxShadow: "0 0 12px rgba(52,211,153,0.5)", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(52,211,153,0.72)", textTransform: "uppercase", fontWeight: 700 }}>Studio Tools</span>
+          <div style={{ padding: "0.18rem 0.7rem", background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.18)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(52,211,153,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>8 TOOLS</span>
+          </div>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(52,211,153,0.15), transparent)" }} />
+          {isMobile ? (
+            <span style={{ fontSize: "0.5rem", color: "rgba(52,211,153,0.6)", fontFamily: "'Cinzel', serif", letterSpacing: "2px" }}>{studioIdx + 1} / {studioTools.length}</span>
+          ) : (
+            <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
+              {studioTools.map((_, i) => (
+                <button key={i} onClick={() => setStudioIdx(i)} style={{ width: i === studioIdx ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === studioIdx ? "rgba(52,211,153,0.85)" : "rgba(52,211,153,0.22)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", flexShrink: 0 }} />
+              ))}
             </div>
-          ))}
+          )}
         </div>
+
+        {/* Carousel track */}
+        <div
+          style={{ overflow: "hidden", position: "relative", touchAction: "pan-y" }}
+          onMouseEnter={() => setStudioPaused(true)}
+          onMouseLeave={() => setStudioPaused(false)}
+          onTouchStart={e => { studioTouchStartX.current = e.touches[0].clientX; studioTouchDeltaX.current = 0; setStudioPaused(true); }}
+          onTouchMove={e => { studioTouchDeltaX.current = e.touches[0].clientX - studioTouchStartX.current; setStudioDragOffset(studioTouchDeltaX.current); }}
+          onTouchEnd={() => { if (Math.abs(studioTouchDeltaX.current) > 50) advanceStudio(studioTouchDeltaX.current < 0 ? 1 : -1, studioTools.length); setStudioDragOffset(0); setTimeout(() => setStudioPaused(false), 3000); }}
+        >
+          <div style={{
+            display: "flex", gap: "0.9rem",
+            transform: `translateX(calc(-${studioIdx} * (${isMobile ? "82vw" : "298px"} + 0.9rem) + ${studioDragOffset}px))`,
+            transition: studioDragOffset !== 0 ? "none" : "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+            willChange: "transform",
+            paddingLeft: isMobile ? "9vw" : "2.5rem",
+            paddingRight: isMobile ? "9vw" : "2.5rem",
+            paddingBottom: "0.5rem",
+          }}>
+            {studioTools.map((m, i) => {
+              const isActive = i === studioIdx;
+              return (
+                <div
+                  key={m.title}
+                  onClick={m.onClick}
+                  style={{
+                    flex: `0 0 ${isMobile ? "82vw" : "292px"}`,
+                    width: isMobile ? "82vw" : "292px",
+                    height: isMobile ? "340px" : "360px",
+                    borderRadius: "20px", overflow: "hidden",
+                    position: "relative", cursor: "pointer",
+                    border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`,
+                    boxShadow: isActive ? `0 12px 48px rgba(${m.r},${m.g},${m.b},0.28), 0 0 0 1px rgba(${m.r},${m.g},${m.b},0.12)` : "none",
+                    transform: isActive ? "scale(1.02)" : "scale(0.97)",
+                    transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.55s, box-shadow 0.55s",
+                    background: "rgba(4,1,12,0.9)",
+                  }}
+                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.transform = "scale(1.0)"; (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},0.55)`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = isActive ? "scale(1.02)" : "scale(0.97)"; (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`; }}
+                >
+                  {/* Background image */}
+                  <img
+                    src={m.img} alt={m.title}
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.5, transition: "opacity 0.3s" }}
+                  />
+                  {/* Gradient overlay */}
+                  <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(${m.r},${m.g},${m.b},0.04) 0%, rgba(4,1,12,0.42) 38%, rgba(4,1,12,0.92) 65%, rgba(4,1,12,0.99) 100%)` }} />
+                  {/* Accent top bar */}
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${m.r},${m.g},${m.b},${isActive ? 0.9 : 0.3}), transparent)`, transition: "opacity 0.4s" }} />
+
+                  {/* Content */}
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: "1.25rem 1.35rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "auto" }}>
+                      <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", color: m.accent, fontFamily: "'Cinzel', serif", background: `rgba(${m.r},${m.g},${m.b},0.1)`, border: `1px solid rgba(${m.r},${m.g},${m.b},0.28)`, borderRadius: "20px", padding: "0.22rem 0.7rem" }}>{m.badge}</span>
+                      <span style={{ fontSize: "1.2rem", opacity: 0.7 }}>{m.icon}</span>
+                    </div>
+                    <div>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.0rem", fontWeight: 900, color: "#F4F0FF", letterSpacing: "0.5px", marginBottom: "0.55rem", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>{m.title}</div>
+                      <p style={{ fontSize: "0.78rem", color: "rgba(215,208,245,0.72)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, margin: "0 0 1.1rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{m.desc}</p>
+                      <button
+                        onClick={e => { e.stopPropagation(); m.onClick(); }}
+                        style={{ display: "block", width: "100%", padding: "0.7rem", background: `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`, border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.55 : 0.3})`, borderRadius: "12px", color: m.accent, fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "3px", cursor: "pointer", transition: "all 0.22s", textTransform: "uppercase" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},0.3)`; e.currentTarget.style.boxShadow = `0 0 20px rgba(${m.r},${m.g},${m.b},0.3)`; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`; e.currentTarget.style.boxShadow = "none"; }}
+                      >OPEN TOOL</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop side arrows */}
+          {!isMobile && (
+            <>
+              <button
+                onClick={() => advanceStudio(-1, studioTools.length)}
+                style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(52,211,153,0.3)", color: "rgba(52,211,153,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(52,211,153,0.15)"; e.currentTarget.style.borderColor = "rgba(52,211,153,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(52,211,153,0.3)"; }}
+              >‹</button>
+              <button
+                onClick={() => advanceStudio(1, studioTools.length)}
+                style={{ position: "absolute", right: "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(52,211,153,0.3)", color: "rgba(52,211,153,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(52,211,153,0.15)"; e.currentTarget.style.borderColor = "rgba(52,211,153,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(52,211,153,0.3)"; }}
+              >›</button>
+            </>
+          )}
+        </div>
+
+        {/* Mobile bottom nav */}
+        {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.25rem", marginTop: "0.9rem", padding: "0 1rem" }}>
+            <button
+              onClick={() => advanceStudio(-1, studioTools.length)}
+              style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(6,2,16,0.92)", border: "1px solid rgba(52,211,153,0.35)", color: "rgba(52,211,153,0.85)", fontSize: "1.4rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, backdropFilter: "blur(8px)", WebkitTapHighlightColor: "transparent" }}
+            >‹</button>
+            <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+              {studioTools.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setStudioIdx(i); setStudioPaused(true); setTimeout(() => setStudioPaused(false), 4000); }}
+                  style={{ width: i === studioIdx ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === studioIdx ? "rgba(52,211,153,0.88)" : "rgba(52,211,153,0.2)", border: "none", cursor: "pointer", padding: 0, flexShrink: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", WebkitTapHighlightColor: "transparent" }}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => advanceStudio(1, studioTools.length)}
+              style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(6,2,16,0.92)", border: "1px solid rgba(52,211,153,0.35)", color: "rgba(52,211,153,0.85)", fontSize: "1.4rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, backdropFilter: "blur(8px)", WebkitTapHighlightColor: "transparent" }}
+            >›</button>
+          </div>
+        )}
       </div>
 
       <div style={{ height: "2.5rem" }} />
