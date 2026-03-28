@@ -39,6 +39,10 @@ import LongGameMode from "./pages/LongGameMode";
 import DarkMirrorMode from "./pages/DarkMirrorMode";
 import ArenaMode from "./pages/ArenaMode";
 import TheHandlerMode from "./pages/TheHandlerMode";
+import TimeLoopMode from "./pages/TimeLoopMode";
+import DreamSequenceMode from "./pages/DreamSequenceMode";
+import SequelGenerator from "./pages/SequelGenerator";
+import StoryContinuation from "./pages/StoryContinuation";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -95,6 +99,10 @@ type Page =
   | "dark-mirror"
   | "arena-mode"
   | "the-handler"
+  | "time-loop"
+  | "dream-sequence"
+  | "sequel-generator"
+  | "story-continuation"
   | "achievements"
   | "admin";
 
@@ -106,6 +114,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "corruption-arc","hero-auction","trophy-display","obedience-training",
   "showcase","public-property","betting-pool","villain-team-up",
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
+  "time-loop","dream-sequence","sequel-generator","story-continuation",
 ]);
 
 function BackgroundEffects() {
@@ -272,6 +281,10 @@ function AppInner() {
           onVillainBuilder={() => navigate("villain-builder")}
           onRelationshipMap={() => navigate("relationship-map")}
           onAchievements={() => navigate("achievements")}
+          onTimeLoop={() => navigate("time-loop")}
+          onDreamSequence={() => navigate("dream-sequence")}
+          onSequelGenerator={() => navigate("sequel-generator")}
+          onStoryContinuation={() => navigate("story-continuation")}
         />
       )}
 
@@ -462,6 +475,22 @@ function AppInner() {
 
       {page === "relationship-map" && (
         <RelationshipMap onBack={() => navigate("home")} />
+      )}
+
+      {page === "time-loop" && (
+        <TimeLoopMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "dream-sequence" && (
+        <DreamSequenceMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "sequel-generator" && (
+        <SequelGenerator onBack={() => navigate("home")} />
+      )}
+
+      {page === "story-continuation" && (
+        <StoryContinuation onBack={() => navigate("home")} />
       )}
 
       {page === "achievements" && (
