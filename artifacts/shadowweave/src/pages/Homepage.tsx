@@ -86,12 +86,13 @@ function getDailyScenario() {
 }
 
 // ── MODE CARD ─────────────────────────────────────────────────────────────────
-function ModeCard({ icon, title, desc, badge, accent, r, g, b, onClick, size = "normal", tag }: {
+function ModeCard({ icon, title, desc, badge, accent, r, g, b, onClick, size = "normal", tag, img }: {
   icon: string; title: string; desc: string; badge: string; accent: string;
-  r: number; g: number; b: number; onClick: () => void; size?: "normal" | "large"; tag?: string;
+  r: number; g: number; b: number; onClick: () => void; size?: "normal" | "large"; tag?: string; img?: string;
 }) {
   const [hov, setHov] = useState(false);
   const rgb = `${r},${g},${b}`;
+  const hasImg = !!img;
   return (
     <div
       onClick={onClick}
@@ -99,49 +100,129 @@ function ModeCard({ icon, title, desc, badge, accent, r, g, b, onClick, size = "
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative", cursor: "pointer", borderRadius: "18px", overflow: "hidden",
-        background: hov ? `rgba(${rgb},0.11)` : "rgba(6,2,18,0.82)",
-        border: `1px solid ${hov ? `rgba(${rgb},0.55)` : `rgba(${rgb},0.1)`}`,
-        padding: size === "large" ? "1.6rem 1.5rem 1.4rem" : "1.1rem 1.2rem 1rem",
-        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-        boxShadow: hov ? `0 0 0 1px rgba(${rgb},0.12), 0 20px 60px rgba(${rgb},0.22), 0 40px 80px rgba(0,0,0,0.4)` : "0 4px 24px rgba(0,0,0,0.5)",
-        transform: hov ? "translateY(-5px) scale(1.008)" : "none",
+        background: "rgba(6,2,18,0.92)",
+        border: `1px solid ${hov ? `rgba(${rgb},0.65)` : `rgba(${rgb},0.12)`}`,
+        minHeight: hasImg ? (size === "large" ? "200px" : "165px") : undefined,
+        transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
+        boxShadow: hov
+          ? `0 0 0 1px rgba(${rgb},0.15), 0 24px 70px rgba(${rgb},0.28), 0 0 120px rgba(${rgb},0.08), 0 40px 80px rgba(0,0,0,0.5)`
+          : "0 4px 24px rgba(0,0,0,0.5)",
+        transform: hov ? "translateY(-6px) scale(1.012)" : "none",
         backdropFilter: "blur(20px)",
-        display: "flex", flexDirection: "column", gap: size === "large" ? "0.85rem" : "0.55rem",
       }}
     >
-      {/* Top bar */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.9) 30%, rgba(${rgb},0.9) 70%, transparent)` : `linear-gradient(90deg, transparent, rgba(${rgb},0.2) 50%, transparent)`, transition: "all 0.35s", boxShadow: hov ? `0 0 16px rgba(${rgb},0.5)` : "none" }} />
-      {/* Radial glow */}
-      {hov && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 0%, rgba(${rgb},0.1) 0%, transparent 65%)`, pointerEvents: "none" }} />}
-      {/* Shimmer */}
-      {hov && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.035) 50%, transparent 65%)", animation: "shimmerSweep 0.9s ease forwards", pointerEvents: "none" }} />}
-      {/* Tag */}
-      {tag && <div style={{ position: "absolute", top: "0.75rem", right: "0.85rem", fontSize: "0.38rem", letterSpacing: "2px", padding: "2px 8px", borderRadius: "20px", background: `rgba(${rgb},0.18)`, border: `1px solid rgba(${rgb},0.3)`, color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{tag}</div>}
-      {/* Icon + title row */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-        <div style={{
-          width: size === "large" ? "52px" : "42px", height: size === "large" ? "52px" : "42px",
-          borderRadius: "14px", flexShrink: 0,
-          background: hov ? `rgba(${rgb},0.28)` : `rgba(${rgb},0.08)`,
-          border: `1px solid rgba(${rgb},${hov ? 0.5 : 0.12})`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: size === "large" ? "1.6rem" : "1.2rem",
-          transition: "all 0.28s",
-          filter: hov ? `drop-shadow(0 0 12px rgba(${rgb},0.9))` : "none",
-          boxShadow: hov ? `0 0 24px rgba(${rgb},0.35)` : "none",
-        }}>{icon}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: "'Cinzel', serif", fontSize: size === "large" ? "1rem" : "0.8rem", fontWeight: 700, color: hov ? "#fff" : "rgba(232,228,255,0.82)", letterSpacing: "0.05em", transition: "color 0.25s", lineHeight: 1.2, textShadow: hov ? `0 0 30px rgba(${rgb},0.7)` : "none" }}>{title}</div>
-          <div style={{ fontSize: "0.42rem", letterSpacing: "2px", color: hov ? accent : `rgba(${rgb},0.42)`, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase", marginTop: "3px", transition: "color 0.25s" }}>{badge}</div>
+      {/* ── PORTRAIT PANEL (right side, only when img provided) ── */}
+      {hasImg && (
+        <>
+          {/* Image */}
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "46%", overflow: "hidden" }}>
+            <img
+              src={img}
+              alt=""
+              style={{
+                width: "100%", height: "100%",
+                objectFit: "cover", objectPosition: "center top",
+                opacity: hov ? 0.82 : 0.28,
+                transform: hov ? "scale(1.12) translateY(-2%)" : "scale(1.03)",
+                filter: hov
+                  ? `saturate(1.35) brightness(1.15) contrast(1.05)`
+                  : "saturate(0.5) brightness(0.55)",
+                transition: "opacity 0.6s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease",
+              }}
+            />
+            {/* Left bleed gradient */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(to right, rgba(6,2,18,1) 0%, rgba(6,2,18,0.82) 22%, rgba(6,2,18,${hov ? 0.08 : 0.6}) 65%, rgba(6,2,18,0) 100%)`,
+              transition: "all 0.55s ease",
+            }} />
+            {/* Bottom vignette */}
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0, height: "55%",
+              background: `linear-gradient(to top, rgba(6,2,18,${hov ? 0.75 : 0.92}), transparent)`,
+              transition: "all 0.45s",
+            }} />
+            {/* Accent tint overlay */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: `radial-gradient(ellipse at 75% 40%, rgba(${rgb},${hov ? 0.18 : 0.0}) 0%, transparent 65%)`,
+              transition: "all 0.55s",
+            }} />
+            {/* Scan-line reveal on hover */}
+            {hov && (
+              <div style={{
+                position: "absolute", inset: 0, pointerEvents: "none",
+                background: `linear-gradient(to bottom, transparent 0%, rgba(${rgb},0.12) 48%, rgba(255,255,255,0.06) 50%, rgba(${rgb},0.12) 52%, transparent 100%)`,
+                animation: "imgScanReveal 0.65s ease forwards",
+              }} />
+            )}
+            {/* Right edge glow */}
+            <div style={{
+              position: "absolute", right: 0, top: 0, bottom: 0, width: "2px",
+              background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.9 : 0.15}) 40%, rgba(${rgb},${hov ? 0.9 : 0.15}) 60%, transparent)`,
+              boxShadow: hov ? `0 0 22px rgba(${rgb},0.7)` : "none",
+              transition: "all 0.4s",
+            }} />
+          </div>
+          {/* Corner tag over portrait */}
+          {hov && (
+            <div style={{
+              position: "absolute", top: "0.7rem", right: "0.7rem", zIndex: 5,
+              fontSize: "0.36rem", letterSpacing: "2.5px", padding: "3px 9px",
+              borderRadius: "20px", background: `rgba(${rgb},0.22)`,
+              border: `1px solid rgba(${rgb},0.5)`, color: accent,
+              fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase",
+              backdropFilter: "blur(8px)",
+            }}>UNCENSORED</div>
+          )}
+        </>
+      )}
+
+      {/* ── TEXT CONTENT ── */}
+      <div style={{
+        position: "relative", zIndex: 2,
+        padding: size === "large" ? "1.55rem 1.5rem 1.35rem" : "1.1rem 1.2rem 1rem",
+        maxWidth: hasImg ? "58%" : "100%",
+        display: "flex", flexDirection: "column",
+        gap: size === "large" ? "0.85rem" : "0.55rem",
+        minHeight: hasImg ? (size === "large" ? "200px" : "165px") : undefined,
+      }}>
+        {/* Top bar */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.95) 35%, rgba(${rgb},0.95) 65%, transparent)` : `linear-gradient(90deg, transparent, rgba(${rgb},0.2) 50%, transparent)`, transition: "all 0.35s", boxShadow: hov ? `0 0 18px rgba(${rgb},0.6)` : "none" }} />
+        {/* Radial glow */}
+        {hov && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 30% 0%, rgba(${rgb},0.12) 0%, transparent 65%)`, pointerEvents: "none" }} />}
+        {/* Shimmer */}
+        {hov && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.04) 50%, transparent 65%)", animation: "shimmerSweep 0.9s ease forwards", pointerEvents: "none" }} />}
+        {/* Tag (non-image cards) */}
+        {tag && !hasImg && <div style={{ position: "absolute", top: "0.75rem", right: "0.85rem", fontSize: "0.38rem", letterSpacing: "2px", padding: "2px 8px", borderRadius: "20px", background: `rgba(${rgb},0.18)`, border: `1px solid rgba(${rgb},0.3)`, color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{tag}</div>}
+        {/* Tag (image cards, visible always) */}
+        {tag && hasImg && !hov && <div style={{ position: "absolute", top: "0.75rem", right: "0.85rem", zIndex: 4, fontSize: "0.38rem", letterSpacing: "2px", padding: "2px 8px", borderRadius: "20px", background: `rgba(${rgb},0.18)`, border: `1px solid rgba(${rgb},0.3)`, color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{tag}</div>}
+        {/* Icon + title row */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+          <div style={{
+            width: size === "large" ? "52px" : "42px", height: size === "large" ? "52px" : "42px",
+            borderRadius: "14px", flexShrink: 0,
+            background: hov ? `rgba(${rgb},0.28)` : `rgba(${rgb},0.08)`,
+            border: `1px solid rgba(${rgb},${hov ? 0.5 : 0.12})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: size === "large" ? "1.6rem" : "1.2rem",
+            transition: "all 0.28s",
+            filter: hov ? `drop-shadow(0 0 12px rgba(${rgb},0.9))` : "none",
+            boxShadow: hov ? `0 0 24px rgba(${rgb},0.35)` : "none",
+          }}>{icon}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: size === "large" ? "1rem" : "0.8rem", fontWeight: 700, color: hov ? "#fff" : "rgba(232,228,255,0.82)", letterSpacing: "0.05em", transition: "color 0.25s", lineHeight: 1.2, textShadow: hov ? `0 0 30px rgba(${rgb},0.7)` : "none" }}>{title}</div>
+            <div style={{ fontSize: "0.42rem", letterSpacing: "2px", color: hov ? accent : `rgba(${rgb},0.42)`, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase", marginTop: "3px", transition: "color 0.25s" }}>{badge}</div>
+          </div>
         </div>
-      </div>
-      {/* Desc */}
-      <div style={{ fontSize: "0.66rem", color: hov ? "rgba(210,205,240,0.55)" : "rgba(200,195,230,0.24)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, transition: "color 0.25s" }}>{desc}</div>
-      {/* CTA row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto", paddingTop: "0.4rem", borderTop: `1px solid rgba(${rgb},${hov ? 0.18 : 0.06})`, transition: "border-color 0.3s" }}>
-        <span style={{ fontSize: "0.44rem", letterSpacing: "3px", color: hov ? `rgba(${rgb},0.85)` : `rgba(${rgb},0.28)`, fontFamily: "'Cinzel', serif", textTransform: "uppercase", fontWeight: 700, transition: "color 0.25s", textShadow: hov ? `0 0 14px rgba(${rgb},0.8)` : "none" }}>Enter →</span>
-        <div style={{ display: "flex", gap: "3px" }}>
-          {[1,2,3].map(i => <div key={i} style={{ width: "4px", height: "4px", borderRadius: "50%", background: hov ? `rgba(${rgb},${1 - i * 0.25})` : `rgba(${rgb},0.1)`, transition: "all 0.25s", boxShadow: hov ? `0 0 8px rgba(${rgb},0.8)` : "none" }} />)}
+        {/* Desc */}
+        <div style={{ fontSize: "0.66rem", color: hov ? "rgba(210,205,240,0.6)" : "rgba(200,195,230,0.26)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.65, transition: "color 0.25s" }}>{desc}</div>
+        {/* CTA row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto", paddingTop: "0.4rem", borderTop: `1px solid rgba(${rgb},${hov ? 0.22 : 0.06})`, transition: "border-color 0.3s" }}>
+          <span style={{ fontSize: "0.44rem", letterSpacing: "3px", color: hov ? `rgba(${rgb},0.9)` : `rgba(${rgb},0.28)`, fontFamily: "'Cinzel', serif", textTransform: "uppercase", fontWeight: 700, transition: "color 0.25s", textShadow: hov ? `0 0 16px rgba(${rgb},0.85)` : "none" }}>Enter →</span>
+          <div style={{ display: "flex", gap: "3px" }}>
+            {[1,2,3].map(i => <div key={i} style={{ width: "4px", height: "4px", borderRadius: "50%", background: hov ? `rgba(${rgb},${1 - i * 0.25})` : `rgba(${rgb},0.1)`, transition: "all 0.25s", boxShadow: hov ? `0 0 8px rgba(${rgb},0.8)` : "none" }} />)}
+          </div>
         </div>
       </div>
     </div>
@@ -261,9 +342,9 @@ export default function Homepage(props: HomepageProps) {
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const allModes = [
-    { id: "forge",    icon: "⚔", title: "HEROINE FORGE", desc: "181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller.", badge: "Core Mode · 8 Universes", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onSuperheroMode, tag: "Flagship", size: "large" as const, cat: "forge" },
-    { id: "int",      icon: "🔦", title: "INTERROGATION ROOM", desc: "Psychological pressure chamber. Extract information through fear, isolation, and manipulation.", badge: "Psych · High Tension", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onInterrogationRoom, cat: "capture" },
-    { id: "celeb",    icon: "🎬", title: "CELEBRITY CAPTURE", desc: "Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall.", badge: "Celebrity · Premium", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onCelebrityMode, tag: "Premium", cat: "celebrity" },
+    { id: "forge",    icon: "⚔", title: "HEROINE FORGE", desc: "181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller.", badge: "Core Mode · 8 Universes", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onSuperheroMode, tag: "Flagship", size: "large" as const, cat: "forge", img: "/icons/heroine-forge.png" },
+    { id: "int",      icon: "🔦", title: "INTERROGATION ROOM", desc: "Psychological pressure chamber. Extract information through fear, isolation, and manipulation.", badge: "Psych · High Tension", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onInterrogationRoom, cat: "capture", img: "/icons/interrogation-room.png" },
+    { id: "celeb",    icon: "🎬", title: "CELEBRITY CAPTURE", desc: "Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall.", badge: "Celebrity · Premium", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onCelebrityMode, tag: "Premium", cat: "celebrity", img: "/icons/celebrity-captive.png" },
     { id: "daily",    icon: "📅", title: "DAILY SCENARIO", desc: "A fresh AI-crafted scenario every 24 hours. New heroine, captor, and setting at midnight.", badge: "Daily · Refreshes 00:00", accent: "#FCD34D", r: 251, g: 191, b: 36, onClick: props.onDailyScenario, cat: "all" },
     { id: "mb",       icon: "🌀", title: "MIND BREAK", desc: "Five-phase psychological deconstruction. Patience, trust, isolation, dependency, and surrender.", badge: "5 Phases · Deep Psych", accent: "#C084FC", r: 192, g: 132, b: 252, onClick: props.onMindBreak, cat: "capture" },
     { id: "dc",       icon: "⛓", title: "DUAL CAPTURE", desc: "Two heroines, one cell. A shared ordeal that tests loyalty, friendship, and individual resolve.", badge: "Duo · Shared Cell", accent: "#34D399", r: 52,  g: 211, b: 153, onClick: props.onDualCapture, cat: "capture" },
@@ -338,6 +419,7 @@ export default function Homepage(props: HomepageProps) {
         @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
         @keyframes hdrShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
         @keyframes floatOrb { 0%,100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-28px) scale(1.05); } }
+        @keyframes imgScanReveal { 0% { transform: translateY(120%); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-120%); opacity: 0; } }
         @keyframes floatOrb2 { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(20px); } }
         @keyframes surpriseGlow { 0%,100% { box-shadow: 0 0 30px rgba(168,85,247,0.45), 0 0 80px rgba(168,85,247,0.12); } 50% { box-shadow: 0 0 55px rgba(168,85,247,0.85), 0 0 120px rgba(168,85,247,0.28); } }
         @keyframes borderGlow { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
