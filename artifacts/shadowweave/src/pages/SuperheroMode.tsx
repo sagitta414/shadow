@@ -325,6 +325,10 @@ const TV_HEROES = [
   { name: "Kara Zor-El",        alias: "Kara — Kryptonian Cousin of Clark",    power: "Full Kryptonian power suite — flight, heat vision, freeze breath, invulnerability and speed rivalling Clark at his absolute peak",           icon: "⭐" },
   // Covert Affairs
   { name: "Annie Walker",       alias: "Annie — CIA Field Operative",           power: "Linguist, martial artist and expert field improviser who has run operations across six continents with minimal backup",                       icon: "🌍" },
+  // The Rookie
+  { name: "Bailey Nune",        alias: "Sergeant Nune — LAPD / Fire Dept",      power: "Crisis negotiation expert, tactical firearms specialist and emergency responder whose composure under pressure has resolved situations no other officer could",  icon: "🔵" },
+  // Scorpion
+  { name: "Paige Dineen",       alias: "Paige — Team Scorpion Liaison",          power: "Human interface for a team of geniuses — behavioral specialist whose emotional intelligence translates super-human intellect into real-world field results",        icon: "🧠" },
 ];
 
 
