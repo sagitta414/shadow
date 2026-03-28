@@ -545,19 +545,36 @@ export default function Homepage(props: HomepageProps) {
 
       {/* ══ HERO SECTION — THREE MAIN MODES ══════════════════════════════════════ */}
       <div style={{
-        padding: isMobile ? "1.5rem 1rem 0" : "2rem 2.5rem 0",
+        padding: isMobile ? "1.5rem 0 0" : "2rem 2.5rem 0",
         position: "relative", zIndex: 2,
         opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.12s ease both" : "none",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.1rem", padding: isMobile ? "0 1rem" : "0" }}>
           <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(251,191,36,0.95), rgba(251,191,36,0.08))", boxShadow: "0 0 12px rgba(251,191,36,0.45)" }} />
           <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "5px", color: "rgba(251,191,36,0.48)", textTransform: "uppercase", fontWeight: 700 }}>Choose Your Mode</span>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.16), transparent)" }} />
+          {isMobile && (
+            <span style={{ fontSize: "0.48rem", color: "rgba(251,191,36,0.45)", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px", flexShrink: 0 }}>SWIPE →</span>
+          )}
         </div>
 
-        {/* Three hero cards */}
-        <div className="hp-hero" style={{ display: "flex", gap: "1.1rem" }}>
+        {/* Three hero cards — horizontal scroll on mobile, flex row on desktop */}
+        <div style={{
+          display: "flex",
+          gap: "1.1rem",
+          ...(isMobile ? {
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            WebkitOverflowScrolling: "touch" as const,
+            paddingLeft: "9vw",
+            paddingRight: "9vw",
+            paddingBottom: "0.75rem",
+            scrollbarWidth: "none" as const,
+            msOverflowStyle: "none" as const,
+          } : {}),
+        }}>
           <HeroCard
+            mobile={isMobile}
             title="HEROINE FORGE"
             desc="210+ heroines across 8 universes. Choose your captor, set the scene, and generate a fully uncensored multi-chapter dark thriller."
             badge="Core Mode · Flagship"
@@ -570,6 +587,7 @@ export default function Homepage(props: HomepageProps) {
             imgSrc={`${BASE}/heroes/card-heroine-forge.png`}
           />
           <HeroCard
+            mobile={isMobile}
             title="CELEBRITY CAPTURE"
             desc="Real-world fame meets dark fantasy. Celebrities and villains in an uncensored narrative that shatters the fourth wall."
             badge="Celebrity · Adults Only"
@@ -582,6 +600,7 @@ export default function Homepage(props: HomepageProps) {
             imgSrc={`${BASE}/heroes/card-celebrity-capture.png`}
           />
           <HeroCard
+            mobile={isMobile}
             title="CUSTOM SCENARIO"
             desc="Build any premise from scratch. Your heroine, your captor, your rules. No filters. No limits. Pure dark narrative."
             badge="Custom · No Limits"
