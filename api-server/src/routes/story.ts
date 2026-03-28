@@ -5,7 +5,7 @@ const router = Router();
 
 const venice = new OpenAI({
   baseURL: "https://api.venice.ai/api/v1",
-  apiKey: process.env["VENICE_API_KEY"] ?? "",
+  apiKey: "VENICE_INFERENCE_KEY_qBu_ROMyfDBfI1PER9fxG0qPLKGGzwPgv2lkrddOQZ",
 });
 
 const VENICE_PARAMS = {
