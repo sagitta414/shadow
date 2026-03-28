@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { getArchive } from "../lib/archive";
+import { heroImgSrc } from "../components/HeroinePicker";
 
 interface Props { onBack: () => void; }
 
@@ -29,6 +30,7 @@ export default function HeroineDossier({ onBack }: Props) {
   const [notes, setNotes] = useState<Record<string, string>>(getNotes);
   const [editNote, setEditNote] = useState("");
   const [noteSaved, setNoteSaved] = useState(false);
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
 
   const dossiers = useMemo<HeroineStats[]>(() => {
     const archive = getArchive();
@@ -108,19 +110,41 @@ export default function HeroineDossier({ onBack }: Props) {
                 ))}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.85rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "0.85rem" }}>
                 {filtered.map(d => (
-                  <div key={d.name} onClick={() => openDossier(d.name)} style={{ background: "rgba(0,0,0,0.45)", border: `1px solid ${notes[d.name] ? "rgba(168,85,247,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "14px", padding: "1.1rem", cursor: "pointer", transition: "all 0.2s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(168,85,247,0.08)"; (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(168,85,247,0.35)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,0.45)"; (e.currentTarget as HTMLDivElement).style.borderColor = notes[d.name] ? "rgba(168,85,247,0.35)" : "rgba(255,255,255,0.08)"; }}
+                  <div
+                    key={d.name}
+                    onClick={() => openDossier(d.name)}
+                    style={{ background: "rgba(0,0,0,0.55)", border: `1px solid ${notes[d.name] ? "rgba(168,85,247,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", overflow: "hidden", cursor: "pointer", transition: "border-color 0.2s, box-shadow 0.2s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(168,85,247,0.45)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 16px rgba(168,85,247,0.12)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = notes[d.name] ? "rgba(168,85,247,0.35)" : "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
                   >
-                    <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.88rem", color: "#E9D5FF", fontWeight: 700, marginBottom: "0.4rem", letterSpacing: "0.5px" }}>{d.name}</div>
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
-                      <span style={{ fontSize: "0.62rem", color: "#C084FC", fontFamily: "'Cinzel', serif" }}>{d.storyCount} {d.storyCount === 1 ? "story" : "stories"}</span>
-                      <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Raleway', sans-serif" }}>·</span>
-                      <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Raleway', sans-serif" }}>{d.totalWords.toLocaleString()} words</span>
+                    {/* Portrait */}
+                    <div style={{ height: "130px", overflow: "hidden", background: "rgba(15,8,25,0.8)", position: "relative" }}>
+                      {!imgErrors.has(d.name) ? (
+                        <img
+                          src={heroImgSrc(d.name)}
+                          alt={d.name}
+                          onError={() => setImgErrors(prev => new Set([...prev, d.name]))}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
+                        />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3.5rem", color: "rgba(168,85,247,0.3)" }}>◈</div>
+                      )}
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(transparent, rgba(0,0,0,0.92))" }} />
+                      {notes[d.name] && (
+                        <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", fontSize: "0.65rem", color: "rgba(168,85,247,0.8)", background: "rgba(0,0,0,0.7)", borderRadius: "4px", padding: "0.1rem 0.3rem" }}>✎</div>
+                      )}
                     </div>
-                    {notes[d.name] && <div style={{ fontSize: "0.65rem", color: "rgba(168,85,247,0.5)", fontFamily: "'Raleway', sans-serif", fontStyle: "italic" }}>has notes ✎</div>}
+                    {/* Info */}
+                    <div style={{ padding: "0.75rem 0.9rem 0.9rem" }}>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.85rem", color: "#E9D5FF", fontWeight: 700, marginBottom: "0.4rem", letterSpacing: "0.5px" }}>{d.name}</div>
+                      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "0.6rem", color: "#C084FC", fontFamily: "'Cinzel', serif" }}>{d.storyCount} {d.storyCount === 1 ? "story" : "stories"}</span>
+                        <span style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Raleway', sans-serif" }}>·</span>
+                        <span style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Raleway', sans-serif" }}>{d.totalWords.toLocaleString()} words</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -129,11 +153,29 @@ export default function HeroineDossier({ onBack }: Props) {
         </>
       ) : selData ? (
         <div>
-          <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: "20px", padding: "2rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.6rem", color: "#E9D5FF", margin: "0 0 0.25rem", fontWeight: 700, letterSpacing: "2px" }}>{selData.name}</h2>
-            <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Raleway', sans-serif", marginBottom: "1.5rem" }}>
-              First appearance: {fmtDate(selData.firstSeen)} · Most recent: {fmtDate(selData.lastSeen)}
+          <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: "20px", overflow: "hidden", marginBottom: "1.5rem" }}>
+            {/* Portrait header */}
+            <div style={{ height: "280px", position: "relative", overflow: "hidden", background: "rgba(10,5,20,0.9)" }}>
+              {!imgErrors.has(selData.name) ? (
+                <img
+                  src={heroImgSrc(selData.name)}
+                  alt={selData.name}
+                  onError={() => setImgErrors(prev => new Set([...prev, selData.name]))}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
+                />
+              ) : (
+                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8rem", color: "rgba(168,85,247,0.25)" }}>◈</div>
+              )}
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "65%", background: "linear-gradient(transparent, rgba(0,0,0,0.95))" }} />
+              <div style={{ position: "absolute", bottom: "1.5rem", left: "2rem", right: "2rem" }}>
+                <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.8rem", color: "#F4F0FF", margin: "0 0 0.2rem", fontWeight: 700, letterSpacing: "2px", textShadow: "0 2px 16px rgba(0,0,0,0.8)" }}>{selData.name}</h2>
+                <div style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Raleway', sans-serif" }}>
+                  First seen {fmtDate(selData.firstSeen)} · Last seen {fmtDate(selData.lastSeen)}
+                </div>
+              </div>
             </div>
+
+            <div style={{ padding: "1.75rem 2rem 2rem" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
               {[
                 { label: "Stories", value: selData.storyCount.toString(), color: "#A855F7" },
@@ -167,6 +209,7 @@ export default function HeroineDossier({ onBack }: Props) {
                 </div>
               </div>
             )}
+            </div>
           </div>
 
           <div style={{ background: "rgba(0,0,0,0.45)", border: "1px solid rgba(168,85,247,0.15)", borderRadius: "16px", padding: "1.5rem" }}>
