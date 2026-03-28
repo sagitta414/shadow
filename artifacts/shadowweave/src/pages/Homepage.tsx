@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import StoryDice from "../components/StoryDice";
 import { getStreak } from "../lib/streak";
 import { getCompletedModes, getUnlockCount, getTotalXP } from "../lib/achievements";
@@ -230,8 +230,8 @@ function ModeCard({ icon, title, desc, badge, accent, r, g, b, onClick, size = "
 }
 
 // ── FEATURED CARD ─────────────────────────────────────────────────────────────
-function FeaturedCard({ title, desc, badge, accent, r, g, b, onClick, img }: {
-  title: string; desc: string; badge: string; accent: string;
+function FeaturedCard({ title, desc, badge, accent, r, g, b, onClick, img, stat }: {
+  title: string; desc: string; badge: string; accent: string; stat: string;
   r: number; g: number; b: number; onClick: () => void; img: string;
 }) {
   const [hov, setHov] = useState(false);
@@ -243,116 +243,179 @@ function FeaturedCard({ title, desc, badge, accent, r, g, b, onClick, img }: {
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative", cursor: "pointer", borderRadius: "22px", overflow: "hidden",
-        height: "310px",
-        border: `1px solid ${hov ? `rgba(${rgb},0.72)` : `rgba(${rgb},0.14)`}`,
-        transition: "all 0.42s cubic-bezier(0.22,1,0.36,1)",
+        height: "460px",
+        border: `1px solid rgba(${rgb},${hov ? 0.78 : 0.22})`,
+        transition: "all 0.45s cubic-bezier(0.22,1,0.36,1)",
         boxShadow: hov
-          ? `0 0 0 1px rgba(${rgb},0.18), 0 32px 100px rgba(${rgb},0.38), 0 0 160px rgba(${rgb},0.1), inset 0 0 60px rgba(${rgb},0.06)`
-          : "0 8px 45px rgba(0,0,0,0.65)",
-        transform: hov ? "translateY(-10px) scale(1.022)" : "none",
+          ? `0 0 0 1px rgba(${rgb},0.2), 0 40px 120px rgba(${rgb},0.45), 0 0 200px rgba(${rgb},0.12), inset 0 0 80px rgba(${rgb},0.08)`
+          : `0 8px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(${rgb},0.08)`,
+        transform: hov ? "translateY(-12px) scale(1.025)" : "none",
+        animation: hov ? "none" : "featBorderPulse 4s ease-in-out infinite",
       }}
     >
       {/* Full-bleed image */}
       <img src={img} alt="" style={{
         position: "absolute", inset: 0, width: "100%", height: "100%",
-        objectFit: "cover", objectPosition: "center",
-        opacity: hov ? 0.9 : 0.32,
-        transform: hov ? "scale(1.12)" : "scale(1.04)",
+        objectFit: "cover", objectPosition: "center top",
+        opacity: hov ? 0.92 : 0.38,
+        transform: hov ? "scale(1.14)" : "scale(1.04)",
         filter: hov
-          ? "saturate(1.45) brightness(1.18) contrast(1.08)"
-          : "saturate(0.45) brightness(0.52)",
-        transition: "all 0.75s cubic-bezier(0.22,1,0.36,1)",
+          ? `saturate(1.5) brightness(1.2) contrast(1.1) drop-shadow(0 0 40px rgba(${rgb},0.4))`
+          : "saturate(0.4) brightness(0.5)",
+        transition: "all 0.8s cubic-bezier(0.22,1,0.36,1)",
       }} />
-      {/* Bottom gradient - text readability */}
+
+      {/* Gradient overlays */}
       <div style={{
         position: "absolute", inset: 0,
-        background: `linear-gradient(to top, rgba(4,1,12,${hov ? 0.95 : 0.82}) 0%, rgba(4,1,12,${hov ? 0.65 : 0.85}) 38%, rgba(4,1,12,${hov ? 0.05 : 0.45}) 72%, transparent 100%)`,
-        transition: "all 0.5s",
-      }} />
-      {/* Accent radial at bottom */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: "65%",
-        background: `radial-gradient(ellipse at 50% 110%, rgba(${rgb},${hov ? 0.25 : 0.0}) 0%, transparent 65%)`,
+        background: `linear-gradient(to top, rgba(4,1,12,${hov ? 0.97 : 0.85}) 0%, rgba(4,1,12,${hov ? 0.6 : 0.88}) 35%, rgba(4,1,12,${hov ? 0.0 : 0.38}) 68%, transparent 100%)`,
         transition: "all 0.55s",
       }} />
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "70%",
+        background: `radial-gradient(ellipse at 50% 120%, rgba(${rgb},${hov ? 0.3 : 0.0}) 0%, transparent 60%)`,
+        transition: "all 0.6s",
+      }} />
+
       {/* Top accent bar */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+        position: "absolute", top: 0, left: 0, right: 0, height: "3px",
         background: hov
-          ? `linear-gradient(90deg, transparent, rgba(${rgb},1) 25%, rgba(${rgb},1) 75%, transparent)`
-          : `linear-gradient(90deg, transparent, rgba(${rgb},0.22) 50%, transparent)`,
-        boxShadow: hov ? `0 0 28px rgba(${rgb},0.75), 0 0 60px rgba(${rgb},0.3)` : "none",
-        transition: "all 0.42s",
+          ? `linear-gradient(90deg, transparent, rgba(${rgb},1) 20%, rgba(${rgb},1) 80%, transparent)`
+          : `linear-gradient(90deg, transparent, rgba(${rgb},0.35) 50%, transparent)`,
+        boxShadow: hov ? `0 0 35px rgba(${rgb},0.85), 0 0 80px rgba(${rgb},0.35)` : `0 0 12px rgba(${rgb},0.2)`,
+        transition: "all 0.45s",
       }} />
-      {/* Left edge glow */}
+      {/* Bottom accent bar */}
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "2px",
+        background: hov ? `linear-gradient(90deg, transparent, rgba(${rgb},0.7) 50%, transparent)` : "none",
+        boxShadow: hov ? `0 0 20px rgba(${rgb},0.5)` : "none",
+        transition: "all 0.45s",
+      }} />
+      {/* Left edge */}
       <div style={{
         position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
-        background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.7 : 0}) 40%, rgba(${rgb},${hov ? 0.7 : 0}) 60%, transparent)`,
-        boxShadow: hov ? `0 0 20px rgba(${rgb},0.6)` : "none",
-        transition: "all 0.42s",
+        background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.8 : 0.15}) 35%, rgba(${rgb},${hov ? 0.8 : 0.15}) 65%, transparent)`,
+        boxShadow: hov ? `0 0 25px rgba(${rgb},0.7)` : "none",
+        transition: "all 0.45s",
       }} />
+      {/* Right edge */}
+      <div style={{
+        position: "absolute", right: 0, top: 0, bottom: 0, width: "2px",
+        background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.8 : 0.15}) 35%, rgba(${rgb},${hov ? 0.8 : 0.15}) 65%, transparent)`,
+        boxShadow: hov ? `0 0 25px rgba(${rgb},0.7)` : "none",
+        transition: "all 0.45s",
+      }} />
+
       {/* Scan-line reveal */}
       {hov && (
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: `linear-gradient(to bottom, transparent 0%, rgba(${rgb},0.12) 48%, rgba(255,255,255,0.07) 50%, rgba(${rgb},0.12) 52%, transparent 100%)`,
-          animation: "imgScanReveal 0.7s ease forwards",
+          background: `linear-gradient(to bottom, transparent 0%, rgba(${rgb},0.14) 47%, rgba(255,255,255,0.1) 50%, rgba(${rgb},0.14) 53%, transparent 100%)`,
+          animation: "imgScanReveal 0.75s ease forwards",
         }} />
       )}
       {/* Shimmer sweep */}
       {hov && (
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: "linear-gradient(108deg, transparent 28%, rgba(255,255,255,0.06) 50%, transparent 72%)",
-          animation: "shimmerSweep 1.1s ease forwards",
+          background: "linear-gradient(108deg, transparent 25%, rgba(255,255,255,0.08) 50%, transparent 75%)",
+          animation: "shimmerSweep 1.2s ease forwards",
         }} />
       )}
-      {/* ── CONTENT ── */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.8rem 1.7rem 1.55rem", zIndex: 2 }}>
+
+      {/* ── TOP-LEFT: Venice AI live badge ── */}
+      <div style={{
+        position: "absolute", top: "1.1rem", left: "1.1rem", zIndex: 4,
+        display: "flex", alignItems: "center", gap: "0.45rem",
+        padding: "4px 10px", borderRadius: "20px",
+        background: "rgba(4,1,12,0.75)", border: "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(12px)",
+      }}>
+        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 10px rgba(34,197,94,0.9)", animation: "pulseDot 2s ease-in-out infinite" }} />
+        <span style={{ fontSize: "0.34rem", letterSpacing: "2px", color: "rgba(100,255,150,0.7)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>Venice AI</span>
+      </div>
+
+      {/* ── TOP-RIGHT: UNCENSORED stamp ── */}
+      <div style={{
+        position: "absolute", top: "1.1rem", right: "1.1rem", zIndex: 4,
+        display: "flex", alignItems: "center", gap: "0.4rem",
+        padding: "4px 10px", borderRadius: "6px",
+        background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.55)",
+        backdropFilter: "blur(10px)",
+        boxShadow: hov ? "0 0 20px rgba(239,68,68,0.4)" : "none",
+        transition: "box-shadow 0.4s",
+      }}>
+        <span style={{ fontSize: "0.34rem", letterSpacing: "3px", color: "#F87171", fontFamily: "'Montserrat', sans-serif", fontWeight: 900, textTransform: "uppercase" }}>◉ UNCENSORED</span>
+      </div>
+
+      {/* ── STAT COUNTER (mid-card, shows when hovered) ── */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: `translate(-50%, -50%) scale(${hov ? 1 : 0.5})`,
+        opacity: hov ? 0 : 0,
+        pointerEvents: "none", zIndex: 3,
+        fontFamily: "'Cinzel', serif", fontSize: "3rem", fontWeight: 900,
+        color: `rgba(${rgb},0.08)`, letterSpacing: "0.1em",
+        whiteSpace: "nowrap", textAlign: "center",
+        transition: "all 0.4s",
+        userSelect: "none",
+      }}>{stat}</div>
+
+      {/* ── BOTTOM CONTENT ── */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "2rem 1.8rem 1.7rem", zIndex: 2 }}>
         {/* Badge pill */}
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.7rem",
-          padding: "4px 12px", borderRadius: "24px",
-          background: `rgba(${rgb},0.16)`, border: `1px solid rgba(${rgb},0.4)`,
-          backdropFilter: "blur(10px)",
+          display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem",
+          padding: "5px 13px", borderRadius: "24px",
+          background: `rgba(${rgb},0.18)`, border: `1px solid rgba(${rgb},0.45)`,
+          backdropFilter: "blur(12px)",
         }}>
-          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: accent, boxShadow: `0 0 10px rgba(${rgb},1)`, animation: "pulseDot 2.5s ease-in-out infinite" }} />
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: accent, boxShadow: `0 0 12px rgba(${rgb},1)`, animation: "pulseDot 2.5s ease-in-out infinite" }} />
           <span style={{ fontSize: "0.38rem", letterSpacing: "2.5px", color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{badge}</span>
+          <span style={{ fontSize: "0.34rem", letterSpacing: "1px", color: `rgba(${rgb},0.55)`, fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>· {stat}</span>
         </div>
         {/* Title */}
         <div style={{
           fontFamily: "'Cinzel', serif",
-          fontSize: hov ? "1.45rem" : "1.2rem",
+          fontSize: hov ? "1.9rem" : "1.45rem",
           fontWeight: 900, color: "#FFFFFF",
-          letterSpacing: "0.09em", lineHeight: 1.05,
-          marginBottom: "0.55rem",
-          textShadow: hov ? `0 0 50px rgba(${rgb},0.75), 0 2px 24px rgba(0,0,0,0.95)` : "0 2px 14px rgba(0,0,0,0.85)",
-          transition: "all 0.38s",
+          letterSpacing: "0.08em", lineHeight: 1.0,
+          marginBottom: "0.6rem",
+          textShadow: hov
+            ? `0 0 60px rgba(${rgb},0.8), 0 0 120px rgba(${rgb},0.35), 0 2px 30px rgba(0,0,0,0.95)`
+            : "0 2px 18px rgba(0,0,0,0.9)",
+          transition: "all 0.42s cubic-bezier(0.22,1,0.36,1)",
         }}>{title}</div>
-        {/* Desc — slides in */}
+        {/* Desc */}
         <div style={{
-          fontSize: "0.64rem", color: "rgba(210,205,240,0.62)",
-          fontFamily: "'Raleway', sans-serif", lineHeight: 1.58,
-          maxWidth: "90%",
-          maxHeight: hov ? "70px" : "0px",
+          fontSize: "0.66rem", color: "rgba(210,205,240,0.68)",
+          fontFamily: "'Raleway', sans-serif", lineHeight: 1.62,
+          maxWidth: "88%",
+          maxHeight: hov ? "80px" : "0px",
           opacity: hov ? 1 : 0,
           overflow: "hidden",
-          transition: "all 0.38s ease",
-          marginBottom: hov ? "0.9rem" : "0",
+          transition: "max-height 0.42s ease, opacity 0.38s ease",
+          marginBottom: hov ? "1rem" : "0",
         }}>{desc}</div>
-        {/* CTA */}
+        {/* CTA row */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          paddingTop: hov ? "0.7rem" : "0",
-          borderTop: `1px solid rgba(${rgb},${hov ? 0.28 : 0})`,
+          paddingTop: hov ? "0.8rem" : "0",
+          borderTop: `1px solid rgba(${rgb},${hov ? 0.32 : 0})`,
           opacity: hov ? 1 : 0,
-          transform: hov ? "translateY(0)" : "translateY(8px)",
-          transition: "all 0.38s ease",
+          transform: hov ? "translateY(0)" : "translateY(10px)",
+          transition: "all 0.42s ease",
         }}>
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "4px", color: accent, fontWeight: 900, textTransform: "uppercase", textShadow: `0 0 22px rgba(${rgb},0.85)` }}>Enter the Dark →</span>
-          <div style={{ display: "flex", gap: "4px" }}>
+          <span style={{
+            fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "4px",
+            color: accent, fontWeight: 900, textTransform: "uppercase",
+            textShadow: `0 0 28px rgba(${rgb},0.9)`,
+          }}>Enter the Dark →</span>
+          <div style={{ display: "flex", gap: "5px" }}>
             {[1,2,3].map(i => (
-              <div key={i} style={{ width: "5px", height: "5px", borderRadius: "50%", background: `rgba(${rgb},${1.05 - i * 0.3})`, boxShadow: `0 0 12px rgba(${rgb},0.85)` }} />
+              <div key={i} style={{ width: "6px", height: "6px", borderRadius: "50%", background: `rgba(${rgb},${1.1 - i * 0.32})`, boxShadow: `0 0 14px rgba(${rgb},0.9)` }} />
             ))}
           </div>
         </div>
@@ -450,7 +513,6 @@ function RecentModeChip({ rm, onClick }: { rm: RecentMode; onClick: () => void }
 export default function Homepage(props: HomepageProps) {
   const isMobile = useIsMobile(768);
   const [mounted, setMounted] = useState(false);
-  const [surpriseHov, setSurpriseHov] = useState(false);
   const [showDice, setShowDice] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [streak] = useState(() => getStreak());
@@ -552,6 +614,8 @@ export default function Homepage(props: HomepageProps) {
         @keyframes hdrShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
         @keyframes floatOrb { 0%,100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-28px) scale(1.05); } }
         @keyframes imgScanReveal { 0% { transform: translateY(120%); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-120%); opacity: 0; } }
+        @keyframes featBorderPulse { 0%,100% { box-shadow: 0 8px 50px rgba(0,0,0,0.7); } 50% { box-shadow: 0 8px 50px rgba(0,0,0,0.7), 0 0 40px rgba(168,85,247,0.08); } }
+        @keyframes particleFloat { 0%,100% { transform: translateY(0px) scale(1); opacity: 0.55; } 50% { transform: translateY(-14px) scale(1.15); opacity: 1; } }
         @keyframes floatOrb2 { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(20px); } }
         @keyframes surpriseGlow { 0%,100% { box-shadow: 0 0 30px rgba(168,85,247,0.45), 0 0 80px rgba(168,85,247,0.12); } 50% { box-shadow: 0 0 55px rgba(168,85,247,0.85), 0 0 120px rgba(168,85,247,0.28); } }
         @keyframes borderGlow { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
@@ -614,7 +678,7 @@ export default function Homepage(props: HomepageProps) {
       </nav>
 
       {/* ══ HERO SECTION ══════════════════════════════════════════════════════════ */}
-      <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "3.5rem 1rem 2.5rem" : "5rem 2rem 3rem", textAlign: "center", overflow: "hidden" }}>
+      <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "2.5rem 1rem 1.8rem" : "3.2rem 2rem 2rem", textAlign: "center", overflow: "hidden" }}>
         {/* Spotlight beams */}
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "2px", height: "100%", background: "linear-gradient(to bottom, rgba(168,85,247,0.35) 0%, rgba(168,85,247,0.04) 60%, transparent 100%)", filter: "blur(1px)" }} />
@@ -639,46 +703,10 @@ export default function Homepage(props: HomepageProps) {
         <h1 style={{ margin: "0 0 0.5rem", fontFamily: "'Cinzel', serif", fontSize: "clamp(2.2rem, 7vw, 5rem)", fontWeight: 900, letterSpacing: "0.12em", background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 28%, #FFFFFF 50%, #E8B830 72%, #F5D67A 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "hdrShimmer 6s linear infinite, titleReveal 0.9s cubic-bezier(0.22,1,0.36,1) both", lineHeight: 1.05, opacity: mounted ? 1 : 0 }}>CHOOSE YOUR MODE</h1>
 
         {/* Subtitle */}
-        <p style={{ margin: "0 0 2.5rem", fontSize: "0.82rem", color: "rgba(200,195,240,0.35)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2.5px", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.7s 0.2s ease both" : "none" }}>Each mode generates a fully uncensored AI-written dark narrative</p>
-
-        {/* Divider line */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem", marginBottom: "2.5rem", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.6s 0.25s ease both" : "none" }}>
-          <div style={{ flex: 1, maxWidth: "220px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,85,247,0.5))" }} />
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "rgba(168,85,247,0.45)" }} />
-            <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 18px #A855F7, 0 0 40px rgba(168,85,247,0.4)" }} />
-            <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "rgba(168,85,247,0.45)" }} />
-          </div>
-          <div style={{ flex: 1, maxWidth: "220px", height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.5), transparent)" }} />
-        </div>
-
-        {/* CTA buttons */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem", flexWrap: "wrap", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.3s ease both" : "none" }}>
-          <button
-            onClick={props.onSurpriseMe}
-            onMouseEnter={() => setSurpriseHov(true)}
-            onMouseLeave={() => setSurpriseHov(false)}
-            style={{ display: "flex", alignItems: "center", gap: "0.85rem", padding: "1rem 2.8rem", background: surpriseHov ? "linear-gradient(135deg, rgba(109,40,217,0.75), rgba(147,51,234,0.75))" : "linear-gradient(135deg, rgba(109,40,217,0.28), rgba(147,51,234,0.28))", border: `1.5px solid ${surpriseHov ? "rgba(168,85,247,0.9)" : "rgba(168,85,247,0.38)"}`, borderRadius: "60px", cursor: "pointer", transition: "all 0.32s", animation: "surpriseGlow 3s ease-in-out infinite", boxShadow: surpriseHov ? "0 12px 50px rgba(109,40,217,0.55), 0 0 90px rgba(168,85,247,0.22)" : "0 0 30px rgba(168,85,247,0.22)", transform: surpriseHov ? "translateY(-4px) scale(1.04)" : "none" }}>
-            <span style={{ fontSize: "1.3rem", filter: surpriseHov ? "drop-shadow(0 0 12px rgba(168,85,247,1))" : "none", transition: "filter 0.3s" }}>⚡</span>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.9rem", fontWeight: 900, letterSpacing: "3.5px", textTransform: "uppercase", color: surpriseHov ? "#F0EDFF" : "rgba(200,160,255,0.85)", transition: "color 0.3s", textShadow: surpriseHov ? "0 0 28px rgba(168,85,247,0.9)" : "none" }}>Surprise Me</div>
-              <div style={{ fontSize: "0.5rem", color: surpriseHov ? "rgba(192,132,252,0.65)" : "rgba(168,85,247,0.32)", transition: "color 0.3s", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif", marginTop: "2px" }}>Launch Random Mode</div>
-            </div>
-          </button>
-          <button onClick={() => setShowDice(true)}
-            style={{ display: "flex", alignItems: "center", gap: "0.7rem", padding: "1rem 2rem", background: "rgba(28,38,88,0.35)", border: "1.5px solid rgba(90,110,210,0.3)", borderRadius: "60px", cursor: "pointer", transition: "all 0.28s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(28,38,88,0.65)"; e.currentTarget.style.borderColor = "rgba(90,110,210,0.72)"; e.currentTarget.style.boxShadow = "0 10px 36px rgba(60,80,200,0.22)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(28,38,88,0.35)"; e.currentTarget.style.borderColor = "rgba(90,110,210,0.3)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}>
-            <span style={{ fontSize: "1.1rem" }}>⚄</span>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.82rem", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: "rgba(140,168,255,0.82)" }}>Story Dice</div>
-              <div style={{ fontSize: "0.48rem", color: "rgba(110,135,215,0.38)", letterSpacing: "2px", fontFamily: "'Montserrat', sans-serif", marginTop: "2px" }}>Spark an Idea</div>
-            </div>
-          </button>
-        </div>
+        <p style={{ margin: "0 0 1.6rem", fontSize: "0.78rem", color: "rgba(200,195,240,0.35)", fontFamily: "'Raleway', sans-serif", letterSpacing: "2.5px", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.7s 0.2s ease both" : "none" }}>Venice AI · Fully Uncensored · Adults Only · Dark Narrative Studio</p>
 
         {/* Floating stat pills */}
-        <div className="hp-hero-stats" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", marginTop: "2.8rem", flexWrap: "wrap", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.38s ease both" : "none" }}>
+        <div className="hp-hero-stats" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.65rem", marginTop: "0", flexWrap: "wrap", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.65s 0.28s ease both" : "none" }}>
           {[
             { v: "27+", l: "Story Modes", c: "168,85,247", d: "0s" },
             { v: "181+", l: "Heroines", c: "251,191,36", d: "0.06s" },
@@ -701,31 +729,56 @@ export default function Homepage(props: HomepageProps) {
           <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Featured Modes</span>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.18), transparent)" }} />
         </div>
-        <div className="hp-feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.1rem" }}>
+        <div className="hp-feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.2rem" }}>
           <FeaturedCard
             title="HEROINE FORGE"
-            desc="181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller."
+            desc="181+ heroines across 8 universes. Choose your captor, set the scene, generate a fully uncensored multi-chapter dark thriller."
             badge="Core Mode · Flagship"
+            stat="181+ Heroines"
             accent="#C084FC" r={168} g={85} b={247}
             onClick={props.onSuperheroMode}
             img="/icons/heroine-forge.png"
           />
           <FeaturedCard
             title="CELEBRITY CAPTURE"
-            desc="Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall."
-            badge="Celebrity · Premium"
+            desc="Real-world fame meets dark fantasy. Celebrities and villains in an uncensored narrative that shatters the fourth wall."
+            badge="Celebrity · Adults Only"
+            stat="100% Uncensored"
             accent="#FCA311" r={252} g={163} b={17}
             onClick={props.onCelebrityMode}
             img="/icons/celebrity-captive.png"
           />
           <FeaturedCard
             title="CUSTOM SCENARIO"
-            desc="Build your own premise from scratch. Custom heroine, captor, setting, and narrative arc — your rules entirely."
-            badge="Custom · Bespoke"
+            desc="Build any premise from scratch. Your heroine, your captor, your rules. No filters. No limits. Pure dark narrative."
+            badge="Custom · No Limits"
+            stat="Infinite Scenarios"
             accent="#34D399" r={52} g={211} b={153}
             onClick={props.onScenarioGenerator}
             img="/icons/custom-scenario.png"
           />
+        </div>
+
+        {/* ── Quick actions below featured ── */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.8rem", marginTop: "1.5rem", flexWrap: "wrap" }}>
+          <button onClick={props.onSurpriseMe} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.8rem", background: "rgba(168,85,247,0.12)", border: "1.5px solid rgba(168,85,247,0.4)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s", animation: "surpriseGlow 3.5s ease-in-out infinite" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.28)"; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 45px rgba(168,85,247,0.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(168,85,247,0.12)"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+            <span style={{ fontSize: "1rem" }}>⚡</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2.5px", color: "rgba(200,160,255,0.88)", textTransform: "uppercase" }}>Surprise Me</span>
+          </button>
+          <button onClick={() => setShowDice(true)} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(96,165,250,0.08)", border: "1.5px solid rgba(96,165,250,0.25)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(96,165,250,0.18)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(96,165,250,0.08)"; e.currentTarget.style.transform = "none"; }}>
+            <span style={{ fontSize: "0.9rem" }}>⚄</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", color: "rgba(140,168,255,0.8)", textTransform: "uppercase" }}>Story Dice</span>
+          </button>
+          <button onClick={props.onStoryArchive} style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.7rem 1.5rem", background: "rgba(34,197,94,0.06)", border: "1.5px solid rgba(34,197,94,0.22)", borderRadius: "50px", cursor: "pointer", transition: "all 0.25s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(34,197,94,0.14)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(34,197,94,0.06)"; e.currentTarget.style.transform = "none"; }}>
+            <span style={{ fontSize: "0.9rem" }}>◈</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", color: "rgba(100,220,140,0.75)", textTransform: "uppercase" }}>Story Archive</span>
+          </button>
         </div>
       </div>
 
