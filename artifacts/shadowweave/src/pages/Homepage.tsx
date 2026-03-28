@@ -316,6 +316,9 @@ export default function Homepage(props: HomepageProps) {
   const [carouselIdx, setCarouselIdx] = useState(0);
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number>(0);
+  const touchDeltaX = useRef<number>(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const [clock, setClock] = useState("");
   const [streak] = useState(() => getStreak());
   const [achCount] = useState(() => getUnlockCount());
@@ -678,27 +681,35 @@ export default function Homepage(props: HomepageProps) {
             <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(192,132,252,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>23 MODES</span>
           </div>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.18), transparent)" }} />
-          {/* Dot indicators */}
-          <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
-            {specialtyModes.slice(0, isMobile ? 8 : 12).map((_, i) => (
-              <button key={i} onClick={() => setCarouselIdx(i)} style={{ width: i === carouselIdx % (isMobile ? 8 : 12) ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === carouselIdx % (isMobile ? 8 : 12) ? "rgba(192,132,252,0.85)" : "rgba(192,132,252,0.22)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", flexShrink: 0 }} />
-            ))}
+          {/* Dot indicators — desktop: pill dots; mobile: counter */}
+          <div style={{ display: "flex", gap: "5px", flexShrink: 0, alignItems: "center" }}>
+            {isMobile ? (
+              <span style={{ fontSize: "0.5rem", color: "rgba(192,132,252,0.6)", fontFamily: "'Cinzel', serif", letterSpacing: "2px" }}>{carouselIdx + 1} / {specialtyModes.length}</span>
+            ) : (
+              specialtyModes.slice(0, 12).map((_, i) => (
+                <button key={i} onClick={() => setCarouselIdx(i)} style={{ width: i === carouselIdx % 12 ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === carouselIdx % 12 ? "rgba(192,132,252,0.85)" : "rgba(192,132,252,0.22)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", flexShrink: 0 }} />
+              ))
+            )}
           </div>
         </div>
 
         {/* Carousel track */}
         <div
           ref={carouselRef}
-          style={{ overflow: "hidden", position: "relative" }}
+          style={{ overflow: "hidden", position: "relative", touchAction: "pan-y" }}
           onMouseEnter={() => setCarouselPaused(true)}
           onMouseLeave={() => setCarouselPaused(false)}
+          onTouchStart={e => { touchStartX.current = e.touches[0].clientX; touchDeltaX.current = 0; setCarouselPaused(true); }}
+          onTouchMove={e => { touchDeltaX.current = e.touches[0].clientX - touchStartX.current; setDragOffset(touchDeltaX.current); }}
+          onTouchEnd={() => { if (Math.abs(touchDeltaX.current) > 50) advanceCarousel(touchDeltaX.current < 0 ? 1 : -1, specialtyModes.length); setDragOffset(0); setTimeout(() => setCarouselPaused(false), 3000); }}
         >
           <div style={{
             display: "flex", gap: "0.9rem",
-            transform: `translateX(calc(-${carouselIdx} * (${isMobile ? "82vw" : "298px"} + 0.9rem)))`,
-            transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
-            paddingLeft: isMobile ? "1rem" : "2.5rem",
-            paddingRight: isMobile ? "1rem" : "2.5rem",
+            transform: `translateX(calc(-${carouselIdx} * (${isMobile ? "82vw" : "298px"} + 0.9rem) + ${dragOffset}px))`,
+            transition: dragOffset !== 0 ? "none" : "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+            willChange: "transform",
+            paddingLeft: isMobile ? "9vw" : "2.5rem",
+            paddingRight: isMobile ? "9vw" : "2.5rem",
             paddingBottom: "0.5rem",
           }}>
             {specialtyModes.map((m, i) => {
@@ -758,22 +769,47 @@ export default function Homepage(props: HomepageProps) {
             })}
           </div>
 
-          {/* Left arrow */}
-          <button
-            onClick={() => advanceCarousel(-1, specialtyModes.length)}
-            style={{ position: "absolute", left: isMobile ? "0.25rem" : "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
-          >‹</button>
-
-          {/* Right arrow */}
-          <button
-            onClick={() => advanceCarousel(1, specialtyModes.length)}
-            style={{ position: "absolute", right: isMobile ? "0.25rem" : "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
-          >›</button>
+          {/* Desktop side arrows only */}
+          {!isMobile && (
+            <>
+              <button
+                onClick={() => advanceCarousel(-1, specialtyModes.length)}
+                style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
+              >‹</button>
+              <button
+                onClick={() => advanceCarousel(1, specialtyModes.length)}
+                style={{ position: "absolute", right: "1.2rem", top: "50%", transform: "translateY(-50%)", width: "40px", height: "40px", borderRadius: "50%", background: "rgba(4,1,12,0.85)", border: "1px solid rgba(192,132,252,0.3)", color: "rgba(192,132,252,0.8)", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "all 0.2s", backdropFilter: "blur(8px)" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(4,1,12,0.85)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; }}
+              >›</button>
+            </>
+          )}
         </div>
+
+        {/* Mobile bottom nav — arrows + live counter */}
+        {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.25rem", marginTop: "0.9rem", padding: "0 1rem" }}>
+            <button
+              onClick={() => advanceCarousel(-1, specialtyModes.length)}
+              style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(6,2,16,0.92)", border: "1px solid rgba(192,132,252,0.35)", color: "rgba(192,132,252,0.85)", fontSize: "1.4rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, backdropFilter: "blur(8px)", WebkitTapHighlightColor: "transparent" }}
+            >‹</button>
+            <div style={{ display: "flex", gap: "3px", alignItems: "center", flexWrap: "nowrap", overflow: "hidden", maxWidth: "calc(100vw - 160px)" }}>
+              {specialtyModes.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setCarouselIdx(i); setCarouselPaused(true); setTimeout(() => setCarouselPaused(false), 4000); }}
+                  style={{ width: i === carouselIdx ? "16px" : "5px", height: "5px", borderRadius: "3px", background: i === carouselIdx ? "rgba(192,132,252,0.88)" : "rgba(192,132,252,0.2)", border: "none", cursor: "pointer", padding: 0, flexShrink: 0, transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)", WebkitTapHighlightColor: "transparent" }}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => advanceCarousel(1, specialtyModes.length)}
+              style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(6,2,16,0.92)", border: "1px solid rgba(192,132,252,0.35)", color: "rgba(192,132,252,0.85)", fontSize: "1.4rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, backdropFilter: "blur(8px)", WebkitTapHighlightColor: "transparent" }}
+            >›</button>
+          </div>
+        )}
       </div>
 
       {/* ══ STUDIO TOOLS ════════════════════════════════════════════════════════ */}
