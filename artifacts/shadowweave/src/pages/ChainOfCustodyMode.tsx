@@ -7,6 +7,7 @@ import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
+import { VILLAINS } from "../lib/villains";
 
 interface Props { onBack: () => void; }
 

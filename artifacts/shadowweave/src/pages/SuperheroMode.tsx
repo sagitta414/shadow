@@ -6,6 +6,7 @@ import { getCustomHeroines, CustomHeroine } from "../lib/customHeroines";
 import CustomHeroineModal from "../components/CustomHeroineModal";
 import { getPreset, savePreset } from "../lib/presets";
 import { useTheme } from "../context/ThemeContext";
+import { VILLAINS } from "../lib/villains";
 
 interface SuperheroModeProps {
   onBack: () => void;
