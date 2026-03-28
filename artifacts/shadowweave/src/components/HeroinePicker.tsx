@@ -179,7 +179,11 @@ export default function HeroinePicker({ value, onChange, accentColor, accentRgb 
       </div>
 
       {/* Portrait grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(138px, 1fr))", gap: "0.5rem", maxHeight: "500px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: `rgba(${accentRgb},0.2) transparent` }}>
+      <div style={{ position: "relative" }}>
+        <div
+          id="heroine-grid-scroll"
+          style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(138px, 1fr))", gap: "0.5rem", maxHeight: "720px", overflowY: "auto", paddingRight: "4px", paddingBottom: "2px", scrollbarWidth: "thin", scrollbarColor: `rgba(${accentRgb},0.55) rgba(255,255,255,0.05)` }}
+        >
         {filtered.map(h => {
           const isSel = value === h.name;
           const univColor = UNIV_COLORS[h.universe] ?? "#888";
@@ -230,7 +234,13 @@ export default function HeroinePicker({ value, onChange, accentColor, accentRgb 
         {filtered.length === 0 && (
           <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "2.5rem", color: `rgba(${accentRgb},0.3)`, fontSize: "0.75rem", fontFamily: "'Cinzel', serif" }}>No heroines match your search</div>
         )}
-      </div>
+        </div>{/* end scroll div */}
+        {filtered.length > 10 && (
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 6, height: "52px", background: `linear-gradient(transparent, rgba(6,2,14,0.94))`, pointerEvents: "none", display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: "6px" }}>
+            <span style={{ fontSize: "0.48rem", color: `rgba(${accentRgb},0.6)`, fontFamily: "'Cinzel', serif", letterSpacing: "2.5px" }}>↕  SCROLL TO SEE ALL {filtered.length} HEROINES</span>
+          </div>
+        )}
+      </div>{/* end relative wrapper */}
 
       {/* Result count */}
       {filtered.length > 0 && (
