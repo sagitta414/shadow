@@ -7,6 +7,7 @@ import OutfitSelector, { outfitPromptLine } from "../components/OutfitSelector";
 import UniversalOptions, { UNIVERSAL_DEFAULTS, universalPromptLines, type UniversalConfig } from "../components/UniversalOptions";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive, updateArchiveStory, exportStoryAsTXT, exportStoryAsPDF } from "../lib/archive";
+import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 
 interface Props { onBack: () => void; }
 
@@ -52,6 +53,23 @@ export default function PowerDrainMode({ onBack }: Props) {
   const [drainMethod, setDrainMethod] = useState("");
   const [drainLevel, setDrainLevel] = useState(0);
   const [chapters, setChapters] = useState<string[]>([]);
+  const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
+  const psycheLogRef = useRef<PsycheEvent[]>([]);
+  const psycheChapRef = useRef(0);
+  useEffect(() => { psycheLogRef.current = psycheLog; }, [psycheLog]);
+  useEffect(() => {
+    if (chapters.length === 0) { psycheChapRef.current = 0; setPsycheLog([]); return; }
+    if (chapters.length <= psycheChapRef.current) return;
+    psycheChapRef.current = chapters.length;
+    const _ch = chapters[chapters.length - 1]; if (!_ch?.trim()) return;
+    const _log = psycheLogRef.current;
+    const _s = Math.max(0, 100 + _log.reduce((a, e) => a + e.sanityDelta, 0));
+    const _r = Math.max(0, 100 + _log.reduce((a, e) => a + (e.resistanceDelta ?? 0), 0));
+    fetch("/api/story/psyche-update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chapterText: _ch.slice(0, 2500), heroineName: fHeroine || undefined, currentSanity: _s, currentResistance: _r }) })
+      .then(r => r.ok ? r.json() : null).then((d: { sanityDelta: number; resistanceDelta: number; event: string } | null) => { if (d) setPsycheLog(prev => [...prev, { sanityDelta: d.sanityDelta, resistanceDelta: d.resistanceDelta, event: d.event }]); }).catch(() => {});
+  }, [chapters]);
+  const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
+  const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [continuing, setContinuing] = useState(false);
@@ -167,6 +185,7 @@ export default function PowerDrainMode({ onBack }: Props) {
         <ReadingProgressBar current={chapters.length} max={5} accentColor={acc} accentRgb={accRgb} />
 
 
+        {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={fHeroine || undefined} />}
         {chapters.map((ch, i) => (
           <div key={i}>
             {chapters.length > 1 && <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "2rem 0 1rem" }}><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /><span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: `rgba(${accRgb},0.5)`, letterSpacing: "3px" }}>— DRAIN PHASE {i + 1} — {(i + 1) * 20}% SIPHONED —</span><div style={{ flex: 1, height: "1px", background: `rgba(${accRgb},0.15)` }} /></div>}

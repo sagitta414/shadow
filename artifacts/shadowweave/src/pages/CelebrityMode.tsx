@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { getAiProvider } from "../lib/aiProvider";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { saveStoryToArchive } from "../lib/archive";
+import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 
 interface CelebrityModeProps { onBack: () => void; }
 
@@ -267,6 +268,23 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [chapters, setChapters] = useState<string[]>([]);
+  const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
+  const psycheLogRef = useRef<PsycheEvent[]>([]);
+  const psycheChapRef = useRef(0);
+  useEffect(() => { psycheLogRef.current = psycheLog; }, [psycheLog]);
+  useEffect(() => {
+    if (chapters.length === 0) { psycheChapRef.current = 0; setPsycheLog([]); return; }
+    if (chapters.length <= psycheChapRef.current) return;
+    psycheChapRef.current = chapters.length;
+    const _ch = chapters[chapters.length - 1]; if (!_ch?.trim()) return;
+    const _log = psycheLogRef.current;
+    const _s = Math.max(0, 100 + _log.reduce((a, e) => a + e.sanityDelta, 0));
+    const _r = Math.max(0, 100 + _log.reduce((a, e) => a + (e.resistanceDelta ?? 0), 0));
+    fetch("/api/story/psyche-update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chapterText: _ch.slice(0, 2500), heroineName: selectedActresses.map(a => a.name).join(" & ") || undefined, currentSanity: _s, currentResistance: _r }) })
+      .then(r => r.ok ? r.json() : null).then((d: { sanityDelta: number; resistanceDelta: number; event: string } | null) => { if (d) setPsycheLog(prev => [...prev, { sanityDelta: d.sanityDelta, resistanceDelta: d.resistanceDelta, event: d.event }]); }).catch(() => {});
+  }, [chapters]);
+  const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
+  const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
   const [savedId, setSavedId] = useState<string | null>(null);
   const [continueDir, setContinueDir] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -903,6 +921,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                 <div style={{ fontSize: "0.55rem", color: "rgba(200,168,75,0.3)" }}>THE STORY IS BEING WRITTEN…</div>
               </div>
             )}
+            {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={selectedActresses.map(a => a.name)} />}
             {chapters.map((ch, i) => (
               <div key={i}>
                 {chapters.length > 1 && <div style={{ fontSize: "0.6rem", color: goldDim, letterSpacing: "2px", fontFamily: "'Cinzel', serif", marginBottom: "0.75rem", marginTop: i > 0 ? "2rem" : 0 }}>— CHAPTER {i + 1} —</div>}
