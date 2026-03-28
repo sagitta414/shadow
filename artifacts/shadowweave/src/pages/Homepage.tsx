@@ -229,6 +229,138 @@ function ModeCard({ icon, title, desc, badge, accent, r, g, b, onClick, size = "
   );
 }
 
+// ── FEATURED CARD ─────────────────────────────────────────────────────────────
+function FeaturedCard({ title, desc, badge, accent, r, g, b, onClick, img }: {
+  title: string; desc: string; badge: string; accent: string;
+  r: number; g: number; b: number; onClick: () => void; img: string;
+}) {
+  const [hov, setHov] = useState(false);
+  const rgb = `${r},${g},${b}`;
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        position: "relative", cursor: "pointer", borderRadius: "22px", overflow: "hidden",
+        height: "310px",
+        border: `1px solid ${hov ? `rgba(${rgb},0.72)` : `rgba(${rgb},0.14)`}`,
+        transition: "all 0.42s cubic-bezier(0.22,1,0.36,1)",
+        boxShadow: hov
+          ? `0 0 0 1px rgba(${rgb},0.18), 0 32px 100px rgba(${rgb},0.38), 0 0 160px rgba(${rgb},0.1), inset 0 0 60px rgba(${rgb},0.06)`
+          : "0 8px 45px rgba(0,0,0,0.65)",
+        transform: hov ? "translateY(-10px) scale(1.022)" : "none",
+      }}
+    >
+      {/* Full-bleed image */}
+      <img src={img} alt="" style={{
+        position: "absolute", inset: 0, width: "100%", height: "100%",
+        objectFit: "cover", objectPosition: "center",
+        opacity: hov ? 0.9 : 0.32,
+        transform: hov ? "scale(1.12)" : "scale(1.04)",
+        filter: hov
+          ? "saturate(1.45) brightness(1.18) contrast(1.08)"
+          : "saturate(0.45) brightness(0.52)",
+        transition: "all 0.75s cubic-bezier(0.22,1,0.36,1)",
+      }} />
+      {/* Bottom gradient - text readability */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: `linear-gradient(to top, rgba(4,1,12,${hov ? 0.95 : 0.82}) 0%, rgba(4,1,12,${hov ? 0.65 : 0.85}) 38%, rgba(4,1,12,${hov ? 0.05 : 0.45}) 72%, transparent 100%)`,
+        transition: "all 0.5s",
+      }} />
+      {/* Accent radial at bottom */}
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "65%",
+        background: `radial-gradient(ellipse at 50% 110%, rgba(${rgb},${hov ? 0.25 : 0.0}) 0%, transparent 65%)`,
+        transition: "all 0.55s",
+      }} />
+      {/* Top accent bar */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+        background: hov
+          ? `linear-gradient(90deg, transparent, rgba(${rgb},1) 25%, rgba(${rgb},1) 75%, transparent)`
+          : `linear-gradient(90deg, transparent, rgba(${rgb},0.22) 50%, transparent)`,
+        boxShadow: hov ? `0 0 28px rgba(${rgb},0.75), 0 0 60px rgba(${rgb},0.3)` : "none",
+        transition: "all 0.42s",
+      }} />
+      {/* Left edge glow */}
+      <div style={{
+        position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
+        background: `linear-gradient(to bottom, transparent, rgba(${rgb},${hov ? 0.7 : 0}) 40%, rgba(${rgb},${hov ? 0.7 : 0}) 60%, transparent)`,
+        boxShadow: hov ? `0 0 20px rgba(${rgb},0.6)` : "none",
+        transition: "all 0.42s",
+      }} />
+      {/* Scan-line reveal */}
+      {hov && (
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: `linear-gradient(to bottom, transparent 0%, rgba(${rgb},0.12) 48%, rgba(255,255,255,0.07) 50%, rgba(${rgb},0.12) 52%, transparent 100%)`,
+          animation: "imgScanReveal 0.7s ease forwards",
+        }} />
+      )}
+      {/* Shimmer sweep */}
+      {hov && (
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "linear-gradient(108deg, transparent 28%, rgba(255,255,255,0.06) 50%, transparent 72%)",
+          animation: "shimmerSweep 1.1s ease forwards",
+        }} />
+      )}
+      {/* ── CONTENT ── */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.8rem 1.7rem 1.55rem", zIndex: 2 }}>
+        {/* Badge pill */}
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.7rem",
+          padding: "4px 12px", borderRadius: "24px",
+          background: `rgba(${rgb},0.16)`, border: `1px solid rgba(${rgb},0.4)`,
+          backdropFilter: "blur(10px)",
+        }}>
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: accent, boxShadow: `0 0 10px rgba(${rgb},1)`, animation: "pulseDot 2.5s ease-in-out infinite" }} />
+          <span style={{ fontSize: "0.38rem", letterSpacing: "2.5px", color: accent, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{badge}</span>
+        </div>
+        {/* Title */}
+        <div style={{
+          fontFamily: "'Cinzel', serif",
+          fontSize: hov ? "1.45rem" : "1.2rem",
+          fontWeight: 900, color: "#FFFFFF",
+          letterSpacing: "0.09em", lineHeight: 1.05,
+          marginBottom: "0.55rem",
+          textShadow: hov ? `0 0 50px rgba(${rgb},0.75), 0 2px 24px rgba(0,0,0,0.95)` : "0 2px 14px rgba(0,0,0,0.85)",
+          transition: "all 0.38s",
+        }}>{title}</div>
+        {/* Desc — slides in */}
+        <div style={{
+          fontSize: "0.64rem", color: "rgba(210,205,240,0.62)",
+          fontFamily: "'Raleway', sans-serif", lineHeight: 1.58,
+          maxWidth: "90%",
+          maxHeight: hov ? "70px" : "0px",
+          opacity: hov ? 1 : 0,
+          overflow: "hidden",
+          transition: "all 0.38s ease",
+          marginBottom: hov ? "0.9rem" : "0",
+        }}>{desc}</div>
+        {/* CTA */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          paddingTop: hov ? "0.7rem" : "0",
+          borderTop: `1px solid rgba(${rgb},${hov ? 0.28 : 0})`,
+          opacity: hov ? 1 : 0,
+          transform: hov ? "translateY(0)" : "translateY(8px)",
+          transition: "all 0.38s ease",
+        }}>
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "4px", color: accent, fontWeight: 900, textTransform: "uppercase", textShadow: `0 0 22px rgba(${rgb},0.85)` }}>Enter the Dark →</span>
+          <div style={{ display: "flex", gap: "4px" }}>
+            {[1,2,3].map(i => (
+              <div key={i} style={{ width: "5px", height: "5px", borderRadius: "50%", background: `rgba(${rgb},${1.05 - i * 0.3})`, boxShadow: `0 0 12px rgba(${rgb},0.85)` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── DAILY DISPATCH ────────────────────────────────────────────────────────────
 function DailyDispatch({ heroine, villain, setting, title, today, onGenerate, onChronicle }: {
   heroine: { name: string; color: string }; villain: string; setting: string;
@@ -342,9 +474,9 @@ export default function Homepage(props: HomepageProps) {
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const allModes = [
-    { id: "forge",    icon: "⚔", title: "HEROINE FORGE", desc: "181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller.", badge: "Core Mode · 8 Universes", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onSuperheroMode, tag: "Flagship", size: "large" as const, cat: "forge", img: "/icons/heroine-forge.png" },
+    { id: "forge",    icon: "⚔", title: "HEROINE FORGE", desc: "181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller.", badge: "Core Mode · 8 Universes", accent: "#C084FC", r: 168, g: 85,  b: 247, onClick: props.onSuperheroMode, tag: "Flagship", size: "large" as const, cat: "forge" },
     { id: "int",      icon: "🔦", title: "INTERROGATION ROOM", desc: "Psychological pressure chamber. Extract information through fear, isolation, and manipulation.", badge: "Psych · High Tension", accent: "#F87171", r: 248, g: 113, b: 113, onClick: props.onInterrogationRoom, cat: "capture", img: "/icons/interrogation-room.png" },
-    { id: "celeb",    icon: "🎬", title: "CELEBRITY CAPTURE", desc: "Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall.", badge: "Celebrity · Premium", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onCelebrityMode, tag: "Premium", cat: "celebrity", img: "/icons/celebrity-captive.png" },
+    { id: "celeb",    icon: "🎬", title: "CELEBRITY CAPTURE", desc: "Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall.", badge: "Celebrity · Premium", accent: "#FCA311", r: 252, g: 163, b: 17, onClick: props.onCelebrityMode, tag: "Premium", cat: "celebrity" },
     { id: "daily",    icon: "📅", title: "DAILY SCENARIO", desc: "A fresh AI-crafted scenario every 24 hours. New heroine, captor, and setting at midnight.", badge: "Daily · Refreshes 00:00", accent: "#FCD34D", r: 251, g: 191, b: 36, onClick: props.onDailyScenario, cat: "all" },
     { id: "mb",       icon: "🌀", title: "MIND BREAK", desc: "Five-phase psychological deconstruction. Patience, trust, isolation, dependency, and surrender.", badge: "5 Phases · Deep Psych", accent: "#C084FC", r: 192, g: 132, b: 252, onClick: props.onMindBreak, cat: "capture" },
     { id: "dc",       icon: "⛓", title: "DUAL CAPTURE", desc: "Two heroines, one cell. A shared ordeal that tests loyalty, friendship, and individual resolve.", badge: "Duo · Shared Cell", accent: "#34D399", r: 52,  g: 211, b: 153, onClick: props.onDualCapture, cat: "capture" },
@@ -432,8 +564,8 @@ export default function Homepage(props: HomepageProps) {
         @keyframes chipIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
         .hp-card-animate { animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
         .hp-chip-animate { animation: chipIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
-        @media (max-width: 900px) { .hp-grid { grid-template-columns: 1fr 1fr !important; } .hp-hero-stats { flex-wrap: wrap !important; } }
-        @media (max-width: 640px) { .hp-grid { grid-template-columns: 1fr !important; } .hp-tabs { gap: 0.35rem !important; } .hp-tabs button { padding: 0.55rem 0.8rem !important; font-size: 0.5rem !important; } }
+        @media (max-width: 900px) { .hp-grid { grid-template-columns: 1fr 1fr !important; } .hp-hero-stats { flex-wrap: wrap !important; } .hp-feat-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) { .hp-grid { grid-template-columns: 1fr !important; } .hp-tabs { gap: 0.35rem !important; } .hp-tabs button { padding: 0.55rem 0.8rem !important; font-size: 0.5rem !important; } .hp-feat-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 480px) { .hp-pad { padding-left: 0.9rem !important; padding-right: 0.9rem !important; } }
       `}</style>
 
@@ -559,6 +691,41 @@ export default function Homepage(props: HomepageProps) {
               <span style={{ fontSize: "0.38rem", letterSpacing: "2.5px", color: `rgba(${c},0.38)`, fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase", fontWeight: 700 }}>{l}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ══ FEATURED MODES ════════════════════════════════════════════════════════ */}
+      <div className="hp-pad" style={{ padding: "0 2rem 2.5rem", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.68s 0.34s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.1rem" }}>
+          <div style={{ width: "3px", height: "14px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(251,191,36,0.9), rgba(251,191,36,0.1))", boxShadow: "0 0 10px rgba(251,191,36,0.4)" }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4.5px", color: "rgba(251,191,36,0.52)", textTransform: "uppercase", fontWeight: 700 }}>Featured Modes</span>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(251,191,36,0.18), transparent)" }} />
+        </div>
+        <div className="hp-feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.1rem" }}>
+          <FeaturedCard
+            title="HEROINE FORGE"
+            desc="181+ heroines across 8 universes. Choose your captor, set the scene, generate a multi-chapter dark thriller."
+            badge="Core Mode · Flagship"
+            accent="#C084FC" r={168} g={85} b={247}
+            onClick={props.onSuperheroMode}
+            img="/icons/heroine-forge.png"
+          />
+          <FeaturedCard
+            title="CELEBRITY CAPTURE"
+            desc="Real-world fame meets dark fantasy. Celebrities and villains in a narrative that breaks the fourth wall."
+            badge="Celebrity · Premium"
+            accent="#FCA311" r={252} g={163} b={17}
+            onClick={props.onCelebrityMode}
+            img="/icons/celebrity-captive.png"
+          />
+          <FeaturedCard
+            title="CUSTOM SCENARIO"
+            desc="Build your own premise from scratch. Custom heroine, captor, setting, and narrative arc — your rules entirely."
+            badge="Custom · Bespoke"
+            accent="#34D399" r={52} g={211} b={153}
+            onClick={props.onScenarioGenerator}
+            img="/icons/custom-scenario.png"
+          />
         </div>
       </div>
 
