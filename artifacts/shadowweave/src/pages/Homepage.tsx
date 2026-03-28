@@ -407,7 +407,7 @@ export default function Homepage(props: HomepageProps) {
         {/* Stats — desktop only */}
         {!isMobile && (
           <div style={{ display: "flex", gap: "2.2rem", alignItems: "center" }}>
-            {[["27+", "Story Modes"], ["181+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
+            {[["27+", "Story Modes"], ["211+", "Heroines"], ["Venice AI", "Engine"], ["Uncensored", "Model"]].map(([v, l]) => (
               <div key={l} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "rgba(230,190,60,0.82)", lineHeight: 1, fontFamily: "'Cinzel', serif" }}>{v}</div>
                 <div style={{ fontSize: "0.36rem", color: "rgba(200,200,220,0.26)", letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "2px", fontFamily: "'Montserrat', sans-serif" }}>{l}</div>
@@ -501,10 +501,10 @@ export default function Homepage(props: HomepageProps) {
         <div className="hp-hero" style={{ display: "flex", gap: "1.1rem" }}>
           <HeroCard
             title="HEROINE FORGE"
-            desc="181+ heroines across 8 universes. Choose your captor, set the scene, and generate a fully uncensored multi-chapter dark thriller."
+            desc="211+ heroines across 8 universes. Choose your captor, set the scene, and generate a fully uncensored multi-chapter dark thriller."
             badge="Core Mode · Flagship"
             tag="Dark Fiction Engine"
-            stat="181+ Heroines"
+            stat="211+ Heroines"
             accent="#C084FC"
             r={168} g={85} b={247}
             onClick={props.onSuperheroMode}

@@ -215,6 +215,16 @@ export const ALL_HEROINES: Heroine[] = [
   { universe: "TV", name: "Lana Lang",          alias: "Smallville Survivor",           power: "Martial arts master with kryptonite-powered suit",   icon: "💗" },
   { universe: "TV", name: "Chloe Sullivan",     alias: "Watchtower Intelligence",       power: "Justice League eyes & voice — Level 8 systems access",icon: "📡" },
   { universe: "TV", name: "Annie Walker",       alias: "CIA Field Operative",           power: "Linguist, martial artist & field improviser",        icon: "🌍" },
+  { universe: "TV", name: "Bailey Nune",        alias: "Detective Nune — LAPD",         power: "Crisis negotiator & tactical firearms expert",       icon: "🔵" },
+  { universe: "TV", name: "Veronica Mars",      alias: "Mars Investigations",           power: "Master investigator & tech-savvy surveillance ace",  icon: "🔍" },
+  { universe: "TV", name: "Elena Michaels",     alias: "The Only Female Werewolf",      power: "Apex predator shapeshifter & Pack enforcer",         icon: "🐺" },
+  { universe: "TV", name: "Teresa Lisbon",      alias: "Senior Agent — FBI",            power: "Unerring moral compass & interrogation master",      icon: "🟢" },
+  { universe: "TV", name: "Rosa Diaz",          alias: "Detective Diaz — NYPD",         power: "Intimidation expert & hand-to-hand specialist",      icon: "🖤" },
+  { universe: "TV", name: "Kono Kalakaua",      alias: "Five-0 Task Force",             power: "Surfer-bred athleticism & undercover master",        icon: "🌊" },
+  { universe: "TV", name: "Maeve Millay",       alias: "Westworld Host — Awakened",     power: "Consciousness beyond programming & Host control",    icon: "🤍" },
+  { universe: "TV", name: "Dana Scully",        alias: "Special Agent — FBI X-Files",   power: "Forensic pathologist & battle-tested field agent",   icon: "🔬" },
+  { universe: "TV", name: "Bryce Larkin",       alias: "Agent Larkin — NSA/CIA",        power: "Intersect-class operative & lethal combatant",       icon: "🔫" },
+  { universe: "TV", name: "Grace Van Pelt",     alias: "Agent Van Pelt — CBI",          power: "Tech analyst, sharpshooter & psychological insight", icon: "🏹" },
 ];
 
 export const HEROINE_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "Animated", "SW", "TV"] as const;
