@@ -140,7 +140,37 @@ export const VILLAINS: Villain[] = [
   { name: "Cruella de Vil",      universe: "Animated", scheme: "Skin one hundred and one Dalmatian puppies to create the ultimate fur coat",                  icon: "💀" },
   { name: "Yzma",                universe: "Animated", scheme: "Assassinate Emperor Kuzco and seize the Incan Empire through scheming brilliance",             icon: "⚗" },
   { name: "Queen of Hearts",     universe: "Animated", scheme: "Maintain absolute terrifying rule through arbitrary decrees — off with their heads",           icon: "❤" },
+  // Gaming
+  { name: "Albert Wesker",       universe: "Gaming",   scheme: "Inject Uroboros into humanity and rule the perfected survivors as an Ubermensch god",         icon: "🕶" },
+  { name: "Sephiroth",           universe: "Gaming",   scheme: "Become one with the Planet by igniting a Meteor and absorbing the life stream as a god",      icon: "🌑" },
+  { name: "The Illusive Man",    universe: "Gaming",   scheme: "Control the Reapers to place humanity at the apex of galactic civilization",                   icon: "🚬" },
+  { name: "Handsome Jack",       universe: "Gaming",   scheme: "Brand Pandora's bandits as vermin and rule Hyperion as its god-emperor of efficiency",        icon: "🎭" },
+  { name: "Vaas Montenegro",     universe: "Gaming",   scheme: "Hold the Rook Islands under pirate terror and feed every captive to his personal madness",    icon: "🏝" },
+  { name: "Ardyn Izunia",        universe: "Gaming",   scheme: "Unravel Lucis's royal bloodline over two millennia of patient, exquisite revenge",             icon: "🎩" },
+  { name: "Caius Ballad",        universe: "Gaming",   scheme: "Destroy the timeline itself to end the suffering of his immortal ward Yeul",                  icon: "💔" },
+  { name: "Mother Miranda",      universe: "Gaming",   scheme: "Resurrect her dead daughter by fusing the Cadou fungus with a perfect host body",             icon: "🦅" },
+  { name: "Ultimecia",           universe: "Gaming",   scheme: "Compress all time and space into a single moment she alone controls as a Time Witch god",     icon: "🕰" },
+  { name: "Seymour Guado",       universe: "Gaming",   scheme: "Lead all of Spira into death and become the most powerful unsent the world has ever seen",    icon: "💀" },
+  { name: "Kefka Palazzo",       universe: "Gaming",   scheme: "Drain the Warring Triad's power to become a god and revel in pure nihilistic destruction",    icon: "🎪" },
+  { name: "GLaDOS",              universe: "Gaming",   scheme: "Run Aperture Science's test chambers with neurotoxin backup and cheerful passive-aggression",  icon: "🤖" },
+  // Film
+  { name: "Immortan Joe",        universe: "Film",     scheme: "Control the Wasteland through water monopoly and breed a warrior dynasty from his seed",       icon: "💀" },
+  { name: "Agent Smith",         universe: "Film",     scheme: "Propagate himself through every mind in the Matrix and tear free from his purpose",           icon: "🕶" },
+  { name: "President Snow",      universe: "Film",     scheme: "Maintain Capitol dominion over all twelve Districts through fear, roses, and the Games",      icon: "🌹" },
+  { name: "Bill (Kill Bill)",    universe: "Film",     scheme: "Reclaim ownership over his deadliest pupil on his own timeline and terms",                     icon: "🗡" },
+  { name: "O-Ren Ishii",         universe: "Film",     scheme: "Rule the Tokyo underworld as its queen and erase every humiliation with a Hattori Hanzo blade",icon: "☃" },
+  { name: "Viktor (Underworld)", universe: "Film",     scheme: "Maintain vampire council supremacy by destroying every Lycan and any hybrid abomination",     icon: "🩸" },
+  { name: "The Terminator",      universe: "Film",     scheme: "Locate and eliminate Sarah Connor before the Resistance can ever be born",                    icon: "🦾" },
+  { name: "Carter Burke",        universe: "Film",     scheme: "Smuggle a live xenomorph past quarantine and make a fortune delivering it to Weyland-Yutani",  icon: "💼" },
+  { name: "Ares (Xena)",         universe: "TV",       scheme: "Transform Xena back into his perfect warlord and rule humanity through her glorious chaos",    icon: "⚔" },
+  { name: "Callisto",            universe: "TV",       scheme: "Destroy Xena's peace by burning everything she loves — starting with Gabrielle",              icon: "🔥" },
+  { name: "Angelus",             universe: "TV",       scheme: "Torture the Scooby Gang psychologically and awaken Acathla to swallow the world into Hell",   icon: "🧛" },
+  { name: "The Mayor",           universe: "TV",       scheme: "Complete his Ascension into a pure demon on Sunnydale's graduation day",                      icon: "🐍" },
+  { name: "Cersei Lannister",    universe: "TV",       scheme: "Keep the Iron Throne for House Lannister by any means — poison, fire, or political ruin",     icon: "👑" },
+  { name: "Ramsay Bolton",       universe: "TV",       scheme: "Break every captive utterly and hold the North through sadism and calculated terror",          icon: "🐕" },
+  { name: "The Night King",      universe: "TV",       scheme: "Lead the Army of the Dead beyond the Wall and end the age of the living forever",             icon: "❄" },
+  { name: "Petyr Baelish",       universe: "TV",       scheme: "Climb the chaos ladder until he sits atop every throne in Westeros with Sansa at his side",   icon: "🪙" },
 ];
 
-export const VILLAIN_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "SW", "Animated"] as const;
+export const VILLAIN_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "SW", "Animated", "Gaming", "Film", "TV"] as const;
 export type VillainUniverse = typeof VILLAIN_UNIVERSES[number];
