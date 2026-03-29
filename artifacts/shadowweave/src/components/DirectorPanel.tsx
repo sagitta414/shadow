@@ -64,33 +64,36 @@ export default function DirectorPanel() {
           </div>
 
           <div style={{ marginBottom: "14px" }}>
-            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", letterSpacing: "2px", marginBottom: "8px" }}>CONTENT MODE</div>
+            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", letterSpacing: "2px", marginBottom: "4px" }}>SEXUAL CONTENT LOCK</div>
+            <div style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.58rem", marginBottom: "8px", lineHeight: "1.4" }}>
+              All modes start non-sexual. Ask for sex to unlock it naturally.
+            </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => setSafeMode(false)}
                 style={{
                   flex: 1, padding: "8px 6px",
-                  borderRadius: "8px", cursor: "pointer", fontSize: "0.65rem", letterSpacing: "1.2px",
+                  borderRadius: "8px", cursor: "pointer", fontSize: "0.62rem", letterSpacing: "1px",
                   border: !safeMode ? "1px solid rgba(192,132,252,0.5)" : "1px solid rgba(255,255,255,0.08)",
                   background: !safeMode ? "rgba(192,132,252,0.12)" : "rgba(255,255,255,0.03)",
                   color: !safeMode ? "#C084FC" : "rgba(255,255,255,0.35)",
                   transition: "all 0.2s",
                 }}
               >
-                ◈ EXPLICIT
+                ◈ DEFAULT
               </button>
               <button
                 onClick={() => setSafeMode(true)}
                 style={{
                   flex: 1, padding: "8px 6px",
-                  borderRadius: "8px", cursor: "pointer", fontSize: "0.65rem", letterSpacing: "1.2px",
+                  borderRadius: "8px", cursor: "pointer", fontSize: "0.62rem", letterSpacing: "1px",
                   border: safeMode ? "1px solid rgba(52,211,153,0.5)" : "1px solid rgba(255,255,255,0.08)",
                   background: safeMode ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.03)",
                   color: safeMode ? "#34D399" : "rgba(255,255,255,0.35)",
                   transition: "all 0.2s",
                 }}
               >
-                ◉ NON-SEXUAL
+                ◉ LOCK SAFE
               </button>
             </div>
           </div>
