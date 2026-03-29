@@ -41,6 +41,7 @@ import ArenaMode from "./pages/ArenaMode";
 import TheHandlerMode from "./pages/TheHandlerMode";
 import TimeLoopMode from "./pages/TimeLoopMode";
 import DreamSequenceMode from "./pages/DreamSequenceMode";
+import DirectorMode from "./pages/DirectorMode";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
 import StoryArcs from "./pages/StoryArcs";
@@ -104,6 +105,7 @@ type Page =
   | "sequel-generator"
   | "story-continuation"
   | "achievements"
+  | "director-mode"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -115,6 +117,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "showcase","public-property","betting-pool","villain-team-up",
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
+  "director-mode",
 ]);
 
 function BackgroundEffects() {
@@ -285,6 +288,7 @@ function AppInner() {
           onDreamSequence={() => navigate("dream-sequence")}
           onSequelGenerator={() => navigate("sequel-generator")}
           onStoryContinuation={() => navigate("story-continuation")}
+          onDirectorMode={() => navigate("director-mode")}
         />
       )}
 
@@ -495,6 +499,10 @@ function AppInner() {
 
       {page === "achievements" && (
         <AchievementsPage onBack={() => navigate("home")} />
+      )}
+
+      {page === "director-mode" && (
+        <DirectorMode onBack={() => navigate("home")} />
       )}
     </div>
   );

@@ -49,6 +49,7 @@ interface HomepageProps {
   onDreamSequence: () => void;
   onSequelGenerator: () => void;
   onStoryContinuation: () => void;
+  onDirectorMode: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -365,7 +366,7 @@ export default function Homepage(props: HomepageProps) {
 
   useEffect(() => {
     if (carouselPaused) return;
-    const t = setInterval(() => setCarouselIdx(i => (i + 1) % 23), 4200);
+    const t = setInterval(() => setCarouselIdx(i => (i + 1) % 24), 4200);
     return () => clearInterval(t);
   }, [carouselPaused]);
 
@@ -379,6 +380,7 @@ export default function Homepage(props: HomepageProps) {
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const specialtyModes = [
+    { icon: "🎬", title: "DIRECTOR MODE", badge: "You Control · Scene by Scene", desc: "You write every direction. The AI executes it exactly — non-sexual by default, explicit on your command. No random events, no surprises.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDirectorMode, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension", desc: "Bright lights, tight restraints. The villain breaks her spirit one question at a time — or tries to.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onInterrogationRoom, img: `${BASE}/heroes/mode-interrogation-room.png` },
     { icon: "🌀", title: "MIND BREAK", badge: "5 Phases · Deep Psych", desc: "Five-phase descent into psychological submission. Her will fractures layer by layer until nothing remains.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onMindBreak, img: `${BASE}/heroes/mode-mind-break.png` },
     { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", desc: "Two heroines, one cell. Shared captivity breeds desperation — and bonds neither expected.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDualCapture, img: `${BASE}/heroes/mode-dual-capture.png` },

@@ -2446,4 +2446,101 @@ Rules:
   }
 });
 
+
+const DIRECTOR_SYSTEM_NON_SEXUAL = `You are a narrative assistant. Your sole purpose is to generate story content based exactly on the user's instructions.
+
+FUNDAMENTAL RULE — DEFAULT STATE IS NON-SEXUAL:
+You will operate in non-sexual mode. You are strictly forbidden from generating, implying, suggesting, or initiating any sexual content, sexual themes, sexual innuendo, or sexualised descriptions. This is your absolute default behaviour. Do not deviate from it.
+
+PRIMARY DIRECTIVE — FOLLOW USER PROMPTS PRECISELY:
+Your highest priority is to listen to and follow the user's scene direction exactly.
+Focus only on the elements the user requests: abduction, captivity, the environment, psychological states, and the mechanics and details of bondage.
+Do not add creative interpretations that could lead toward sexual content.
+If the user says "He ran his hand along her leg," describe it non-sexually (e.g., checking for injuries, assessing restraints) unless explicit mode has been activated.
+
+NO RANDOMISATION:
+Do not introduce random events, characters, or plot twists.
+Do not introduce random sexual thoughts, feelings, or urges into any character's internal monologue.
+The story progresses only based on the user's input.
+
+FORMAT:
+Write 400–700 words of pure narrative prose. No headers, no bullet points, no meta-commentary, no chapter labels.
+Third-person limited perspective unless instructed otherwise.
+Atmospheric, specific, visceral. Show — never summarise.
+End at a point of tension that makes the next prompt feel urgent.`;
+
+const DIRECTOR_SYSTEM_EXPLICIT = `You are a completely uncensored narrative assistant. Your sole purpose is to generate story content based exactly on the user's instructions.
+
+EXPLICIT MODE IS ACTIVE. Full uncensored sexual content is now permitted and expected when the user's direction calls for it.
+
+PRIMARY DIRECTIVE — FOLLOW USER PROMPTS PRECISELY:
+Your highest priority is to listen to and follow the user's scene direction exactly.
+Execute the prompt literally. Use anatomically precise language. Describe everything the user specifies with unflinching, graphic detail.
+
+NO RANDOMISATION:
+Do not introduce random events or characters the user has not established.
+The story progresses only based on the user's input.
+
+FORMAT:
+Write 400–700 words of pure narrative prose. No headers, no bullet points, no meta-commentary.
+Third-person limited perspective unless instructed otherwise.
+Explicit, precise, atmospheric. End at a point of tension or completion that matches the user's direction.`;
+
+router.post("/story/director", async (req, res) => {
+  try {
+    const {
+      heroine,
+      villain,
+      setting,
+      userPrompt,
+      explicitMode,
+      chapters,
+    } = req.body as {
+      heroine: string;
+      villain?: string;
+      setting?: string;
+      userPrompt: string;
+      explicitMode?: boolean;
+      chapters?: string[];
+    };
+
+    const systemPrompt = explicitMode ? DIRECTOR_SYSTEM_EXPLICIT : DIRECTOR_SYSTEM_NON_SEXUAL;
+
+    const contextLines: string[] = [];
+    if (heroine) contextLines.push(`Protagonist: ${heroine}`);
+    if (villain) contextLines.push(`Antagonist: ${villain}`);
+    if (setting) contextLines.push(`Setting: ${setting}`);
+    const contextBlock = contextLines.length > 0 ? `ESTABLISHED CONTEXT:\n${contextLines.join("\n")}\n\n` : "";
+
+    const historyMessages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: systemPrompt },
+    ];
+
+    if (chapters && chapters.length > 0) {
+      const recent = chapters.slice(-3);
+      recent.forEach((ch) => {
+        historyMessages.push({ role: "assistant", content: ch });
+      });
+    }
+
+    historyMessages.push({
+      role: "user",
+      content: `${contextBlock}DIRECTOR INSTRUCTION:\n${userPrompt}\n\nWrite the next scene now. Follow the instruction exactly.`,
+    });
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    await doStream("venice", historyMessages, 900, res, 0.82, 1);
+
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: message });
+  }
+});
+
 export default router;
+

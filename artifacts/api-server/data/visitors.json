@@ -1,9 +1,16 @@
 [
   {
+    "email": "jeff@gmail.com",
+    "registeredAt": 1774757126094,
+    "visitCount": 1,
+    "lastSeen": 1774757126094,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
+  },
+  {
     "email": "jjjefflynch107@gmail.com",
     "registeredAt": 1774649535816,
-    "visitCount": 32,
-    "lastSeen": 1774735273393,
+    "visitCount": 33,
+    "lastSeen": 1774757067345,
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
   },
   {
