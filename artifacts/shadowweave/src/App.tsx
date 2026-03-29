@@ -42,6 +42,8 @@ import TheHandlerMode from "./pages/TheHandlerMode";
 import TimeLoopMode from "./pages/TimeLoopMode";
 import DreamSequenceMode from "./pages/DreamSequenceMode";
 import DirectorMode from "./pages/DirectorMode";
+import EscapeAttemptMode from "./pages/EscapeAttemptMode";
+import NegotiationRoomMode from "./pages/NegotiationRoomMode";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
 import StoryArcs from "./pages/StoryArcs";
@@ -109,6 +111,8 @@ type Page =
   | "story-continuation"
   | "achievements"
   | "director-mode"
+  | "escape-attempt"
+  | "negotiation-room"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -120,7 +124,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "showcase","public-property","betting-pool","villain-team-up",
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
-  "director-mode",
+  "director-mode","escape-attempt","negotiation-room",
 ]);
 
 function BackgroundEffects() {
@@ -310,6 +314,8 @@ function AppInner() {
           onSequelGenerator={() => navigate("sequel-generator")}
           onStoryContinuation={() => navigate("story-continuation")}
           onDirectorMode={() => navigate("director-mode")}
+          onEscapeAttempt={() => navigate("escape-attempt")}
+          onNegotiationRoom={() => navigate("negotiation-room")}
         />
       )}
 
@@ -524,6 +530,12 @@ function AppInner() {
 
       {page === "director-mode" && (
         <DirectorMode onBack={() => navigate("home")} />
+      )}
+      {page === "escape-attempt" && (
+        <EscapeAttemptMode onBack={() => navigate("home")} />
+      )}
+      {page === "negotiation-room" && (
+        <NegotiationRoomMode onBack={() => navigate("home")} />
       )}
     </div>
   );

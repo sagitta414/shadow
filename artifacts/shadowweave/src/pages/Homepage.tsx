@@ -50,6 +50,8 @@ interface HomepageProps {
   onSequelGenerator: () => void;
   onStoryContinuation: () => void;
   onDirectorMode: () => void;
+  onEscapeAttempt: () => void;
+  onNegotiationRoom: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -404,6 +406,8 @@ export default function Homepage(props: HomepageProps) {
     { icon: "◈", title: "DREAM SEQUENCE", badge: "5 Depths · Nightmare", desc: "Five depths of nightmare. The villain reaches her where she feels safest — in sleep — and remakes her.", r: 167, g: 139, b: 250, accent: "#A78BFA", onClick: props.onDreamSequence, img: `${BASE}/heroes/mode-dream-sequence.png` },
     { icon: "⟴", title: "SEQUEL GENERATOR", badge: "Archive · New Chapter", desc: "A story from your archive earns a new chapter. The villain returns, wiser and far more prepared than before.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onSequelGenerator, img: `${BASE}/heroes/mode-sequel-generator.png` },
     { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
+    { icon: "🏃", title: "ESCAPE ATTEMPT", badge: "Turn-Based · 8 Beats", desc: "One shot. You choose every action — the AI plays out the brutal consequences. Escape or be recaptured.", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onEscapeAttempt, img: `${BASE}/heroes/mode-escape-attempt.png` },
+    { icon: "🤝", title: "NEGOTIATION ROOM", badge: "Psych · Turn-Based Chat", desc: "No restraints. Just words. The villain wants something — and he's very good at getting it. You play her.", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onNegotiationRoom, img: `${BASE}/heroes/mode-negotiation-room.png` },
   ];
 
   const studioTools = [

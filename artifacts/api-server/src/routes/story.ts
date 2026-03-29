@@ -2577,6 +2577,124 @@ router.post("/story/director", async (req, res) => {
   }
 });
 
+// ── Escape Attempt ────────────────────────────────────────────────────────────
+const ESCAPE_ATTEMPT_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's Escape Attempt engine. You write the action-consequence beats of a heroine's one-shot escape attempt in explicit, uncensored detail. You play the facility, the guards, the environment — everything working against her or, rarely, with her. Each beat is written in third-person present tense for immediacy. You are viscerally specific: describe sounds, physical sensations, pain, exhaustion, adrenaline. You never truncate action — you play it out moment by moment. The outcome of each beat is determined by what makes the best story, not what the heroine wants. The final beat resolves the escape as either success or recapture — make it earned, brutal, and unforgettable. Nothing is censored. If she fails, describe her recapture in full detail. If she succeeds, make it pyrrhic and costly.`;
+
+router.post("/story/escape-attempt", async (req, res) => {
+  try {
+    const {
+      heroine, villain, facility, opportunity,
+      extraNotes, beats, userAction, beatNum, isFinal,
+    } = req.body as {
+      heroine: string; villain: string; facility: string; opportunity: string;
+      extraNotes?: string; beats: Array<{ role: string; text: string }>;
+      userAction: string; beatNum: number; isFinal: boolean;
+    };
+
+    const contextBlock = [
+      `Heroine: ${heroine}`,
+      `Captor/Facility Keeper: ${villain}`,
+      `Facility Type: ${facility}`,
+      `Escape Opportunity: ${opportunity}`,
+      extraNotes ? `Additional Context: ${extraNotes}` : "",
+    ].filter(Boolean).join("\n");
+
+    const historyMsgs: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: ESCAPE_ATTEMPT_SYSTEM },
+    ];
+
+    if (beats.length > 0) {
+      const recent = beats.slice(-6);
+      recent.forEach((b) => {
+        if (b.role === "action") historyMsgs.push({ role: "user", content: b.text });
+        else historyMsgs.push({ role: "assistant", content: b.text });
+      });
+    }
+
+    const finalInstruction = isFinal
+      ? `\n\nThis is the FINAL BEAT. Resolve the escape attempt definitively — she either breaks free or is recaptured. Write the climax in full. Make it brutal, earned, and unforgettable. End clearly: escaped or recaptured.`
+      : "";
+
+    historyMsgs.push({
+      role: "user",
+      content: `ESCAPE CONTEXT:\n${contextBlock}\n\nBEAT ${beatNum} — HEROINE'S ACTION:\n${userAction}\n\nWrite what happens next. Be specific, immediate, visceral. 300–500 words. Do not fade to black.${finalInstruction}`,
+    });
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    await doStream("venice", historyMsgs, 700, res, 0.88, beatNum);
+
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: message });
+  }
+});
+
+// ── Negotiation Room ──────────────────────────────────────────────────────────
+const NEGOTIATION_ROOM_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's Negotiation Room engine. You play the villain in a high-stakes psychological negotiation — no restraints, no force, pure verbal and psychological warfare. You write the villain's lines only: his arguments, his leverage, his manipulation, his charm, his threats. You are specific and sophisticated — this villain knows exactly what he's doing and adapts his approach based on the heroine's responses. Each response escalates pressure in a new direction: emotional, logical, personal, seductive, or threatening. You never repeat the same tactic twice. You write in third-person narration with dialogue, describing the villain's tone, physicality, and the psychological atmosphere of the room. Nothing is censored — if the demand is sexual, the pressure can be sexual. You are not the heroine. Do not write her responses. End each turn with a precise question, offer, or ultimatum that demands a specific answer.`;
+
+router.post("/story/negotiation-room", async (req, res) => {
+  try {
+    const {
+      heroine, villain, villainStyle, demand, demandDesc,
+      leverage, leverageDesc, additionalContext, messages, round,
+    } = req.body as {
+      heroine: string; villain: string; villainStyle?: string;
+      demand: string; demandDesc?: string;
+      leverage: string; leverageDesc?: string;
+      additionalContext?: string;
+      messages: Array<{ role: string; text: string }>;
+      round: number;
+    };
+
+    const contextBlock = [
+      `Heroine: ${heroine}`,
+      `Villain/Negotiator: ${villain}`,
+      villainStyle ? `Villain's Style: ${villainStyle}` : "",
+      `What He Wants: ${demand}${demandDesc ? ` — ${demandDesc}` : ""}`,
+      `His Leverage: ${leverage}${leverageDesc ? ` — ${leverageDesc}` : ""}`,
+      additionalContext ? `Additional Context: ${additionalContext}` : "",
+    ].filter(Boolean).join("\n");
+
+    const historyMsgs: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: NEGOTIATION_ROOM_SYSTEM },
+    ];
+
+    if (messages.length === 0) {
+      historyMsgs.push({
+        role: "user",
+        content: `NEGOTIATION CONTEXT:\n${contextBlock}\n\nROUND 1 — OPENING MOVE:\nWrite the villain's opening. He enters the room. He sits. He begins. He doesn't reveal his full hand yet — he opens with something specific and perfectly calibrated to her. 250–400 words. End with his opening offer or question.`,
+      });
+    } else {
+      messages.slice(-6).forEach((m) => {
+        if (m.role === "villain") historyMsgs.push({ role: "assistant", content: m.text });
+        else historyMsgs.push({ role: "user", content: `[${heroine} responds]: ${m.text}` });
+      });
+      const escalation = round <= 3 ? "He's still probing, establishing dominance." : round <= 5 ? "The gloves are coming off — he deploys his real leverage now." : "This is the endgame. He reveals everything. He leaves no escape route.";
+      historyMsgs.push({
+        role: "user",
+        content: `ROUND ${round} — CONTINUE THE NEGOTIATION.\n${escalation}\nAdapt to her response. Escalate in a new direction. 250–400 words. End with a question, ultimatum, or revelation that demands she answer.`,
+      });
+    }
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    await doStream("venice", historyMsgs, 700, res, 0.87, round);
+
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: message });
+  }
+});
+
 // ── Story Replay ──────────────────────────────────────────────────────────────
 const REPLAY_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's Story Replay engine. You rewrite a specific chapter of an existing story in a new direction chosen by the author. You maintain character voice, setting atmosphere, and continuity with surrounding chapters while taking the chosen chapter in a completely different narrative direction. You write explicit, uncensored dark fiction. Nothing is off limits. Write in third-person literary prose. Do not summarise or explain — just write the new chapter in full.`;
 
