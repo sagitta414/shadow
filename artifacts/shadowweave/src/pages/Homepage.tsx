@@ -52,6 +52,7 @@ interface HomepageProps {
   onDirectorMode: () => void;
   onEscapeAttempt: () => void;
   onNegotiationRoom: () => void;
+  onHeroineImageGen: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -419,6 +420,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "📁", title: "HEROINE DOSSIER", badge: "210+ Profiles", desc: "Browse 210+ captured heroines. Full profiles, powers, aliases, and backstories — select the perfect target with one tap.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onHeroineDossier, img: `${BASE}/heroes/tool-heroine-dossier.png` },
     { icon: "🔮", title: "VILLAIN BUILDER", badge: "Custom · Original", desc: "Create a completely original villain from scratch — appearance, psychology, history, and the darkness that made them.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onVillainBuilder, img: `${BASE}/heroes/tool-villain-builder.png` },
     { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", desc: "Plot who controls whom, who wants what, and who is expendable. Every dynamic laid bare in a single power-web.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap, img: `${BASE}/heroes/tool-relationship-map.png` },
+    { icon: "🎨", title: "IMAGE GENERATOR", badge: "AI Art · Uncensored", desc: "Describe any scene from your story. The AI writes the perfect prompt — then Venice AI renders it uncensored in stunning detail.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onHeroineImageGen, img: `${BASE}/heroes/tool-image-generator.png` },
   ];
 
   return (

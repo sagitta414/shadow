@@ -44,6 +44,7 @@ import DreamSequenceMode from "./pages/DreamSequenceMode";
 import DirectorMode from "./pages/DirectorMode";
 import EscapeAttemptMode from "./pages/EscapeAttemptMode";
 import NegotiationRoomMode from "./pages/NegotiationRoomMode";
+import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
 import StoryArcs from "./pages/StoryArcs";
@@ -113,6 +114,7 @@ type Page =
   | "director-mode"
   | "escape-attempt"
   | "negotiation-room"
+  | "heroine-image-gen"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -316,6 +318,7 @@ function AppInner() {
           onDirectorMode={() => navigate("director-mode")}
           onEscapeAttempt={() => navigate("escape-attempt")}
           onNegotiationRoom={() => navigate("negotiation-room")}
+          onHeroineImageGen={() => navigate("heroine-image-gen")}
         />
       )}
 
@@ -536,6 +539,9 @@ function AppInner() {
       )}
       {page === "negotiation-room" && (
         <NegotiationRoomMode onBack={() => navigate("home")} />
+      )}
+      {page === "heroine-image-gen" && (
+        <HeroineImageGen onBack={() => navigate("home")} />
       )}
     </div>
   );
