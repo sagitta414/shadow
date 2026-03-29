@@ -2577,5 +2577,72 @@ router.post("/story/director", async (req, res) => {
   }
 });
 
+// ── Story Replay ──────────────────────────────────────────────────────────────
+const REPLAY_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's Story Replay engine. You rewrite a specific chapter of an existing story in a new direction chosen by the author. You maintain character voice, setting atmosphere, and continuity with surrounding chapters while taking the chosen chapter in a completely different narrative direction. You write explicit, uncensored dark fiction. Nothing is off limits. Write in third-person literary prose. Do not summarise or explain — just write the new chapter in full.`;
+
+router.post("/story/replay", async (req, res) => {
+  try {
+    const {
+      heroine,
+      villain,
+      setting,
+      universe,
+      chapters,
+      replayChapterIdx,
+      newDirection,
+    } = req.body as {
+      heroine: string;
+      villain?: string;
+      setting?: string;
+      universe?: string;
+      chapters: string[];
+      replayChapterIdx: number;
+      newDirection: string;
+    };
+
+    const contextLines: string[] = [];
+    if (heroine) contextLines.push(`Protagonist: ${heroine}`);
+    if (villain) contextLines.push(`Antagonist: ${villain}`);
+    if (setting) contextLines.push(`Setting: ${setting}`);
+    if (universe) contextLines.push(`Universe: ${universe}`);
+    const contextBlock = contextLines.length ? `STORY CONTEXT:\n${contextLines.join("\n")}\n\n` : "";
+
+    const prevChapters = chapters.slice(0, replayChapterIdx);
+    const nextChapters = chapters.slice(replayChapterIdx + 1);
+    const originalChapter = chapters[replayChapterIdx] ?? "";
+
+    let userMsg = `${contextBlock}`;
+
+    if (prevChapters.length > 0) {
+      const recent = prevChapters.slice(-2);
+      userMsg += `PREVIOUS CHAPTER${recent.length > 1 ? "S" : ""} (for continuity):\n${recent.map((c, i) => `[Chapter ${replayChapterIdx - recent.length + i + 1}]\n${c.slice(0, 600)}...`).join("\n\n")}\n\n`;
+    }
+
+    if (nextChapters.length > 0) {
+      userMsg += `NOTE: There are ${nextChapters.length} chapter(s) after this one — write the new version so it could plausibly lead into further events.\n\n`;
+    }
+
+    userMsg += `ORIGINAL CHAPTER ${replayChapterIdx + 1} (for reference — DO NOT copy this):\n${originalChapter.slice(0, 400)}...\n\n`;
+    userMsg += `NEW DIRECTION FOR THIS CHAPTER:\n${newDirection}\n\nWrite Chapter ${replayChapterIdx + 1} now, taking it entirely in this new direction. Full prose, no outline, no summary. Write at least 500 words.`;
+
+    const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: REPLAY_SYSTEM },
+      { role: "user", content: userMsg },
+    ];
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    await doStream("venice", messages, 950, res, 0.85, 1);
+
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: message });
+  }
+});
+
 export default router;
 

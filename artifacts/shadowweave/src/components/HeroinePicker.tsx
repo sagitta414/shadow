@@ -26,6 +26,8 @@ const UNIV_COLORS: Record<string, string> = {
   Animated: "#FBBF24",
   SW: "#A78BFA",
   TV: "#94A3B8",
+  Gaming: "#34D399",
+  Film: "#C084FC",
 };
 
 interface Props {

@@ -225,9 +225,30 @@ export const ALL_HEROINES: Heroine[] = [
   { universe: "TV", name: "Dana Scully",        alias: "Special Agent — FBI X-Files",   power: "Forensic pathologist & battle-tested field agent",   icon: "🔬" },
   { universe: "TV", name: "Grace Van Pelt",     alias: "Agent Van Pelt — CBI",          power: "Tech analyst, sharpshooter & psychological insight", icon: "🏹" },
   { universe: "TV", name: "Paige Dineen",      alias: "Team Scorpion Liaison",          power: "Behavioral specialist & human interface for genius",  icon: "🧠" },
+  { universe: "TV", name: "Eve Polastri",      alias: "MI5/MI6 Handler",                power: "Obsessive intelligence & uncanny psychological insight",icon: "🔪" },
+  { universe: "TV", name: "Ilsa Faust",        alias: "Rogue IMF Agent",                power: "Lethal combatant & expert in deception & infiltration", icon: "🎭" },
+
+  // ── Gaming ────────────────────────────────────────────────────
+  { universe: "Gaming", name: "Lara Croft",       alias: "Tomb Raider",                 power: "Master archaeologist — acrobatics, survival & firearms",icon: "🏹" },
+  { universe: "Gaming", name: "Jill Valentine",   alias: "STARS Alpha Team / BSAA",     power: "Counter-bioterrorism specialist & explosives expert",   icon: "🧬" },
+  { universe: "Gaming", name: "Claire Redfield",  alias: "Raccoon City Survivor",        power: "Motorcycle ace, firearms expert & ferocious protector",  icon: "🔴" },
+  { universe: "Gaming", name: "2B (NieR)",         alias: "YoRHa No.2 Type B",           power: "Android combat unit — superhuman speed, dual swords",   icon: "⚔" },
+  { universe: "Gaming", name: "Lightning (FFXIII)",alias: "Claire Farron — l'Cie",       power: "Gunblade mastery & Eidolon Odin command",               icon: "⚡" },
+  { universe: "Gaming", name: "Samus Aran",        alias: "Galactic Bounty Hunter",      power: "Power Suit with plasma cannon, grapple beam & missiles",icon: "🚀" },
+  { universe: "Gaming", name: "Bayonetta",         alias: "The Umbra Witch",             power: "Bullet arts, time-slowing Witch Time & demon summoning",icon: "💄" },
+  { universe: "Gaming", name: "Aloy",              alias: "Seeker of the Nora Tribe",    power: "Focus scanner, precision archery & machine override",   icon: "🏹" },
+  { universe: "Gaming", name: "Ellie (TLOU)",      alias: "The Last of Us",              power: "Immune survivor — stealth, improvised weapons & grit",  icon: "🎸" },
+  { universe: "Gaming", name: "Abby (TLOU2)",      alias: "WLF Soldier",                 power: "Peak physical conditioning & unflinching combat resolve", icon: "⚒" },
+  { universe: "Gaming", name: "Ada Wong",          alias: "Freelance Spy — Umbrella",    power: "Espionage genius, grapple hook & ice-cold under fire",  icon: "🌹" },
+  { universe: "Gaming", name: "Cassie Cage",       alias: "Special Forces Captain",      power: "Gunslinger with enhanced strength & Kotal Kahn's magic", icon: "💪" },
+
+  // ── Film / Sci-Fi ─────────────────────────────────────────────
+  { universe: "Film", name: "Ellen Ripley",       alias: "Weyland-Yutani Warrant Officer", power: "Survival instinct, zero-g combat & mechanical loader suit", icon: "👾" },
+  { universe: "Film", name: "Sarah Connor",       alias: "Mother of the Resistance",       power: "Tactical genius, firearms mastery & indomitable will",      icon: "🔫" },
+  { universe: "SW",   name: "Cara Dune",          alias: "Rebel Shock Trooper",            power: "Elite infantry combat & dead-eye heavy weapons accuracy",   icon: "🪖" },
 ];
 
-export const HEROINE_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "Animated", "SW", "TV"] as const;
+export const HEROINE_UNIVERSES = ["Marvel", "DC", "CW", "TB", "PR", "Animated", "SW", "TV", "Gaming", "Film"] as const;
 export type HeroineUniverse = typeof HEROINE_UNIVERSES[number];
 
 export const UNIVERSE_LABELS: Record<string, string> = {
@@ -239,4 +260,6 @@ export const UNIVERSE_LABELS: Record<string, string> = {
   Animated: "Animated",
   SW: "Star Wars",
   TV: "TV Live-Action",
+  Gaming: "Gaming",
+  Film: "Film / Sci-Fi",
 };

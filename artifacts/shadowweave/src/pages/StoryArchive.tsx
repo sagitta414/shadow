@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getArchive,
   updateArchiveStory,
@@ -24,6 +24,8 @@ const UNIVERSE_COLORS: Record<string, string> = {
   SW: "#4DC8FF",
   TV: "#FF9640",
   Daily: "#E8D08A",
+  GAMING: "#34D399",
+  FILM: "#A78BFA",
 };
 
 function univColor(u: string): string {
@@ -45,6 +47,8 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
+interface ReplayKey { storyId: string; chapterIdx: number; }
+
 export default function StoryArchive({ onBack, onRemix }: Props) {
   const [stories, setStories] = useState<ArchivedStory[]>([]);
   const [search, setSearch] = useState("");
@@ -56,10 +60,93 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [hoverRow, setHoverRow] = useState<string | null>(null);
 
+  const [replayKey, setReplayKey] = useState<ReplayKey | null>(null);
+  const [replayDir, setReplayDir] = useState("");
+  const [replayOut, setReplayOut] = useState("");
+  const [replayLoading, setReplayLoading] = useState(false);
+  const [replaySaved, setReplaySaved] = useState(false);
+  const replayAbortRef = useRef<AbortController | null>(null);
+
   function reload() {
     setStories(getArchive());
   }
   useEffect(reload, []);
+
+  function openReplay(storyId: string, chapterIdx: number) {
+    if (replayKey?.storyId === storyId && replayKey?.chapterIdx === chapterIdx) {
+      setReplayKey(null);
+    } else {
+      setReplayKey({ storyId, chapterIdx });
+      setReplayDir("");
+      setReplayOut("");
+      setReplaySaved(false);
+    }
+  }
+
+  async function doReplay(story: ArchivedStory) {
+    if (!replayKey || !replayDir.trim() || replayLoading) return;
+    if (replayAbortRef.current) replayAbortRef.current.abort();
+    const abort = new AbortController();
+    replayAbortRef.current = abort;
+    setReplayLoading(true);
+    setReplayOut("");
+    setReplaySaved(false);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const resp = await fetch(`${base}/api/story/replay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abort.signal,
+        body: JSON.stringify({
+          heroine: story.characters[0] ?? "",
+          villain: story.characters[1] ?? "",
+          setting: "",
+          universe: story.universe,
+          chapters: story.chapters,
+          replayChapterIdx: replayKey.chapterIdx,
+          newDirection: replayDir.trim(),
+        }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop()!;
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (payload === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(payload);
+            const token = parsed?.choices?.[0]?.delta?.content ?? "";
+            if (token) {
+              acc += token;
+              setReplayOut(acc);
+            }
+          } catch {}
+        }
+      }
+    } catch (e: unknown) {
+      if ((e as Error)?.name !== "AbortError") setReplayOut("Error generating replay. Please try again.");
+    } finally {
+      setReplayLoading(false);
+    }
+  }
+
+  function saveReplayVersion(story: ArchivedStory) {
+    if (!replayKey || !replayOut.trim()) return;
+    const newChapters = [...story.chapters];
+    newChapters[replayKey.chapterIdx] = replayOut.trim();
+    updateArchiveStory(story.id, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
+    setReplaySaved(true);
+    reload();
+  }
 
   function toggleFav(id: string, current: boolean) {
     updateArchiveStory(id, { favourite: !current });
@@ -212,19 +299,118 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
               fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.95rem",
               lineHeight: "1.85", color: "rgba(220,210,200,0.88)",
             }}>
-              {s.chapters.map((ch, i) => (
-                <div key={i}>
-                  {s.chapters.length > 1 && (
-                    <p style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "3px", color: col, marginBottom: "1rem", textAlign: "center" }}>
-                      — CHAPTER {i + 1} —
-                    </p>
-                  )}
-                  {ch.split("\n").filter(Boolean).map((para, j) => (
-                    <p key={j} style={{ textIndent: "1.5em", marginBottom: "0.5em" }}>{para}</p>
-                  ))}
-                  {i < s.chapters.length - 1 && <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.06)", margin: "1.5rem auto", width: "50%" }} />}
-                </div>
-              ))}
+              {s.chapters.map((ch, i) => {
+                const isReplaying = replayKey?.storyId === s.id && replayKey?.chapterIdx === i;
+                return (
+                  <div key={i}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                      {s.chapters.length > 1 && (
+                        <p style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "3px", color: col, margin: 0 }}>
+                          — CHAPTER {i + 1} —
+                        </p>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openReplay(s.id, i); }}
+                        title="Replay this chapter with a new direction"
+                        style={{
+                          padding: "0.15rem 0.55rem", borderRadius: "5px", cursor: "pointer",
+                          fontSize: "0.6rem", letterSpacing: "1.5px", fontFamily: "'Cinzel', serif",
+                          transition: "all 0.18s",
+                          background: isReplaying ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${isReplaying ? "rgba(52,211,153,0.45)" : "rgba(255,255,255,0.12)"}`,
+                          color: isReplaying ? "#34D399" : "rgba(200,200,220,0.35)",
+                        }}
+                        onMouseEnter={(e) => { if (!isReplaying) { e.currentTarget.style.borderColor = "rgba(52,211,153,0.35)"; e.currentTarget.style.color = "#34D399"; e.currentTarget.style.background = "rgba(52,211,153,0.08)"; } }}
+                        onMouseLeave={(e) => { if (!isReplaying) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(200,200,220,0.35)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
+                      >
+                        ↻ REPLAY
+                      </button>
+                    </div>
+                    {ch.split("\n").filter(Boolean).map((para, j) => (
+                      <p key={j} style={{ textIndent: "1.5em", marginBottom: "0.5em" }}>{para}</p>
+                    ))}
+                    {isReplaying && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          marginTop: "1.25rem", padding: "1rem 1.1rem",
+                          background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.2)",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <div style={{ fontSize: "0.58rem", letterSpacing: "2.5px", color: "#34D399", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>
+                          REPLAY CHAPTER {i + 1} — NEW DIRECTION
+                        </div>
+                        <textarea
+                          value={replayDir}
+                          onChange={(e) => setReplayDir(e.target.value)}
+                          placeholder="Describe the new direction for this chapter… e.g. 'This time she escapes' or 'The villain reveals his true identity' or 'Make it explicit'"
+                          rows={3}
+                          style={{
+                            width: "100%", boxSizing: "border-box", background: "rgba(0,0,0,0.35)",
+                            border: "1px solid rgba(52,211,153,0.2)", borderRadius: "6px",
+                            padding: "0.65rem 0.75rem", color: "#E8E0D0", fontSize: "0.82rem",
+                            outline: "none", resize: "vertical", fontFamily: "'EB Garamond', Georgia, serif",
+                            lineHeight: 1.6, marginBottom: "0.65rem",
+                          }}
+                        />
+                        <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap" }}>
+                          <button
+                            onClick={() => doReplay(s)}
+                            disabled={replayLoading || !replayDir.trim()}
+                            style={{
+                              padding: "0.5rem 1rem", borderRadius: "7px", cursor: replayLoading || !replayDir.trim() ? "not-allowed" : "pointer",
+                              fontSize: "0.7rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px",
+                              background: replayLoading ? "rgba(52,211,153,0.06)" : "rgba(52,211,153,0.14)",
+                              border: "1px solid rgba(52,211,153,0.4)", color: "#34D399",
+                              transition: "all 0.2s", opacity: !replayDir.trim() ? 0.4 : 1,
+                            }}
+                          >
+                            {replayLoading ? "⟳ Generating…" : "↻ Generate New Version"}
+                          </button>
+                          {replayOut && !replayLoading && !replaySaved && (
+                            <button
+                              onClick={() => saveReplayVersion(s)}
+                              style={{
+                                padding: "0.5rem 1rem", borderRadius: "7px", cursor: "pointer",
+                                fontSize: "0.7rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px",
+                                background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.4)",
+                                color: "#C084FC", transition: "all 0.2s",
+                              }}
+                            >
+                              ✓ Save as This Version
+                            </button>
+                          )}
+                          {replaySaved && (
+                            <span style={{ fontSize: "0.72rem", color: "#34D399", padding: "0.5rem 0", letterSpacing: "1px", fontFamily: "'Cinzel', serif" }}>
+                              ✓ Saved!
+                            </span>
+                          )}
+                        </div>
+                        {replayOut && (
+                          <div style={{
+                            marginTop: "1rem", padding: "1rem",
+                            background: "rgba(0,0,0,0.5)", borderRadius: "6px",
+                            fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.9rem",
+                            lineHeight: 1.85, color: "rgba(220,210,200,0.88)",
+                            maxHeight: "280px", overflowY: "auto",
+                            border: "1px solid rgba(52,211,153,0.1)",
+                          }}>
+                            <div style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(52,211,153,0.45)", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>
+                              NEW VERSION PREVIEW
+                            </div>
+                            {replayOut.split("\n").filter(Boolean).map((p, j) => (
+                              <p key={j} style={{ textIndent: "1.5em", marginBottom: "0.5em" }}>{p}</p>
+                            ))}
+                            {replayLoading && <span style={{ opacity: 0.5 }}>▌</span>}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {i < s.chapters.length - 1 && <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.06)", margin: "1.5rem auto", width: "50%" }} />}
+                  </div>
+                );
+              })}
             </div>
 
             {/* ── Star Rating ── */}
