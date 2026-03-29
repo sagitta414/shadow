@@ -344,8 +344,50 @@ const TV_HEROES = [
   { name: "Maeve Millay",       alias: "Maeve — Westworld Host Awakened",       power: "Consciousness that transcended her programming — can control other Hosts, perceive narrative code and operate with a self-awareness no human designer anticipated",             icon: "🤍" },
   // X-Files
   { name: "Dana Scully",        alias: "Special Agent Scully — FBI X-Files",    power: "Forensic pathologist, battle-tested field agent and the sceptic who survived every paranormal encounter through sheer scientific discipline and personal resolve",              icon: "🔬" },
+  // Person of Interest
+  { name: "Sameen Shaw",        alias: "Shaw — The Machine's Operative",         power: "ISA-trained assassin whose near-absence of affect makes her the most dangerous combatant The Machine fields — she doesn't flinch, she just acts",                            icon: "🔫" },
+  // Lost Girl
+  { name: "Bo Dennis",          alias: "Bo — Unaligned Succubus",                power: "Fae succubus with chi-drain touch, rapid healing fuelled by life-force and the rare charisma that has united Light and Dark Fae behind her against their own leaders",          icon: "💙" },
+  // Xena
+  { name: "Xena",               alias: "Xena — Warrior Princess",                power: "Master of the chakram, veteran warlord-turned-hero whose combat genius, pressure-point mastery and sheer force of will have toppled armies and gods alike",                     icon: "⚔" },
+  // Buffy the Vampire Slayer
+  { name: "Buffy Summers",      alias: "Buffy — The Vampire Slayer",             power: "Chosen One with superhuman strength, speed and healing — slays apocalyptic threats on a nightly basis and has died twice, returning stronger each time",                       icon: "🌙" },
+  // Game of Thrones
+  { name: "Arya Stark",         alias: "Arya — No One / Faceless Assassin",      power: "Faceless Men-trained assassin with a kill-list and the single-handed destruction of the Night King — the most dangerous teenager in Westeros by a considerable margin",       icon: "🗡" },
+  { name: "Brienne of Tarth",   alias: "Brienne — Knight of the Seven Kingdoms",power: "The finest swordswoman in Westeros who defeated the Hound in open combat — her honour is absolute and her skill with Oathkeeper borders on legendary",                        icon: "🛡" },
+  { name: "Daenerys Targaryen", alias: "Daenerys — Mother of Dragons",           power: "Khaleesi, Breaker of Chains and Dragon Queen — commands three dragons and an army of unsullied while being functionally immune to fire",                                        icon: "🔥" },
 ];
 
+
+const GAMING_HEROES = [
+  { name: "Tifa Lockhart",      alias: "Tifa — AVALANCHE Fighter",               power: "Bare-knuckle martial artist whose Limits channel her grief into devastating combos — the emotional and physical backbone of AVALANCHE",                                         icon: "👊" },
+  { name: "Aerith Gainsborough",alias: "Aerith — Last Ancient / Cetra",          power: "Last of the Cetra with a direct channel to the Planet's life-force — her white magic heals allies while her Great Gospel can protect all of humanity",                          icon: "🌸" },
+  { name: "Yuna",               alias: "Yuna — High Summoner of Spira",           power: "High Summoner who commands Aeons of divine scale and possesses Spira's most potent healing arts — she destroyed Sin itself at the cost of her own life",                        icon: "🌸" },
+  { name: "Faith Connors",      alias: "Faith — Runner of the City of Glass",    power: "Mirror's Edge parkour specialist who navigates any urban environment at speed — her freerunning lets her evade or reach targets no conventional operative could",                icon: "🏃" },
+  { name: "Commander Shepard",  alias: "Shepard — N7 Spectre",                   power: "Humanity's first Spectre — elite biotic, tactical genius and the commanding presence who united an entire galaxy of species against extinction",                                 icon: "🚀" },
+  { name: "Quiet",              alias: "Quiet — Parasite-Enhanced Sniper",       power: "Photosynthetic supersoldier with superhuman speed, optical camouflage and a sniper's accuracy that borders on supernatural — a one-woman army",                                 icon: "🎯" },
+  { name: "Kassandra",          alias: "Kassandra — Eagle Bearer of Sparta",     power: "Demigod Spartan mercenary with the Spear of Leonidas and an assassin's instinct honed across decades — the most dangerous human alive in Ancient Greece",                      icon: "🦅" },
+  { name: "Ciri",               alias: "Ciri — Child of the Elder Blood",        power: "Source of Elder Blood with space-time manipulation, teleportation and an untamed power that makes Witchers and emperors alike willing to start wars over her",                   icon: "⚡" },
+  { name: "Widowmaker",         alias: "Widowmaker — Talon's Perfect Assassin", power: "Talon-conditioned operative with surgically slowed heartbeat for steady aim — the world's deadliest sniper, emotionally detached and operationally flawless",                   icon: "💜" },
+  { name: "Tracer",             alias: "Tracer — Overwatch's Chronal Accelerator",power: "Chronal accelerator enables time recall and acceleration — the most agile Overwatch agent, her Pulse Bomb can destroy hardened targets, her spirit is unbreakable",            icon: "⚡" },
+  { name: "Senua",              alias: "Senua — Pict Warrior Hellwalker",        power: "Hellblade warrior with psyche-powered perception of hidden truths, hyper-acute combat senses and a will that walked into Hel itself and bargained with the goddess",             icon: "🌑" },
+  { name: "Rebecca Chambers",  alias: "Rebecca — STARS Bravo Team Medic",       power: "S.T.A.R.S. combat medic with pharmaceutical expertise allowing her to synthesise antidotes mid-mission — sharpshooting and virus-knowledge make her uniquely lethal",           icon: "💉" },
+  { name: "Freya",              alias: "Freya — Vanir Goddess of War",           power: "Former goddess of war with Brisingamen and nature magic — her magic is bound but her tactical brilliance and raw divine resilience are entirely intact",                         icon: "🌿" },
+  { name: "Lady Dimitrescu",    alias: "Lady Dimitrescu — Castle Dimitrescu",    power: "Nine-foot aristocratic vampire with razor claws and the ability to call her daughters — centuries of noble authority wrapped around a genuinely monstrous predator",             icon: "🩸" },
+];
+
+const FILM_HEROES = [
+  { name: "Furiosa",            alias: "Furiosa — Imperator of the Citadel",     power: "One-armed War Rig commander who planned and executed the most audacious escape in Wasteland history — her tactical mind operates years ahead of every opponent",                icon: "🔧" },
+  { name: "Trinity",            alias: "Trinity — Zion Operative",               power: "Ship operator and elite Matrix combatant — the first free human to return from a rooftop fall by choice, whose love proved the statistical impossibility the Oracle predicted",  icon: "💊" },
+  { name: "Lorraine Broughton", alias: "Lorraine — MI6 Coldest Operative",      power: "MI6's most capable field operative — fluent in close-quarters brutality and psychological tradecraft equally, equally comfortable in a ballgown or a stairwell brawl",          icon: "❄" },
+  { name: "Beatrix Kiddo",      alias: "The Bride — Former DiVAS Assassin",      power: "Ex-DiVA trained by Pai Mei himself — her Hanzo blade, Five Point Palm Exploding Heart Technique and killing focus make her the world's most dangerous living weapon",          icon: "⚔" },
+  { name: "Selene",             alias: "Selene — Death Dealer",                  power: "600-year vampire Death Dealer whose hybrid evolution grants her Corvinus-strain strength, sunlight tolerance and a tactical ruthlessness built across six centuries",             icon: "🌙" },
+  { name: "Katniss Everdeen",  alias: "Katniss — The Mockingjay",               power: "Victor of the 74th Hunger Games and the symbol that ignited a revolution — her archery is surgical, her survival instincts are primal, her resolve is unbreakable",             icon: "🏹" },
+  { name: "Evelyn Salt",        alias: "Salt — CIA Officer / KA Sleeper",       power: "CIA officer and KA sleeper agent who burned her own handlers and rewrote the mission — equally capable of deep-cover insertion and kinetic extraction under fire",                icon: "🕵" },
+  { name: "Alice",              alias: "Alice — Umbrella Experiment T-001",      power: "Umbrella's T-virus-enhanced supersoldier with psychokinetic ability — the closest thing to an unstoppable weapon that corporate science accidentally created",                  icon: "🔴" },
+  { name: "Sonya Blade",        alias: "Sonya — Special Forces Commander",       power: "Special Forces commander with energy ring projectiles and hand-to-hand mastery — decorated military career punctuated by victories against literal gods",                        icon: "🎖" },
+  { name: "Natalie Artemis",    alias: "Natalie — US Army Ranger Captain",       power: "US Army Ranger Captain whose tactical precision and adaptability proved capable of hunting and fighting Monsters with no preparation and minimal resources",                      icon: "🏹" },
+];
 
 // ── Weakness Catalog ──────────────────────────────────────────
 const WEAKNESS_CATALOG: Record<string, string[]> = {
@@ -601,7 +643,7 @@ const CHAPTER_FOCUS_TAGS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "CUSTOM";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "GAMING" | "FILM" | "CUSTOM";
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
@@ -807,6 +849,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     ...ANIMATED_HEROES.map((h) => ({ ...h, universe: "ANIMATED" })),
     ...SW_HEROES.map((h) => ({ ...h, universe: "SW" })),
     ...TV_HEROES.map((h) => ({ ...h, universe: "TV" })),
+    ...GAMING_HEROES.map((h) => ({ ...h, universe: "GAMING" })),
+    ...FILM_HEROES.map((h) => ({ ...h, universe: "FILM" })),
     ...customHeroesList.map((h) => ({
       name: h.name,
       alias: h.appearance ? h.appearance.slice(0, 40) : "Custom Heroine",
@@ -1238,9 +1282,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV", "CUSTOM"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : u === "CUSTOM" ? "rgba(255,184,0,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : u === "CUSTOM" ? "#FFB800" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : u === "CUSTOM" ? `Custom (${customHeroesList.length})` : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV", "GAMING", "FILM", "CUSTOM"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : u === "GAMING" ? "rgba(52,211,153,0.22)" : u === "FILM" ? "rgba(251,191,36,0.22)" : u === "CUSTOM" ? "rgba(255,184,0,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : u === "GAMING" ? "#34D399" : u === "FILM" ? "#FCD34D" : u === "CUSTOM" ? "#FFB800" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : u === "GAMING" ? "Gaming ✦" : u === "FILM" ? "Film ✦" : u === "CUSTOM" ? `Custom (${customHeroesList.length})` : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -1284,9 +1328,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   const isAnim = h.universe === "ANIMATED";
                   const isSW = h.universe === "SW";
                   const isTV = h.universe === "TV";
-                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
-                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.15)" : isTV ? "rgba(255,150,60,0.15)" : "rgba(0,100,220,0.18)";
-                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : isSW ? "rgba(0,180,255,0.28)" : isTV ? "rgba(255,150,60,0.28)" : "rgba(0,100,220,0.3)";
+                  const isGaming = h.universe === "GAMING";
+                  const isFilm = h.universe === "FILM";
+                  const col = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
+                  const bg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.15)" : isTV ? "rgba(255,150,60,0.15)" : isGaming ? "rgba(52,211,153,0.15)" : isFilm ? "rgba(252,211,77,0.15)" : "rgba(0,100,220,0.18)";
+                  const bgHover = isMarvel ? "rgba(220,30,30,0.3)" : isCW ? "rgba(0,180,100,0.3)" : isTB ? "rgba(200,30,0,0.3)" : isPR ? "rgba(220,0,150,0.3)" : isAnim ? "rgba(160,0,255,0.3)" : isSW ? "rgba(0,180,255,0.28)" : isTV ? "rgba(255,150,60,0.28)" : isGaming ? "rgba(52,211,153,0.28)" : isFilm ? "rgba(252,211,77,0.28)" : "rgba(0,100,220,0.3)";
                   return (
                     <button
                       key={h.name}
@@ -1316,10 +1362,12 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isAnim = hero.universe === "ANIMATED";
                 const isSW = hero.universe === "SW";
                 const isTV = hero.universe === "TV";
+                const isGaming = hero.universe === "GAMING";
+                const isFilm = hero.universe === "FILM";
                 const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
-                const accentBg = isMarvel ? "rgba(220,30,30,0.12)" : isCW ? "rgba(0,180,100,0.1)" : isTB ? "rgba(200,30,0,0.12)" : isPR ? "rgba(220,0,150,0.1)" : isAnim ? "rgba(160,0,255,0.1)" : isSW ? "rgba(0,180,255,0.1)" : isTV ? "rgba(255,150,60,0.1)" : "rgba(0,100,220,0.12)";
-                const selectedBg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.16)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.16)" : isTV ? "rgba(255,150,60,0.16)" : "rgba(0,100,220,0.18)";
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.12)" : isCW ? "rgba(0,180,100,0.1)" : isTB ? "rgba(200,30,0,0.12)" : isPR ? "rgba(220,0,150,0.1)" : isAnim ? "rgba(160,0,255,0.1)" : isSW ? "rgba(0,180,255,0.1)" : isTV ? "rgba(255,150,60,0.1)" : isGaming ? "rgba(52,211,153,0.1)" : isFilm ? "rgba(252,211,77,0.1)" : "rgba(0,100,220,0.12)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.16)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.16)" : isTV ? "rgba(255,150,60,0.16)" : isGaming ? "rgba(52,211,153,0.16)" : isFilm ? "rgba(252,211,77,0.16)" : "rgba(0,100,220,0.18)";
                 return (
                   <button
                     key={`${hero.universe}-${hero.name}-list`}
@@ -1355,10 +1403,12 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isAnim = hero.universe === "ANIMATED";
                 const isSW = hero.universe === "SW";
                 const isTV = hero.universe === "TV";
+                const isGaming = hero.universe === "GAMING";
+                const isFilm = hero.universe === "FILM";
                 const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : "#60A0FF";
-                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : "rgba(0,100,220,0.15)";
-                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : "rgba(0,100,220,0.2)";
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : isGaming ? "rgba(52,211,153,0.12)" : isFilm ? "rgba(252,211,77,0.12)" : "rgba(0,100,220,0.15)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : isGaming ? "rgba(52,211,153,0.18)" : isFilm ? "rgba(252,211,77,0.18)" : "rgba(0,100,220,0.2)";
                 return (
                   <button
                     key={`${hero.universe}-${hero.name}`}
