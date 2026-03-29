@@ -1,0 +1,33 @@
+modules = ["nodejs-24"]
+
+[[artifacts]]
+id = "artifacts/api-server"
+
+[[artifacts]]
+id = "artifacts/mockup-sandbox"
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VENICE_API_KEY = "VENICE_ADMIN_KEY_FS141xKqKaUt8ImKl8rNJ88XVSqe9yAMX_ZhsgGLOR"
+NOVELAI_API_KEY = "pst-h87XpeQ4Sc5S0NZy7whc3qfI1cNm5ojiSzveRBkthK2FAPl5Z21onCgqPzTAD0Ji"
+ADMIN_KEY = "shadow-admin-2026"

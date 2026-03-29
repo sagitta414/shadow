@@ -1,0 +1,657 @@
+import { useState, useEffect, useRef } from "react";
+import {
+  getArchive,
+  updateArchiveStory,
+  deleteArchiveStory,
+  exportStoryAsTXT,
+  exportStoryAsPDF,
+  ArchivedStory,
+} from "../lib/archive";
+
+interface Props {
+  onBack: () => void;
+  onRemix?: (heroName: string) => void;
+}
+
+const UNIVERSE_COLORS: Record<string, string> = {
+  MARVEL: "#FF6060",
+  DC: "#60A0FF",
+  CW: "#40E090",
+  "The Boys": "#FF3D00",
+  "Power Rangers": "#FF69B4",
+  ANIMATED: "#C084FC",
+  Celebrity: "#C8A84B",
+  SW: "#4DC8FF",
+  TV: "#FF9640",
+  Daily: "#E8D08A",
+  GAMING: "#34D399",
+  FILM: "#A78BFA",
+};
+
+function univColor(u: string): string {
+  for (const [k, v] of Object.entries(UNIVERSE_COLORS)) {
+    if (u.toUpperCase().includes(k.toUpperCase())) return v;
+  }
+  return "#888";
+}
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d ago`;
+  return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+interface ReplayKey { storyId: string; chapterIdx: number; }
+
+export default function StoryArchive({ onBack, onRemix }: Props) {
+  const [stories, setStories] = useState<ArchivedStory[]>([]);
+  const [search, setSearch] = useState("");
+  const [filterFav, setFilterFav] = useState(false);
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "words" | "alpha" | "rated">("newest");
+  const [copyState, setCopyState] = useState<Record<string, boolean>>({});
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [tagInput, setTagInput] = useState<Record<string, string>>({});
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [hoverRow, setHoverRow] = useState<string | null>(null);
+
+  const [replayKey, setReplayKey] = useState<ReplayKey | null>(null);
+  const [replayDir, setReplayDir] = useState("");
+  const [replayOut, setReplayOut] = useState("");
+  const [replayLoading, setReplayLoading] = useState(false);
+  const [replaySaved, setReplaySaved] = useState(false);
+  const replayAbortRef = useRef<AbortController | null>(null);
+
+  function reload() {
+    setStories(getArchive());
+  }
+  useEffect(reload, []);
+
+  function openReplay(storyId: string, chapterIdx: number) {
+    if (replayKey?.storyId === storyId && replayKey?.chapterIdx === chapterIdx) {
+      setReplayKey(null);
+    } else {
+      setReplayKey({ storyId, chapterIdx });
+      setReplayDir("");
+      setReplayOut("");
+      setReplaySaved(false);
+    }
+  }
+
+  async function doReplay(story: ArchivedStory) {
+    if (!replayKey || !replayDir.trim() || replayLoading) return;
+    if (replayAbortRef.current) replayAbortRef.current.abort();
+    const abort = new AbortController();
+    replayAbortRef.current = abort;
+    setReplayLoading(true);
+    setReplayOut("");
+    setReplaySaved(false);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const resp = await fetch(`${base}/api/story/replay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abort.signal,
+        body: JSON.stringify({
+          heroine: story.characters[0] ?? "",
+          villain: story.characters[1] ?? "",
+          setting: "",
+          universe: story.universe,
+          chapters: story.chapters,
+          replayChapterIdx: replayKey.chapterIdx,
+          newDirection: replayDir.trim(),
+        }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop()!;
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (payload === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(payload);
+            const token = parsed?.choices?.[0]?.delta?.content ?? "";
+            if (token) {
+              acc += token;
+              setReplayOut(acc);
+            }
+          } catch {}
+        }
+      }
+    } catch (e: unknown) {
+      if ((e as Error)?.name !== "AbortError") setReplayOut("Error generating replay. Please try again.");
+    } finally {
+      setReplayLoading(false);
+    }
+  }
+
+  function saveReplayVersion(story: ArchivedStory) {
+    if (!replayKey || !replayOut.trim()) return;
+    const newChapters = [...story.chapters];
+    newChapters[replayKey.chapterIdx] = replayOut.trim();
+    updateArchiveStory(story.id, { chapters: newChapters, wordCount: newChapters.join(" ").split(/\s+/).filter(Boolean).length });
+    setReplaySaved(true);
+    reload();
+  }
+
+  function toggleFav(id: string, current: boolean) {
+    updateArchiveStory(id, { favourite: !current });
+    reload();
+  }
+
+  function addTag(id: string) {
+    const val = (tagInput[id] ?? "").trim();
+    if (!val) return;
+    const story = stories.find((s) => s.id === id);
+    if (!story) return;
+    if (story.tags.includes(val)) return;
+    updateArchiveStory(id, { tags: [...story.tags, val] });
+    setTagInput((prev) => ({ ...prev, [id]: "" }));
+    reload();
+  }
+
+  function removeTag(id: string, tag: string) {
+    const story = stories.find((s) => s.id === id);
+    if (!story) return;
+    updateArchiveStory(id, { tags: story.tags.filter((t) => t !== tag) });
+    reload();
+  }
+
+  function doDelete(id: string) {
+    deleteArchiveStory(id);
+    setConfirmDelete(null);
+    if (expanded === id) setExpanded(null);
+    reload();
+  }
+
+  const filtered = stories
+    .filter((s) => {
+      const q = search.toLowerCase();
+      const matchSearch =
+        !q ||
+        s.title.toLowerCase().includes(q) ||
+        s.characters.some((c) => c.toLowerCase().includes(q)) ||
+        s.tags.some((t) => t.toLowerCase().includes(q)) ||
+        s.universe.toLowerCase().includes(q);
+      const matchFav = !filterFav || s.favourite;
+      return matchSearch && matchFav;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") return b.createdAt - a.createdAt;
+      if (sortBy === "oldest") return a.createdAt - b.createdAt;
+      if (sortBy === "words") return b.wordCount - a.wordCount;
+      if (sortBy === "rated") return (b.rating ?? 0) - (a.rating ?? 0);
+      return a.title.localeCompare(b.title);
+    });
+
+  const card = (s: ArchivedStory) => {
+    const col = univColor(s.universe);
+    const isOpen = expanded === s.id;
+    return (
+      <div
+        key={s.id}
+        onMouseEnter={() => setHoverRow(s.id)}
+        onMouseLeave={() => setHoverRow(null)}
+        style={{
+          background: "rgba(10,8,16,0.85)",
+          border: `1px solid ${isOpen ? col : "rgba(255,255,255,0.07)"}`,
+          borderLeft: `3px solid ${col}`,
+          borderRadius: "10px",
+          overflow: "hidden",
+          transition: "border-color 0.25s",
+          marginBottom: "0.75rem",
+          position: "relative",
+        }}
+      >
+        <div
+          onClick={() => setExpanded(isOpen ? null : s.id)}
+          style={{
+            padding: "1rem 1.25rem",
+            cursor: "pointer",
+            display: "flex",
+            gap: "1rem",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.35rem", flexWrap: "wrap" }}>
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.95rem", color: "#E8E0D0", fontWeight: 600 }}>
+                {s.title}
+              </span>
+              {s.favourite && <span style={{ color: "#FFB800", fontSize: "0.85rem" }}>★</span>}
+              {s.rating != null && (
+                <span style={{ fontSize: "0.62rem", color: "#FFB800", letterSpacing: "1px", opacity: 0.8 }}>
+                  {"★".repeat(s.rating)}{"☆".repeat(5 - s.rating)}
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.5)", letterSpacing: "1px", marginBottom: "0.5rem" }}>
+              {s.characters.join(" · ")}
+              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
+              <span style={{ color: col }}>{s.universe}</span>
+              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
+              {s.wordCount.toLocaleString()} words
+              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
+              {s.chapters.length > 1 ? `${s.chapters.length} chapters · ` : ""}{timeAgo(s.createdAt)}
+            </div>
+            {s.tags.length > 0 && (
+              <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
+                {s.tags.map((t) => (
+                  <span key={t} style={{
+                    fontSize: "0.65rem", letterSpacing: "0.5px",
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "20px", padding: "0.15rem 0.55rem", color: "rgba(200,200,220,0.6)",
+                  }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginTop: "0.15rem" }}>
+            {/* Quick delete — visible on row hover when not expanded */}
+            {!isOpen && hoverRow === s.id && (
+              confirmDelete === s.id ? (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <button onClick={() => doDelete(s.id)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "rgba(200,0,0,0.22)", border: "1px solid rgba(200,0,0,0.45)", color: "#FF6060", fontSize: "0.65rem", cursor: "pointer", fontFamily: "'Cinzel',serif" }}>Yes</button>
+                  <button onClick={() => setConfirmDelete(null)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,200,220,0.4)", fontSize: "0.65rem", cursor: "pointer" }}>No</button>
+                </div>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setConfirmDelete(s.id); }}
+                  title="Delete story"
+                  style={{ padding: "0.2rem 0.5rem", borderRadius: "5px", background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.18)", color: "rgba(200,100,100,0.45)", fontSize: "0.72rem", cursor: "pointer", transition: "all 0.18s", lineHeight: 1 }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.18)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.45)"; e.currentTarget.style.color = "#FF6060"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.06)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.18)"; e.currentTarget.style.color = "rgba(200,100,100,0.45)"; }}
+                >
+                  ✕
+                </button>
+              )
+            )}
+            <span style={{ color: isOpen ? col : "rgba(200,200,220,0.25)", fontSize: "0.8rem", transition: "all 0.2s" }}>
+              {isOpen ? "▲" : "▼"}
+            </span>
+          </div>
+        </div>
+
+        {isOpen && (
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "1.25rem" }}>
+            <div style={{
+              background: "rgba(0,0,0,0.4)", borderRadius: "8px", padding: "1.25rem",
+              maxHeight: "380px", overflowY: "auto", marginBottom: "1rem",
+              fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.95rem",
+              lineHeight: "1.85", color: "rgba(220,210,200,0.88)",
+            }}>
+              {s.chapters.map((ch, i) => {
+                const isReplaying = replayKey?.storyId === s.id && replayKey?.chapterIdx === i;
+                return (
+                  <div key={i}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                      {s.chapters.length > 1 && (
+                        <p style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "3px", color: col, margin: 0 }}>
+                          — CHAPTER {i + 1} —
+                        </p>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openReplay(s.id, i); }}
+                        title="Replay this chapter with a new direction"
+                        style={{
+                          padding: "0.15rem 0.55rem", borderRadius: "5px", cursor: "pointer",
+                          fontSize: "0.6rem", letterSpacing: "1.5px", fontFamily: "'Cinzel', serif",
+                          transition: "all 0.18s",
+                          background: isReplaying ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${isReplaying ? "rgba(52,211,153,0.45)" : "rgba(255,255,255,0.12)"}`,
+                          color: isReplaying ? "#34D399" : "rgba(200,200,220,0.35)",
+                        }}
+                        onMouseEnter={(e) => { if (!isReplaying) { e.currentTarget.style.borderColor = "rgba(52,211,153,0.35)"; e.currentTarget.style.color = "#34D399"; e.currentTarget.style.background = "rgba(52,211,153,0.08)"; } }}
+                        onMouseLeave={(e) => { if (!isReplaying) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(200,200,220,0.35)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
+                      >
+                        ↻ REPLAY
+                      </button>
+                    </div>
+                    {ch.split("\n").filter(Boolean).map((para, j) => (
+                      <p key={j} style={{ textIndent: "1.5em", marginBottom: "0.5em" }}>{para}</p>
+                    ))}
+                    {isReplaying && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          marginTop: "1.25rem", padding: "1rem 1.1rem",
+                          background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.2)",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <div style={{ fontSize: "0.58rem", letterSpacing: "2.5px", color: "#34D399", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>
+                          REPLAY CHAPTER {i + 1} — NEW DIRECTION
+                        </div>
+                        <textarea
+                          value={replayDir}
+                          onChange={(e) => setReplayDir(e.target.value)}
+                          placeholder="Describe the new direction for this chapter… e.g. 'This time she escapes' or 'The villain reveals his true identity' or 'Make it explicit'"
+                          rows={3}
+                          style={{
+                            width: "100%", boxSizing: "border-box", background: "rgba(0,0,0,0.35)",
+                            border: "1px solid rgba(52,211,153,0.2)", borderRadius: "6px",
+                            padding: "0.65rem 0.75rem", color: "#E8E0D0", fontSize: "0.82rem",
+                            outline: "none", resize: "vertical", fontFamily: "'EB Garamond', Georgia, serif",
+                            lineHeight: 1.6, marginBottom: "0.65rem",
+                          }}
+                        />
+                        <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap" }}>
+                          <button
+                            onClick={() => doReplay(s)}
+                            disabled={replayLoading || !replayDir.trim()}
+                            style={{
+                              padding: "0.5rem 1rem", borderRadius: "7px", cursor: replayLoading || !replayDir.trim() ? "not-allowed" : "pointer",
+                              fontSize: "0.7rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px",
+                              background: replayLoading ? "rgba(52,211,153,0.06)" : "rgba(52,211,153,0.14)",
+                              border: "1px solid rgba(52,211,153,0.4)", color: "#34D399",
+                              transition: "all 0.2s", opacity: !replayDir.trim() ? 0.4 : 1,
+                            }}
+                          >
+                            {replayLoading ? "⟳ Generating…" : "↻ Generate New Version"}
+                          </button>
+                          {replayOut && !replayLoading && !replaySaved && (
+                            <button
+                              onClick={() => saveReplayVersion(s)}
+                              style={{
+                                padding: "0.5rem 1rem", borderRadius: "7px", cursor: "pointer",
+                                fontSize: "0.7rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px",
+                                background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.4)",
+                                color: "#C084FC", transition: "all 0.2s",
+                              }}
+                            >
+                              ✓ Save as This Version
+                            </button>
+                          )}
+                          {replaySaved && (
+                            <span style={{ fontSize: "0.72rem", color: "#34D399", padding: "0.5rem 0", letterSpacing: "1px", fontFamily: "'Cinzel', serif" }}>
+                              ✓ Saved!
+                            </span>
+                          )}
+                        </div>
+                        {replayOut && (
+                          <div style={{
+                            marginTop: "1rem", padding: "1rem",
+                            background: "rgba(0,0,0,0.5)", borderRadius: "6px",
+                            fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.9rem",
+                            lineHeight: 1.85, color: "rgba(220,210,200,0.88)",
+                            maxHeight: "280px", overflowY: "auto",
+                            border: "1px solid rgba(52,211,153,0.1)",
+                          }}>
+                            <div style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(52,211,153,0.45)", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>
+                              NEW VERSION PREVIEW
+                            </div>
+                            {replayOut.split("\n").filter(Boolean).map((p, j) => (
+                              <p key={j} style={{ textIndent: "1.5em", marginBottom: "0.5em" }}>{p}</p>
+                            ))}
+                            {replayLoading && <span style={{ opacity: 0.5 }}>▌</span>}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {i < s.chapters.length - 1 && <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.06)", margin: "1.5rem auto", width: "50%" }} />}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ── Star Rating ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+              <div style={{ fontSize: "0.58rem", letterSpacing: "2px", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Rate this story</div>
+              <div style={{ display: "flex", gap: "0.25rem" }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={(e) => { e.stopPropagation(); updateArchiveStory(s.id, { rating: star }); reload(); }}
+                    title={`${star} star${star !== 1 ? "s" : ""}`}
+                    style={{
+                      fontSize: "1.1rem", cursor: "pointer",
+                      color: (s.rating ?? 0) >= star ? "#FFB800" : "rgba(255,255,255,0.1)",
+                      transition: "color 0.15s, transform 0.1s",
+                      display: "inline-block",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.25)"; e.currentTarget.style.color = "#FFB800"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.color = (s.rating ?? 0) >= star ? "#FFB800" : "rgba(255,255,255,0.1)"; }}
+                  >★</span>
+                ))}
+              </div>
+              {s.rating != null && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); updateArchiveStory(s.id, { rating: undefined }); reload(); }}
+                  style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.25)", cursor: "pointer", letterSpacing: "1px", fontFamily: "'Montserrat', sans-serif" }}
+                  title="Clear rating"
+                >✕ clear</span>
+              )}
+            </div>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <div style={{ fontSize: "0.65rem", letterSpacing: "2px", color: "rgba(200,200,220,0.4)", marginBottom: "0.5rem" }}>TAGS</div>
+              <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap", alignItems: "center" }}>
+                {s.tags.map((t) => (
+                  <span key={t}
+                    onClick={() => removeTag(s.id, t)}
+                    title="Click to remove"
+                    style={{
+                      fontSize: "0.65rem", letterSpacing: "0.5px",
+                      background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.14)",
+                      borderRadius: "20px", padding: "0.2rem 0.6rem", color: "rgba(200,200,220,0.7)",
+                      cursor: "pointer", transition: "all 0.15s",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,100,100,0.5)"; (e.currentTarget as HTMLElement).style.color = "#FF8080"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.14)"; (e.currentTarget as HTMLElement).style.color = "rgba(200,200,220,0.7)"; }}
+                  >
+                    {t} ✕
+                  </span>
+                ))}
+                <form onSubmit={(e) => { e.preventDefault(); addTag(s.id); }} style={{ display: "flex", gap: "0.35rem" }}>
+                  <input
+                    value={tagInput[s.id] ?? ""}
+                    onChange={(e) => setTagInput((prev) => ({ ...prev, [s.id]: e.target.value }))}
+                    placeholder="+ add tag"
+                    style={{
+                      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "20px", padding: "0.2rem 0.6rem", fontSize: "0.65rem",
+                      color: "rgba(200,200,220,0.7)", outline: "none", width: "80px",
+                    }}
+                  />
+                </form>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  onClick={() => toggleFav(s.id, s.favourite)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: s.favourite ? "rgba(255,184,0,0.15)" : "rgba(255,255,255,0.04)",
+                    border: `1px solid ${s.favourite ? "rgba(255,184,0,0.4)" : "rgba(255,255,255,0.1)"}`,
+                    color: s.favourite ? "#FFB800" : "rgba(200,200,220,0.5)",
+                  }}
+                >
+                  {s.favourite ? "★ Unfavourite" : "☆ Favourite"}
+                </button>
+                <button
+                  onClick={() => exportStoryAsTXT(s)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(200,200,220,0.6)",
+                  }}
+                >
+                  ↓ TXT
+                </button>
+                <button
+                  onClick={() => {
+                    const text = s.chapters.map((ch, i) =>
+                      s.chapters.length > 1 ? `CHAPTER ${i + 1}\n\n${ch}` : ch
+                    ).join("\n\n─────────────────\n\n");
+                    navigator.clipboard.writeText(`${s.title}\n${"─".repeat(40)}\n\n${text}`).then(() => {
+                      setCopyState((prev) => ({ ...prev, [s.id]: true }));
+                      setTimeout(() => setCopyState((prev) => ({ ...prev, [s.id]: false })), 1800);
+                    });
+                  }}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: copyState[s.id] ? "rgba(52,211,153,0.1)" : "rgba(255,255,255,0.04)",
+                    border: copyState[s.id] ? "1px solid rgba(52,211,153,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                    color: copyState[s.id] ? "#34D399" : "rgba(200,200,220,0.6)",
+                  }}
+                >
+                  {copyState[s.id] ? "✓ Copied!" : "⎘ Copy"}
+                </button>
+                <button
+                  onClick={() => exportStoryAsPDF(s)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(200,200,220,0.6)",
+                  }}
+                >
+                  ↓ PDF
+                </button>
+                {onRemix && s.characters?.length > 0 && (
+                  <button
+                    onClick={() => onRemix(s.characters[0])}
+                    style={{
+                      padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                      fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                      background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)",
+                      color: "rgba(192,132,252,0.8)",
+                    }}
+                  >
+                    ⟳ Reimagine
+                  </button>
+                )}
+              </div>
+              {confirmDelete === s.id ? (
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.7rem", color: "rgba(200,200,220,0.5)" }}>Delete forever?</span>
+                  <button onClick={() => doDelete(s.id)} style={{ padding: "0.4rem 0.8rem", borderRadius: "6px", background: "rgba(200,0,0,0.2)", border: "1px solid rgba(200,0,0,0.4)", color: "#FF6060", fontSize: "0.72rem", cursor: "pointer" }}>Yes</button>
+                  <button onClick={() => setConfirmDelete(null)} style={{ padding: "0.4rem 0.8rem", borderRadius: "6px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,200,220,0.4)", fontSize: "0.72rem", cursor: "pointer" }}>No</button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmDelete(s.id)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.2)",
+                    color: "rgba(200,100,100,0.5)",
+                  }}
+                >
+                  ✕ Delete
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem 1.25rem", minHeight: "100vh" }}>
+      <button
+        onClick={onBack}
+        style={{
+          background: "transparent", border: "none", color: "rgba(200,200,220,0.35)",
+          fontFamily: "'Cinzel', serif", fontSize: "0.75rem", letterSpacing: "2px",
+          cursor: "pointer", padding: "0.5rem 0", marginBottom: "2rem",
+        }}
+      >
+        ← Back to Studio
+      </button>
+
+      <div style={{ marginBottom: "2rem" }}>
+        <div style={{ fontSize: "0.65rem", letterSpacing: "4px", color: "rgba(200,168,75,0.6)", marginBottom: "0.5rem" }}>
+          STORY ARCHIVE
+        </div>
+        <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(1.8rem, 5vw, 2.5rem)", fontWeight: 700, color: "#E8E0D0", marginBottom: "0.35rem" }}>
+          Narrative Library
+        </h1>
+        <p style={{ fontSize: "0.85rem", color: "rgba(200,200,220,0.45)", letterSpacing: "0.5px" }}>
+          {stories.length} {stories.length === 1 ? "story" : "stories"} saved — browse, tag, export
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search title, character, tag…"
+          style={{
+            flex: 1, minWidth: "200px", background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px",
+            padding: "0.65rem 1rem", color: "#E8E0D0", fontSize: "0.85rem", outline: "none",
+            fontFamily: "'Cinzel', serif",
+          }}
+        />
+        <button
+          onClick={() => setFilterFav(!filterFav)}
+          style={{
+            padding: "0.65rem 1rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.75rem",
+            fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+            background: filterFav ? "rgba(255,184,0,0.15)" : "rgba(255,255,255,0.04)",
+            border: `1px solid ${filterFav ? "rgba(255,184,0,0.4)" : "rgba(255,255,255,0.1)"}`,
+            color: filterFav ? "#FFB800" : "rgba(200,200,220,0.5)",
+          }}
+        >
+          ★ Favourites
+        </button>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+          style={{
+            padding: "0.65rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.75rem",
+            fontFamily: "'Cinzel', serif", letterSpacing: "1px",
+            background: "rgba(10,8,16,0.9)", border: "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(200,200,220,0.6)", outline: "none",
+          }}
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="words">Most Words</option>
+          <option value="alpha">A → Z</option>
+          <option value="rated">Top Rated</option>
+        </select>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "5rem 2rem" }}>
+          <div style={{ fontSize: "2rem", marginBottom: "1rem", opacity: 0.3 }}>◈</div>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "rgba(200,200,220,0.3)", letterSpacing: "2px" }}>
+            {stories.length === 0 ? "No stories archived yet" : "No results found"}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "rgba(200,200,220,0.2)", marginTop: "0.5rem" }}>
+            {stories.length === 0 ? "Generate a story in any mode, then save it to your archive" : "Try a different search or filter"}
+          </div>
+        </div>
+      ) : (
+        <div>{filtered.map(card)}</div>
+      )}
+    </div>
+  );
+}

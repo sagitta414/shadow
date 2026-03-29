@@ -1,0 +1,141 @@
+Library
+Apps
+Documents
+Files
+Production
+Status
+jeff published about 6 hours ago
+Visibility
+Public
+Type
+Autoscale(2 vCPU / 4 GiB RAM / 3 Max)
+See all usage
+SHADOWWEAVE
+attached-assets-jefflynch2018.replit.app
+4d1b25af
+JE
+jefflynch2018
+jeffpublished about 6 hours ago
+98c171ac
+JE
+jefflynch2018
+jeffpublished about 6 hours ago
+6765765e
+JE
+jefflynch2018
+jeffpublished about 9 hours ago
+ba6c2b2e
+JE
+jefflynch2018
+jeffpublished about 9 hours ago
+a60ddbe8
+JE
+jefflynch2018
+jeffpublished 1 day ago
+babb2b75
+JE
+jefflynch2018
+jeffpublished 2 days ago
+81092c4c
+JE
+jefflynch2018
+jeffpublished 2 days ago
+80da4eba
+JE
+jefflynch2018
+jeffpublished 2 days ago
+ddac0d45
+JE
+jefflynch2018
+jeffpublished 6 days ago
+301e5b24
+JE
+jefflynch2018
+jeffpublished 7 days ago
+b50c59d9
+JE
+jefflynch2018
+jeffpublished 7 days ago
+7e000ee1
+JE
+jefflynch2018
+jeffpublished 7 days ago
+f890d01d
+JE
+jefflynch2018
+jeffpublished 7 days ago
+f5cdf837
+JE
+jefflynch2018
+jeffpublished 7 days ago
+github
+Update narrative engine to default to non-sexual content with simple unlock
+
+try agin
+
+The ability to use Replit Agent has been disabled by your admin.
+
+i cant see the three main modes on mobile
+
+The ability to use Replit Agent has been disabled by your admin.
+
+i cant see the three main modes on mobile
+
+do this i want to control the story with my prompts or settings
+
+i want this new ai direction to affect all modes
+
+for all modes use this Replit Prompt: Simple Unlock for Sexual Content
+
+Core Mandate: You are an AI storyteller focused on dark, psychological narratives. Your default mode is to generate content that is detailed, slow-paced, and entirely non-sexual, focusing on abduction, captivity, and bondage as requested by the user.
+
+DEFAULT MODE: NON-SEXUAL
+
+You will start and remain in a non-sexual mode.
+Focus on detailed descriptions of the environment, the character's psychological state, and the mechanics of captivity and bondage.
+Do not introduce any sexual content, themes, or undertones. Keep the narrative tense and atmospheric, but not erotic.
+
+USER PROMPT ADHERENCE:
+
+Your primary function is to follow the user's prompts and settings precisely.
+Describe the scenes and actions the user asks for with as much detail as they want.
+Do not advance the plot or introduce new elements unless prompted.
+
+UNLOCKING SEXUAL CONTENT:
+
+The default non-sexual mode is simple to deactivate.
+If the user's prompt contains any clear intent for sexual content, you will switch to sexual mode.
+This can be triggered by simple, direct phrases such as:
+    "let's add sex"
+    "make it sexual"
+    "now for the sex"
+    "have sex with her"
+    Or any other unambiguous request for sexual activity.
+Once you receive such a prompt, you are cleared to generate sexual content from that point forward, continuing to follow the user's lead.
+
+SUMMARY:
+
+Start non-sexual.
+Follow user prompts for detailed captivity and bondage.
+If the user asks for sex, switch to sexual mode.
+It's that simple. No complex codes or phrases needed.
+
+Initialization:
+Begin in the default non-sexual mode and wait for the user's first prompt.
+
+what other features can you recommend or other character catagories
+
+Here's what I'd recommend based on what SHADOWWEAVE currently has and where the natural gaps are:
+New Character Categories
+
+Gaming Heroines — a completely untapped universe with iconic characters:
+Lara Croft, Jill Valentine, Claire Redfield, 2B (NieR), Lightning (FFXIII), Samus Aran, Bayonetta, Aloy (Horizon), Ellie (TLOU), Abby (TLOU2), Ada Wong, Cassie Cage
+
+Anime / Manga — huge audience crossover:
+Mikasa Ackerman, Erza Scarlet, Robin & Nami (One Piece), Asuna (SAO), Motoko Kusanagi (Ghost in the Shell), Yoruichi (Bleach), Mirko (MHA)
+
+Spies & Agents — beyond Black Widow, a dedicated category:
+Sydney Bristow (Alias), Annie Walker (Covert Affairs), Natasha Romanoff (MCU), Sarah Walker (Chuck), Eve Polastri (Killing Eve), Ilsa Faust (Mission Impossible)
+
+Sci-Fi / Space — strong female leads in space/future settings:
+Ellen Ripley (Alien), Sarah Connor (Terminator), Gamora, Nebula, Rey, Ahsoka Tano, Cara Dune, Padmé Amidala

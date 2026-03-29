@@ -1,0 +1,1100 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Raleway:wght@200;300;400;500;600;700&family=Montserrat:wght@200;300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --void-black: #000000;
+  --abyss-purple: #0A0015;
+  --blood-crimson: #8B0000;
+  --violet-veins: #2D1B69;
+  --shadow-silver: #C8C8D8;
+  --poison-green: #00FF41;
+  --moonlight: #F0F0FF;
+  --chained-gold: #B8860B;
+  --bright-gold: #D4AF37;
+  --blood-red: #800000;
+  --gold-chain: #D4AF37;
+  --shadow: #050505;
+  --bondage-purple: #3D0A4A;
+  --dark-purple: #1A0A2E;
+  --midnight: #0F0F1E;
+  --tactical-gray: #2C3E50;
+  --steel: #7F8C8D;
+  --tactical-black: #1C2833;
+  --ember: #FF4500;
+  --deep-red: #4A0000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background: var(--void-black);
+  color: var(--shadow-silver);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ─── Font Helpers ────────────────────────────────── */
+.font-cinzel   { font-family: 'Cinzel', serif; }
+.font-crimson  { font-family: 'Crimson Text', serif; }
+.font-raleway  { font-family: 'Raleway', sans-serif; }
+.font-montserrat { font-family: 'Montserrat', sans-serif; }
+
+/* ─── Keyframes ───────────────────────────────────── */
+@keyframes voidDrift {
+  0%,100% { transform: scale(1) rotate(0deg); opacity: 0.4; }
+  50%     { transform: scale(1.3) rotate(180deg); opacity: 0.7; }
+}
+
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); opacity: 0.15; }
+  33%     { transform: translate(30px,-40px) scale(1.1); opacity: 0.25; }
+  66%     { transform: translate(-20px,20px) scale(0.95); opacity: 0.1; }
+}
+
+@keyframes logoGlow {
+  0%,100% { filter: brightness(1) drop-shadow(0 0 20px rgba(139,0,0,0.4)); }
+  50%     { filter: brightness(1.25) drop-shadow(0 0 50px rgba(184,134,11,0.7)); }
+}
+
+@keyframes progressGlow {
+  0%,100% { opacity: 0.5; box-shadow: 0 0 10px rgba(139,0,0,0.5); }
+  50%     { opacity: 1;   box-shadow: 0 0 25px rgba(184,134,11,0.8); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes heroReveal {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes lineExpand {
+  from { width: 0; opacity: 0; }
+  to   { width: 120px; opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 15px rgba(139,0,0,0.4); }
+  50%     { box-shadow: 0 0 40px rgba(139,0,0,0.8), 0 0 80px rgba(139,0,0,0.3); }
+}
+
+@keyframes borderSpin {
+  0%   { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+@keyframes textFlicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; }
+  20%,24%,55% { opacity: 0.4; }
+}
+
+@keyframes scanLine {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes particleDrift {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-100vh) translateX(60px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes nightmareVignette {
+  0%,100% { opacity: 0.75; }
+  50%     { opacity: 1; }
+}
+@keyframes nightmareScan {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes nightmareFlicker {
+  0%,87%,89%,91%,100% { opacity: 1; }
+  88%,90%             { opacity: 0.72; }
+}
+@keyframes nightmareGlitch {
+  0%,94%,96%,100% { transform: translate(0,0); filter: none; }
+  95%             { transform: translate(-3px,0); filter: hue-rotate(90deg) saturate(2); }
+  96.5%           { transform: translate(2px,0); filter: hue-rotate(-90deg) saturate(2); }
+}
+@keyframes nightmarePillPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(180,0,30,0.5); }
+  50%     { box-shadow: 0 0 20px rgba(220,0,40,0.9), 0 0 40px rgba(180,0,30,0.4); }
+}
+@keyframes twistReveal {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes twistBorderSpin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes twistLightning {
+  0%,90%,100% { opacity: 0; }
+  92%,98%     { opacity: 1; }
+}
+
+/* ─── Background System ───────────────────────────── */
+.void-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(45,27,105,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,0,0,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 60% 80%, rgba(61,10,74,0.12) 0%, transparent 50%),
+    #000000;
+}
+
+.void-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at 50% 50%, rgba(139,0,0,0.12) 0%, transparent 45%);
+  animation: voidDrift 25s ease-in-out infinite;
+}
+
+.void-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: orbFloat var(--dur, 20s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ─── Scan Line Overlay ───────────────────────────── */
+.void-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* ─── Logo ────────────────────────────────────────── */
+.logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg,
+    var(--blood-crimson) 0%,
+    var(--chained-gold) 35%,
+    var(--bright-gold) 50%,
+    var(--chained-gold) 65%,
+    var(--moonlight) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: logoGlow 4s ease-in-out infinite, shimmer 6s linear infinite;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.captor-logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg,
+    var(--blood-crimson) 0%,
+    var(--steel) 40%,
+    var(--shadow-silver) 55%,
+    var(--steel) 70%,
+    var(--moonlight) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: logoGlow 4s ease-in-out infinite, shimmer 7s linear infinite;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Decorative Divider ──────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184,134,11,0.6), transparent);
+}
+.divider-symbol {
+  color: var(--chained-gold);
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* ─── Glass Cards ─────────────────────────────────── */
+.glass-card {
+  background: rgba(10,0,21,0.65);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(139,0,0,0.35);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.glass-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(184,134,11,0.55);
+  box-shadow:
+    0 24px 50px rgba(0,0,0,0.6),
+    0 0 40px rgba(139,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* ─── Progress Bar ────────────────────────────────── */
+.progress-bar-gradient {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--blood-crimson),
+    var(--chained-gold),
+    var(--violet-veins),
+    var(--chained-gold),
+    var(--blood-crimson)
+  );
+  background-size: 200%;
+  animation: shimmer 3s linear infinite, progressGlow 3s ease-in-out infinite;
+}
+
+/* ─── Slide In ────────────────────────────────────── */
+.slide-in { animation: slideIn 0.45s cubic-bezier(0.23,1,0.32,1); }
+.fade-in  { animation: fadeIn 0.5s ease; }
+
+/* ─── Question Options ────────────────────────────── */
+.question-option {
+  background: rgba(20,0,30,0.6);
+  border: 1px solid rgba(139,0,0,0.4);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.question-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--blood-crimson);
+  border-radius: 3px 0 0 3px;
+  transition: all 0.3s ease;
+}
+
+.question-option:hover {
+  background: rgba(139,0,0,0.2);
+  border-color: rgba(184,134,11,0.6);
+  transform: translateX(6px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4), -4px 0 20px rgba(139,0,0,0.2);
+}
+
+.question-option:hover::before {
+  background: var(--chained-gold);
+  width: 4px;
+}
+
+.question-option.selected {
+  background: rgba(184,134,11,0.15);
+  border-color: var(--chained-gold);
+  box-shadow:
+    0 0 0 1px rgba(184,134,11,0.3),
+    0 12px 30px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.question-option.selected::before {
+  background: var(--chained-gold);
+  width: 4px;
+  box-shadow: 0 0 10px rgba(184,134,11,0.8);
+}
+
+/* ─── Captor Options ──────────────────────────────── */
+.captor-option {
+  background: rgba(10,15,25,0.6);
+  border: 1px solid rgba(44,62,80,0.5);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.captor-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--tactical-gray);
+  border-radius: 3px 0 0 3px;
+  transition: all 0.3s ease;
+}
+
+.captor-option:hover {
+  background: rgba(44,62,80,0.25);
+  border-color: rgba(127,140,141,0.7);
+  transform: translateX(5px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.captor-option:hover::before {
+  background: var(--steel);
+  width: 4px;
+}
+
+.captor-option.selected {
+  background: rgba(127,140,141,0.12);
+  border-color: var(--steel);
+  box-shadow: 0 0 0 1px rgba(127,140,141,0.25), 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.captor-option.selected::before {
+  background: var(--steel);
+  width: 4px;
+  box-shadow: 0 0 8px rgba(127,140,141,0.7);
+}
+
+/* ─── Buttons ─────────────────────────────────────── */
+.enter-button {
+  background: linear-gradient(135deg, var(--blood-crimson) 0%, var(--violet-veins) 100%);
+  border: 1px solid rgba(184,134,11,0.3);
+  border-radius: 50px;
+  padding: 1.4rem 3rem;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.23,1,0.32,1);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow:
+    0 10px 30px rgba(139,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.enter-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.enter-button:hover {
+  transform: scale(1.06) translateY(-2px);
+  box-shadow:
+    0 20px 50px rgba(139,0,0,0.65),
+    0 0 60px rgba(139,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  border-color: rgba(184,134,11,0.6);
+}
+
+.enter-button:active {
+  transform: scale(1.02) translateY(0);
+}
+
+.action-button {
+  padding: 1.1rem 2.25rem;
+  background: linear-gradient(135deg, var(--blood-crimson) 0%, var(--violet-veins) 100%);
+  border: 1px solid rgba(184,134,11,0.25);
+  border-radius: 30px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.action-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(139,0,0,0.55), 0 0 30px rgba(139,0,0,0.2);
+  border-color: rgba(184,134,11,0.5);
+}
+
+.action-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.action-button.secondary {
+  background: linear-gradient(135deg, rgba(45,27,105,0.8) 0%, rgba(61,10,74,0.8) 100%);
+  border-color: rgba(45,27,105,0.6);
+}
+
+.action-button.secondary:hover:not(:disabled) {
+  box-shadow: 0 12px 30px rgba(45,27,105,0.5);
+}
+
+.captor-action-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, rgba(44,62,80,0.9), rgba(139,0,0,0.8));
+  border: 1px solid rgba(127,140,141,0.3);
+  border-radius: 25px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.captor-action-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(139,0,0,0.45);
+  border-color: rgba(127,140,141,0.55);
+}
+
+.captor-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.captor-action-btn.secondary {
+  background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(62,78,90,0.8));
+}
+
+/* ─── Tool Buttons ────────────────────────────────── */
+.tool-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, rgba(139,0,0,0.7), rgba(100,0,0,0.7));
+  border: 1px solid rgba(139,0,0,0.5);
+  border-radius: 10px;
+  color: var(--shadow-silver);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.tool-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139,0,0,0.5);
+  border-color: rgba(184,134,11,0.5);
+}
+
+.tool-button.secondary {
+  background: linear-gradient(135deg, rgba(45,27,105,0.7), rgba(61,10,74,0.7));
+  border-color: rgba(45,27,105,0.5);
+}
+
+.tool-button.secondary:hover {
+  box-shadow: 0 8px 20px rgba(45,27,105,0.5);
+}
+
+/* ─── Followup Inputs ─────────────────────────────── */
+.followup-input,
+.followup-select,
+.followup-textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(45,27,105,0.6);
+  border-radius: 10px;
+  color: var(--shadow-silver);
+  font-size: 0.95rem;
+  font-family: 'Raleway', sans-serif;
+  transition: all 0.3s ease;
+  resize: vertical;
+  backdrop-filter: blur(10px);
+}
+
+.followup-input::placeholder,
+.followup-textarea::placeholder {
+  color: rgba(192,192,192,0.35);
+}
+
+.followup-input:focus,
+.followup-select:focus,
+.followup-textarea:focus {
+  outline: none;
+  border-color: var(--chained-gold);
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.15), 0 0 20px rgba(184,134,11,0.3);
+  background: rgba(0,0,0,0.7);
+}
+
+.captor-followup-input,
+.captor-followup-textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(44,62,80,0.6);
+  border-radius: 8px;
+  color: var(--shadow-silver);
+  font-size: 0.9rem;
+  font-family: 'Raleway', sans-serif;
+  transition: all 0.3s ease;
+  resize: vertical;
+}
+
+.captor-followup-input::placeholder,
+.captor-followup-textarea::placeholder {
+  color: rgba(192,192,192,0.35);
+}
+
+.captor-followup-input:focus,
+.captor-followup-textarea:focus {
+  outline: none;
+  border-color: var(--steel);
+  box-shadow: 0 0 0 3px rgba(127,140,141,0.12), 0 0 15px rgba(127,140,141,0.3);
+}
+
+/* ─── Prompt Items ────────────────────────────────── */
+.prompt-item {
+  background: rgba(0,0,0,0.4);
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+  border-left: 3px solid var(--blood-red);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.prompt-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(139,0,0,0.12), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.prompt-item:hover {
+  transform: translateX(5px);
+  border-left-color: var(--chained-gold);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.prompt-item:hover::before {
+  opacity: 1;
+}
+
+/* ─── Progress Steps ──────────────────────────────── */
+.progress-step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  border: 2px solid;
+  position: relative;
+}
+
+.progress-step::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.progress-step.active::after {
+  border-color: rgba(184,134,11,0.4);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ─── Radio Inputs ────────────────────────────────── */
+input[type="radio"] {
+  accent-color: var(--chained-gold);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+textarea {
+  font-family: 'Raleway', sans-serif;
+}
+
+/* ─── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--blood-crimson), var(--violet-veins));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--chained-gold), var(--blood-crimson));
+}
+
+/* ─── Section Header ──────────────────────────────── */
+.section-header {
+  font-family: 'Cinzel', serif;
+  color: var(--chained-gold);
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(184,134,11,0.3);
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--chained-gold);
+  box-shadow: 0 0 10px rgba(184,134,11,0.8);
+}
+
+/* ─── Glow Text ───────────────────────────────────── */
+.glow-text-gold {
+  color: var(--chained-gold);
+  text-shadow: 0 0 20px rgba(184,134,11,0.6), 0 0 40px rgba(184,134,11,0.3);
+}
+
+.glow-text-crimson {
+  color: #FF3333;
+  text-shadow: 0 0 20px rgba(255,50,50,0.6), 0 0 40px rgba(139,0,0,0.4);
+}
+
+/* ─── Badge ───────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.badge-crimson {
+  background: rgba(139,0,0,0.2);
+  border-color: rgba(139,0,0,0.5);
+  color: #FF6666;
+}
+
+.badge-gold {
+  background: rgba(184,134,11,0.15);
+  border-color: rgba(184,134,11,0.4);
+  color: var(--bright-gold);
+}
+
+/* ─── Theme Animations ────────────────────────────── */
+@keyframes glitchScan {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+}
+
+@keyframes candleFlicker {
+  0%,100% { opacity: 0.6; transform: scaleY(1); }
+  20%     { opacity: 0.8; transform: scaleY(1.02); }
+  40%     { opacity: 0.5; transform: scaleY(0.98); }
+  60%     { opacity: 0.75; transform: scaleY(1.01); }
+  80%     { opacity: 0.55; transform: scaleY(0.99); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme: Cold Blue — subtle font shift via body class */
+body.theme-cold-blue {
+  --void-black: #000811;
+}
+
+/* Theme: Candlelight — warm sepia body */
+body.theme-candlelight {
+  --void-black: #0a0500;
+}
+
+/* Theme: Glitch — green matrix */
+body.theme-glitch {
+  --void-black: #000500;
+  font-family: 'Courier New', monospace;
+}
+
+/* ─── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .editor-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Glass card compact padding */
+  .glass-card {
+    padding: 1.25rem !important;
+  }
+
+  /* Buttons full width where appropriate */
+  .enter-button {
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+  }
+
+  /* Action buttons reduce padding */
+  .action-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* Question options */
+  .question-option {
+    padding: 1rem 1.1rem;
+  }
+
+  /* Section header */
+  .section-header {
+    font-size: 0.95rem;
+  }
+
+  /* Tool rows in homepage */
+  .row-arrow {
+    display: none;
+  }
+
+  /* Prevent wide absolute positioned watermark numbers from causing overflow */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* ─── Mobile layout improvements ─────────────────────── */
+@media (max-width: 768px) {
+  /* Story mode pages — better padding */
+  .story-mode-page {
+    padding: 1rem !important;
+  }
+
+  /* Heatmap container — prevent overflow */
+  .hp-pad .heatmap-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  /* Daily dispatch — improve wrapping */
+  .hp-daily {
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+    align-items: flex-start !important;
+  }
+  .hp-daily-cta {
+    margin-left: 0 !important;
+  }
+
+  /* Step wizard headers in story modes */
+  .step-header-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Hero grid on story mode — compact */
+  .hero-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Surprise Me / Story Dice buttons — reduce padding */
+  .hp-surprise button {
+    padding: 0.65rem 1.4rem !important;
+  }
+
+  /* Section labels — reduce letter spacing */
+  .section-label-text {
+    letter-spacing: 2px !important;
+  }
+
+  /* Studio tools grid — 2 col on narrow */
+  .hp-general {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Story arc + dossier panels */
+  .panel-two-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* WelcomeCard on small phones */
+  .welcome-card-inner {
+    border-radius: 16px !important;
+  }
+
+  /* Nav brand letter-spacing compress */
+  .nav-brand-text {
+    letter-spacing: 3px !important;
+  }
+}
+
+/* ─── Homepage main 3-col grid → 1-col on tablet/mobile ─── */
+@media (max-width: 768px) {
+  .hp-cols {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  /* Reduce heavy padding on all .hp-pad sections */
+  .hp-pad {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Studio tools 4-col → 2-col at 768 */
+  .hp-general {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Chronicle stats 4-col → 2-col */
+  .chronicle-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Dual-picker grids (Two Heroines, Rescue Gone Wrong, etc.) → 1-col */
+  .mode-dual-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+}
+
+/* Scrollbar styling for infamy board horizontal scroll */
+.infamy-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.infamy-scroll::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0);
+}
+.infamy-scroll::-webkit-scrollbar-thumb {
+  background: rgba(239,68,68,0.2);
+  border-radius: 2px;
+}
+.infamy-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(239,68,68,0.4);
+}
+
+/* ─── Mobile: Mode Pages ──────────────────────────── */
+@media (max-width: 640px) {
+  /* Universal page padding reduction */
+  .mode-page-wrap {
+    padding: 1rem !important;
+  }
+
+  /* Pill row horizontal scroll on narrow screens */
+  .pill-scroll-mobile {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Story text bigger on mobile for readability */
+  .story-prose {
+    font-size: 1rem !important;
+    line-height: 1.85 !important;
+  }
+
+  /* Config panels full width */
+  .config-panel {
+    padding: 0.875rem !important;
+  }
+
+  /* Back button reduced size */
+  .mode-back-btn {
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* Trio toggle 3-col still on mobile — but tighter */
+  .trio-toggle {
+    gap: 0.35rem !important;
+  }
+
+  /* Generate button sticky at bottom on mobile */
+  .gen-btn-sticky {
+    position: sticky !important;
+    bottom: 1rem !important;
+    z-index: 10 !important;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.5) !important;
+  }
+
+  /* Primary card height on homepage */
+  .hp-primary-card {
+    height: 280px !important;
+  }
+
+  /* Homepage mode grid — 2 cols on mobile */
+  .hp-specialist-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* AiProviderBadge — compact on mobile */
+  .ai-badge-wrap {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.58rem !important;
+  }
+
+  /* Scoreboard / stats wrap — allow scroll */
+  .stats-row {
+    overflow-x: auto !important;
+  }
+
+  /* Narrative Controls section touch targets */
+  .narrative-controls-btn {
+    padding: 0.5rem 0.4rem !important;
+    min-height: 60px !important;
+  }
+
+  /* StoryLengthPicker buttons — taller for touch */
+  .length-picker-btn {
+    min-height: 70px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Page containers — full bleed */
+  .page-inner-wrap {
+    padding: 0.875rem !important;
+  }
+
+  /* Section labels compressed */
+  .sec-label {
+    font-size: 0.5rem !important;
+    letter-spacing: 2px !important;
+  }
+
+  /* Pill buttons — larger touch target */
+  .pill-btn {
+    min-height: 34px !important;
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  /* Step indicators — compact */
+  .step-indicator-row {
+    gap: 0.5rem !important;
+  }
+
+  /* Export buttons — row */
+  .export-btn-row {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-left: auto !important;
+  }
+
+  /* Story chapter dividers */
+  .chapter-divider-text {
+    font-size: 0.55rem !important;
+    letter-spacing: 2px !important;
+  }
+}
+
+/* ─── Safe area insets (iPhone notch etc) ─────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .gen-btn-sticky {
+    bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+  }
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
