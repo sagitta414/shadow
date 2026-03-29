@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import ThemeSwitcher from "./components/ThemeSwitcher";
 import Login from "./pages/Login";
@@ -57,6 +57,9 @@ import WelcomeCard from "./components/WelcomeCard";
 import AiProviderBadge from "./components/AiProviderBadge";
 import { recordStoryDay } from "./lib/streak";
 import { recordModeVisit } from "./lib/recentModes";
+import { DirectorProvider } from "./contexts/DirectorContext";
+import DirectorPanel from "./components/DirectorPanel";
+import { directorStore } from "./lib/directorStore";
 
 type Page =
   | "login"
@@ -197,6 +200,23 @@ function AppInner() {
   const [surpriseActive, setSurpriseActive] = useState(false);
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
 
+  useEffect(() => {
+    const orig = window.fetch;
+    window.fetch = async (input, init) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
+      if (url.includes("/api/story/") && init?.method === "POST" && init.body) {
+        try {
+          const body = JSON.parse(init.body as string);
+          body._safeMode = directorStore.safeMode;
+          body._directorNote = directorStore.directorNote;
+          init = { ...init, body: JSON.stringify(body) };
+        } catch {}
+      }
+      return orig(input, init);
+    };
+    return () => { window.fetch = orig; };
+  }, []);
+
   function navigate(p: Page) {
     recordModeVisit(p);
     setPage(p);
@@ -242,6 +262,7 @@ function AppInner() {
           <AchievementToastManager />
           {STORY_MODE_PAGES.has(page) && <SessionTimer key={page} pageKey={page} />}
           {STORY_MODE_PAGES.has(page) && <PlotTwistInjector />}
+          {STORY_MODE_PAGES.has(page) && <DirectorPanel />}
           <AiProviderBadge />
         </>
       )}
@@ -511,7 +532,9 @@ function AppInner() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppInner />
+      <DirectorProvider>
+        <AppInner />
+      </DirectorProvider>
     </ThemeProvider>
   );
 }

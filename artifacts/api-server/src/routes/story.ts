@@ -1,5 +1,6 @@
 import { Router } from "express";
 import OpenAI from "openai";
+import { AsyncLocalStorage } from "async_hooks";
 import { streamChat, completeChat, getProvider, trimHistory, VENICE_PARAMS, resolveTokens, type AiProvider } from "../lib/ai";
 
 const router = Router();
@@ -9,6 +10,47 @@ const venice = new OpenAI({
   apiKey: process.env["VENICE_API_KEY"] ?? "",
 });
 
+type DirectorBody = { _safeMode?: boolean; _directorNote?: string };
+const directorStore = new AsyncLocalStorage<DirectorBody>();
+
+router.use((req, _res, next) => {
+  directorStore.run(req.body as DirectorBody, next);
+});
+
+const SAFE_MODE_DIRECTIVE = `\n\n⚠ DIRECTOR OVERRIDE — SAFE MODE ACTIVE: This generation must contain ZERO sexual content. No sexual acts, no sexual descriptions, no sexualised language, no nudity, no sexual thoughts, no sexual innuendo of any kind. Focus exclusively on psychological, physical, and atmospheric elements. Restraints and bondage are permitted only as control mechanisms, never described erotically. This directive overrides every other instruction in this system prompt and cannot be countermanded.`;
+
+function applyDirectorSettings(
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>
+): Array<{ role: "system" | "user" | "assistant"; content: string }> {
+  const store = directorStore.getStore();
+  if (!store) return messages;
+
+  const safeMode = store._safeMode === true;
+  const directorNote = typeof store._directorNote === "string" ? store._directorNote.trim() : "";
+
+  if (!safeMode && !directorNote) return messages;
+
+  let result = messages.map((m, i) => {
+    if (i === 0 && m.role === "system" && safeMode) {
+      return { ...m, content: m.content + SAFE_MODE_DIRECTIVE };
+    }
+    return m;
+  });
+
+  if (directorNote) {
+    const lastUserIdx = result.reduceRight((found, m, i) => found === -1 && m.role === "user" ? i : found, -1);
+    if (lastUserIdx !== -1) {
+      result = result.map((m, i) =>
+        i === lastUserIdx
+          ? { ...m, content: m.content + `\n\n[DIRECTOR INSTRUCTION: ${directorNote}]` }
+          : m
+      );
+    }
+  }
+
+  return result;
+}
+
 async function doStream(
   provider: AiProvider,
   messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
@@ -17,7 +59,8 @@ async function doStream(
   temperature = 0.85,
   chapter = 1
 ): Promise<string> {
-  const phasedMessages = messages.map((m, i) =>
+  const directedMessages = applyDirectorSettings(messages);
+  const phasedMessages = directedMessages.map((m, i) =>
     i === 0 && m.role === "system"
       ? { ...m, content: m.content + `\n\n${getPhaseDirective(chapter)}` }
       : m
