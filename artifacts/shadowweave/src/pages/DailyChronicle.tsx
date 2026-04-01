@@ -313,7 +313,7 @@ export default function DailyChronicle({ onBack, onPlayDate }: Props) {
                     ? "0 8px 40px rgba(0,0,0,0.5)"
                     : "none",
                 animation: `fadeUp 0.38s ease ${Math.min(idx,18)*0.025}s both`,
-                opacity: hasStory ? 1 : 0.55,
+                opacity: 1,
               }}
             >
               {/* ── Row header ── */}
@@ -361,18 +361,41 @@ export default function DailyChronicle({ onBack, onPlayDate }: Props) {
                   )}
                 </div>
 
-                {/* Right badges */}
-                <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", flexShrink:0 }}>
+                {/* Right badges + inline actions */}
+                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexShrink:0 }} onClick={e => e.stopPropagation()}>
                   {hasStory ? (
-                    <span style={{ fontSize:"0.4rem", letterSpacing:"2px", padding:"0.2rem 0.65rem", borderRadius:"20px", background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.22)", color:"rgba(74,222,128,0.65)", fontFamily:"'Cinzel',serif", textTransform:"uppercase", fontWeight:700 }}>
-                      ✓ Sealed
-                    </span>
+                    <>
+                      {!isOpen && (
+                        <>
+                          <button
+                            onClick={() => onPlayDate(slot.dateKey, slot.scenario, "continue")}
+                            style={{ fontSize:"0.42rem", letterSpacing:"1.5px", padding:"0.22rem 0.65rem", borderRadius:"20px", background:"rgba(200,168,75,0.1)", border:"1px solid rgba(200,168,75,0.3)", color:"rgba(200,168,75,0.82)", fontFamily:"'Cinzel',serif", textTransform:"uppercase", fontWeight:700, cursor:"pointer", transition:"all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background="rgba(200,168,75,0.22)"; e.currentTarget.style.borderColor="rgba(200,168,75,0.6)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background="rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor="rgba(200,168,75,0.3)"; }}
+                          >▶ Continue</button>
+                          <button
+                            onClick={() => onPlayDate(slot.dateKey, slot.scenario, "redo")}
+                            style={{ fontSize:"0.42rem", letterSpacing:"1.5px", padding:"0.22rem 0.65rem", borderRadius:"20px", background:"rgba(100,0,200,0.08)", border:"1px solid rgba(120,60,220,0.22)", color:"rgba(160,120,255,0.72)", fontFamily:"'Cinzel',serif", textTransform:"uppercase", fontWeight:700, cursor:"pointer", transition:"all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background="rgba(100,0,200,0.18)"; e.currentTarget.style.borderColor="rgba(150,80,255,0.5)"; e.currentTarget.style.color="rgba(190,160,255,0.95)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background="rgba(100,0,200,0.08)"; e.currentTarget.style.borderColor="rgba(120,60,220,0.22)"; e.currentTarget.style.color="rgba(160,120,255,0.72)"; }}
+                          >↺ Redo</button>
+                        </>
+                      )}
+                      <span style={{ fontSize:"0.4rem", letterSpacing:"2px", padding:"0.2rem 0.65rem", borderRadius:"20px", background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.22)", color:"rgba(74,222,128,0.65)", fontFamily:"'Cinzel',serif", textTransform:"uppercase", fontWeight:700 }}>
+                        ✓ Sealed
+                      </span>
+                    </>
                   ) : (
-                    <span style={{ fontSize:"0.4rem", letterSpacing:"2px", padding:"0.2rem 0.65rem", borderRadius:"20px", border:"1px solid rgba(200,168,75,0.08)", color:"rgba(200,168,75,0.2)", fontFamily:"'Cinzel',serif", textTransform:"uppercase" }}>
-                      Unbroken
-                    </span>
+                    <button
+                      onClick={() => onPlayDate(slot.dateKey, slot.scenario, "start")}
+                      style={{ fontSize:"0.45rem", letterSpacing:"2px", padding:"0.28rem 0.9rem", borderRadius:"20px", background:"linear-gradient(135deg, rgba(200,168,75,0.78), rgba(150,110,30,0.78))", border:"1px solid rgba(200,168,75,0.6)", color:"#0a0808", fontFamily:"'Cinzel',serif", textTransform:"uppercase", fontWeight:900, cursor:"pointer", boxShadow:"0 0 14px rgba(200,168,75,0.28)", transition:"all 0.18s" }}
+                      onMouseEnter={e => { e.currentTarget.style.filter="brightness(1.2)"; e.currentTarget.style.boxShadow="0 0 22px rgba(200,168,75,0.5)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.filter=""; e.currentTarget.style.boxShadow="0 0 14px rgba(200,168,75,0.28)"; }}
+                    >
+                      ▶ {slot.isToday ? "Begin Today" : "Start"}
+                    </button>
                   )}
-                  <div style={{ color: isOpen ? "rgba(200,168,75,0.75)" : hasStory ? "rgba(200,168,75,0.28)" : "rgba(255,255,255,0.08)", fontSize:"0.75rem", transition:"all 0.3s", transform: isOpen ? "rotate(180deg)" : "rotate(0)", display:"inline-block" }}>▾</div>
+                  <div onClick={e => { e.stopPropagation(); setExpanded(isOpen ? null : slot.dateKey); }} style={{ color: isOpen ? "rgba(200,168,75,0.75)" : hasStory ? "rgba(200,168,75,0.28)" : "rgba(255,255,255,0.12)", fontSize:"0.75rem", transition:"all 0.3s", transform: isOpen ? "rotate(180deg)" : "rotate(0)", display:"inline-block", cursor:"pointer", padding:"0.2rem 0.3rem" }}>▾</div>
                 </div>
               </div>
 
