@@ -106,6 +106,10 @@ export function getDailyEntryForToday(): DailyEntry | null {
   return getDailyArchive().find((e) => e.dateKey === key) ?? null;
 }
 
+export function getDailyEntryForDate(dateKey: string): DailyEntry | null {
+  return getDailyArchive().find((e) => e.dateKey === dateKey) ?? null;
+}
+
 export function saveDailyEntry(entry: Omit<DailyEntry, "savedAt">): void {
   const existing = getDailyArchive().filter((e) => e.dateKey !== entry.dateKey);
   localStorage.setItem(DAILY_KEY, JSON.stringify([{ ...entry, savedAt: Date.now() }, ...existing]));

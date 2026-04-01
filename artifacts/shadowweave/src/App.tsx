@@ -205,6 +205,11 @@ function AppInner() {
   const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
   const [surpriseActive, setSurpriseActive] = useState(false);
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
+  const [dailyPlay, setDailyPlay] = useState<{
+    dateKey: string;
+    scenario: { heroine: { name: string; color: string; power: string }; villain: string; setting: string; title: string };
+    mode: "start" | "continue" | "redo";
+  } | null>(null);
 
   useEffect(() => {
     const orig = window.fetch;
@@ -331,13 +336,22 @@ function AppInner() {
 
       {page === "daily-scenario" && (
         <DailyScenarioPage
-          onBack={() => navigate("home")}
-          onChronicle={() => navigate("daily-chronicle")}
+          onBack={() => { setDailyPlay(null); navigate("home"); }}
+          onChronicle={() => { setDailyPlay(null); navigate("daily-chronicle"); }}
+          dateKey={dailyPlay?.dateKey}
+          scenarioOverride={dailyPlay?.scenario}
+          forceGenerate={dailyPlay?.mode === "start" || dailyPlay?.mode === "redo"}
         />
       )}
 
       {page === "daily-chronicle" && (
-        <DailyChronicle onBack={() => navigate("daily-scenario")} />
+        <DailyChronicle
+          onBack={() => navigate("daily-scenario")}
+          onPlayDate={(dateKey, scenario, mode) => {
+            setDailyPlay({ dateKey, scenario, mode });
+            navigate("daily-scenario");
+          }}
+        />
       )}
 
       {page === "character-params" && (

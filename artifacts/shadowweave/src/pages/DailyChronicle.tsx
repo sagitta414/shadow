@@ -81,9 +81,18 @@ function buildCalendar() {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-interface Props { onBack: () => void; }
+interface ScenarioData {
+  heroine: { name: string; color: string; power: string };
+  villain: string;
+  setting: string;
+  title: string;
+}
+interface Props {
+  onBack: () => void;
+  onPlayDate: (dateKey: string, scenario: ScenarioData, mode: "start" | "continue" | "redo") => void;
+}
 
-export default function DailyChronicle({ onBack }: Props) {
+export default function DailyChronicle({ onBack, onPlayDate }: Props) {
   const [savedMap, setSavedMap] = useState<Record<string, DailyEntry>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "generated" | "unplayed">("all");
@@ -267,6 +276,7 @@ export default function DailyChronicle({ onBack }: Props) {
           const setting    = hasStory ? (saved as any).setting  ?? slot.scenario.setting : slot.scenario.setting;
           const heroineName  = hasStory ? saved.heroine : slot.scenario.heroine.name;
           const heroineColor = hasStory ? saved.heroineColor : slot.scenario.heroine.color;
+          const chapterCount = hasStory ? (saved.story.match(/---/g)?.length ?? 0) + 1 : 0;
           const preview    = hasStory && paragraphs.length > 0
             ? paragraphs[0].slice(0, 120) + (paragraphs[0].length > 120 ? "…" : "")
             : null;
@@ -394,35 +404,65 @@ export default function DailyChronicle({ onBack }: Props) {
                         ))}
                       </div>
 
-                      {/* Footer meta */}
-                      <div style={{ display:"flex", alignItems:"center", gap:"1.5rem", marginTop:"2rem", paddingTop:"1rem", borderTop:"1px solid rgba(200,168,75,0.07)", flexWrap:"wrap" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Words</span>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color:"rgba(200,168,75,0.55)", fontWeight:700 }}>{wordCount.toLocaleString()}</span>
+                      {/* Footer meta + actions */}
+                      <div style={{ marginTop:"2rem", paddingTop:"1rem", borderTop:"1px solid rgba(200,168,75,0.07)" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:"1.5rem", flexWrap:"wrap", marginBottom:"1.25rem" }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Words</span>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color:"rgba(200,168,75,0.55)", fontWeight:700 }}>{wordCount.toLocaleString()}</span>
+                          </div>
+                          <div style={{ width:"1px", height:"1rem", background:"rgba(200,168,75,0.1)" }} />
+                          <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Reading Time</span>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color:"rgba(200,168,75,0.55)", fontWeight:700 }}>{readingTime(wordCount)}</span>
+                          </div>
+                          <div style={{ width:"1px", height:"1rem", background:"rgba(200,168,75,0.1)" }} />
+                          <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Heroine</span>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color: heroineColor ?? "rgba(200,168,75,0.55)", fontWeight:700, textShadow:`0 0 12px ${heroineColor}66` }}>{heroineName}</span>
+                          </div>
                         </div>
-                        <div style={{ width:"1px", height:"1rem", background:"rgba(200,168,75,0.1)" }} />
-                        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Reading Time</span>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color:"rgba(200,168,75,0.55)", fontWeight:700 }}>{readingTime(wordCount)}</span>
-                        </div>
-                        <div style={{ width:"1px", height:"1rem", background:"rgba(200,168,75,0.1)" }} />
-                        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.38rem", letterSpacing:"3px", color:"rgba(200,168,75,0.3)", textTransform:"uppercase" }}>Heroine</span>
-                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.65rem", color: heroineColor ?? "rgba(200,168,75,0.55)", fontWeight:700, textShadow:`0 0 12px ${heroineColor}66` }}>{heroineName}</span>
+                        {/* Action buttons for played entries */}
+                        <div style={{ display:"flex", gap:"0.6rem", flexWrap:"wrap" }}>
+                          <button
+                            onClick={() => onPlayDate(slot.dateKey, slot.scenario, "continue")}
+                            style={{ display:"flex", alignItems:"center", gap:"0.4rem", padding:"0.5rem 1.1rem", background:"rgba(200,168,75,0.1)", border:"1px solid rgba(200,168,75,0.3)", borderRadius:"8px", color:"rgba(200,168,75,0.85)", fontFamily:"'Cinzel',serif", fontSize:"0.62rem", letterSpacing:"1.5px", cursor:"pointer", fontWeight:700, transition:"all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background="rgba(200,168,75,0.2)"; e.currentTarget.style.borderColor="rgba(200,168,75,0.6)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background="rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor="rgba(200,168,75,0.3)"; }}
+                          >
+                            ▶ Continue — Chapter {chapterCount + 1}
+                          </button>
+                          <button
+                            onClick={() => onPlayDate(slot.dateKey, slot.scenario, "redo")}
+                            style={{ display:"flex", alignItems:"center", gap:"0.4rem", padding:"0.5rem 1.1rem", background:"rgba(100,0,200,0.08)", border:"1px solid rgba(120,60,220,0.25)", borderRadius:"8px", color:"rgba(160,120,255,0.75)", fontFamily:"'Cinzel',serif", fontSize:"0.62rem", letterSpacing:"1.5px", cursor:"pointer", fontWeight:700, transition:"all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background="rgba(100,0,200,0.16)"; e.currentTarget.style.borderColor="rgba(120,60,220,0.55)"; e.currentTarget.style.color="rgba(180,150,255,0.95)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background="rgba(100,0,200,0.08)"; e.currentTarget.style.borderColor="rgba(120,60,220,0.25)"; e.currentTarget.style.color="rgba(160,120,255,0.75)"; }}
+                          >
+                            ↺ Redo This Night
+                          </button>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div style={{ padding:"2.5rem 1.5rem", textAlign:"center" }}>
+                    <div style={{ padding:"2rem 1.5rem", textAlign:"center" }}>
                       <div style={{ fontSize:"2.2rem", marginBottom:"1rem", opacity:0.12 }}>◆</div>
                       <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.88rem", color:"rgba(200,168,75,0.22)", marginBottom:"0.5rem", letterSpacing:"2px" }}>
                         {slot.isToday ? "This Seal Awaits You" : "This Seal Was Never Broken"}
                       </div>
-                      <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:"0.7rem", color:"rgba(200,195,220,0.18)", lineHeight:1.75, maxWidth:"340px", margin:"0 auto" }}>
+                      <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:"0.7rem", color:"rgba(200,195,220,0.18)", lineHeight:1.75, maxWidth:"340px", margin:"0 auto 1.5rem" }}>
                         {slot.isToday
-                          ? "Visit today's Daily Dark Scenario to generate and seal this chapter into the Chronicle."
+                          ? "Today's scenario has been seeded — enter the darkness and seal this chapter."
                           : "The scenario was seeded, but no one answered the dark's call that night. Its story remains unwritten."}
                       </p>
+                      {/* Start button */}
+                      <button
+                        onClick={() => onPlayDate(slot.dateKey, slot.scenario, "start")}
+                        style={{ display:"inline-flex", alignItems:"center", gap:"0.5rem", padding:"0.65rem 1.8rem", background:"linear-gradient(135deg, rgba(200,168,75,0.82), rgba(150,110,30,0.82))", border:"none", borderRadius:"10px", color:"#0a0808", fontFamily:"'Cinzel',serif", fontSize:"0.7rem", fontWeight:900, letterSpacing:"2.5px", textTransform:"uppercase", cursor:"pointer", boxShadow:"0 0 22px rgba(200,168,75,0.22)", transition:"filter 0.18s" }}
+                        onMouseEnter={e => { e.currentTarget.style.filter="brightness(1.2)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.filter=""; }}
+                      >
+                        ▶ {slot.isToday ? "Begin Today's Chronicle" : "Write This Night"}
+                      </button>
                     </div>
                   )}
                 </div>

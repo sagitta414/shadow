@@ -4,6 +4,7 @@ import { saveStoryToArchive } from "../lib/archive";
 import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 import {
   getDailyEntryForToday,
+  getDailyEntryForDate,
   saveDailyEntry,
   getTodayDateKey,
 } from "../lib/archive";
@@ -95,15 +96,31 @@ async function streamRequest(
   return full;
 }
 
+interface ScenarioData {
+  heroine: { name: string; color: string; power: string };
+  villain: string;
+  setting: string;
+  title: string;
+}
+
 interface Props {
   onBack: () => void;
   onChronicle: () => void;
+  dateKey?: string;
+  scenarioOverride?: ScenarioData;
+  forceGenerate?: boolean;
 }
 
-export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
-  const scenario = getDailyScenario();
+export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenarioOverride, forceGenerate }: Props) {
+  const scenario = scenarioOverride ?? getDailyScenario();
   const { heroine, villain, setting, title } = scenario;
-  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  const effectiveDateKey = dateKey ?? getTodayDateKey();
+  const isPastDate = !!dateKey && dateKey !== getTodayDateKey();
+  const displayDate = isPastDate
+    ? new Date(dateKey + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const today = displayDate;
 
   const [chapters, setChapters] = useState<string[]>([]);
   const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
@@ -136,7 +153,12 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
   const fullStory = chapters.join("\n\n---\n\n");
 
   useEffect(() => {
-    const existing = getDailyEntryForToday();
+    if (forceGenerate) {
+      hasGenerated.current = true;
+      generate();
+      return;
+    }
+    const existing = dateKey ? getDailyEntryForDate(dateKey) : getDailyEntryForToday();
     if (existing && existing.story && existing.story.trim().length > 50) {
       setChapters([existing.story]);
       setAlreadySaved(true);
@@ -178,7 +200,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
       );
       setChapters([full]);
       saveDailyEntry({
-        dateKey: getTodayDateKey(),
+        dateKey: effectiveDateKey,
         date: today,
         heroine: heroine.name,
         heroineColor: heroine.color,
@@ -223,7 +245,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
       setContinueDir("");
       // Update chronicle with full accumulated story
       saveDailyEntry({
-        dateKey: getTodayDateKey(),
+        dateKey: effectiveDateKey,
         date: today,
         heroine: heroine.name,
         heroineColor: heroine.color,
@@ -265,6 +287,11 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
             <div style={{ padding: "0.25rem 0.85rem", background: "rgba(200,168,75,0.12)", border: "1px solid rgba(200,168,75,0.35)", borderRadius: "20px", fontSize: "0.62rem", color: "rgba(200,168,75,0.9)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
               ◆ Daily Dark Scenario
             </div>
+            {isPastDate && (
+              <div style={{ padding: "0.25rem 0.75rem", background: "rgba(150,100,255,0.12)", border: "1px solid rgba(150,100,255,0.35)", borderRadius: "20px", fontSize: "0.55rem", color: "rgba(180,140,255,0.9)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
+                ◈ Past Chronicle
+              </div>
+            )}
             <div style={{ fontSize: "0.62rem", color: "rgba(200,168,75,0.4)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
               {today}
             </div>
