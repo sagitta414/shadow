@@ -4,14 +4,14 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
 const router = Router();
-const ADMIN_KEY = process.env.ADMIN_KEY ?? "shadow-admin-2026";
+const ADMIN_KEY = process.env.ADMIN_KEY;
 const ADMIN_EMAIL = "jefflynch107@gmail.com";
 const VISITORS_FILE = join(process.cwd(), "data", "visitors.json");
 
 function requireAdmin(req: Parameters<Parameters<typeof router.get>[1]>[0], res: Parameters<Parameters<typeof router.get>[1]>[1]): boolean {
   const key = req.headers["x-admin-key"] as string | undefined;
   const email = req.headers["x-admin-email"] as string | undefined;
-  if (key !== ADMIN_KEY) {
+  if (!ADMIN_KEY || !key || key !== ADMIN_KEY) {
     res.status(401).json({ error: "Invalid admin key" });
     return false;
   }
