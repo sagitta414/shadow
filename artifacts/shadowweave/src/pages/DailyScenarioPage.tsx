@@ -2,8 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive } from "../lib/archive";
 import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
+import StoryIntro from "../components/StoryIntro";
+import CinematicReader from "../components/CinematicReader";
+import StoryChoices from "../components/StoryChoices";
+import MoodDial from "../components/MoodDial";
+import StoryDebrief from "../components/StoryDebrief";
+import PromptPreview from "../components/PromptPreview";
+import VillainDossier from "../components/VillainDossier";
 import {
   getDailyEntryForToday,
+  getDailyEntryForDate,
   saveDailyEntry,
   getTodayDateKey,
 } from "../lib/archive";
@@ -95,15 +103,31 @@ async function streamRequest(
   return full;
 }
 
+interface ScenarioData {
+  heroine: { name: string; color: string; power: string };
+  villain: string;
+  setting: string;
+  title: string;
+}
+
 interface Props {
   onBack: () => void;
   onChronicle: () => void;
+  dateKey?: string;
+  scenarioOverride?: ScenarioData;
+  forceGenerate?: boolean;
 }
 
-export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
-  const scenario = getDailyScenario();
+export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenarioOverride, forceGenerate }: Props) {
+  const scenario = scenarioOverride ?? getDailyScenario();
   const { heroine, villain, setting, title } = scenario;
-  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  const effectiveDateKey = dateKey ?? getTodayDateKey();
+  const isPastDate = !!dateKey && dateKey !== getTodayDateKey();
+  const displayDate = isPastDate
+    ? new Date(dateKey + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const today = displayDate;
 
   const [chapters, setChapters] = useState<string[]>([]);
   const [psycheLog, setPsycheLog] = useState<PsycheEvent[]>([]);
@@ -123,6 +147,20 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
   }, [chapters]);
   const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
   const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
+
+  // Auto-update villain dossier after each chapter
+  const dossierChapRef = useRef(0);
+  useEffect(() => {
+    if (chapters.length === 0) { dossierChapRef.current = 0; return; }
+    if (chapters.length <= dossierChapRef.current) return;
+    dossierChapRef.current = chapters.length;
+    const ch = chapters[chapters.length - 1]; if (!ch?.trim()) return;
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setDossierLoading(true);
+    fetch(`${base}/api/story/dossier-update`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ heroine: heroine.name, villain: String(villain), chapterText: ch.slice(0, 2000), previousDossier: dossier }) })
+      .then(r => r.ok ? r.json() : null).then((d: { dossier: Record<string, unknown> } | null) => { if (d?.dossier) setDossier(d.dossier); }).catch(() => {})
+      .finally(() => setDossierLoading(false));
+  }, [chapters]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [continuing, setContinuing] = useState(false);
@@ -133,10 +171,30 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const hasGenerated = useRef(false);
 
+  const [showIntro, setShowIntro] = useState(false);
+  const [pendingRegenerate, setPendingRegenerate] = useState(false);
+  const [showCinematic, setShowCinematic] = useState(false);
+  const [liveChoices, setLiveChoices] = useState(true);
+  const [choices, setChoices] = useState<Array<{ label: string; description: string }> | null>(null);
+  const [loadingChoices, setLoadingChoices] = useState(false);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [generatingCover, setGeneratingCover] = useState(false);
+  const [moodLevel, setMoodLevel] = useState(50);
+  const [showDebrief, setShowDebrief] = useState(false);
+  const [showPromptPreview, setShowPromptPreview] = useState(false);
+  const [pendingContinue, setPendingContinue] = useState(false);
+  const [dossier, setDossier] = useState<Record<string, unknown> | null>(null);
+  const [dossierLoading, setDossierLoading] = useState(false);
+
   const fullStory = chapters.join("\n\n---\n\n");
 
   useEffect(() => {
-    const existing = getDailyEntryForToday();
+    if (forceGenerate) {
+      hasGenerated.current = true;
+      generate();
+      return;
+    }
+    const existing = dateKey ? getDailyEntryForDate(dateKey) : getDailyEntryForToday();
     if (existing && existing.story && existing.story.trim().length > 50) {
       setChapters([existing.story]);
       setAlreadySaved(true);
@@ -178,7 +236,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
       );
       setChapters([full]);
       saveDailyEntry({
-        dateKey: getTodayDateKey(),
+        dateKey: effectiveDateKey,
         date: today,
         heroine: heroine.name,
         heroineColor: heroine.color,
@@ -188,6 +246,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
         story: full,
       });
       setAlreadySaved(true);
+      if (liveChoices) fetchBranchChoices(full);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed");
     } finally {
@@ -223,7 +282,7 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
       setContinueDir("");
       // Update chronicle with full accumulated story
       saveDailyEntry({
-        dateKey: getTodayDateKey(),
+        dateKey: effectiveDateKey,
         date: today,
         heroine: heroine.name,
         heroineColor: heroine.color,
@@ -232,6 +291,46 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
         title,
         story: newChapters.join("\n\n---\n\n"),
       });
+      if (liveChoices) fetchBranchChoices(full);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Continuation failed");
+    } finally {
+      setContinuing(false);
+      setStreamingText("");
+    }
+  }
+
+  async function continueWithChoice(choiceLabel: string, choiceDesc: string) {
+    setChoices(null);
+    const direction = `${choiceLabel}: ${choiceDesc}`;
+    setContinueDir(direction);
+    if (!fullStory) return;
+    setContinuing(true);
+    setStreamingText("");
+    setError("");
+    let accumulated = "";
+    try {
+      const full = await streamRequest(
+        "/api/story/daily-continue",
+        {
+          previousStory: fullStory,
+          chapterNumber: chapters.length + 1,
+          heroine: `${heroine.name} — ${heroine.power}`,
+          villain, setting,
+          continueDirection: direction,
+        },
+        (c) => { accumulated += c; setStreamingText(accumulated); }
+      );
+      const newChapters = [...chapters, full];
+      setChapters(newChapters);
+      setContinueDir("");
+      saveDailyEntry({
+        dateKey: effectiveDateKey, date: today,
+        heroine: heroine.name, heroineColor: heroine.color,
+        villain, setting, title,
+        story: newChapters.join("\n\n---\n\n"),
+      });
+      if (liveChoices) fetchBranchChoices(full);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Continuation failed");
     } finally {
@@ -252,11 +351,99 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
     setSavedId(id);
   }
 
+  async function fetchBranchChoices(text: string) {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setLoadingChoices(true); setChoices(null);
+    try {
+      const resp = await fetch(`${base}/api/story/branch-choices`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storyExcerpt: text, heroine: heroine.name, villain, setting }),
+      });
+      const json = await resp.json();
+      setChoices(json.choices ?? null);
+    } catch { setChoices(null); }
+    finally { setLoadingChoices(false); }
+  }
+
+  async function generateCoverArt() {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setGeneratingCover(true);
+    try {
+      const resp = await fetch(`${base}/api/story/generate-scene-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          heroine: heroine.name,
+          sceneDescription: `${villain} has captured ${heroine.name} in ${setting}`,
+          shotLabel: "Full Shot", mood: "Dark & Cinematic",
+          styleLabel: "Hyperrealistic digital art", width: 512, height: 768,
+        }),
+      });
+      const json = await resp.json();
+      if (json.imageBase64) setCoverImage(json.imageBase64);
+    } finally { setGeneratingCover(false); }
+  }
+
   const isBusy = loading || continuing;
   const displayParagraphs = (text: string) => text.split(/\n+/).filter(Boolean);
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem 1.5rem", minHeight: "100vh" }}>
+
+      {/* Cinematic intro overlay */}
+      {showIntro && (
+        <StoryIntro
+          title={title}
+          heroineName={heroine.name}
+          heroineColor={heroine.color}
+          villain={villain}
+          setting={setting}
+          universe="Daily Dark Scenario"
+          onComplete={() => {
+            setShowIntro(false);
+            if (pendingRegenerate) {
+              setPendingRegenerate(false);
+              hasGenerated.current = false;
+              generate();
+            }
+          }}
+        />
+      )}
+
+      {/* Cinematic reader overlay */}
+      {showCinematic && fullStory && (
+        <CinematicReader
+          story={fullStory}
+          title={title}
+          heroineName={heroine.name}
+          heroineColor={heroine.color}
+          villain={villain}
+          onExit={() => setShowCinematic(false)}
+        />
+      )}
+
+      {/* Debrief classified report */}
+      {showDebrief && fullStory && (
+        <StoryDebrief
+          heroine={heroine.name}
+          villain={String(villain)}
+          setting={String(setting)}
+          storyText={fullStory}
+          heroineColor={heroine.color}
+          onClose={() => setShowDebrief(false)}
+        />
+      )}
+
+      {/* Prompt preview */}
+      {showPromptPreview && (
+        <PromptPreview
+          userPrompt={`CONTINUE STORY — Chapter ${chapters.length + 1}\nHEROINE: ${heroine.name}\nVILLAIN: ${String(villain)}\nSETTING: ${String(setting)}\nMOOD LEVEL: ${moodLevel}/100\nDIRECTION: ${continueDir || "(let it escalate naturally)"}\n\nPREVIOUS STORY EXCERPT:\n${fullStory.slice(-1200)}`}
+          heroineColor={heroine.color}
+          onGenerate={() => { setShowPromptPreview(false); if (pendingContinue) { setPendingContinue(false); continueStory(); } else { hasGenerated.current = false; generate(); } }}
+          onClose={() => setShowPromptPreview(false)}
+        />
+      )}
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
@@ -265,6 +452,11 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
             <div style={{ padding: "0.25rem 0.85rem", background: "rgba(200,168,75,0.12)", border: "1px solid rgba(200,168,75,0.35)", borderRadius: "20px", fontSize: "0.62rem", color: "rgba(200,168,75,0.9)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
               ◆ Daily Dark Scenario
             </div>
+            {isPastDate && (
+              <div style={{ padding: "0.25rem 0.75rem", background: "rgba(150,100,255,0.12)", border: "1px solid rgba(150,100,255,0.35)", borderRadius: "20px", fontSize: "0.55rem", color: "rgba(180,140,255,0.9)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
+                ◈ Past Chronicle
+              </div>
+            )}
             <div style={{ fontSize: "0.62rem", color: "rgba(200,168,75,0.4)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
               {today}
             </div>
@@ -332,6 +524,8 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
         )}
 
         {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={heroine.name} />}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {chapters.length > 0 && <VillainDossier heroine={heroine.name} villain={String(villain)} heroineColor={heroine.color} dossier={dossier as any} chapterCount={chapters.length} loading={dossierLoading} />}
         <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.05rem", lineHeight: 1.9, color: "rgba(228,222,210,0.85)" }}>
           {chapters.map((chapter, ci) => (
             <div key={ci}>
@@ -375,26 +569,73 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
 
       {/* Action bar */}
       {fullStory && (
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
-          {alreadySaved && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.5rem 1rem", background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(0,200,80,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
-              ✓ Saved to Chronicle
-            </div>
-          )}
-          {!savedId ? (
-            <button onClick={saveToMainArchive} style={{ padding: "0.6rem 1.5rem", background: "rgba(200,168,75,0.1)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "8px", color: "rgba(200,168,75,0.8)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.18)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.6)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.3)"; }}>
-              ◈ Save to Archive
+        <div style={{ marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+            {alreadySaved && (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.5rem 1rem", background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(0,200,80,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
+                ✓ Saved to Chronicle
+              </div>
+            )}
+            {!savedId ? (
+              <button onClick={saveToMainArchive} style={{ padding: "0.6rem 1.5rem", background: "rgba(200,168,75,0.1)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "8px", color: "rgba(200,168,75,0.8)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.18)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.6)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.3)"; }}>
+                ◈ Save to Archive
+              </button>
+            ) : (
+              <div style={{ padding: "0.5rem 1rem", background: "rgba(0,100,200,0.08)", border: "1px solid rgba(0,100,200,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(100,180,255,0.7)", fontFamily: "'Montserrat', sans-serif" }}>
+                ✓ Saved to Archive
+              </div>
+            )}
+            <button onClick={() => setShowCinematic(true)} style={{ padding: "0.6rem 1.1rem", background: "rgba(200,168,75,0.08)", border: "1px solid rgba(200,168,75,0.25)", borderRadius: "8px", color: "rgba(200,168,75,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.15)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.08)"; }}>
+              📖 Cinematic
             </button>
-          ) : (
-            <div style={{ padding: "0.5rem 1rem", background: "rgba(0,100,200,0.08)", border: "1px solid rgba(0,100,200,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(100,180,255,0.7)", fontFamily: "'Montserrat', sans-serif" }}>
-              ✓ Saved to Archive
+            <button onClick={generateCoverArt} disabled={generatingCover} style={{ padding: "0.6rem 1.1rem", background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: "8px", color: generatingCover ? "rgba(168,85,247,0.35)" : "rgba(168,85,247,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: generatingCover ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
+              {generatingCover ? "🎨 Generating…" : "🎨 Cover Art"}
+            </button>
+            <button onClick={() => setShowDebrief(true)} style={{ padding: "0.6rem 1.1rem", background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.2)", borderRadius: "8px", color: "rgba(200,80,80,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background="rgba(200,0,0,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background="rgba(200,0,0,0.06)"; }}>
+              📂 Debrief
+            </button>
+            <button onClick={() => { setShowIntro(true); setPendingRegenerate(true); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
+              ⚡ Regenerate
+            </button>
+          </div>
+
+          {/* Live Choices toggle */}
+          <label style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem", cursor: "pointer" }}>
+            <div onClick={() => setLiveChoices(!liveChoices)} style={{ width: "30px", height: "16px", borderRadius: "8px", background: liveChoices ? "rgba(200,168,75,0.4)" : "rgba(255,255,255,0.08)", border: `1px solid ${liveChoices ? "rgba(200,168,75,0.6)" : "rgba(255,255,255,0.1)"}`, position: "relative", transition: "all 0.2s", cursor: "pointer" }}>
+              <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: liveChoices ? "#C8A830" : "rgba(200,200,220,0.3)", position: "absolute", top: "1px", left: liveChoices ? "15px" : "1px", transition: "all 0.2s" }} />
+            </div>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.52rem", color: "rgba(200,195,220,0.55)", letterSpacing: "1px" }}>Live Choice Prompts</span>
+            <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: "0.42rem", color: "rgba(200,195,220,0.3)" }}>— AI offers 3 branches after each chapter</span>
+          </label>
+
+          {/* Cover image */}
+          {coverImage && (
+            <div style={{ marginTop: "1rem" }}>
+              <img src={`data:image/jpeg;base64,${coverImage}`} alt="Story cover" style={{ maxWidth: "220px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", display: "block" }} />
             </div>
           )}
-          <button onClick={() => { hasGenerated.current = false; generate(); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
-            ⚡ Regenerate
-          </button>
+        </div>
+      )}
+
+      {/* Branch choices */}
+      {choices && !isBusy && (
+        <StoryChoices
+          choices={choices}
+          loading={loadingChoices}
+          heroineColor={heroine.color}
+          onChoose={(c) => continueWithChoice(c.label, c.description)}
+          onSkip={() => { setChoices(null); }}
+        />
+      )}
+      {loadingChoices && (
+        <div style={{ textAlign: "center", padding: "1.5rem", fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "4px", color: "rgba(200,168,75,0.4)", animation: "pulse 1.2s infinite" }}>
+          Generating choices…
         </div>
       )}
 
@@ -430,29 +671,37 @@ export default function DailyScenarioPage({ onBack, onChronicle }: Props) {
             onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(200,168,75,0.2)")}
           />
 
-          <button
-            onClick={continueStory}
-            disabled={isBusy}
-            style={{
-              padding: "0.75rem 2rem",
-              background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))",
-              border: "none",
-              borderRadius: "10px",
-              color: "#0a0808",
-              fontFamily: "'Cinzel', serif",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              cursor: isBusy ? "not-allowed" : "pointer",
-              opacity: isBusy ? 0.5 : 1,
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => { if (!isBusy) e.currentTarget.style.filter = "brightness(1.15)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
-          >
-            {continuing ? "Writing..." : `Continue → Chapter ${chapters.length + 1}`}
-          </button>
+          <div style={{ marginBottom: "1rem" }}>
+            <MoodDial value={moodLevel} onChange={setMoodLevel} heroineColor={heroine.color} />
+          </div>
+
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <button onClick={() => { setPendingContinue(true); setShowPromptPreview(true); }} style={{ padding: "0.65rem 1rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", color: "rgba(200,195,215,0.35)", fontFamily: "'Cinzel',serif", fontSize: "0.52rem", letterSpacing: "2px", cursor: "pointer" }}>👁 Preview Prompt</button>
+            <button
+              onClick={continueStory}
+              disabled={isBusy}
+              style={{
+                flex: 1,
+                padding: "0.75rem 2rem",
+                background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))",
+                border: "none",
+                borderRadius: "10px",
+                color: "#0a0808",
+                fontFamily: "'Cinzel', serif",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                cursor: isBusy ? "not-allowed" : "pointer",
+                opacity: isBusy ? 0.5 : 1,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => { if (!isBusy) e.currentTarget.style.filter = "brightness(1.15)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
+            >
+              {continuing ? "Writing..." : `Continue → Chapter ${chapters.length + 1}`}
+            </button>
+          </div>
         </div>
       )}
 

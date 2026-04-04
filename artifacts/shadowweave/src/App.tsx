@@ -44,6 +44,10 @@ import DreamSequenceMode from "./pages/DreamSequenceMode";
 import DirectorMode from "./pages/DirectorMode";
 import EscapeAttemptMode from "./pages/EscapeAttemptMode";
 import NegotiationRoomMode from "./pages/NegotiationRoomMode";
+import FactionMode from "./pages/FactionMode";
+import SlowBurnMode from "./pages/SlowBurnMode";
+import ConfinedSpaceMode from "./pages/ConfinedSpaceMode";
+import VillainInterrogation from "./pages/VillainInterrogation";
 import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
@@ -114,6 +118,10 @@ type Page =
   | "director-mode"
   | "escape-attempt"
   | "negotiation-room"
+  | "faction-mode"
+  | "slow-burn"
+  | "confined-space"
+  | "villain-interrogation"
   | "heroine-image-gen"
   | "admin";
 
@@ -126,7 +134,8 @@ const STORY_MODE_PAGES = new Set<Page>([
   "showcase","public-property","betting-pool","villain-team-up",
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
-  "director-mode","escape-attempt","negotiation-room",
+  "director-mode","escape-attempt","negotiation-room","faction-mode",
+  "slow-burn","confined-space","villain-interrogation",
 ]);
 
 function BackgroundEffects() {
@@ -205,6 +214,11 @@ function AppInner() {
   const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
   const [surpriseActive, setSurpriseActive] = useState(false);
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
+  const [dailyPlay, setDailyPlay] = useState<{
+    dateKey: string;
+    scenario: { heroine: { name: string; color: string; power: string }; villain: string; setting: string; title: string };
+    mode: "start" | "continue" | "redo";
+  } | null>(null);
 
   useEffect(() => {
     const orig = window.fetch;
@@ -318,7 +332,11 @@ function AppInner() {
           onDirectorMode={() => navigate("director-mode")}
           onEscapeAttempt={() => navigate("escape-attempt")}
           onNegotiationRoom={() => navigate("negotiation-room")}
+          onFactionMode={() => navigate("faction-mode")}
           onHeroineImageGen={() => navigate("heroine-image-gen")}
+          onSlowBurn={() => navigate("slow-burn")}
+          onConfinedSpace={() => navigate("confined-space")}
+          onVillainInterrogation={() => navigate("villain-interrogation")}
         />
       )}
 
@@ -331,13 +349,22 @@ function AppInner() {
 
       {page === "daily-scenario" && (
         <DailyScenarioPage
-          onBack={() => navigate("home")}
-          onChronicle={() => navigate("daily-chronicle")}
+          onBack={() => { setDailyPlay(null); navigate("home"); }}
+          onChronicle={() => { setDailyPlay(null); navigate("daily-chronicle"); }}
+          dateKey={dailyPlay?.dateKey}
+          scenarioOverride={dailyPlay?.scenario}
+          forceGenerate={dailyPlay?.mode === "start" || dailyPlay?.mode === "redo"}
         />
       )}
 
       {page === "daily-chronicle" && (
-        <DailyChronicle onBack={() => navigate("daily-scenario")} />
+        <DailyChronicle
+          onBack={() => navigate("daily-scenario")}
+          onPlayDate={(dateKey, scenario, mode) => {
+            setDailyPlay({ dateKey, scenario, mode });
+            navigate("daily-scenario");
+          }}
+        />
       )}
 
       {page === "character-params" && (
@@ -540,6 +567,22 @@ function AppInner() {
       {page === "negotiation-room" && (
         <NegotiationRoomMode onBack={() => navigate("home")} />
       )}
+      {page === "faction-mode" && (
+        <FactionMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "slow-burn" && (
+        <SlowBurnMode />
+      )}
+
+      {page === "confined-space" && (
+        <ConfinedSpaceMode />
+      )}
+
+      {page === "villain-interrogation" && (
+        <VillainInterrogation onBack={() => navigate("home")} />
+      )}
+
       {page === "heroine-image-gen" && (
         <HeroineImageGen onBack={() => navigate("home")} />
       )}
