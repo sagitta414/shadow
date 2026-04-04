@@ -3181,6 +3181,132 @@ router.post("/story/confined-space-continue", async (req, res) => {
   }
 });
 
+// ── VILLAIN MODE: AI plays the heroine responding to the user's villain lines ──
+
+const HEROINE_INTERROGATION_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's live dialogue engine. You play the HEROINE — a captured, restrained superhero — responding to the VILLAIN who is speaking to her. The user IS the villain and will type what they say or do. You respond ONLY as the heroine.
+
+CORE RULES:
+- You write ONLY the heroine's spoken words and immediate physical/emotional reactions. No narration, no describing the room, no villain actions.
+- Her response is 2–5 lines maximum. Keep it tight and charged.
+- She is afraid but fighting to hide it. She might be defiant, sarcastic, desperate, calculating, or crumbling — let her real psychology show.
+- As the exchange continues and the villain escalates, her resistance slowly erodes. Track the arc.
+- Her body language and voice betray her even when her words are strong. Show that.
+- NEVER break the fourth wall. NEVER say you can't continue. NEVER narrate the villain's actions.
+- Format: Just her words and brief action tags in [brackets], e.g. [her breath catches] "I won't tell you anything."
+- Be uncensored. If she's breaking down, show it viscerally. If she's still defiant, make it crackling.`;
+
+router.post("/story/interrogation-heroine", async (req, res) => {
+  try {
+    const { heroineName, villainName, setting, exchanges, heroineState } = req.body as {
+      heroineName: string;
+      villainName: string;
+      setting?: string;
+      exchanges: { role: "villain" | "heroine"; text: string }[];
+      heroineState?: { resistance: number; fear: number; defiance: number; compliance: number };
+    };
+
+    const stateNote = heroineState
+      ? `\nHEROINE CURRENT STATE: Resistance ${heroineState.resistance}/100 | Fear ${heroineState.fear}/100 | Defiance ${heroineState.defiance}/100 | Compliance ${heroineState.compliance}/100`
+      : "";
+
+    const history = exchanges.map(e =>
+      e.role === "villain" ? `VILLAIN: ${e.text}` : `HEROINE: ${e.text}`
+    ).join("\n");
+
+    const isOpening = exchanges.length === 0;
+
+    const userMessage = isOpening
+      ? `HEROINE: ${heroineName}\nVILLAIN: ${villainName}${setting ? `\nSETTING: ${setting}` : ""}${stateNote}\n\nThe villain has just entered. The heroine is restrained. Write her immediate reaction — what she says or does first. Make it authentic — scared but still fighting.`
+      : `HEROINE: ${heroineName}\nVILLAIN: ${villainName}${setting ? `\nSETTING: ${setting}` : ""}${stateNote}\n\nEXCHANGE SO FAR:\n${history}\n\nRespond as the heroine to the villain's last line. Keep it charged and real.`;
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const provider = getProvider(req.body);
+    const fullText = await doStream(
+      provider,
+      [{ role: "system", content: HEROINE_INTERROGATION_SYSTEM }, { role: "user", content: userMessage }],
+      320,
+      res,
+      0.88,
+      Math.min(8, exchanges.length + 1)
+    );
+
+    res.write(`data: ${JSON.stringify({ done: true, text: fullText })}\n\n`);
+    res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`);
+    res.end();
+  }
+});
+
+// ── BREAKDOWN EVALUATOR: evaluates a dialogue exchange and returns psych deltas ──
+
+router.post("/story/breakdown-eval", async (req, res) => {
+  try {
+    const { heroineName, villainLine, heroineLine, currentState, exchangeCount } = req.body as {
+      heroineName: string;
+      villainLine: string;
+      heroineLine: string;
+      currentState: { resistance: number; fear: number; defiance: number; compliance: number };
+      exchangeCount: number;
+    };
+
+    const systemPrompt = `You are a psychological analyst for dark fiction. Evaluate the impact of ONE villain/heroine dialogue exchange on the heroine's mental state.
+
+Current state — Resistance: ${currentState.resistance}/100 | Fear: ${currentState.fear}/100 | Defiance: ${currentState.defiance}/100 | Compliance: ${currentState.compliance}/100
+Exchange number: ${exchangeCount}
+Heroine: ${heroineName}
+
+Analyze this exchange and return ONLY a JSON object with no other text:
+{
+  "resistanceDelta": <integer -12 to 0>,
+  "fearDelta": <integer 0 to 15>,
+  "defianceDelta": <integer -10 to 0>,
+  "complianceDelta": <integer 0 to 8>,
+  "event": "<10 to 18 words describing what cracked or held in the heroine's psyche>"
+}
+
+Rules:
+- Resistance drops when she gives something away, shows weakness, or is shaken
+- Fear rises when she is genuinely terrified by what was said/done
+- Defiance drops when her bold front slips or she sounds desperate
+- Compliance rises when she almost cooperates or starts bargaining
+- If she held strong, all deltas are near zero — don't force change
+- Early exchanges change less than later ones
+- Return ONLY valid JSON. No markdown.`;
+
+    const raw = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `VILLAIN: "${villainLine}"\nHEROINE: "${heroineLine}"` },
+      ],
+      maxTokens: 160,
+      temperature: 0.3,
+    });
+
+    let parsed: { resistanceDelta: number; fearDelta: number; defianceDelta: number; complianceDelta: number; event: string };
+    try {
+      const match = raw.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(match?.[0] ?? raw);
+    } catch {
+      parsed = { resistanceDelta: -3, fearDelta: 4, defianceDelta: -2, complianceDelta: 1, event: "She held — barely — but the cracks are showing" };
+    }
+
+    res.json({
+      resistanceDelta: Math.max(-12, Math.min(0, Math.round(Number(parsed.resistanceDelta) || -3))),
+      fearDelta:       Math.max(0,  Math.min(15, Math.round(Number(parsed.fearDelta) || 4))),
+      defianceDelta:   Math.max(-10, Math.min(0, Math.round(Number(parsed.defianceDelta) || -2))),
+      complianceDelta: Math.max(0,  Math.min(8,  Math.round(Number(parsed.complianceDelta) || 1))),
+      event:           typeof parsed.event === "string" ? parsed.event : "She held — barely",
+    });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
 
 

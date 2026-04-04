@@ -56,6 +56,7 @@ interface HomepageProps {
   onHeroineImageGen: () => void;
   onSlowBurn: () => void;
   onConfinedSpace: () => void;
+  onVillainInterrogation: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -415,6 +416,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "⚔️", title: "FACTION WAR", badge: "5 Factions · Dark Alliance", desc: "Avengers vs HYDRA. Justice League vs Gotham Rogues. The Guild vs the Sith. Pick two factions and write the conflict.", r: 200, g: 168, b: 75, accent: "#C8A830", onClick: props.onFactionMode, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Weeks of Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", r: 124, g: 58, b: 237, accent: "#7C3AED", onClick: props.onSlowBurn, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", r: 14, g: 165, b: 233, accent: "#0EA5E9", onClick: props.onConfinedSpace, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   const studioTools = [
