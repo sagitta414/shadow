@@ -93,6 +93,12 @@ const CAPTOR_MOTIVATIONS = ["Power and control — he needs this","To possess he
 const CAPTOR_METHODS = ["Cold and methodical — planned this precisely","Psychologically sophisticated — words are his tools","Brutal directness — he doesn't pretend","Seductive and manipulative — almost gentle until he isn't","Unpredictable — she never knows what comes next","Controlled and patient — he has all the time in the world"];
 const CAPTOR_LOCATIONS = ["His private property — isolated, soundproofed","An abandoned industrial space","A vehicle — moving, no fixed point","Her own home — the most disorienting place","A purpose-built facility","A rented property with no neighbours","His office or workplace after hours","Multiple locations — she's moved regularly"];
 
+async function trackComplete(base: string, wordCount: number, mode: string, isFirst: boolean) {
+  try {
+    await fetch(`${base}/api/story/track-complete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ wordCount, mode, isFirst }) });
+  } catch {}
+}
+
 async function streamRequest(endpoint: string, body: object, onChunk: (c: string) => void): Promise<string> {
   const res = await fetch(`${BASE}${endpoint}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
@@ -184,6 +190,7 @@ export default function CivilianCapture({ onBack }: Props) {
         storyLength: "Standard",
       }, c => setStreamText(p => p + c));
       setChapters([full]); setStreamText("");
+      void trackComplete(BASE, full.split(/\s+/).filter(Boolean).length, "civilian-capture", true);
       await fetchChoices(full);
     } catch (e) { setError(e instanceof Error ? e.message : "Failed"); }
     finally { setStreaming(false); }
@@ -201,6 +208,7 @@ export default function CivilianCapture({ onBack }: Props) {
         moodLevel,
       }, c => setStreamText(p => p + c));
       setChapters(p => [...p, full]); setStreamText(""); setContinueDir("");
+      void trackComplete(BASE, full.split(/\s+/).filter(Boolean).length, "civilian-continue", false);
       await fetchChoices(full);
     } catch (e) { setError(e instanceof Error ? e.message : "Failed"); }
     finally { setContinuing(false); }

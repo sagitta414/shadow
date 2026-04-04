@@ -2,6 +2,7 @@ import { Router } from "express";
 import OpenAI from "openai";
 import { AsyncLocalStorage } from "async_hooks";
 import { streamChat, completeChat, getProvider, trimHistory, VENICE_PARAMS, resolveTokens, type AiProvider } from "../lib/ai";
+import { trackChapter, getSessionId as getStatsSessionId } from "../lib/sessionStats.js";
 
 const router = Router();
 
@@ -3178,6 +3179,19 @@ router.post("/story/confined-space-continue", async (req, res) => {
     res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`); res.end();
   } catch (err) {
     res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end();
+  }
+});
+
+// ── CHAPTER TRACKING: frontend calls this after each chapter completes ────────
+
+router.post("/story/track-complete", (req, res) => {
+  try {
+    const { wordCount, mode, isFirst } = req.body as { wordCount: number; mode: string; isFirst?: boolean };
+    const sessionId = getStatsSessionId(req);
+    trackChapter(sessionId, wordCount || 0, mode || "unknown", isFirst === true);
+    res.json({ ok: true });
+  } catch {
+    res.json({ ok: false });
   }
 });
 

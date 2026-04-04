@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAllEvents, getEventStats } from "../lib/eventLogger";
+import { getAllSessionStats } from "../lib/sessionStats";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -53,6 +54,48 @@ router.get("/admin/events", (req, res) => {
 router.get("/admin/stats", (req, res) => {
   if (!requireAdmin(req, res)) return;
   res.json(getEventStats());
+});
+
+router.get("/admin/session-stats", (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const stats = getAllSessionStats();
+
+  // Supplement with event-based counts for sessions not yet in session_stats.json
+  const events = getAllEvents();
+  const STORY_TYPES = new Set(["story_generate","slow_burn_start","confined_start","daily_scenario","daily_scenario_continue","slow_burn_continue","confined_continue","faction","director","arena","interrogation","mind_break","escape","negotiation","corruption","dream_sequence","time_loop","dark_mirror","long_game","auction","dual_capture","mass_capture","trophy","obedience","public_property","betting_pool","chain_of_custody","showcase","villain_team","handler","rescue_gone_wrong","power_drain"]);
+
+  const eventMap: Record<string, { storiesFromEvents: number; modesFromEvents: Record<string, number>; lastEventActivity: number; firstEventSeen: number }> = {};
+  for (const e of events) {
+    if (!STORY_TYPES.has(e.type)) continue;
+    const s = eventMap[e.sessionId];
+    if (!s) {
+      eventMap[e.sessionId] = { storiesFromEvents: 1, modesFromEvents: { [e.type]: 1 }, lastEventActivity: e.timestamp, firstEventSeen: e.timestamp };
+    } else {
+      s.storiesFromEvents++;
+      s.modesFromEvents[e.type] = (s.modesFromEvents[e.type] ?? 0) + 1;
+      if (e.timestamp > s.lastEventActivity) s.lastEventActivity = e.timestamp;
+      if (e.timestamp < s.firstEventSeen) s.firstEventSeen = e.timestamp;
+    }
+  }
+
+  // Merge: prefer session_stats.json data, fall back to event-derived data
+  const trackedIds = new Set(stats.map(s => s.sessionId));
+  const merged = [...stats];
+  for (const [sid, ev] of Object.entries(eventMap)) {
+    if (trackedIds.has(sid)) continue;
+    merged.push({
+      sessionId: sid,
+      storiesStarted: ev.storiesFromEvents,
+      chaptersGenerated: ev.storiesFromEvents,
+      totalWords: 0,
+      modes: ev.modesFromEvents,
+      lastActivity: ev.lastEventActivity,
+      firstSeen: ev.firstEventSeen,
+    });
+  }
+
+  merged.sort((a, b) => b.lastActivity - a.lastActivity);
+  res.json({ sessions: merged });
 });
 
 export default router;

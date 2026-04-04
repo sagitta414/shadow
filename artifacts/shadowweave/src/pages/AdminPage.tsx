@@ -14,6 +14,7 @@ const RED    = "#F87171";
 interface Visitor { email: string; registeredAt: number; visitCount: number; lastSeen: number; }
 interface SwEvent { id: string; timestamp: number; type: string; path: string; ip: string; sessionId: string; heroine?: string; villain?: string; setting?: string; durationMs?: number; }
 interface Stats { total: number; today: number; thisWeek: number; sessions: number; images: number; topMode: { type: string; count: number } | null; modeCounts: Record<string, number>; hourBuckets: number[]; topHeroines: [string, number][]; topVillains: [string, number][]; }
+interface SessionStat { sessionId: string; storiesStarted: number; chaptersGenerated: number; totalWords: number; modes: Record<string, number>; lastActivity: number; firstSeen: number; }
 
 function fmtDate(ts: number) { return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
 function fmtTime(ts: number) { return new Date(ts).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
@@ -59,15 +60,17 @@ export default function AdminPage({ onBack }: AdminPageProps) {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
 
-  const [tab, setTab] = useState<"overview" | "events" | "visitors">("overview");
+  const [tab, setTab] = useState<"overview" | "events" | "visitors" | "profiles">("overview");
 
-  const [stats, setStats]       = useState<Stats | null>(null);
-  const [events, setEvents]     = useState<SwEvent[]>([]);
-  const [visitors, setVisitors] = useState<Visitor[]>([]);
-  const [evtFilter, setEvtFilter] = useState("all");
-  const [evtSearch, setEvtSearch] = useState("");
-  const [vSearch, setVSearch]   = useState("");
-  const [polling, setPolling]   = useState(false);
+  const [stats, setStats]             = useState<Stats | null>(null);
+  const [events, setEvents]           = useState<SwEvent[]>([]);
+  const [visitors, setVisitors]       = useState<Visitor[]>([]);
+  const [sessionStats, setSessionStats] = useState<SessionStat[]>([]);
+  const [evtFilter, setEvtFilter]     = useState("all");
+  const [evtSearch, setEvtSearch]     = useState("");
+  const [vSearch, setVSearch]         = useState("");
+  const [profileSearch, setProfileSearch] = useState("");
+  const [polling, setPolling]         = useState(false);
 
   const [emailFocus, setEmailFocus] = useState(false);
   const [keyFocus, setKeyFocus]     = useState(false);
@@ -79,14 +82,15 @@ export default function AdminPage({ onBack }: AdminPageProps) {
     setLoading(true); setError("");
     try {
       const headers = { "x-admin-key": adminKey.trim(), "x-admin-email": email.trim() };
-      const [statsRes, eventsRes, visitorsRes] = await Promise.all([
+      const [statsRes, eventsRes, visitorsRes, sessRes] = await Promise.all([
         fetch(`${BASE}/api/admin/stats`, { headers }),
         fetch(`${BASE}/api/admin/events?limit=200`, { headers }),
         fetch(`${BASE}/api/admin/visitors`, { headers }),
+        fetch(`${BASE}/api/admin/session-stats`, { headers }),
       ]);
       if (!statsRes.ok) { setError("Server rejected the request. Check the API server."); setLoading(false); return; }
-      const [s, ev, vis] = await Promise.all([statsRes.json(), eventsRes.json(), visitorsRes.json()]);
-      setStats(s); setEvents(ev.events ?? []); setVisitors(vis.visitors ?? []);
+      const [s, ev, vis, ss] = await Promise.all([statsRes.json(), eventsRes.json(), visitorsRes.json(), sessRes.json()]);
+      setStats(s); setEvents(ev.events ?? []); setVisitors(vis.visitors ?? []); setSessionStats(ss.sessions ?? []);
       setAuthed(true);
     } catch { setError("Network error — make sure the API server is running."); }
     setLoading(false);
@@ -97,11 +101,12 @@ export default function AdminPage({ onBack }: AdminPageProps) {
     setPolling(true);
     try {
       const headers = { "x-admin-key": adminKey.trim(), "x-admin-email": email.trim() };
-      const [s, ev] = await Promise.all([
+      const [s, ev, ss] = await Promise.all([
         fetch(`${BASE}/api/admin/stats`, { headers }).then(r => r.json()),
         fetch(`${BASE}/api/admin/events?limit=200`, { headers }).then(r => r.json()),
+        fetch(`${BASE}/api/admin/session-stats`, { headers }).then(r => r.json()),
       ]);
-      setStats(s); setEvents(ev.events ?? []);
+      setStats(s); setEvents(ev.events ?? []); setSessionStats(ss.sessions ?? []);
     } catch {}
     setPolling(false);
   }
@@ -217,9 +222,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: "0.25rem", marginLeft: "1.5rem" }}>
-          {(["overview", "events", "visitors"] as const).map(t => (
+          {(["overview", "events", "visitors", "profiles"] as const).map(t => (
             <button key={t} className="sw-tab" onClick={() => setTab(t)} style={{ padding: "0.3rem 0.9rem", borderRadius: "8px", border: `1px solid ${tab === t ? "rgba(168,85,247,0.4)" : "transparent"}`, background: tab === t ? "rgba(168,85,247,0.14)" : "transparent", color: tab === t ? "#C084FC" : "rgba(200,195,240,0.35)", fontFamily: "'Montserrat',sans-serif", fontSize: "0.58rem", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", cursor: "pointer", opacity: tab === t ? 1 : 0.7, transition: "all 0.2s" }}>
-              {t === "overview" ? "⬡ Overview" : t === "events" ? "◈ Interactions" : "◉ Users"}
+              {t === "overview" ? "⬡ Overview" : t === "events" ? "◈ Interactions" : t === "visitors" ? "◉ Users" : "◈ Profiles"}
             </button>
           ))}
         </div>
@@ -473,6 +478,115 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                 })
               )}
             </div>
+          </div>
+        )}
+
+        {/* ══ PROFILES TAB ══ */}
+        {tab === "profiles" && (
+          <div style={{ animation: "rise 0.4s cubic-bezier(0.23,1,0.32,1) both" }}>
+
+            {/* Summary cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0.75rem", marginBottom: "1.5rem" }}>
+              {[
+                { label: "Active Profiles", value: sessionStats.length.toString(), icon: "◉", accent: PURPLE, sub: "unique sessions" },
+                { label: "Stories Started", value: sessionStats.reduce((s,p)=>s+p.storiesStarted,0).toLocaleString(), icon: "📖", accent: GOLD, sub: "total across all sessions" },
+                { label: "Chapters Generated", value: sessionStats.reduce((s,p)=>s+p.chaptersGenerated,0).toLocaleString(), icon: "◆", accent: GREEN, sub: "including continuations" },
+                { label: "Words Generated", value: sessionStats.reduce((s,p)=>s+p.totalWords,0).toLocaleString(), icon: "✦", accent: PINK, sub: "tracked in real time" },
+              ].map((c,i) => (
+                <div key={c.label} style={{ background:"rgba(8,2,22,0.85)", border:"1px solid rgba(168,85,247,0.13)", borderRadius:"14px", padding:"1.1rem 1.2rem", position:"relative", overflow:"hidden", animation:`rise 0.4s ${i*0.06}s both` }}>
+                  <div style={{ position:"absolute", top:0, left:0, right:0, height:"2px", background:`linear-gradient(90deg,transparent,${c.accent}55,transparent)` }} />
+                  <div style={{ fontSize:"1rem", marginBottom:"0.5rem" }}>{c.icon}</div>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.7rem", fontWeight:900, color:c.accent, lineHeight:1, marginBottom:"0.25rem" }}>{c.value}</div>
+                  <div style={{ fontSize:"0.52rem", fontFamily:"'Montserrat',sans-serif", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"rgba(200,195,240,0.45)", marginBottom:"0.15rem" }}>{c.label}</div>
+                  <div style={{ fontSize:"0.55rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.22)" }}>{c.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Search */}
+            <div style={{ marginBottom:"1rem" }}>
+              <input value={profileSearch} onChange={e=>setProfileSearch(e.target.value)} placeholder="Search by session ID…"
+                style={{ width:"100%", background:"rgba(0,0,0,0.4)", border:"1px solid rgba(168,85,247,0.15)", borderRadius:"10px", padding:"0.65rem 1rem", color:"#EEE", fontFamily:"'Raleway',sans-serif", fontSize:"0.82rem", outline:"none", boxSizing:"border-box" }}
+                onFocus={e=>e.currentTarget.style.borderColor="rgba(168,85,247,0.4)"}
+                onBlur={e=>e.currentTarget.style.borderColor="rgba(168,85,247,0.15)"} />
+            </div>
+
+            {/* Table */}
+            <div style={{ background:"rgba(8,2,22,0.85)", border:"1px solid rgba(168,85,247,0.13)", borderRadius:"14px", overflow:"hidden" }}>
+              {/* Header */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 90px 90px 100px 110px 120px 120px", gap:"0", padding:"0.65rem 1.25rem", background:"rgba(168,85,247,0.06)", borderBottom:"1px solid rgba(168,85,247,0.1)" }}>
+                {["Session ID","Stories","Chapters","Words","Top Mode","First Seen","Last Active"].map(h => (
+                  <div key={h} style={{ fontSize:"0.48rem", fontFamily:"'Montserrat',sans-serif", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"rgba(192,132,252,0.4)" }}>{h}</div>
+                ))}
+              </div>
+
+              {sessionStats.length === 0 && (
+                <div style={{ padding:"2.5rem", textAlign:"center", fontSize:"0.75rem", color:"rgba(200,195,240,0.2)", fontFamily:"'Raleway',sans-serif" }}>
+                  No profiles yet — stories generate profile data automatically.
+                </div>
+              )}
+
+              {sessionStats
+                .filter(p => !profileSearch.trim() || p.sessionId.toLowerCase().includes(profileSearch.toLowerCase()))
+                .map((p, i) => {
+                  const topMode = Object.entries(p.modes).sort((a,b)=>b[1]-a[1])[0];
+                  const shareWidth = Math.round((p.storiesStarted / Math.max(1,sessionStats[0]?.storiesStarted)) * 100);
+                  return (
+                    <div key={p.sessionId} className="sw-row" style={{ display:"grid", gridTemplateColumns:"1fr 90px 90px 100px 110px 120px 120px", gap:"0", padding:"0.85rem 1.25rem", borderBottom:"1px solid rgba(168,85,247,0.05)", animation:`fadeRow 0.3s ${i*0.03}s both` }}>
+                      {/* Session ID */}
+                      <div style={{ display:"flex", flexDirection:"column", gap:"0.25rem" }}>
+                        <code style={{ fontSize:"0.65rem", fontFamily:"monospace", color:PURPLE, letterSpacing:"0.5px" }}>{p.sessionId}</code>
+                        <div style={{ height:"3px", borderRadius:"2px", background:"rgba(255,255,255,0.04)", width:"80px" }}>
+                          <div style={{ height:"100%", borderRadius:"2px", width:`${shareWidth}%`, background:`linear-gradient(90deg,${PURPLE}55,${PURPLE})` }} />
+                        </div>
+                      </div>
+                      {/* Stories started */}
+                      <div style={{ display:"flex", alignItems:"center" }}>
+                        <span style={{ fontFamily:"'Cinzel',serif", fontSize:"1.1rem", fontWeight:900, color: p.storiesStarted > 5 ? GOLD : "rgba(200,195,240,0.6)" }}>{p.storiesStarted}</span>
+                      </div>
+                      {/* Chapters */}
+                      <div style={{ display:"flex", alignItems:"center", gap:"0.3rem" }}>
+                        <span style={{ fontFamily:"'Cinzel',serif", fontSize:"1rem", fontWeight:700, color: p.chaptersGenerated > 10 ? GREEN : "rgba(200,195,240,0.5)" }}>{p.chaptersGenerated}</span>
+                        {p.chaptersGenerated > p.storiesStarted && <span style={{ fontSize:"0.45rem", fontFamily:"'Montserrat',sans-serif", color:"rgba(110,231,183,0.4)", letterSpacing:"1px" }}>+{p.chaptersGenerated-p.storiesStarted} cont.</span>}
+                      </div>
+                      {/* Word count */}
+                      <div style={{ display:"flex", flexDirection:"column", gap:"0.15rem", justifyContent:"center" }}>
+                        {p.totalWords > 0 ? (
+                          <>
+                            <span style={{ fontFamily:"'Cinzel',serif", fontSize:"0.95rem", fontWeight:700, color:PINK }}>{p.totalWords.toLocaleString()}</span>
+                            <span style={{ fontSize:"0.42rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.2)" }}>≈ {Math.round(p.totalWords/250)} min read</span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize:"0.6rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.15)" }}>—</span>
+                        )}
+                      </div>
+                      {/* Top mode */}
+                      <div style={{ display:"flex", alignItems:"center" }}>
+                        {topMode ? (
+                          <span style={{ fontSize:"0.6rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.45)", background:"rgba(168,85,247,0.07)", border:"1px solid rgba(168,85,247,0.12)", borderRadius:"6px", padding:"0.15rem 0.4rem" }}>
+                            {typeIcon(topMode[0])} {prettyType(topMode[0]).slice(0,12)}
+                          </span>
+                        ) : <span style={{ fontSize:"0.55rem", color:"rgba(200,195,240,0.15)" }}>—</span>}
+                      </div>
+                      {/* First seen */}
+                      <div style={{ display:"flex", flexDirection:"column", justifyContent:"center" }}>
+                        <span style={{ fontSize:"0.6rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.4)" }}>{fmtDate(p.firstSeen)}</span>
+                      </div>
+                      {/* Last active */}
+                      <div style={{ display:"flex", flexDirection:"column", justifyContent:"center" }}>
+                        <span style={{ fontSize:"0.6rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.55)" }}>{timeAgo(p.lastActivity)}</span>
+                        <span style={{ fontSize:"0.5rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.18)" }}>{fmtTime(p.lastActivity)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {sessionStats.length > 0 && (
+              <div style={{ textAlign:"right", fontSize:"0.52rem", fontFamily:"'Raleway',sans-serif", color:"rgba(200,195,240,0.18)", marginTop:"0.5rem", padding:"0 0.25rem" }}>
+                {sessionStats.length} profile{sessionStats.length !== 1 ? "s" : ""} · Word counts tracked from new stories; event counts backfilled from history
+              </div>
+            )}
           </div>
         )}
 
