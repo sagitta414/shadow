@@ -418,7 +418,6 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Weeks of Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", r: 124, g: 58, b: 237, accent: "#7C3AED", onClick: props.onSlowBurn, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", r: 14, g: 165, b: 233, accent: "#0EA5E9", onClick: props.onConfinedSpace, img: `${BASE}/heroes/mode-director.png` },
     { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "👤", title: "CIVILIAN CAPTURE", badge: "Custom Character · Build Her From Scratch", desc: "She's not a superhero. Build her appearance, outfit, background, and fears from scratch. A real person, completely real vulnerability.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onCivilianCapture, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   const studioTools = [
@@ -620,14 +619,14 @@ export default function Homepage(props: HomepageProps) {
           <HeroCard
             mobile={isMobile}
             title="CUSTOM SCENARIO"
-            desc="Build any premise from scratch. Your heroine, your captor, your rules. No filters. No limits. Pure dark narrative."
-            badge="Custom · No Limits"
-            tag="Infinite Possibilities"
-            stat="Infinite Scenarios"
-            accent="#34D399"
-            r={52} g={211} b={153}
-            onClick={props.onScenarioGenerator}
-            gradient="radial-gradient(ellipse at 50% 20%, rgba(0,90,70,0.88) 0%, rgba(0,35,30,0.93) 45%, rgba(2,4,12,0.98) 100%)"
+            desc="Build her from scratch — appearance, outfit, background, fears. Then build him. No filters, no presets, no limits."
+            badge="Custom Character · Build From Scratch"
+            tag="Fully Custom"
+            stat="Infinite Possibilities"
+            accent="#C084FC"
+            r={192} g={132} b={252}
+            onClick={props.onCivilianCapture}
+            gradient="radial-gradient(ellipse at 50% 20%, rgba(80,0,120,0.88) 0%, rgba(30,0,60,0.93) 45%, rgba(2,4,12,0.98) 100%)"
             imgSrc={`${BASE}/heroes/card-custom-scenario.png`}
           />
         </div>
