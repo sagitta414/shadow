@@ -3195,6 +3195,33 @@ router.post("/story/track-complete", (req, res) => {
   }
 });
 
+// ── CIVILIAN CAPTURE: AI portrait (lustify-sdxl) ────────────────────────────
+
+router.post("/story/civilian-portrait", async (req, res) => {
+  try {
+    const { appearanceDescription, name } = req.body as { appearanceDescription: string; name?: string };
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const subject = name?.trim() ? name.trim() : "a woman";
+    const rawPrompt = `Photorealistic portrait photograph of ${subject}. ${appearanceDescription.slice(0, 400)}. Natural studio lighting, sharp focus on face, 8k, cinematic, beautiful, elegant, realistic skin texture, professional photography.`;
+    const negativePrompt = "cartoon, anime, painting, drawing, sketch, watermark, text, logo, blurry, deformed, bad anatomy, ugly, nsfw explicit genitals, censored bar, mosaic";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt: rawPrompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 25, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) throw new Error(`Venice ${imgResp.status}`);
+    const json = await imgResp.json() as { images?: string[] };
+    if (!json.images?.[0]) throw new Error("No image returned");
+    res.json({ imageBase64: json.images[0] });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 // ── CIVILIAN CAPTURE: AI appearance generator ─────────────────────────────────
 
 router.post("/story/generate-appearance", async (req, res) => {

@@ -131,6 +131,10 @@ export default function CivilianCapture({ onBack }: Props) {
   const [outfitStyle, setOutfitStyle] = useState("");
   const [generatingAppearance, setGeneratingAppearance] = useState(false);
   const [appearanceError, setAppearanceError] = useState("");
+  const [portrait, setPortrait] = useState<string | null>(null);
+  const [generatingPortrait, setGeneratingPortrait] = useState(false);
+  const [portraitError, setPortraitError] = useState("");
+  const [storyLength, setStoryLength] = useState<"Quick Strike" | "Standard" | "Epic">("Standard");
 
   const [chapters, setChapters] = useState<string[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -162,8 +166,62 @@ export default function CivilianCapture({ onBack }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [streamText, chapters]);
 
+  // LocalStorage persistence — save and restore draft
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("cc_draft");
+      if (saved) {
+        const { p, c, oc, os, sl } = JSON.parse(saved);
+        if (p) setProfile(p);
+        if (c) setCaptor(c);
+        if (oc) setOutfitOccasion(oc);
+        if (os) setOutfitStyle(os);
+        if (sl) setStoryLength(sl);
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("cc_draft", JSON.stringify({ p: profile, c: captor, oc: outfitOccasion, os: outfitStyle, sl: storyLength })); } catch {}
+  }, [profile, captor, outfitOccasion, outfitStyle, storyLength]);
+
   function setP<K extends keyof Profile>(k: K, v: Profile[K]) { setProfile(p => ({ ...p, [k]: v })); }
   function setC<K extends keyof CaptorProfile>(k: K, v: CaptorProfile[K]) { setCaptor(c => ({ ...c, [k]: v })); }
+
+  function quickFill() {
+    const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+    setProfile({
+      name: "", age: pick(AGE_OPTIONS), build: pick(BUILD_OPTIONS), height: pick(HEIGHT_OPTIONS),
+      hairColor: pick(HAIR_COLORS), hairStyle: pick(HAIR_STYLES), eyeColor: pick(EYE_COLORS), skinTone: pick(SKIN_TONES),
+      extraFeatures: "", appearanceDescription: "",
+      outfit: "", outfitCondition: pick(OUTFIT_CONDITIONS),
+      occupation: pick(OCCUPATIONS), personality: pick(PERSONALITIES),
+      whyTaken: pick(WHY_TAKEN), greatestFear: pick(FEARS),
+      relationship: pick(RELATIONSHIPS), extraDetails: "",
+    });
+    const occ = pick(OUTFIT_OCCASIONS);
+    setOutfitOccasion(occ);
+    setOutfitStyle(pick(OUTFIT_BY_OCCASION[occ] ?? []));
+    setCaptor({
+      name: "", type: pick(CAPTOR_TYPES), motivation: pick(CAPTOR_MOTIVATIONS),
+      method: pick(CAPTOR_METHODS), location: pick(CAPTOR_LOCATIONS), appearance: "",
+    });
+    setPortrait(null);
+  }
+
+  async function generatePortrait() {
+    if (!profile.appearanceDescription.trim()) return;
+    setGeneratingPortrait(true); setPortraitError("");
+    try {
+      const res = await fetch(`${BASE}/api/story/civilian-portrait`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ appearanceDescription: profile.appearanceDescription, name: profile.name }),
+      });
+      const data = await res.json();
+      if (data.imageBase64) setPortrait(data.imageBase64);
+      else throw new Error(data.error || "No image");
+    } catch (e) { setPortraitError(e instanceof Error ? e.message : "Portrait failed"); }
+    finally { setGeneratingPortrait(false); }
+  }
 
   async function generateAppearance() {
     setGeneratingAppearance(true); setAppearanceError("");
@@ -187,7 +245,7 @@ export default function CivilianCapture({ onBack }: Props) {
       const full = await streamRequest("/api/story/civilian-capture", {
         profile: { ...profile, outfit: outfitFull },
         captor,
-        storyLength: "Standard",
+        storyLength,
       }, c => setStreamText(p => p + c));
       setChapters([full]); setStreamText("");
       void trackComplete(BASE, full.split(/\s+/).filter(Boolean).length, "civilian-capture", true);
@@ -236,12 +294,18 @@ export default function CivilianCapture({ onBack }: Props) {
 
   return (
     <div style={{ minHeight: "100vh", background: "rgba(4,0,10,0.98)", padding: step === 5 ? 0 : "1.5rem 1rem" }}>
-      <style>{`@keyframes cc-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} @keyframes cc-pulse{0%,100%{opacity:0.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes cc-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} @keyframes cc-pulse{0%,100%{opacity:0.6}50%{opacity:1}} @keyframes cc-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       {/* STEP 1–4: setup wizard */}
       {step < 5 && (
         <div style={{ maxWidth: "780px", margin: "0 auto" }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(200,195,215,0.3)", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: "0.7rem", letterSpacing: "1.5px", padding: 0, marginBottom: "1.5rem" }}>← BACK</button>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem" }}>
+            <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(200,195,215,0.3)", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: "0.7rem", letterSpacing: "1.5px", padding: 0 }}>← BACK</button>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button onClick={quickFill} style={{ padding: "0.4rem 1rem", background: `${ACCENT}14`, border: `1px solid ${ACCENT}33`, borderRadius: "20px", color: ACCENT, fontFamily: "'Montserrat',sans-serif", fontSize: "0.58rem", fontWeight: 700, letterSpacing: "2px", cursor: "pointer", transition: "all 0.2s" }} title="Randomly fill all fields">⚡ QUICK BUILD</button>
+              <button onClick={() => { setProfile(EMPTY_PROFILE); setCaptor(EMPTY_CAPTOR); setOutfitOccasion(""); setOutfitStyle(""); setPortrait(null); try { localStorage.removeItem("cc_draft"); } catch {} }} style={{ padding: "0.4rem 0.8rem", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", color: "rgba(200,195,215,0.25)", fontFamily: "'Montserrat',sans-serif", fontSize: "0.55rem", letterSpacing: "1.5px", cursor: "pointer" }}>↺ RESET</button>
+            </div>
+          </div>
 
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: "2rem" }}>
@@ -350,9 +414,44 @@ export default function CivilianCapture({ onBack }: Props) {
 
               <Card>
                 <SectionLabel>Her Appearance — Description</SectionLabel>
-                <TextArea value={profile.appearanceDescription} onChange={v => setP("appearanceDescription", v)} placeholder="Write or edit her appearance here… The AI will use this throughout the story to make her feel completely real." rows={5} />
+                <TextArea value={profile.appearanceDescription} onChange={v => { setP("appearanceDescription", v); setPortrait(null); }} placeholder="Write or edit her appearance here… The AI will use this throughout the story to make her feel completely real." rows={5} />
                 {profile.appearanceDescription.trim().length > 0 && <div style={{ marginTop: "0.5rem", fontSize: "0.58rem", color: `${ACCENT}88`, fontFamily: "'Raleway',sans-serif" }}>✓ Description ready — {profile.appearanceDescription.trim().length} characters</div>}
               </Card>
+
+              {/* Portrait */}
+              {profile.appearanceDescription.trim().length > 20 && (
+                <Card>
+                  <SectionLabel>AI Portrait (optional)</SectionLabel>
+                  <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+                    {portrait ? (
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <img src={`data:image/png;base64,${portrait}`} alt="Character portrait" style={{ width: "120px", height: "160px", objectFit: "cover", borderRadius: "10px", border: `1px solid ${ACCENT}33` }} />
+                        <button onClick={() => setPortrait(null)} style={{ position: "absolute", top: "4px", right: "4px", background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", color: "rgba(255,255,255,0.5)", fontSize: "0.55rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+                      </div>
+                    ) : (
+                      <div style={{ width: "120px", height: "160px", borderRadius: "10px", border: `1px dashed ${ACCENT}22`, background: "rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.4rem", flexShrink: 0 }}>
+                        {generatingPortrait ? (
+                          <>
+                            <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: `2px solid ${ACCENT}44`, borderTop: `2px solid ${ACCENT}`, animation: "cc-spin 1s linear infinite" }} />
+                            <span style={{ fontSize: "0.5rem", color: `${ACCENT}66`, fontFamily: "'Montserrat',sans-serif" }}>generating…</span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: "1.5rem", opacity: 0.2 }}>👤</span>
+                        )}
+                      </div>
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: "0.65rem", color: "rgba(200,195,215,0.35)", fontFamily: "'Raleway',sans-serif", lineHeight: 1.55, margin: "0 0 0.75rem" }}>
+                        Generate an AI portrait from her appearance description. Used in the story header and dossier. Takes ~15 seconds.
+                      </p>
+                      <button onClick={generatePortrait} disabled={generatingPortrait || !profile.appearanceDescription.trim()} style={{ padding: "0.55rem 1.2rem", background: portrait ? "rgba(0,0,0,0.3)" : `${ACCENT}18`, border: `1px solid ${portrait ? "rgba(255,255,255,0.08)" : `${ACCENT}44`}`, borderRadius: "10px", color: portrait ? "rgba(200,195,215,0.3)" : ACCENT, fontFamily: "'Cinzel',serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", cursor: "pointer", opacity: generatingPortrait ? 0.6 : 1 }}>
+                        {generatingPortrait ? "GENERATING…" : portrait ? "✓ REGENERATE" : "GENERATE PORTRAIT"}
+                      </button>
+                      {portraitError && <div style={{ marginTop: "0.5rem", fontSize: "0.6rem", color: "#F87171", fontFamily: "'Raleway',sans-serif" }}>{portraitError}</div>}
+                    </div>
+                  </div>
+                </Card>
+              )}
 
               <button onClick={() => setStep(2)} disabled={!canProceed1} style={{ width: "100%", padding: "0.9rem", background: canProceed1 ? `${ACCENT}22` : "rgba(0,0,0,0.3)", border: `1px solid ${canProceed1 ? `${ACCENT}55` : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", color: canProceed1 ? ACCENT : "rgba(200,195,215,0.2)", fontFamily: "'Cinzel',serif", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "3px", cursor: canProceed1 ? "pointer" : "not-allowed", transition: "all 0.2s" }}>
                 CONTINUE — HER OUTFIT →
@@ -454,6 +553,35 @@ export default function CivilianCapture({ onBack }: Props) {
           {/* ── STEP 4: CAPTOR ── */}
           {step === 4 && (
             <div style={{ animation: "cc-rise 0.4s ease both" }}>
+
+              {/* Her dossier review card */}
+              <div style={{ background: "rgba(0,0,0,0.55)", border: `1px solid ${ACCENT}20`, borderRadius: "14px", padding: "1.1rem 1.4rem", marginBottom: "1rem", display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+                {portrait && <img src={`data:image/png;base64,${portrait}`} alt="Portrait" style={{ width: "72px", height: "96px", objectFit: "cover", borderRadius: "8px", border: `1px solid ${ACCENT}33`, flexShrink: 0 }} />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "0.48rem", fontFamily: "'Cinzel',serif", color: ACCENT, letterSpacing: "3px", textTransform: "uppercase", marginBottom: "0.6rem" }}>Her Profile — Review</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.35rem 1.5rem" }}>
+                    {[
+                      { label: "Name", value: profile.name || "Unnamed" },
+                      { label: "Age", value: profile.age || "—" },
+                      { label: "Build", value: [profile.build, profile.height].filter(Boolean).join(", ") || "—" },
+                      { label: "Hair", value: [profile.hairColor, profile.hairStyle].filter(Boolean).join(", ") || "—" },
+                      { label: "Eyes", value: profile.eyeColor || "—" },
+                      { label: "Skin", value: profile.skinTone || "—" },
+                      { label: "Occupation", value: profile.occupation || "—" },
+                      { label: "Personality", value: profile.personality ? profile.personality.split("—")[0].trim() : "—" },
+                      { label: "Why taken", value: profile.whyTaken ? profile.whyTaken.split("—")[0].slice(0, 38) + "…" : "—" },
+                      { label: "Greatest fear", value: profile.greatestFear ? profile.greatestFear.split("—")[0].slice(0, 38) : "—" },
+                    ].map(({ label, value }) => (
+                      <div key={label} style={{ display: "flex", gap: "0.4rem", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "0.45rem", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, letterSpacing: "1.5px", color: `${ACCENT}55`, textTransform: "uppercase", whiteSpace: "nowrap" }}>{label}</span>
+                        <span style={{ fontSize: "0.62rem", fontFamily: "'Raleway',sans-serif", color: "rgba(200,195,215,0.55)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setStep(1)} style={{ marginTop: "0.75rem", padding: "0.25rem 0.75rem", background: "none", border: `1px solid ${ACCENT}22`, borderRadius: "20px", color: `${ACCENT}66`, fontFamily: "'Montserrat',sans-serif", fontSize: "0.5rem", letterSpacing: "1.5px", cursor: "pointer" }}>EDIT PROFILE</button>
+                </div>
+              </div>
+
               <Card accent={RED}>
                 <SectionLabel color={RED}>His Name (optional)</SectionLabel>
                 <TextInput value={captor.name} onChange={v => setC("name", v)} placeholder="Leave blank for 'he'…" />
@@ -492,6 +620,21 @@ export default function CivilianCapture({ onBack }: Props) {
                 <TextArea value={captor.appearance} onChange={v => setC("appearance", v)} placeholder="Physical description, how he carries himself, what she notices first about him…" rows={2} />
               </Card>
 
+              {/* Story length selector */}
+              <div style={{ marginBottom: "1rem", padding: "1rem 1.4rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "14px" }}>
+                <div style={{ fontSize: "0.48rem", fontFamily: "'Cinzel',serif", color: "rgba(200,195,215,0.35)", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.75rem" }}>Story Length</div>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {(["Quick Strike","Standard","Epic"] as const).map(l => (
+                    <button key={l} onClick={() => setStoryLength(l)} style={{ flex: 1, padding: "0.65rem 0.5rem", background: storyLength === l ? "rgba(220,38,38,0.15)" : "rgba(0,0,0,0.35)", border: `1px solid ${storyLength === l ? RED+"66" : "rgba(255,255,255,0.06)"}`, borderRadius: "10px", color: storyLength === l ? "#FCA5A5" : "rgba(200,195,215,0.3)", fontFamily: "'Cinzel',serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "1.5px", cursor: "pointer", transition: "all 0.2s" }}>
+                      {l === "Quick Strike" ? "⚡ Quick Strike" : l === "Standard" ? "◆ Standard" : "★ Epic"}
+                      <div style={{ fontSize: "0.42rem", fontFamily: "'Raleway',sans-serif", fontWeight: 400, marginTop: "0.2rem", color: storyLength === l ? "#FCA5A555" : "rgba(200,195,215,0.15)", letterSpacing: "0.5px" }}>
+                        {l === "Quick Strike" ? "3–4 paragraphs" : l === "Standard" ? "5–7 paragraphs" : "9–10 paragraphs"}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div style={{ display: "flex", gap: "0.75rem" }}>
                 <button onClick={() => setStep(3)} style={{ flex: "0 0 auto", padding: "0.9rem 1.5rem", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", color: "rgba(200,195,215,0.3)", fontFamily: "'Cinzel',serif", fontSize: "0.72rem", cursor: "pointer" }}>← BACK</button>
                 <button onClick={generateStory} disabled={!canProceed4} style={{ flex: 1, padding: "0.9rem", background: canProceed4 ? `linear-gradient(135deg, ${RED}cc, #7f1d1d)` : "rgba(0,0,0,0.3)", border: `1px solid ${canProceed4 ? RED : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", color: canProceed4 ? "#FFF5F5" : "rgba(200,195,215,0.2)", fontFamily: "'Cinzel',serif", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "3px", cursor: canProceed4 ? "pointer" : "not-allowed", transition: "all 0.2s", boxShadow: canProceed4 ? `0 8px 32px ${RED}33` : "none" }}>
@@ -508,12 +651,13 @@ export default function CivilianCapture({ onBack }: Props) {
         <div style={{ maxWidth: "860px", margin: "0 auto", padding: "1.5rem 1rem 4rem" }}>
           {/* Story header */}
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.75rem" }}>
-            <button onClick={() => setStep(4)} style={{ background: "none", border: "none", color: "rgba(200,195,215,0.3)", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: "0.65rem", letterSpacing: "1.5px", padding: 0 }}>← EDIT</button>
+            <button onClick={() => setStep(4)} style={{ background: "none", border: "none", color: "rgba(200,195,215,0.3)", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: "0.65rem", letterSpacing: "1.5px", padding: 0, flexShrink: 0 }}>← EDIT</button>
+            {portrait && <img src={`data:image/png;base64,${portrait}`} alt={profile.name || "Heroine"} style={{ width: "44px", height: "58px", objectFit: "cover", borderRadius: "7px", border: `1px solid ${ACCENT}33`, flexShrink: 0 }} />}
             <div style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontFamily: "'Cinzel',serif", fontSize: "0.8rem", color: ACCENT, letterSpacing: "3px", textTransform: "uppercase" }}>
                 {profile.name || "Her"} — {captor.name || "The Captor"}
               </div>
-              <div style={{ fontSize: "0.55rem", color: "rgba(200,195,215,0.2)", fontFamily: "'Raleway',sans-serif", marginTop: "0.2rem" }}>{captor.location}</div>
+              <div style={{ fontSize: "0.55rem", color: "rgba(200,195,215,0.2)", fontFamily: "'Raleway',sans-serif", marginTop: "0.2rem" }}>{[captor.location, storyLength !== "Standard" ? storyLength : ""].filter(Boolean).join(" · ")}</div>
             </div>
             <div style={{ padding: "0.2rem 0.6rem", borderRadius: "6px", background: "rgba(192,132,252,0.1)", border: `1px solid ${ACCENT}33`, fontSize: "0.48rem", fontFamily: "'Montserrat',sans-serif", color: ACCENT, letterSpacing: "1.5px" }}>CH. {chapters.length + (streaming ? 1 : 0)}</div>
           </div>
