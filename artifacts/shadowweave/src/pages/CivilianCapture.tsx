@@ -189,21 +189,40 @@ export default function CivilianCapture({ onBack }: Props) {
 
   function quickFill() {
     const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-    setProfile({
-      name: "", age: pick(AGE_OPTIONS), build: pick(BUILD_OPTIONS), height: pick(HEIGHT_OPTIONS),
-      hairColor: pick(HAIR_COLORS), hairStyle: pick(HAIR_STYLES), eyeColor: pick(EYE_COLORS), skinTone: pick(SKIN_TONES),
-      extraFeatures: "", appearanceDescription: "",
-      outfit: "", outfitCondition: pick(OUTFIT_CONDITIONS),
-      occupation: pick(OCCUPATIONS), personality: pick(PERSONALITIES),
-      whyTaken: pick(WHY_TAKEN), greatestFear: pick(FEARS),
-      relationship: pick(RELATIONSHIPS), extraDetails: "",
-    });
+    const age = pick(AGE_OPTIONS);
+    const build = pick(BUILD_OPTIONS);
+    const height = pick(HEIGHT_OPTIONS);
+    const hairColor = pick(HAIR_COLORS);
+    const hairStyle = pick(HAIR_STYLES);
+    const eyeColor = pick(EYE_COLORS);
+    const skinTone = pick(SKIN_TONES);
     const occ = pick(OUTFIT_OCCASIONS);
+    const outfitStylePicked = pick(OUTFIT_BY_OCCASION[occ] ?? ["Casual wear"]);
+    const occupation = pick(OCCUPATIONS);
+    const personality = pick(PERSONALITIES);
+    const whyTaken = pick(WHY_TAKEN);
+    const fear = pick(FEARS);
+    const relationship = pick(RELATIONSHIPS);
+    const captorType = pick(CAPTOR_TYPES);
+    const captorMotivation = pick(CAPTOR_MOTIVATIONS);
+    const captorMethod = pick(CAPTOR_METHODS);
+    const captorLocation = pick(CAPTOR_LOCATIONS);
+
+    // Build a baseline description so canProceed1 unlocks immediately
+    const desc = `A ${build.toLowerCase()} woman in her ${age} range. She stands ${height.toLowerCase()}, with ${hairStyle.toLowerCase()} ${hairColor.toLowerCase()} hair, ${eyeColor.toLowerCase()} eyes, and ${skinTone.toLowerCase()} skin. She works as a ${occupation.toLowerCase()}.`;
+
+    setProfile({
+      name: "", age, build, height, hairColor, hairStyle, eyeColor, skinTone,
+      extraFeatures: "", appearanceDescription: desc,
+      outfit: "", outfitCondition: pick(OUTFIT_CONDITIONS),
+      occupation, personality, whyTaken, greatestFear: fear,
+      relationship, extraDetails: "",
+    });
     setOutfitOccasion(occ);
-    setOutfitStyle(pick(OUTFIT_BY_OCCASION[occ] ?? []));
+    setOutfitStyle(outfitStylePicked);
     setCaptor({
-      name: "", type: pick(CAPTOR_TYPES), motivation: pick(CAPTOR_MOTIVATIONS),
-      method: pick(CAPTOR_METHODS), location: pick(CAPTOR_LOCATIONS), appearance: "",
+      name: "", type: captorType, motivation: captorMotivation,
+      method: captorMethod, location: captorLocation, appearance: "",
     });
     setPortrait(null);
   }
