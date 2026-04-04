@@ -82,16 +82,29 @@ const OUTFIT_BY_OCCASION: Record<string, string[]> = {
 };
 const OUTFIT_CONDITIONS = ["Pristine — exactly as she wore it","Slightly disheveled from the struggle","Torn / damaged during capture","Partially removed"];
 
-const OCCUPATIONS = ["Nurse / healthcare","Teacher","Lawyer","Journalist","Student","Waitress / hospitality","Office worker","Artist / designer","Police officer","Social worker","Personal trainer","Businesswoman","Doctor","Receptionist","Therapist / counsellor","Writer","Retail worker","Real estate agent","Flight attendant"];
-const PERSONALITIES = ["Shy and quiet — easy to intimidate","Feisty and defiant — fights back","Intelligent and calculating — always thinking","Warm and trusting — her kindness is a weakness","Cold and guarded — hard to reach","Anxious and fragile — breaks under pressure","Composed and strong — hides her fear well","Sweet and naive — unprepared for this"];
-const WHY_TAKEN = ["Wrong place, wrong time — random victim","She witnessed something she shouldn't have","He's been obsessed with her for a long time","Revenge — she hurt him, or someone he cared about","She has something he wants: information, access, leverage","Someone who knows her arranged this","She rejected him — this is his response","She owes him, or someone sent her as payment","She stumbled into his operation and knows too much"];
-const FEARS = ["Physical pain — she can't handle it","Public humiliation and exposure","Losing someone she loves because of this","Being completely powerless and helpless","The psychological breaking — losing herself","Isolation and not being found","What he'll do to her body","Never getting out","Being forced to comply and hating that she did"];
-const RELATIONSHIPS = ["Single, no one will miss her quickly","In a relationship — someone will notice","Married","Has children who need her","Close family who will search","Alone in the city, no one nearby","Just moved here — doesn't know many people"];
+const OCCUPATIONS = ["Nurse / healthcare","Teacher","Lawyer","Journalist","Student","Waitress / hospitality","Office worker","Artist / designer","Police officer","Social worker","Personal trainer","Businesswoman","Doctor","Receptionist","Therapist / counsellor","Writer","Retail worker","Real estate agent","Flight attendant","Bartender","Chef / restaurant","Actress / performer","Model","Banker / finance","Paramedic","Event planner","Photographer","Musician","Accountant","Marketing executive","University lecturer","Pharmacist","Veterinarian","Detective","Politician's aide","Influencer / content creator","Nanny / au pair","Scientist / researcher","PR manager","Interior designer"];
+const PERSONALITIES = ["Shy and quiet — easy to intimidate","Feisty and defiant — fights back","Intelligent and calculating — always thinking","Warm and trusting — her kindness is a weakness","Cold and guarded — hard to reach","Anxious and fragile — breaks under pressure","Composed and strong — hides her fear well","Sweet and naive — unprepared for this","Sarcastic and sharp-tongued — deflects with wit","Empathetic and perceptive — reads people well","Deeply loyal — would do anything for those she loves","Ambitious and driven — being here is the worst thing she can imagine","Quiet dignity — she won't beg, ever"];
+const WHY_TAKEN = ["Wrong place, wrong time — random victim","She witnessed something she shouldn't have","He's been obsessed with her for a long time","Revenge — she hurt him, or someone he cared about","She has something he wants: information, access, leverage","Someone who knows her arranged this","She rejected him — this is his response","She owes him, or someone sent her as payment","She stumbled into his operation and knows too much","She was investigating him and got too close","She left him and he couldn't accept it","She's collateral in a bigger game she knows nothing about","Mistaken identity — she was the wrong person","She's being used to control someone else who matters to him"];
+const FEARS = ["Physical pain — she can't handle it","Public humiliation and exposure","Losing someone she loves because of this","Being completely powerless and helpless","The psychological breaking — losing herself","Isolation and not being found","What he'll do to her body","Never getting out","Being forced to comply and hating that she did","Being forgotten — no one coming","That she'll eventually want to stay","Losing her mind before her body","That he already knows everything about her"];
+const RELATIONSHIPS = ["Single, no one will miss her quickly","In a relationship — someone will notice","Married","Has children who need her","Close family who will search","Alone in the city, no one nearby","Just moved here — doesn't know many people","Estranged from family — no one will look","Recently divorced — complicated situation","Best friend knows something is wrong"];
 
-const CAPTOR_TYPES = ["Complete stranger / opportunist","Obsessive stalker — has watched her for months","Ex-partner who couldn't let go","Professional — this is what he does","Connected to someone she knows","Debt enforcer sent by someone above","A man of means with no one to answer to","Part of an organisation"];
-const CAPTOR_MOTIVATIONS = ["Power and control — he needs this","To possess her specifically — obsession","Financial — ransom, or she has value","Revenge for something real or imagined","To break her spirit completely","She owes him and he's collecting","Sadistic pleasure in her fear","To make her need him eventually"];
-const CAPTOR_METHODS = ["Cold and methodical — planned this precisely","Psychologically sophisticated — words are his tools","Brutal directness — he doesn't pretend","Seductive and manipulative — almost gentle until he isn't","Unpredictable — she never knows what comes next","Controlled and patient — he has all the time in the world"];
-const CAPTOR_LOCATIONS = ["His private property — isolated, soundproofed","An abandoned industrial space","A vehicle — moving, no fixed point","Her own home — the most disorienting place","A purpose-built facility","A rented property with no neighbours","His office or workplace after hours","Multiple locations — she's moved regularly"];
+const CAPTOR_TYPES = ["Complete stranger / opportunist","Obsessive stalker — has watched her for months","Ex-partner who couldn't let go","Professional — this is what he does","Connected to someone she knows","Debt enforcer sent by someone above","A man of means with no one to answer to","Part of an organisation","Former client who became fixated","Corrupt authority figure — police or government","Someone she once helped — now exploiting that","A collector — she is not his first","Childhood connection turned dark","A twin or doppelganger — someone she trusted","Organised crime figure — this is business"];
+const CAPTOR_MOTIVATIONS = ["Power and control — he needs this","To possess her specifically — obsession","Financial — ransom, or she has value","Revenge for something real or imagined","To break her spirit completely","She owes him and he's collecting","Sadistic pleasure in her fear","To make her need him eventually","To replace someone he lost","To prove something to himself","She represents everything he wants and can't have","Political leverage — she's a bargaining chip","He genuinely believes this is love"];
+const CAPTOR_METHODS = ["Cold and methodical — planned this precisely","Psychologically sophisticated — words are his tools","Brutal directness — he doesn't pretend","Seductive and manipulative — almost gentle until he isn't","Unpredictable — she never knows what comes next","Controlled and patient — he has all the time in the world","Gaslighting — making her question her own perception","Alternating cruelty and kindness — keeping her off balance","Silent and watchful — his presence alone is the threat"];
+const CAPTOR_LOCATIONS = ["His private property — isolated, soundproofed","An abandoned industrial space","A vehicle — moving, no fixed point","Her own home — the most disorienting place","A purpose-built facility","A rented property with no neighbours","His office or workplace after hours","Multiple locations — she's moved regularly","A luxury penthouse — gilded cage","Underground — bunker or basement","A remote cabin with no roads nearby","A ship or boat — water in every direction","A foreign country — no contacts, no language","A room inside a functioning business","An institution — she looks like a patient"];
+
+const STORY_STARTS = [
+  { id: "at-capture",    label: "The Moment of Capture",    desc: "It begins as she's being taken — mid-struggle, mid-shock" },
+  { id: "just-after",   label: "Just After",                desc: "She's restrained, still processing what just happened" },
+  { id: "waking-up",    label: "She Wakes Up",              desc: "Consciousness returns — she doesn't know where she is" },
+  { id: "first-meeting",label: "First Face-to-Face",        desc: "He walks in for the first time — she sees who has her" },
+  { id: "hours-in",     label: "Hours In",                  desc: "The initial shock has passed — reality is setting in" },
+  { id: "mid-transport",label: "Mid-Transport",             desc: "She's being moved — destination unknown" },
+  { id: "days-in",      label: "Days Later",                desc: "She's had time to think, to plan, to begin to break" },
+  { id: "escape-fail",  label: "A Failed Escape Attempt",   desc: "She tried. It didn't work. Now there are consequences" },
+  { id: "negotiation",  label: "A Negotiation",             desc: "He comes to her with terms — she has to decide how to play it" },
+  { id: "visitor",      label: "An Unexpected Visitor",     desc: "Someone else enters the picture — ally, threat, or both" },
+];
 
 async function trackComplete(base: string, wordCount: number, mode: string, isFirst: boolean) {
   try {
@@ -134,7 +147,11 @@ export default function CivilianCapture({ onBack }: Props) {
   const [portrait, setPortrait] = useState<string | null>(null);
   const [generatingPortrait, setGeneratingPortrait] = useState(false);
   const [portraitError, setPortraitError] = useState("");
+  const [outfitImage, setOutfitImage] = useState<string | null>(null);
+  const [generatingOutfitImage, setGeneratingOutfitImage] = useState(false);
+  const [outfitImageError, setOutfitImageError] = useState("");
   const [storyLength, setStoryLength] = useState<"Quick Strike" | "Standard" | "Epic">("Standard");
+  const [storyStart, setStoryStart] = useState("just-after");
 
   const [chapters, setChapters] = useState<string[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -171,18 +188,19 @@ export default function CivilianCapture({ onBack }: Props) {
     try {
       const saved = localStorage.getItem("cc_draft");
       if (saved) {
-        const { p, c, oc, os, sl } = JSON.parse(saved);
+        const { p, c, oc, os, sl, ss } = JSON.parse(saved);
         if (p) setProfile(p);
         if (c) setCaptor(c);
         if (oc) setOutfitOccasion(oc);
         if (os) setOutfitStyle(os);
         if (sl) setStoryLength(sl);
+        if (ss) setStoryStart(ss);
       }
     } catch {}
   }, []);
   useEffect(() => {
-    try { localStorage.setItem("cc_draft", JSON.stringify({ p: profile, c: captor, oc: outfitOccasion, os: outfitStyle, sl: storyLength })); } catch {}
-  }, [profile, captor, outfitOccasion, outfitStyle, storyLength]);
+    try { localStorage.setItem("cc_draft", JSON.stringify({ p: profile, c: captor, oc: outfitOccasion, os: outfitStyle, sl: storyLength, ss: storyStart })); } catch {}
+  }, [profile, captor, outfitOccasion, outfitStyle, storyLength, storyStart]);
 
   function setP<K extends keyof Profile>(k: K, v: Profile[K]) { setProfile(p => ({ ...p, [k]: v })); }
   function setC<K extends keyof CaptorProfile>(k: K, v: CaptorProfile[K]) { setCaptor(c => ({ ...c, [k]: v })); }
@@ -225,6 +243,24 @@ export default function CivilianCapture({ onBack }: Props) {
       method: captorMethod, location: captorLocation, appearance: "",
     });
     setPortrait(null);
+    setOutfitImage(null);
+    setStoryStart(pick(STORY_STARTS.map(s => s.id)));
+  }
+
+  async function generateOutfitImage() {
+    const outfitDesc = outfitStyle || profile.outfit;
+    if (!outfitDesc.trim()) return;
+    setGeneratingOutfitImage(true); setOutfitImageError("");
+    try {
+      const res = await fetch(`${BASE}/api/story/civilian-outfit-image`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ outfitDescription: outfitDesc, appearanceDescription: profile.appearanceDescription, occasion: outfitOccasion }),
+      });
+      const data = await res.json();
+      if (data.imageBase64) setOutfitImage(data.imageBase64);
+      else throw new Error(data.error || "No image");
+    } catch (e) { setOutfitImageError(e instanceof Error ? e.message : "Failed"); }
+    finally { setGeneratingOutfitImage(false); }
   }
 
   async function generatePortrait() {
@@ -261,10 +297,12 @@ export default function CivilianCapture({ onBack }: Props) {
     setStep(5); setStreaming(true); setStreamText(""); setChapters([]); setError(""); setPsycheLog([]);
     try {
       const outfitFull = [outfitStyle || profile.outfit, profile.outfitCondition].filter(Boolean).join(" — ");
+      const startLabel = STORY_STARTS.find(s => s.id === storyStart)?.label ?? "Just After";
       const full = await streamRequest("/api/story/civilian-capture", {
         profile: { ...profile, outfit: outfitFull },
         captor,
         storyLength,
+        storyStart: startLabel,
       }, c => setStreamText(p => p + c));
       setChapters([full]); setStreamText("");
       void trackComplete(BASE, full.split(/\s+/).filter(Boolean).length, "civilian-capture", true);
@@ -490,15 +528,50 @@ export default function CivilianCapture({ onBack }: Props) {
                   <>
                     <SectionLabel color="rgba(200,195,215,0.4)">What was she wearing?</SectionLabel>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginBottom: "0.75rem" }}>
-                      {(OUTFIT_BY_OCCASION[outfitOccasion] || []).map(o => <Pill key={o} label={o} active={outfitStyle === o} onClick={() => setOutfitStyle(o)} />)}
+                      {(OUTFIT_BY_OCCASION[outfitOccasion] || []).map(o => <Pill key={o} label={o} active={outfitStyle === o} onClick={() => { setOutfitStyle(o); setOutfitImage(null); }} />)}
                     </div>
                   </>
                 )}
                 <div style={{ marginTop: "0.75rem" }}>
                   <div style={{ fontSize: "0.5rem", color: "rgba(200,195,215,0.25)", fontFamily: "'Montserrat',sans-serif", letterSpacing: "1.5px", marginBottom: "0.4rem" }}>OR DESCRIBE EXACTLY</div>
-                  <TextInput value={profile.outfit} onChange={v => setP("outfit", v)} placeholder="e.g. Dark jeans, a white silk blouse, nude heels. Office-appropriate but fitted." />
+                  <TextInput value={profile.outfit} onChange={v => { setP("outfit", v); setOutfitImage(null); }} placeholder="e.g. Dark jeans, a white silk blouse, nude heels. Office-appropriate but fitted." />
                 </div>
               </Card>
+
+              {/* Outfit Image */}
+              {(outfitStyle || profile.outfit).trim().length > 0 && (
+                <Card>
+                  <SectionLabel>AI Outfit Image (optional)</SectionLabel>
+                  <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+                    {outfitImage ? (
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <img src={`data:image/png;base64,${outfitImage}`} alt="Outfit" style={{ width: "120px", height: "160px", objectFit: "cover", borderRadius: "10px", border: `1px solid ${ACCENT}33` }} />
+                        <button onClick={() => setOutfitImage(null)} style={{ position: "absolute", top: "4px", right: "4px", background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer", color: "rgba(255,255,255,0.5)", fontSize: "0.55rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+                      </div>
+                    ) : (
+                      <div style={{ width: "120px", height: "160px", borderRadius: "10px", border: `1px dashed ${ACCENT}22`, background: "rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.4rem", flexShrink: 0 }}>
+                        {generatingOutfitImage ? (
+                          <>
+                            <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: `2px solid ${ACCENT}44`, borderTop: `2px solid ${ACCENT}`, animation: "cc-spin 1s linear infinite" }} />
+                            <span style={{ fontSize: "0.5rem", color: `${ACCENT}66`, fontFamily: "'Montserrat',sans-serif" }}>generating…</span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: "1.5rem", opacity: 0.2 }}>👗</span>
+                        )}
+                      </div>
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: "0.65rem", color: "rgba(200,195,215,0.35)", fontFamily: "'Raleway',sans-serif", lineHeight: 1.55, margin: "0 0 0.75rem" }}>
+                        Generate a full-body AI image showing exactly what she's wearing when taken. Takes ~15 seconds.
+                      </p>
+                      <button onClick={generateOutfitImage} disabled={generatingOutfitImage} style={{ padding: "0.55rem 1.2rem", background: outfitImage ? "rgba(0,0,0,0.3)" : `${ACCENT}18`, border: `1px solid ${outfitImage ? "rgba(255,255,255,0.08)" : `${ACCENT}44`}`, borderRadius: "10px", color: outfitImage ? "rgba(200,195,215,0.3)" : ACCENT, fontFamily: "'Cinzel',serif", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "2px", cursor: "pointer", opacity: generatingOutfitImage ? 0.6 : 1 }}>
+                        {generatingOutfitImage ? "GENERATING…" : outfitImage ? "✓ REGENERATE" : "GENERATE OUTFIT IMAGE"}
+                      </button>
+                      {outfitImageError && <div style={{ marginTop: "0.5rem", fontSize: "0.6rem", color: "#F87171", fontFamily: "'Raleway',sans-serif" }}>{outfitImageError}</div>}
+                    </div>
+                  </div>
+                </Card>
+              )}
 
               <Card>
                 <SectionLabel>Condition of her clothing</SectionLabel>
@@ -638,6 +711,22 @@ export default function CivilianCapture({ onBack }: Props) {
                 <SectionLabel color={RED}>What Does He Look Like? (optional)</SectionLabel>
                 <TextArea value={captor.appearance} onChange={v => setC("appearance", v)} placeholder="Physical description, how he carries himself, what she notices first about him…" rows={2} />
               </Card>
+
+              {/* Story start selector */}
+              <div style={{ marginBottom: "1rem", padding: "1rem 1.4rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "14px" }}>
+                <div style={{ fontSize: "0.48rem", fontFamily: "'Cinzel',serif", color: "rgba(200,195,215,0.35)", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.75rem" }}>Where Does the Story Begin?</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                  {STORY_STARTS.map(s => (
+                    <button key={s.id} onClick={() => setStoryStart(s.id)} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.65rem 1rem", background: storyStart === s.id ? "rgba(192,132,252,0.12)" : "rgba(0,0,0,0.3)", border: `1px solid ${storyStart === s.id ? `${ACCENT}55` : "rgba(255,255,255,0.05)"}`, borderRadius: "10px", cursor: "pointer", transition: "all 0.2s", textAlign: "left" }}>
+                      <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: storyStart === s.id ? ACCENT : "rgba(255,255,255,0.1)", flexShrink: 0, transition: "all 0.2s" }} />
+                      <div>
+                        <div style={{ fontSize: "0.68rem", fontFamily: "'Cinzel',serif", fontWeight: 700, color: storyStart === s.id ? ACCENT : "rgba(200,195,215,0.4)", letterSpacing: "1px" }}>{s.label}</div>
+                        <div style={{ fontSize: "0.6rem", fontFamily: "'Raleway',sans-serif", color: storyStart === s.id ? "rgba(200,195,215,0.45)" : "rgba(200,195,215,0.2)", marginTop: "0.15rem" }}>{s.desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Story length selector */}
               <div style={{ marginBottom: "1rem", padding: "1rem 1.4rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "14px" }}>

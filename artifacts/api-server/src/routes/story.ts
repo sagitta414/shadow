@@ -3195,6 +3195,33 @@ router.post("/story/track-complete", (req, res) => {
   }
 });
 
+// ── CIVILIAN CAPTURE: AI outfit image (lustify-sdxl) ─────────────────────────
+
+router.post("/story/civilian-outfit-image", async (req, res) => {
+  try {
+    const { outfitDescription, appearanceDescription, occasion } = req.body as { outfitDescription: string; appearanceDescription?: string; occasion?: string };
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const appearancePart = appearanceDescription?.slice(0, 200) ?? "an attractive woman";
+    const prompt = `Full body photograph of ${appearancePart}, wearing ${outfitDescription}. ${occasion ? `She was ${occasion.toLowerCase()}.` : ""} High fashion photography, studio lighting, sharp detail, elegant composition, photorealistic, 8k.`;
+    const negativePrompt = "cartoon, anime, painting, watermark, text, blurry, deformed, bad anatomy, ugly, cropped head, missing body";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 25, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) throw new Error(`Venice ${imgResp.status}`);
+    const json = await imgResp.json() as { images?: string[] };
+    if (!json.images?.[0]) throw new Error("No image returned");
+    res.json({ imageBase64: json.images[0] });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 // ── CIVILIAN CAPTURE: AI portrait (lustify-sdxl) ────────────────────────────
 
 router.post("/story/civilian-portrait", async (req, res) => {
@@ -3272,7 +3299,7 @@ CORE DIRECTIVES:
 
 router.post("/story/civilian-capture", async (req, res) => {
   try {
-    const { profile, captor, setting, storyLength } = req.body as {
+    const { profile, captor, setting, storyLength, storyStart } = req.body as {
       profile: {
         name?: string; age?: string; appearanceDescription: string;
         outfit: string; occupation: string; personality: string;
@@ -3285,11 +3312,26 @@ router.post("/story/civilian-capture", async (req, res) => {
       };
       setting?: string;
       storyLength?: string;
+      storyStart?: string;
     };
 
     const lengthGuide = storyLength === "Quick Strike" ? "3–4 paragraphs" : storyLength === "Epic" ? "9–10 paragraphs" : "5–7 paragraphs";
     const herName = profile.name?.trim() || "She";
     const captorName = captor.name?.trim() || "He";
+
+    const startingPointMap: Record<string, string> = {
+      "The Moment of Capture": "Begin at the exact moment she is being taken — the ambush, the shock, the physical struggle.",
+      "Just After": "Begin immediately after she has been captured — restrained, disoriented, still processing what just happened to her.",
+      "She Wakes Up": "Begin as she regains consciousness in an unfamiliar place, not knowing where she is, how she got here, or how much time has passed.",
+      "First Face-to-Face": "Begin at the moment he walks in and she sees him for the first time — she finally has a face to put to her captivity.",
+      "Hours In": "Begin hours after the capture — the shock has worn off, reality is sinking in, and the fear is becoming something harder and more specific.",
+      "Mid-Transport": "Begin while she is being moved — in a vehicle or container, uncertain of her destination, unable to act.",
+      "Days Later": "Begin several days into her captivity — she has had time to think, to grieve, to study him. The dynamic has begun to form.",
+      "A Failed Escape Attempt": "Begin immediately after she tried to escape and was caught — she failed, and now there are consequences.",
+      "A Negotiation": "Begin with him coming to her with a proposition or demand — she must decide how to respond, what she is willing to do.",
+      "An Unexpected Visitor": "Begin with the arrival of someone unexpected — a third party who complicates everything: ally, threat, or something in between.",
+    };
+    const startInstruction = storyStart ? (startingPointMap[storyStart] ?? `Begin at: ${storyStart}.`) : "Open at the moment she realises where she is and what is happening.";
 
     const profileBlock = [
       `HER NAME: ${herName}`,
@@ -3320,7 +3362,7 @@ ${profileBlock}
 ${captorBlock}
 ${setting ? `\nSETTING DETAILS: ${setting}` : ""}
 
-Open at the moment she realises where she is and what is happening. Use her exact appearance and outfit. Make her completely real — a specific person, not a type. Ground every sensation in physical reality. The captor's presence, his specific interest in HER, should be palpable from the first line.`;
+${startInstruction} Use her exact appearance and outfit. Make her completely real — a specific person, not a type. Ground every sensation in physical reality. The captor's presence, his specific interest in HER, should be palpable from the first line.`;
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
