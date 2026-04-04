@@ -104,6 +104,8 @@ export default function SlowBurnMode() {
             setChapters(prev => [...prev, full]);
             setGenerating(false);
             setStep("reading");
+            setShowChoices(true);
+            fetchChoices(full.slice(-1200));
             updateDossier(full);
           } else if (payload.chunk) {
             full += payload.chunk;
@@ -138,10 +140,11 @@ export default function SlowBurnMode() {
     } finally { setGenningImg(false); }
   }
 
-  async function fetchChoices() {
+  async function fetchChoices(excerpt?: string) {
     setLoadingChoices(true); setChoices(null);
     try {
-      const resp = await fetch(`${BASE}/api/story/branch-choices`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ heroine, villain, setting, storyExcerpt: chapters[chapters.length-1]?.slice(-1200) ?? story.slice(-1200) }) });
+      const text = excerpt ?? chapters[chapters.length-1]?.slice(-1200) ?? story.slice(-1200);
+      const resp = await fetch(`${BASE}/api/story/branch-choices`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ heroine, villain, setting, storyExcerpt: text }) });
       const json = await resp.json();
       if (json.choices) setChoices(json.choices);
     } catch { setChoices([]) } finally { setLoadingChoices(false); }
@@ -259,7 +262,7 @@ export default function SlowBurnMode() {
             {/* Actions */}
             {!generating && (
               <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap" }}>
-                <button onClick={() => { const next = !showChoices; setShowChoices(next); if (next && !choices && !loadingChoices) fetchChoices(); }} style={{ flex:1, padding:"0.6rem", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:"10px", color:"rgba(200,195,215,0.4)", fontFamily:"'Cinzel',serif", fontSize:"0.5rem", cursor:"pointer", letterSpacing:"1px" }}>⟁ CHOICES</button>
+                <button onClick={() => { const next = !showChoices; setShowChoices(next); if (next && !choices && !loadingChoices) fetchChoices(); }} style={{ flex:1, padding:"0.6rem", background: showChoices ? `${COLOR}18` : "rgba(255,255,255,0.02)", border: showChoices ? `1px solid ${COLOR}55` : "1px solid rgba(255,255,255,0.06)", borderRadius:"10px", color: showChoices ? COLOR : "rgba(200,195,215,0.4)", fontFamily:"'Cinzel',serif", fontSize:"0.5rem", cursor:"pointer", letterSpacing:"1px", transition:"all 0.2s" }}>⟁ {showChoices ? "HIDE CHOICES" : "CHOICES"}</button>
                 <button onClick={() => continueStory()} style={{ flex:2, padding:"0.7rem", background:`linear-gradient(135deg, ${COLOR}22, ${COLOR}0a)`, border:`1px solid ${COLOR}44`, borderRadius:"10px", color:COLOR, fontFamily:"'Cinzel',serif", fontSize:"0.65rem", letterSpacing:"3px", cursor:"pointer", fontWeight:700 }}>▶ DAY {dayNumber + 1}</button>
                 <button onClick={generateCoverArt} disabled={genningImg} style={{ flex:1, padding:"0.6rem", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:"10px", color:"rgba(200,195,215,0.35)", fontFamily:"'Cinzel',serif", fontSize:"0.48rem", cursor:"pointer" }}>{genningImg ? "…" : "🎨 ART"}</button>
                 <button onClick={() => setShowDebrief(true)} style={{ flex:1, padding:"0.6rem", background:"rgba(255,0,0,0.04)", border:"1px solid rgba(200,0,0,0.2)", borderRadius:"10px", color:"rgba(200,80,80,0.7)", fontFamily:"'Cinzel',serif", fontSize:"0.48rem", cursor:"pointer", letterSpacing:"1px" }}>📂 DEBRIEF</button>

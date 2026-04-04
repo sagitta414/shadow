@@ -174,7 +174,7 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
   const [showIntro, setShowIntro] = useState(false);
   const [pendingRegenerate, setPendingRegenerate] = useState(false);
   const [showCinematic, setShowCinematic] = useState(false);
-  const [liveChoices, setLiveChoices] = useState(false);
+  const [liveChoices, setLiveChoices] = useState(true);
   const [choices, setChoices] = useState<Array<{ label: string; description: string }> | null>(null);
   const [loadingChoices, setLoadingChoices] = useState(false);
   const [coverImage, setCoverImage] = useState<string | null>(null);
