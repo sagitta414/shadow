@@ -52,6 +52,7 @@ interface HomepageProps {
   onDirectorMode: () => void;
   onEscapeAttempt: () => void;
   onNegotiationRoom: () => void;
+  onFactionMode: () => void;
   onHeroineImageGen: () => void;
 }
 
@@ -409,6 +410,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
     { icon: "🏃", title: "ESCAPE ATTEMPT", badge: "Turn-Based · 8 Beats", desc: "One shot. You choose every action — the AI plays out the brutal consequences. Escape or be recaptured.", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onEscapeAttempt, img: `${BASE}/heroes/mode-escape-attempt.png` },
     { icon: "🤝", title: "NEGOTIATION ROOM", badge: "Psych · Turn-Based Chat", desc: "No restraints. Just words. The villain wants something — and he's very good at getting it. You play her.", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onNegotiationRoom, img: `${BASE}/heroes/mode-negotiation-room.png` },
+    { icon: "⚔️", title: "FACTION WAR", badge: "5 Factions · Dark Alliance", desc: "Avengers vs HYDRA. Justice League vs Gotham Rogues. The Guild vs the Sith. Pick two factions and write the conflict.", r: 200, g: 168, b: 75, accent: "#C8A830", onClick: props.onFactionMode, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   const studioTools = [

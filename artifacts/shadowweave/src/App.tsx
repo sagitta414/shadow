@@ -44,6 +44,7 @@ import DreamSequenceMode from "./pages/DreamSequenceMode";
 import DirectorMode from "./pages/DirectorMode";
 import EscapeAttemptMode from "./pages/EscapeAttemptMode";
 import NegotiationRoomMode from "./pages/NegotiationRoomMode";
+import FactionMode from "./pages/FactionMode";
 import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
@@ -114,6 +115,7 @@ type Page =
   | "director-mode"
   | "escape-attempt"
   | "negotiation-room"
+  | "faction-mode"
   | "heroine-image-gen"
   | "admin";
 
@@ -126,7 +128,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "showcase","public-property","betting-pool","villain-team-up",
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
-  "director-mode","escape-attempt","negotiation-room",
+  "director-mode","escape-attempt","negotiation-room","faction-mode",
 ]);
 
 function BackgroundEffects() {
@@ -323,6 +325,7 @@ function AppInner() {
           onDirectorMode={() => navigate("director-mode")}
           onEscapeAttempt={() => navigate("escape-attempt")}
           onNegotiationRoom={() => navigate("negotiation-room")}
+          onFactionMode={() => navigate("faction-mode")}
           onHeroineImageGen={() => navigate("heroine-image-gen")}
         />
       )}
@@ -553,6 +556,9 @@ function AppInner() {
       )}
       {page === "negotiation-room" && (
         <NegotiationRoomMode onBack={() => navigate("home")} />
+      )}
+      {page === "faction-mode" && (
+        <FactionMode onBack={() => navigate("home")} />
       )}
       {page === "heroine-image-gen" && (
         <HeroineImageGen onBack={() => navigate("home")} />

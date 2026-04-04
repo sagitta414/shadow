@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { getAiProvider } from "../lib/aiProvider";
 import { saveStoryToArchive } from "../lib/archive";
 import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
+import StoryIntro from "../components/StoryIntro";
+import CinematicReader from "../components/CinematicReader";
+import StoryChoices from "../components/StoryChoices";
 import {
   getDailyEntryForToday,
   getDailyEntryForDate,
@@ -150,6 +153,15 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
   const bottomRef = useRef<HTMLDivElement>(null);
   const hasGenerated = useRef(false);
 
+  const [showIntro, setShowIntro] = useState(false);
+  const [pendingRegenerate, setPendingRegenerate] = useState(false);
+  const [showCinematic, setShowCinematic] = useState(false);
+  const [liveChoices, setLiveChoices] = useState(false);
+  const [choices, setChoices] = useState<Array<{ label: string; description: string }> | null>(null);
+  const [loadingChoices, setLoadingChoices] = useState(false);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [generatingCover, setGeneratingCover] = useState(false);
+
   const fullStory = chapters.join("\n\n---\n\n");
 
   useEffect(() => {
@@ -210,6 +222,7 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
         story: full,
       });
       setAlreadySaved(true);
+      if (liveChoices) fetchBranchChoices(full);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed");
     } finally {
@@ -254,6 +267,46 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
         title,
         story: newChapters.join("\n\n---\n\n"),
       });
+      if (liveChoices) fetchBranchChoices(full);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Continuation failed");
+    } finally {
+      setContinuing(false);
+      setStreamingText("");
+    }
+  }
+
+  async function continueWithChoice(choiceLabel: string, choiceDesc: string) {
+    setChoices(null);
+    const direction = `${choiceLabel}: ${choiceDesc}`;
+    setContinueDir(direction);
+    if (!fullStory) return;
+    setContinuing(true);
+    setStreamingText("");
+    setError("");
+    let accumulated = "";
+    try {
+      const full = await streamRequest(
+        "/api/story/daily-continue",
+        {
+          previousStory: fullStory,
+          chapterNumber: chapters.length + 1,
+          heroine: `${heroine.name} — ${heroine.power}`,
+          villain, setting,
+          continueDirection: direction,
+        },
+        (c) => { accumulated += c; setStreamingText(accumulated); }
+      );
+      const newChapters = [...chapters, full];
+      setChapters(newChapters);
+      setContinueDir("");
+      saveDailyEntry({
+        dateKey: effectiveDateKey, date: today,
+        heroine: heroine.name, heroineColor: heroine.color,
+        villain, setting, title,
+        story: newChapters.join("\n\n---\n\n"),
+      });
+      if (liveChoices) fetchBranchChoices(full);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Continuation failed");
     } finally {
@@ -274,11 +327,77 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
     setSavedId(id);
   }
 
+  async function fetchBranchChoices(text: string) {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setLoadingChoices(true); setChoices(null);
+    try {
+      const resp = await fetch(`${base}/api/story/branch-choices`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storyExcerpt: text, heroine: heroine.name, villain, setting }),
+      });
+      const json = await resp.json();
+      setChoices(json.choices ?? null);
+    } catch { setChoices(null); }
+    finally { setLoadingChoices(false); }
+  }
+
+  async function generateCoverArt() {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setGeneratingCover(true);
+    try {
+      const resp = await fetch(`${base}/api/story/generate-scene-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          heroine: heroine.name,
+          sceneDescription: `${villain} has captured ${heroine.name} in ${setting}`,
+          shotLabel: "Full Shot", mood: "Dark & Cinematic",
+          styleLabel: "Hyperrealistic digital art", width: 512, height: 768,
+        }),
+      });
+      const json = await resp.json();
+      if (json.imageBase64) setCoverImage(json.imageBase64);
+    } finally { setGeneratingCover(false); }
+  }
+
   const isBusy = loading || continuing;
   const displayParagraphs = (text: string) => text.split(/\n+/).filter(Boolean);
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem 1.5rem", minHeight: "100vh" }}>
+
+      {/* Cinematic intro overlay */}
+      {showIntro && (
+        <StoryIntro
+          title={title}
+          heroineName={heroine.name}
+          heroineColor={heroine.color}
+          villain={villain}
+          setting={setting}
+          universe="Daily Dark Scenario"
+          onComplete={() => {
+            setShowIntro(false);
+            if (pendingRegenerate) {
+              setPendingRegenerate(false);
+              hasGenerated.current = false;
+              generate();
+            }
+          }}
+        />
+      )}
+
+      {/* Cinematic reader overlay */}
+      {showCinematic && fullStory && (
+        <CinematicReader
+          story={fullStory}
+          title={title}
+          heroineName={heroine.name}
+          heroineColor={heroine.color}
+          villain={villain}
+          onExit={() => setShowCinematic(false)}
+        />
+      )}
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
@@ -402,26 +521,68 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
 
       {/* Action bar */}
       {fullStory && (
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
-          {alreadySaved && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.5rem 1rem", background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(0,200,80,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
-              ✓ Saved to Chronicle
-            </div>
-          )}
-          {!savedId ? (
-            <button onClick={saveToMainArchive} style={{ padding: "0.6rem 1.5rem", background: "rgba(200,168,75,0.1)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "8px", color: "rgba(200,168,75,0.8)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.18)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.6)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.3)"; }}>
-              ◈ Save to Archive
+        <div style={{ marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+            {alreadySaved && (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.5rem 1rem", background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(0,200,80,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>
+                ✓ Saved to Chronicle
+              </div>
+            )}
+            {!savedId ? (
+              <button onClick={saveToMainArchive} style={{ padding: "0.6rem 1.5rem", background: "rgba(200,168,75,0.1)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "8px", color: "rgba(200,168,75,0.8)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.18)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.6)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.1)"; e.currentTarget.style.borderColor = "rgba(200,168,75,0.3)"; }}>
+                ◈ Save to Archive
+              </button>
+            ) : (
+              <div style={{ padding: "0.5rem 1rem", background: "rgba(0,100,200,0.08)", border: "1px solid rgba(0,100,200,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(100,180,255,0.7)", fontFamily: "'Montserrat', sans-serif" }}>
+                ✓ Saved to Archive
+              </div>
+            )}
+            <button onClick={() => setShowCinematic(true)} style={{ padding: "0.6rem 1.1rem", background: "rgba(200,168,75,0.08)", border: "1px solid rgba(200,168,75,0.25)", borderRadius: "8px", color: "rgba(200,168,75,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.15)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,168,75,0.08)"; }}>
+              📖 Cinematic
             </button>
-          ) : (
-            <div style={{ padding: "0.5rem 1rem", background: "rgba(0,100,200,0.08)", border: "1px solid rgba(0,100,200,0.2)", borderRadius: "8px", fontSize: "0.65rem", color: "rgba(100,180,255,0.7)", fontFamily: "'Montserrat', sans-serif" }}>
-              ✓ Saved to Archive
+            <button onClick={generateCoverArt} disabled={generatingCover} style={{ padding: "0.6rem 1.1rem", background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: "8px", color: generatingCover ? "rgba(168,85,247,0.35)" : "rgba(168,85,247,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: generatingCover ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
+              {generatingCover ? "🎨 Generating…" : "🎨 Cover Art"}
+            </button>
+            <button onClick={() => { setShowIntro(true); setPendingRegenerate(true); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
+              ⚡ Regenerate
+            </button>
+          </div>
+
+          {/* Live Choices toggle */}
+          <label style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem", cursor: "pointer" }}>
+            <div onClick={() => setLiveChoices(!liveChoices)} style={{ width: "30px", height: "16px", borderRadius: "8px", background: liveChoices ? "rgba(200,168,75,0.4)" : "rgba(255,255,255,0.08)", border: `1px solid ${liveChoices ? "rgba(200,168,75,0.6)" : "rgba(255,255,255,0.1)"}`, position: "relative", transition: "all 0.2s", cursor: "pointer" }}>
+              <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: liveChoices ? "#C8A830" : "rgba(200,200,220,0.3)", position: "absolute", top: "1px", left: liveChoices ? "15px" : "1px", transition: "all 0.2s" }} />
+            </div>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.52rem", color: "rgba(200,195,220,0.55)", letterSpacing: "1px" }}>Live Choice Prompts</span>
+            <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: "0.42rem", color: "rgba(200,195,220,0.3)" }}>— AI offers 3 branches after each chapter</span>
+          </label>
+
+          {/* Cover image */}
+          {coverImage && (
+            <div style={{ marginTop: "1rem" }}>
+              <img src={`data:image/jpeg;base64,${coverImage}`} alt="Story cover" style={{ maxWidth: "220px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", display: "block" }} />
             </div>
           )}
-          <button onClick={() => { hasGenerated.current = false; generate(); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
-            ⚡ Regenerate
-          </button>
+        </div>
+      )}
+
+      {/* Branch choices */}
+      {choices && !isBusy && (
+        <StoryChoices
+          choices={choices}
+          loading={loadingChoices}
+          heroineColor={heroine.color}
+          onChoose={(c) => continueWithChoice(c.label, c.description)}
+          onSkip={() => { setChoices(null); }}
+        />
+      )}
+      {loadingChoices && (
+        <div style={{ textAlign: "center", padding: "1.5rem", fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "4px", color: "rgba(200,168,75,0.4)", animation: "pulse 1.2s infinite" }}>
+          Generating choices…
         </div>
       )}
 
