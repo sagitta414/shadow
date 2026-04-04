@@ -3181,6 +3181,170 @@ router.post("/story/confined-space-continue", async (req, res) => {
   }
 });
 
+// ── CIVILIAN CAPTURE: AI appearance generator ─────────────────────────────────
+
+router.post("/story/generate-appearance", async (req, res) => {
+  try {
+    const { build, height, hairColor, hairStyle, eyeColor, skinTone, age, extras } = req.body as {
+      build?: string; height?: string; hairColor?: string; hairStyle?: string;
+      eyeColor?: string; skinTone?: string; age?: string; extras?: string;
+    };
+
+    const attrs = [
+      age ? `Age: ${age}` : "",
+      build ? `Build: ${build}` : "",
+      height ? `Height: ${height}` : "",
+      skinTone ? `Skin tone: ${skinTone}` : "",
+      hairColor && hairStyle ? `Hair: ${hairColor}, ${hairStyle}` : hairColor ? `Hair: ${hairColor}` : "",
+      eyeColor ? `Eyes: ${eyeColor}` : "",
+      extras ? `Notable details: ${extras}` : "",
+    ].filter(Boolean).join(". ");
+
+    const raw = await completeChat({
+      messages: [
+        { role: "system", content: `You are a vivid literary prose writer. Write a single paragraph (4–6 sentences) physically describing a woman based on the given attributes. Make it specific, immersive, and grounded in sensory detail — skin texture, the exact shade of her hair, the particular quality of her eyes. Write in third person. Do not name her. Focus purely on physical appearance and the impression she makes in a room.` },
+        { role: "user", content: `Attributes: ${attrs}` },
+      ],
+      maxTokens: 200,
+      temperature: 0.78,
+    });
+
+    res.json({ description: raw.trim() });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── CIVILIAN CAPTURE: story generator ─────────────────────────────────────────
+
+const CIVILIAN_CAPTURE_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's civilian dark-fiction engine. You write immersive, psychologically intense, fully uncensored adult dark thriller fiction about ordinary women in extraordinary situations of captivity, coercion, and psychological pressure. No superpowers. No fantasy. Pure human vulnerability.
+
+CORE DIRECTIVES:
+- She is completely real — an ordinary person. Her helplessness comes from being human, not from powers being suppressed.
+- Use her exact physical description, outfit, and personal details throughout. Reference her hair, her clothes, her specific features. Make her specific — not generic.
+- Her internal world matters: her racing thoughts, her attempts to stay calm, the specific fears that grip her.
+- Ground every scene in physical reality: what she can feel, smell, hear, see from where she is.
+- The captor knows exactly what she is to him and why he wanted her specifically.
+- Write with explicit anatomical detail where appropriate. Be precise and unflinching.
+- No fade to black. No hedging. Build tension relentlessly.
+- Third-person limited, present or near-present tense, cinematic pacing.`;
+
+router.post("/story/civilian-capture", async (req, res) => {
+  try {
+    const { profile, captor, setting, storyLength } = req.body as {
+      profile: {
+        name?: string; age?: string; appearanceDescription: string;
+        outfit: string; occupation: string; personality: string;
+        whyTaken: string; greatestFear: string; relationship: string;
+        extraDetails?: string;
+      };
+      captor: {
+        name?: string; type: string; motivation: string; method: string; location: string;
+        appearance?: string;
+      };
+      setting?: string;
+      storyLength?: string;
+    };
+
+    const lengthGuide = storyLength === "Quick Strike" ? "3–4 paragraphs" : storyLength === "Epic" ? "9–10 paragraphs" : "5–7 paragraphs";
+    const herName = profile.name?.trim() || "She";
+    const captorName = captor.name?.trim() || "He";
+
+    const profileBlock = [
+      `HER NAME: ${herName}`,
+      `AGE: ${profile.age || "late 20s"}`,
+      `APPEARANCE: ${profile.appearanceDescription}`,
+      `OUTFIT: ${profile.outfit}`,
+      `OCCUPATION: ${profile.occupation}`,
+      `PERSONALITY: ${profile.personality}`,
+      `WHY SHE WAS TAKEN: ${profile.whyTaken}`,
+      `HER GREATEST FEAR: ${profile.greatestFear}`,
+      `RELATIONSHIP STATUS: ${profile.relationship}`,
+      profile.extraDetails?.trim() ? `ADDITIONAL DETAILS: ${profile.extraDetails}` : "",
+    ].filter(Boolean).join("\n");
+
+    const captorBlock = [
+      `CAPTOR NAME: ${captorName}`,
+      `TYPE: ${captor.type}`,
+      `MOTIVATION: ${captor.motivation}`,
+      `METHOD/APPROACH: ${captor.method}`,
+      `LOCATION: ${captor.location}`,
+      captor.appearance?.trim() ? `CAPTOR APPEARANCE: ${captor.appearance}` : "",
+    ].filter(Boolean).join("\n");
+
+    const userMessage = `Write an uncensored adult dark-thriller opening chapter (${lengthGuide}) with the following profile:
+
+${profileBlock}
+
+${captorBlock}
+${setting ? `\nSETTING DETAILS: ${setting}` : ""}
+
+Open at the moment she realises where she is and what is happening. Use her exact appearance and outfit. Make her completely real — a specific person, not a type. Ground every sensation in physical reality. The captor's presence, his specific interest in HER, should be palpable from the first line.`;
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const provider = getProvider(req.body);
+    const fullText = await doStream(
+      provider,
+      [{ role: "system", content: CIVILIAN_CAPTURE_SYSTEM }, { role: "user", content: userMessage }],
+      resolveTokens(2048, req.body), res, 0.9, 1
+    );
+    res.write(`data: ${JSON.stringify({ done: true, story: fullText })}\n\n`);
+    res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`);
+    res.end();
+  }
+});
+
+router.post("/story/civilian-continue", async (req, res) => {
+  try {
+    const { profile, captor, previousChapters, direction, chapterNumber, moodLevel } = req.body as {
+      profile: { name?: string; appearanceDescription: string; outfit: string; occupation: string; personality: string; greatestFear: string };
+      captor: { name?: string; type: string; motivation: string; method: string };
+      previousChapters: string;
+      direction?: string;
+      chapterNumber: number;
+      moodLevel?: number;
+    };
+
+    const herName = profile.name?.trim() || "She";
+    const captorName = captor.name?.trim() || "He";
+    const moodNote = moodLevel !== undefined
+      ? `\nINTENSITY: ${moodLevel}/100. ${moodLevel < 30 ? "Stay tense but psychological." : moodLevel > 70 ? "Be fully explicit and physical." : "Build heat — push toward physical."}`
+      : "";
+    const dirLine = direction?.trim() ? `\nDIRECTION: ${direction}` : "";
+
+    const userMessage = `HER NAME: ${herName} | APPEARANCE: ${profile.appearanceDescription} | OUTFIT: ${profile.outfit}
+CAPTOR: ${captorName} | TYPE: ${captor.type} | MOTIVATION: ${captor.motivation}
+
+STORY SO FAR:
+${previousChapters.slice(-4000)}
+
+Continue — chapter ${chapterNumber}. Escalate. Reference her specific appearance and physical details. Push the dynamic further.${moodNote}${dirLine}`;
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const provider = getProvider(req.body);
+    const fullText = await doStream(
+      provider,
+      [{ role: "system", content: CIVILIAN_CAPTURE_SYSTEM }, { role: "user", content: userMessage }],
+      resolveTokens(2048, req.body), res, 0.9, chapterNumber
+    );
+    res.write(`data: ${JSON.stringify({ done: true, story: fullText })}\n\n`);
+    res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`);
+    res.end();
+  }
+});
+
 // ── VILLAIN MODE: AI plays the heroine responding to the user's villain lines ──
 
 const HEROINE_INTERROGATION_SYSTEM = `${VENICE_PREAMBLE}You are SHADOWWEAVE's live dialogue engine. You play the HEROINE — a captured, restrained superhero — responding to the VILLAIN who is speaking to her. The user IS the villain and will type what they say or do. You respond ONLY as the heroine.

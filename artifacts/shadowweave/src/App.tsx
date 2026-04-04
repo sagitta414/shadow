@@ -48,6 +48,7 @@ import FactionMode from "./pages/FactionMode";
 import SlowBurnMode from "./pages/SlowBurnMode";
 import ConfinedSpaceMode from "./pages/ConfinedSpaceMode";
 import VillainInterrogation from "./pages/VillainInterrogation";
+import CivilianCapture from "./pages/CivilianCapture";
 import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
@@ -122,6 +123,7 @@ type Page =
   | "slow-burn"
   | "confined-space"
   | "villain-interrogation"
+  | "civilian-capture"
   | "heroine-image-gen"
   | "admin";
 
@@ -135,7 +137,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
   "director-mode","escape-attempt","negotiation-room","faction-mode",
-  "slow-burn","confined-space","villain-interrogation",
+  "slow-burn","confined-space","villain-interrogation","civilian-capture",
 ]);
 
 function BackgroundEffects() {
@@ -337,6 +339,7 @@ function AppInner() {
           onSlowBurn={() => navigate("slow-burn")}
           onConfinedSpace={() => navigate("confined-space")}
           onVillainInterrogation={() => navigate("villain-interrogation")}
+          onCivilianCapture={() => navigate("civilian-capture")}
         />
       )}
 
@@ -581,6 +584,10 @@ function AppInner() {
 
       {page === "villain-interrogation" && (
         <VillainInterrogation onBack={() => navigate("home")} />
+      )}
+
+      {page === "civilian-capture" && (
+        <CivilianCapture onBack={() => navigate("home")} />
       )}
 
       {page === "heroine-image-gen" && (
