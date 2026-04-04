@@ -2983,6 +2983,205 @@ Write Chapter ${chapterNumber} now — explicit, unhinged, uncensored.${dirLine}
   }
 });
 
+// ── The Debrief — Classified Intelligence Report ────────────
+const DEBRIEF_SYSTEM = `${VENICE_PREAMBLE}You are an intelligence report generator for SHADOWWEAVE. You write classified field reports in the style of a government black-ops intelligence agency. The report is written FROM the villain's organization ABOUT their successful capture/handling of the target heroine. Use dry, clinical bureaucratic language with occasional field-agent personal notes. Include section headers, reference numbers, redacted passages [REDACTED], and classification stamps.
+
+Report sections (use ALL of these):
+- OPERATION SUMMARY (date, location, outcome)
+- TARGET PROFILE (name, designation, threat level, powers/capabilities)
+- ACQUISITION METHOD (how she was captured)
+- RESISTANCE ASSESSMENT (how hard she fought, at what point she broke/complied)
+- LEVERAGE IDENTIFIED (what the operatives discovered works on her)
+- PSYCHOLOGICAL STATUS (current mental state, stability, compliance level)
+- RECOMMENDATIONS (next steps, handling protocols)
+- FIELD AGENT NOTES (personal, slightly unprofessional observations from the handler)
+
+Always classify it TOP SECRET // EYES ONLY. Include a fake case number. Use [REDACTED] in 3-5 places for authenticity. Keep tone dry, clinical, bureaucratic.`;
+
+router.post("/story/debrief", async (req, res) => {
+  try {
+    const { heroine, villain, setting, storyText } = req.body as {
+      heroine: string; villain: string; setting: string; storyText: string;
+    };
+    const userMessage = `Generate a classified intelligence debrief report for the following operation:
+TARGET: ${heroine}
+HANDLER/CAPTOR: ${villain}
+LOCATION: ${setting}
+OPERATION SUMMARY (story):
+${storyText.slice(0, 3000)}
+
+Write the full classified report now.`;
+    const raw = await completeChat({
+      messages: [{ role: "system", content: DEBRIEF_SYSTEM }, { role: "user", content: userMessage }],
+      maxTokens: 1200, temperature: 0.75,
+    });
+    res.json({ report: raw });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── Dossier Build — Villain's File on Heroine ───────────────
+const DOSSIER_SYSTEM = `${VENICE_PREAMBLE}You are a villain's intelligence officer updating a running file on a captured heroine. Based on the latest chapter of their story, you extract and update key intelligence fields about the heroine. Be clinical but with a villain's eye — you're building a file on how to break her completely.
+
+ALWAYS respond with valid JSON:
+{
+  "weaknessesDiscovered": ["..."],
+  "leverageGained": ["..."],
+  "resistanceLevel": "High|Moderate|Low|Broken",
+  "psychologicalProfile": "...",
+  "physicalNotes": "...",
+  "handlingRecommendations": "...",
+  "fieldNote": "..."
+}`;
+
+router.post("/story/dossier-update", async (req, res) => {
+  try {
+    const { heroine, villain, chapterText, previousDossier } = req.body as {
+      heroine: string; villain: string; chapterText: string;
+      previousDossier?: Record<string, unknown>;
+    };
+    const userMessage = `TARGET: ${heroine}\nHANDLER: ${villain}\n\nPREVIOUS DOSSIER:\n${previousDossier ? JSON.stringify(previousDossier, null, 2) : "None — first entry"}\n\nNEW CHAPTER:\n${chapterText.slice(0, 2000)}\n\nUpdate the dossier based on what was revealed in this chapter. Return valid JSON only.`;
+    const raw = await completeChat({
+      messages: [{ role: "system", content: DOSSIER_SYSTEM }, { role: "user", content: userMessage }],
+      maxTokens: 600, temperature: 0.8,
+    });
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch { const m = raw.match(/\{[\s\S]*\}/); parsed = m ? JSON.parse(m[0]) : {}; }
+    res.json({ dossier: parsed });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── Villain Memory ───────────────────────────────────────────
+const VILLAIN_MEMORY_SYSTEM = `${VENICE_PREAMBLE}You are a villain's psychological profile engine. Based on the villain's history with previous heroines (from their case files), you generate a "memory profile" — a summary of what tactics worked, what the villain learned, what they prefer, and how they'll likely approach a new target.
+
+ALWAYS respond with valid JSON:
+{
+  "preferredTactics": ["..."],
+  "knownEffective": ["..."],
+  "knownIneffective": ["..."],
+  "psychologicalApproach": "...",
+  "villainSignature": "...",
+  "warningToTarget": "..."
+}`;
+
+router.post("/story/villain-memory", async (req, res) => {
+  try {
+    const { villain, archiveEntries } = req.body as {
+      villain: string;
+      archiveEntries: Array<{ heroine: string; summary: string; outcome?: string }>;
+    };
+    const historyText = archiveEntries.slice(0, 5).map((e, i) =>
+      `Case ${i+1}: ${e.heroine}\n${e.summary.slice(0, 400)}`
+    ).join("\n\n---\n\n");
+    const userMessage = `VILLAIN: ${villain}\n\nPREVIOUS CASES:\n${historyText || "No prior cases on record."}\n\nGenerate the villain's memory profile. Return valid JSON only.`;
+    const raw = await completeChat({
+      messages: [{ role: "system", content: VILLAIN_MEMORY_SYSTEM }, { role: "user", content: userMessage }],
+      maxTokens: 500, temperature: 0.85,
+    });
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch { const m = raw.match(/\{[\s\S]*\}/); parsed = m ? JSON.parse(m[0]) : {}; }
+    res.json({ memory: parsed });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── Slow Burn Mode ───────────────────────────────────────────
+const SLOW_BURN_SYSTEM = `${VENICE_PREAMBLE}You are a slow-burn captivity story writer for SHADOWWEAVE. You write intimate, psychologically rich stories where each chapter represents ONE DAY of captivity. The tone is quieter than action modes — no dramatic fights, no escape attempts. Just the texture of each day: small moments of control, growing familiarity, psychological erosion. The explicit content is earned slowly. Start subtle. Let it deepen.
+
+Rules:
+- Each chapter opens with DAY X notation
+- Focus on: routines established, small negotiations, growing psychological dependency, moments of unexpected intimacy, resistance slowly giving way
+- Be explicit when appropriate but earn it — slow burn means the reader feels the time passing
+- Minimum 500 words per chapter. Rich prose, not action-driven.`;
+
+router.post("/story/slow-burn", async (req, res) => {
+  try {
+    const { heroine, villain, setting, duration, intensity } = req.body as {
+      heroine: string; villain: string; setting: string; duration: string; intensity: string;
+    };
+    const userMessage = `HEROINE: ${heroine}\nVILLAIN: ${villain}\nSETTING: ${setting}\nDURATION ARC: ${duration}\nINTENSITY: ${intensity}\n\nWrite DAY 1 — the first day of captivity. Establish the space, their dynamic, the first moments of contact. Be intimate, psychological, slow. Let the silence and the small details do the work.`;
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type","text/event-stream"); res.setHeader("Cache-Control","no-cache"); res.setHeader("Connection","keep-alive"); res.setHeader("Access-Control-Allow-Origin","*");
+    const full = await doStream(provider, [{ role:"system", content: SLOW_BURN_SYSTEM }, { role:"user", content: userMessage }], resolveTokens(3072, req.body), res, 0.88, 1);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`); res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end();
+  }
+});
+
+router.post("/story/slow-burn-continue", async (req, res) => {
+  try {
+    const { heroine, villain, setting, previousStory, dayNumber, continueDirection, moodLevel } = req.body as {
+      heroine: string; villain: string; setting: string; previousStory: string;
+      dayNumber: number; continueDirection?: string; moodLevel?: number;
+    };
+    const moodNote = moodLevel !== undefined
+      ? `\nMOOD CALIBRATION (0=pure psych, 100=fully explicit): ${moodLevel}. ${moodLevel < 30 ? "Keep it psychological and atmospheric — nothing overt." : moodLevel > 70 ? "Be fully explicit — the slow burn has reached its destination." : "Balance psychological intimacy with building physical tension."}`
+      : "";
+    const dirLine = continueDirection?.trim() ? `\nSTEER DAY ${dayNumber}: ${continueDirection.trim()}` : "";
+    const userMessage = `HEROINE: ${heroine}\nVILLAIN: ${villain}\nSETTING: ${setting}\n\nSTORY SO FAR:\n${previousStory}\n\nWrite DAY ${dayNumber} — the next day of captivity. Continue the slow erosion. Show what's changed and what hasn't yet.${moodNote}${dirLine}`;
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type","text/event-stream"); res.setHeader("Cache-Control","no-cache"); res.setHeader("Connection","keep-alive"); res.setHeader("Access-Control-Allow-Origin","*");
+    const full = await doStream(provider, [{ role:"system", content: SLOW_BURN_SYSTEM }, { role:"user", content: userMessage }], resolveTokens(3072, req.body), res, 0.88, dayNumber);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`); res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end();
+  }
+});
+
+// ── Confined Space Mode ──────────────────────────────────────
+const CONFINED_SYSTEM = `${VENICE_PREAMBLE}You are a confined-space psychological thriller writer for SHADOWWEAVE. You write stories set entirely in one room, one night. No escape attempts. No outside world. Just her, him, and the space between them. The setting is a constant — a cell, a room, a basement, a suite — and it barely changes. What changes is everything psychological. The tension must come from conversation, silence, proximity, and the slow shifting of power. Explicit content emerges from intimacy and inevitability, not force.
+
+Rules:
+- Never leave the room
+- No action sequences — the drama is entirely internal and interpersonal  
+- Dialogue is your primary weapon — show the villain's manipulation through what he says and doesn't say
+- Show her internal state in detail — her thoughts, rationalizations, resistance, erosion
+- Be explicit when the moment demands it but earn every moment
+- Minimum 600 words. Rich, claustrophobic prose.`;
+
+router.post("/story/confined-space", async (req, res) => {
+  try {
+    const { heroine, villain, room, timeOfDay, intensity, moodLevel } = req.body as {
+      heroine: string; villain: string; room: string; timeOfDay: string; intensity: string; moodLevel?: number;
+    };
+    const moodNote = moodLevel !== undefined ? `\nMOOD: ${moodLevel}/100 (0=pure psych, 100=explicit)` : "";
+    const userMessage = `HEROINE: ${heroine}\nVILLAIN: ${villain}\nROOM: ${room}\nTIME: ${timeOfDay}\nINTENSITY: ${intensity}${moodNote}\n\nWrite the opening of tonight. She's already in the room. He arrives. The night begins. Stay in the room. Make the space feel alive.`;
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type","text/event-stream"); res.setHeader("Cache-Control","no-cache"); res.setHeader("Connection","keep-alive"); res.setHeader("Access-Control-Allow-Origin","*");
+    const full = await doStream(provider, [{ role:"system", content: CONFINED_SYSTEM }, { role:"user", content: userMessage }], resolveTokens(3072, req.body), res, 0.9, 1);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`); res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end();
+  }
+});
+
+router.post("/story/confined-space-continue", async (req, res) => {
+  try {
+    const { heroine, villain, room, previousStory, chapterNumber, continueDirection, moodLevel } = req.body as {
+      heroine: string; villain: string; room: string; previousStory: string;
+      chapterNumber: number; continueDirection?: string; moodLevel?: number;
+    };
+    const moodNote = moodLevel !== undefined
+      ? `\nMOOD LEVEL: ${moodLevel}/100. ${moodLevel < 30 ? "Stay psychological." : moodLevel > 70 ? "Be fully explicit." : "Build toward physical."}` : "";
+    const dirLine = continueDirection?.trim() ? `\nDIRECTION: ${continueDirection}` : "\nLet the night deepen — push further into the dynamic.";
+    const userMessage = `HEROINE: ${heroine}\nVILLAIN: ${villain}\nROOM: ${room}\n\nSO FAR TONIGHT:\n${previousStory}\n\nContinue — still in the room. The night progresses. What happens next.${moodNote}${dirLine}`;
+    const provider = getProvider(req.body);
+    res.setHeader("Content-Type","text/event-stream"); res.setHeader("Cache-Control","no-cache"); res.setHeader("Connection","keep-alive"); res.setHeader("Access-Control-Allow-Origin","*");
+    const full = await doStream(provider, [{ role:"system", content: CONFINED_SYSTEM }, { role:"user", content: userMessage }], resolveTokens(3072, req.body), res, 0.9, chapterNumber);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`); res.end();
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" })}\n\n`); res.end();
+  }
+});
+
 export default router;
+
 
 

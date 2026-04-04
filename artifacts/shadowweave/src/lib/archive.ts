@@ -45,9 +45,48 @@ export function saveStoryToArchive(
   return id;
 }
 
+// Alias for consistency across new mode pages
+export const saveToArchive = saveStoryToArchive;
+
 export function updateArchiveStory(id: string, patch: Partial<ArchivedStory>) {
   const stories = getArchive().map((s) => (s.id === id ? { ...s, ...patch } : s));
   localStorage.setItem(KEY, JSON.stringify(stories));
+}
+
+// Heroine Resistance Score — compute across all archived stories featuring a heroine
+export interface HeroineResistanceScore {
+  totalStories: number;
+  resistEvents: number;
+  brokenEvents: number;
+  bargainEvents: number;
+  submitEvents: number;
+  dominantOutcome: "Fighter" | "Negotiator" | "Submitted" | "Broken" | "Unknown";
+  resistanceRating: number; // 0-100, higher = more resistant overall
+}
+
+export function getHeroineResistanceScore(heroineName: string): HeroineResistanceScore {
+  const name = heroineName.toLowerCase();
+  const stories = getArchive().filter(s =>
+    s.characters.some(c => c.toLowerCase().includes(name) || name.includes(c.toLowerCase()))
+  );
+  let resistEvents = 0, brokenEvents = 0, bargainEvents = 0, submitEvents = 0;
+  for (const story of stories) {
+    const text = story.chapters.join(" ").toLowerCase();
+    resistEvents += (text.match(/\b(resist|fought|defiant|defi|struggle|refused|won't|wouldn't|pushes? back|breaks? free|not giving|never submit|holds? firm)\b/g) ?? []).length;
+    brokenEvents += (text.match(/\b(broken|shatter|completely broken|utterly broken|spirit broken|breaks? completely|no longer resists?|stopped fighting|gave up|finally broke|all resistance gone)\b/g) ?? []).length;
+    bargainEvents += (text.match(/\b(bargain|negotiate|deal|if you|please|promise|let me go|trade|exchange|terms?)\b/g) ?? []).length;
+    submitEvents += (text.match(/\b(submitted?|surrender|yields?|complies?|obeyed?|relented?|gave in|gave way|accepts? his|accepts? the|does as|does what)\b/g) ?? []).length;
+  }
+  const total = resistEvents + brokenEvents + bargainEvents + submitEvents || 1;
+  const resistanceRating = Math.min(100, Math.round((resistEvents * 100 + bargainEvents * 60 - submitEvents * 40 - brokenEvents * 80) / total + 50));
+  let dominantOutcome: HeroineResistanceScore["dominantOutcome"] = "Unknown";
+  const max = Math.max(resistEvents, brokenEvents, bargainEvents, submitEvents);
+  if (max === 0) dominantOutcome = "Unknown";
+  else if (max === resistEvents) dominantOutcome = "Fighter";
+  else if (max === bargainEvents) dominantOutcome = "Negotiator";
+  else if (max === submitEvents) dominantOutcome = "Submitted";
+  else dominantOutcome = "Broken";
+  return { totalStories: stories.length, resistEvents, brokenEvents, bargainEvents, submitEvents, dominantOutcome, resistanceRating: Math.max(0, Math.min(100, resistanceRating)) };
 }
 
 export function deleteArchiveStory(id: string) {

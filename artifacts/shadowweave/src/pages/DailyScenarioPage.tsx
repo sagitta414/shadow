@@ -5,6 +5,10 @@ import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 import StoryIntro from "../components/StoryIntro";
 import CinematicReader from "../components/CinematicReader";
 import StoryChoices from "../components/StoryChoices";
+import MoodDial from "../components/MoodDial";
+import StoryDebrief from "../components/StoryDebrief";
+import PromptPreview from "../components/PromptPreview";
+import VillainDossier from "../components/VillainDossier";
 import {
   getDailyEntryForToday,
   getDailyEntryForDate,
@@ -143,6 +147,20 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
   }, [chapters]);
   const psycheSanity = Math.max(0, 100 + psycheLog.reduce((s, e) => s + e.sanityDelta, 0));
   const psycheResistance = Math.max(0, 100 + psycheLog.reduce((s, e) => s + (e.resistanceDelta ?? 0), 0));
+
+  // Auto-update villain dossier after each chapter
+  const dossierChapRef = useRef(0);
+  useEffect(() => {
+    if (chapters.length === 0) { dossierChapRef.current = 0; return; }
+    if (chapters.length <= dossierChapRef.current) return;
+    dossierChapRef.current = chapters.length;
+    const ch = chapters[chapters.length - 1]; if (!ch?.trim()) return;
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    setDossierLoading(true);
+    fetch(`${base}/api/story/dossier-update`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ heroine: heroine.name, villain: String(villain), chapterText: ch.slice(0, 2000), previousDossier: dossier }) })
+      .then(r => r.ok ? r.json() : null).then((d: { dossier: Record<string, unknown> } | null) => { if (d?.dossier) setDossier(d.dossier); }).catch(() => {})
+      .finally(() => setDossierLoading(false));
+  }, [chapters]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [continuing, setContinuing] = useState(false);
@@ -161,6 +179,12 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
   const [loadingChoices, setLoadingChoices] = useState(false);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
+  const [moodLevel, setMoodLevel] = useState(50);
+  const [showDebrief, setShowDebrief] = useState(false);
+  const [showPromptPreview, setShowPromptPreview] = useState(false);
+  const [pendingContinue, setPendingContinue] = useState(false);
+  const [dossier, setDossier] = useState<Record<string, unknown> | null>(null);
+  const [dossierLoading, setDossierLoading] = useState(false);
 
   const fullStory = chapters.join("\n\n---\n\n");
 
@@ -399,6 +423,28 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
         />
       )}
 
+      {/* Debrief classified report */}
+      {showDebrief && fullStory && (
+        <StoryDebrief
+          heroine={heroine.name}
+          villain={String(villain)}
+          setting={String(setting)}
+          storyText={fullStory}
+          heroineColor={heroine.color}
+          onClose={() => setShowDebrief(false)}
+        />
+      )}
+
+      {/* Prompt preview */}
+      {showPromptPreview && (
+        <PromptPreview
+          userPrompt={`CONTINUE STORY — Chapter ${chapters.length + 1}\nHEROINE: ${heroine.name}\nVILLAIN: ${String(villain)}\nSETTING: ${String(setting)}\nMOOD LEVEL: ${moodLevel}/100\nDIRECTION: ${continueDir || "(let it escalate naturally)"}\n\nPREVIOUS STORY EXCERPT:\n${fullStory.slice(-1200)}`}
+          heroineColor={heroine.color}
+          onGenerate={() => { setShowPromptPreview(false); if (pendingContinue) { setPendingContinue(false); continueStory(); } else { hasGenerated.current = false; generate(); } }}
+          onClose={() => setShowPromptPreview(false)}
+        />
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
         <div>
@@ -478,6 +524,8 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
         )}
 
         {psycheLog.length > 0 && <PsycheMeter sanity={psycheSanity} resistance={psycheResistance} log={psycheLog} heroineName={heroine.name} />}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {chapters.length > 0 && <VillainDossier heroine={heroine.name} villain={String(villain)} heroineColor={heroine.color} dossier={dossier as any} chapterCount={chapters.length} loading={dossierLoading} />}
         <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "1.05rem", lineHeight: 1.9, color: "rgba(228,222,210,0.85)" }}>
           {chapters.map((chapter, ci) => (
             <div key={ci}>
@@ -546,6 +594,11 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
             </button>
             <button onClick={generateCoverArt} disabled={generatingCover} style={{ padding: "0.6rem 1.1rem", background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: "8px", color: generatingCover ? "rgba(168,85,247,0.35)" : "rgba(168,85,247,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: generatingCover ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
               {generatingCover ? "🎨 Generating…" : "🎨 Cover Art"}
+            </button>
+            <button onClick={() => setShowDebrief(true)} style={{ padding: "0.6rem 1.1rem", background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.2)", borderRadius: "8px", color: "rgba(200,80,80,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background="rgba(200,0,0,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background="rgba(200,0,0,0.06)"; }}>
+              📂 Debrief
             </button>
             <button onClick={() => { setShowIntro(true); setPendingRegenerate(true); }} disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "rgba(100,0,200,0.08)", border: "1px solid rgba(100,0,200,0.2)", borderRadius: "8px", color: isBusy ? "rgba(200,200,220,0.2)" : "rgba(150,100,255,0.7)", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", cursor: isBusy ? "not-allowed" : "pointer", letterSpacing: "1px", transition: "all 0.2s" }}>
               ⚡ Regenerate
@@ -618,29 +671,37 @@ export default function DailyScenarioPage({ onBack, onChronicle, dateKey, scenar
             onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(200,168,75,0.2)")}
           />
 
-          <button
-            onClick={continueStory}
-            disabled={isBusy}
-            style={{
-              padding: "0.75rem 2rem",
-              background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))",
-              border: "none",
-              borderRadius: "10px",
-              color: "#0a0808",
-              fontFamily: "'Cinzel', serif",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              cursor: isBusy ? "not-allowed" : "pointer",
-              opacity: isBusy ? 0.5 : 1,
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => { if (!isBusy) e.currentTarget.style.filter = "brightness(1.15)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
-          >
-            {continuing ? "Writing..." : `Continue → Chapter ${chapters.length + 1}`}
-          </button>
+          <div style={{ marginBottom: "1rem" }}>
+            <MoodDial value={moodLevel} onChange={setMoodLevel} heroineColor={heroine.color} />
+          </div>
+
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <button onClick={() => { setPendingContinue(true); setShowPromptPreview(true); }} style={{ padding: "0.65rem 1rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", color: "rgba(200,195,215,0.35)", fontFamily: "'Cinzel',serif", fontSize: "0.52rem", letterSpacing: "2px", cursor: "pointer" }}>👁 Preview Prompt</button>
+            <button
+              onClick={continueStory}
+              disabled={isBusy}
+              style={{
+                flex: 1,
+                padding: "0.75rem 2rem",
+                background: "linear-gradient(135deg, rgba(200,168,75,0.85), rgba(160,120,40,0.85))",
+                border: "none",
+                borderRadius: "10px",
+                color: "#0a0808",
+                fontFamily: "'Cinzel', serif",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                cursor: isBusy ? "not-allowed" : "pointer",
+                opacity: isBusy ? 0.5 : 1,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => { if (!isBusy) e.currentTarget.style.filter = "brightness(1.15)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
+            >
+              {continuing ? "Writing..." : `Continue → Chapter ${chapters.length + 1}`}
+            </button>
+          </div>
         </div>
       )}
 

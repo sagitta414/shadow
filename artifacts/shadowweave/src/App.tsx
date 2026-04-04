@@ -45,6 +45,8 @@ import DirectorMode from "./pages/DirectorMode";
 import EscapeAttemptMode from "./pages/EscapeAttemptMode";
 import NegotiationRoomMode from "./pages/NegotiationRoomMode";
 import FactionMode from "./pages/FactionMode";
+import SlowBurnMode from "./pages/SlowBurnMode";
+import ConfinedSpaceMode from "./pages/ConfinedSpaceMode";
 import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
@@ -116,6 +118,8 @@ type Page =
   | "escape-attempt"
   | "negotiation-room"
   | "faction-mode"
+  | "slow-burn"
+  | "confined-space"
   | "heroine-image-gen"
   | "admin";
 
@@ -129,6 +133,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "chain-of-custody","long-game","dark-mirror","arena-mode","the-handler",
   "time-loop","dream-sequence","sequel-generator","story-continuation",
   "director-mode","escape-attempt","negotiation-room","faction-mode",
+  "slow-burn","confined-space",
 ]);
 
 function BackgroundEffects() {
@@ -327,6 +332,8 @@ function AppInner() {
           onNegotiationRoom={() => navigate("negotiation-room")}
           onFactionMode={() => navigate("faction-mode")}
           onHeroineImageGen={() => navigate("heroine-image-gen")}
+          onSlowBurn={() => navigate("slow-burn")}
+          onConfinedSpace={() => navigate("confined-space")}
         />
       )}
 
@@ -559,6 +566,14 @@ function AppInner() {
       )}
       {page === "faction-mode" && (
         <FactionMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "slow-burn" && (
+        <SlowBurnMode />
+      )}
+
+      {page === "confined-space" && (
+        <ConfinedSpaceMode />
       )}
       {page === "heroine-image-gen" && (
         <HeroineImageGen onBack={() => navigate("home")} />
