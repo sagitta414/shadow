@@ -389,6 +389,53 @@ const FILM_HEROES = [
   { name: "Natalie Artemis",    alias: "Natalie — US Army Ranger Captain",       power: "US Army Ranger Captain whose tactical precision and adaptability proved capable of hunting and fighting Monsters with no preparation and minimal resources",                      icon: "🏹" },
 ];
 
+// ── Bond Captives Catalogue ───────────────────────────────────
+const BOND_CAPTIVES = [
+  { name: "Rachel Adams",     alias: "The Quintessential Damsel",          power: "Long dark hair, expressive brown eyes, delicate feminine features, naturally pale skin, slender build — the gold standard of distressed beauty",                        icon: "⛓" },
+  { name: "Paris Kennedy",    alias: "The Blonde Classic",                 power: "Shoulder-length blonde hair, blue eyes, hourglass figure, girl-next-door charm that makes her distress entirely convincing — a vintage bondage icon",                   icon: "⛓" },
+  { name: "Callie Calypso",   alias: "The Athletic Adventurer",           power: "Brunette with natural waves, hazel eyes, toned athletic build, sun-kissed skin — capable and spirited but always perfectly overwhelmed when it counts",                   icon: "⛓" },
+  { name: "Liz Tyler",        alias: "The Expressive Redhead",            power: "Long auburn-red hair, green eyes, full curves, porcelain complexion — her genuine expressiveness and natural reactions are her signature",                                icon: "⛓" },
+  { name: "Ariel Anderssen",  alias: "The Elegant British Captive",       power: "Tall, willowy English beauty with light brown hair, blue-grey eyes, refined features, graceful poise that contrasts perfectly with distress",                            icon: "⛓" },
+  { name: "Alexis Taylor",    alias: "The Dark-Eyed Brunette",            power: "Dark brown hair, intense dark eyes, slender Mediterranean build, high cheekbones — cool composure that breaks beautifully under pressure",                               icon: "⛓" },
+  { name: "Sasha Fae",        alias: "The Petite Platinum",               power: "Platinum blonde pixie-cut, wide blue eyes, petite elfin figure — delicate, fragile-looking beauty that belies a spirited defiance",                                     icon: "⛓" },
+  { name: "Christina Carter", alias: "The Athletic All-American",         power: "Dark chestnut hair, green eyes, sculpted athletic build, strong and capable — a trained combatant who can be taken down only with considerable effort and craft",         icon: "⛓" },
+  { name: "Kendra James",     alias: "The Statuesque Sophisticate",       power: "Tall and commanding presence, dark hair, rich brown skin, structured features — regal and composed even in the most challenging circumstances",                          icon: "⛓" },
+  { name: "Dia Zerva",        alias: "The Ink-Adorned Rebel",             power: "Dark hair, piercing dark eyes, tattooed curves, fierce demeanour — a rebel whose defiance makes every restraint more dramatically satisfying",                           icon: "⛓" },
+  { name: "Harmony Rose",     alias: "The Sweet-Faced Blonde",            power: "Curly blonde hair, soft blue eyes, generous curves, an innocent expression that creates stunning contrast with any predicament she finds herself in",                     icon: "⛓" },
+  { name: "Veruca James",     alias: "The Fierce Redhead",                power: "Vivid red hair, sharp green eyes, slim toned figure — natural authority and fierce resistance that makes every surrender all the more compelling",                       icon: "⛓" },
+  { name: "Monica Jene",      alias: "The Dark Mysterious",               power: "Jet black hair, dark smouldering eyes, olive complexion, angular features — an air of mystery that deepens every scenario",                                             icon: "⛓" },
+  { name: "Sadie Holmes",     alias: "The Willowy Brunette",              power: "Dark hair, wide soft eyes, slim willowy build, gentle refined features — an air of vulnerability that she never quite manages to disguise",                             icon: "⛓" },
+  { name: "Shara Deane",      alias: "The Dramatic Dark Beauty",          power: "Long raven hair, dramatic dark eyes, ivory skin, full lips — Gothic beauty whose composure under duress is itself a kind of challenge",                                 icon: "⛓" },
+  { name: "Hannah Perez",     alias: "The Spirited Latina",               power: "Long dark brown hair, rich brown eyes, full warm curves, expressive face — passionate nature that ensures she never stays quietly compliant for long",                   icon: "⛓" },
+  { name: "Jasmine St Claire","alias": "The Exotic Icon",                "power": "Long dark layered hair, deep brown eyes, lightly bronzed complexion, statuesque curves — a commanding screen presence that makes restraint feel like theatre",          icon: "⛓" },
+  { name: "Dee Williams",     alias: "The Toned Athlete",                 power: "Short dark hair, brown eyes, compact athletic build, defined musculature — formidable fitness that makes her capture the more impressive and her vulnerability earned",   icon: "⛓" },
+  { name: "Sandra Silvers",   alias: "The Refined Classic",               power: "Elegant silver-blonde hair, blue eyes, poised mature figure — grace and refinement that persist even under the most challenging conditions",                            icon: "⛓" },
+  { name: "Amanda Foxx",      alias: "The Bubbly Blonde",                 power: "Long golden blonde hair, bright blue eyes, full hourglass figure, natural radiance — warmth and enthusiasm that never quite hardens no matter what the situation",      icon: "⛓" },
+];
+
+const BOND_APPEARANCES: Record<string, string> = {
+  "Rachel Adams":     "Beautiful young woman, long wavy dark brown hair past shoulders, expressive large brown eyes, delicate soft facial features, slim slender build, fair pale skin, natural beauty",
+  "Paris Kennedy":    "Attractive woman, shoulder-length blonde hair, blue eyes, girl-next-door features, hourglass figure, warm smile, classic all-American looks",
+  "Callie Calypso":   "Attractive brunette woman, natural wavy mid-length brown hair, hazel eyes, toned athletic build, light olive skin, energetic and spirited appearance",
+  "Liz Tyler":        "Beautiful woman with long flowing auburn-red hair, green eyes, full curves, porcelain fair complexion, expressive face, sensual look",
+  "Ariel Anderssen":  "Tall slender elegant British woman, light brown hair worn loose, blue-grey eyes, refined aristocratic features, graceful willowy figure, sophisticated beauty",
+  "Alexis Taylor":    "Attractive brunette woman, dark brown straight hair, intense dark brown eyes, slender figure, high cheekbones, Mediterranean features, controlled composure",
+  "Sasha Fae":        "Petite woman with platinum white-blonde very short hair, wide blue eyes, elfin delicate features, tiny slim frame, fragile ethereal appearance",
+  "Christina Carter": "Fit athletic woman with chestnut brown hair, bright green eyes, toned sculpted physique, strong yet feminine build, capable confident look",
+  "Kendra James":     "Tall statuesque woman with dark hair, warm brown skin, structured elegant facial features, commanding presence, slim toned figure",
+  "Dia Zerva":        "Edgy woman with dark hair, dark eyes, visible tattoos, curvy figure, fierce expression, alternative punk aesthetic",
+  "Harmony Rose":     "Beautiful woman with curly blonde hair, soft blue eyes, generous full curves, round sweet face, innocent expression, generous hourglass figure",
+  "Veruca James":     "Striking woman with vivid red hair, sharp green eyes, slim toned figure, natural authority in her bearing, fierce intelligent expression",
+  "Monica Jene":      "Mysterious woman with jet black hair, dark smouldering eyes, olive complexion, angular elegant features, slender exotic figure",
+  "Sadie Holmes":     "Slender woman with dark brunette hair, wide soft brown eyes, willowy slim build, gentle refined features, natural vulnerability in her expression",
+  "Shara Deane":      "Gothic beauty with long raven black hair, dramatic dark eyes, ivory porcelain skin, full lips, slim figure, dramatic elegant appearance",
+  "Hannah Perez":     "Beautiful Latina woman with long dark brown hair, rich brown eyes, full warm curves, expressive emotional face, naturally animated expressions",
+  "Jasmine St Claire":"Exotic statuesque woman with long dark layered hair, deep brown eyes, lightly bronzed complexion, full commanding curves, theatrical presence",
+  "Dee Williams":     "Athletic compact woman with short dark hair, warm brown eyes, defined muscular physique, toned fit body, powerful yet feminine build",
+  "Sandra Silvers":   "Elegant mature woman with silver-blonde hair, blue eyes, poised refined figure, graceful sophisticated appearance, timeless classical beauty",
+  "Amanda Foxx":      "Beautiful blonde woman with long golden blonde hair, bright blue eyes, full generous hourglass figure, warm radiant smile, naturally cheerful look",
+};
+
 // ── Weakness Catalog ──────────────────────────────────────────
 const WEAKNESS_CATALOG: Record<string, string[]> = {
   "Black Widow":       ["No superhuman durability — fully human limits", "Psychological Red Room conditioning exploited", "Equipment seizure removes primary advantages", "Isolation from SHIELD support network"],
@@ -643,7 +690,7 @@ const CHAPTER_FOCUS_TAGS = [
 ];
 
 type Step = 1 | 2 | 3 | 4;
-type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "GAMING" | "FILM" | "CUSTOM";
+type UniverseFilter = "ALL" | "MARVEL" | "DC" | "CW" | "TB" | "PR" | "ANIMATED" | "SW" | "TV" | "GAMING" | "FILM" | "BOND" | "CUSTOM";
 type VillainFilter = "ALL" | "Marvel" | "DC" | "CW" | "TB" | "PR" | "Animated" | "SW";
 
 // ── Component ─────────────────────────────────────────────────
@@ -655,6 +702,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
   const [search, setSearch] = useState("");
   const [heroViewMode, setHeroViewMode] = useState<"grid" | "list">("grid");
+  const [bondPortraits, setBondPortraits] = useState<Record<string, string>>({});
+  const [generatingBondPortrait, setGeneratingBondPortrait] = useState<string | null>(null);
 
   // Selections
   const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
@@ -851,6 +900,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     ...TV_HEROES.map((h) => ({ ...h, universe: "TV" })),
     ...GAMING_HEROES.map((h) => ({ ...h, universe: "GAMING" })),
     ...FILM_HEROES.map((h) => ({ ...h, universe: "FILM" })),
+    ...BOND_CAPTIVES.map((h) => ({ ...h, universe: "BOND" })),
     ...customHeroesList.map((h) => ({
       name: h.name,
       alias: h.appearance ? h.appearance.slice(0, 40) : "Custom Heroine",
@@ -887,6 +937,21 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     );
   }
   function canProceedStep1() { return selectedHeroes.length > 0; }
+
+  async function generateBondPortrait(name: string) {
+    const appearance = BOND_APPEARANCES[name];
+    if (!appearance || generatingBondPortrait) return;
+    setGeneratingBondPortrait(name);
+    try {
+      const res = await fetch("/api/story/civilian-portrait", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ appearanceDescription: appearance, name }),
+      });
+      const data = await res.json();
+      if (data.imageBase64) setBondPortraits(prev => ({ ...prev, [name]: data.imageBase64 }));
+    } catch {}
+    finally { setGeneratingBondPortrait(null); }
+  }
   function canProceedStep2() {
     const primary = villainMode === "pick" ? !!selectedVillain : !!customVillain.trim();
     if (!primary) return false;
@@ -1282,9 +1347,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
-              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV", "GAMING", "FILM", "CUSTOM"] as UniverseFilter[]).map((u, i, arr) => (
-                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : u === "GAMING" ? "rgba(52,211,153,0.22)" : u === "FILM" ? "rgba(251,191,36,0.22)" : u === "CUSTOM" ? "rgba(255,184,0,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : u === "GAMING" ? "#34D399" : u === "FILM" ? "#FCD34D" : u === "CUSTOM" ? "#FFB800" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : u === "GAMING" ? "Gaming ✦" : u === "FILM" ? "Film ✦" : u === "CUSTOM" ? `Custom (${customHeroesList.length})` : "The Boys ✦"}
+              {(["ALL", "MARVEL", "DC", "CW", "TB", "PR", "ANIMATED", "SW", "TV", "GAMING", "FILM", "BOND", "CUSTOM"] as UniverseFilter[]).map((u, i, arr) => (
+                <button key={u} onClick={() => setUniverseFilter(u)} style={{ padding: isMobile ? "0.45rem 0.5rem" : "0.5rem 0.9rem", background: universeFilter === u ? (u === "MARVEL" ? "rgba(220,30,30,0.25)" : u === "DC" ? "rgba(0,100,220,0.25)" : u === "CW" ? "rgba(0,180,100,0.2)" : u === "TB" ? "rgba(200,30,0,0.25)" : u === "PR" ? "rgba(220,0,150,0.25)" : u === "ANIMATED" ? "rgba(160,0,255,0.25)" : u === "SW" ? "rgba(0,180,255,0.22)" : u === "TV" ? "rgba(255,150,60,0.22)" : u === "GAMING" ? "rgba(52,211,153,0.22)" : u === "FILM" ? "rgba(251,191,36,0.22)" : u === "BOND" ? "rgba(190,100,20,0.28)" : u === "CUSTOM" ? "rgba(255,184,0,0.2)" : "rgba(255,184,0,0.15)") : "transparent", border: "none", borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", color: universeFilter === u ? (u === "MARVEL" ? "#FF6060" : u === "DC" ? "#60A0FF" : u === "CW" ? "#40E090" : u === "TB" ? "#FF3D00" : u === "PR" ? "#FF69B4" : u === "ANIMATED" ? "#C084FC" : u === "SW" ? "#4DC8FF" : u === "TV" ? "#FF9640" : u === "GAMING" ? "#34D399" : u === "FILM" ? "#FCD34D" : u === "BOND" ? "#E8A020" : u === "CUSTOM" ? "#FFB800" : "#FFB800") : "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.55rem" : "0.68rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {u === "ALL" ? "All" : u === "MARVEL" ? "Marvel ✦" : u === "DC" ? "DC ✦" : u === "CW" ? "CW ✦" : u === "PR" ? "Power Rangers ✦" : u === "ANIMATED" ? "Animated ✦" : u === "SW" ? "Star Wars ✦" : u === "TV" ? "TV Shows ✦" : u === "GAMING" ? "Gaming ✦" : u === "FILM" ? "Film ✦" : u === "BOND" ? "⛓ Bond Captives" : u === "CUSTOM" ? `Custom (${customHeroesList.length})` : "The Boys ✦"}
                 </button>
               ))}
             </div>
@@ -1364,10 +1429,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isTV = hero.universe === "TV";
                 const isGaming = hero.universe === "GAMING";
                 const isFilm = hero.universe === "FILM";
+                const isBond = hero.universe === "BOND";
                 const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
-                const accentBg = isMarvel ? "rgba(220,30,30,0.12)" : isCW ? "rgba(0,180,100,0.1)" : isTB ? "rgba(200,30,0,0.12)" : isPR ? "rgba(220,0,150,0.1)" : isAnim ? "rgba(160,0,255,0.1)" : isSW ? "rgba(0,180,255,0.1)" : isTV ? "rgba(255,150,60,0.1)" : isGaming ? "rgba(52,211,153,0.1)" : isFilm ? "rgba(252,211,77,0.1)" : "rgba(0,100,220,0.12)";
-                const selectedBg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.16)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.16)" : isTV ? "rgba(255,150,60,0.16)" : isGaming ? "rgba(52,211,153,0.16)" : isFilm ? "rgba(252,211,77,0.16)" : "rgba(0,100,220,0.18)";
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : isBond ? "#E8A020" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.12)" : isCW ? "rgba(0,180,100,0.1)" : isTB ? "rgba(200,30,0,0.12)" : isPR ? "rgba(220,0,150,0.1)" : isAnim ? "rgba(160,0,255,0.1)" : isSW ? "rgba(0,180,255,0.1)" : isTV ? "rgba(255,150,60,0.1)" : isGaming ? "rgba(52,211,153,0.1)" : isFilm ? "rgba(252,211,77,0.1)" : isBond ? "rgba(190,100,20,0.12)" : "rgba(0,100,220,0.12)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.16)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.18)" : isAnim ? "rgba(160,0,255,0.18)" : isSW ? "rgba(0,180,255,0.16)" : isTV ? "rgba(255,150,60,0.16)" : isGaming ? "rgba(52,211,153,0.16)" : isFilm ? "rgba(252,211,77,0.16)" : isBond ? "rgba(190,100,20,0.2)" : "rgba(0,100,220,0.18)";
                 return (
                   <button
                     key={`${hero.universe}-${hero.name}-list`}
@@ -1376,8 +1442,18 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}44`; e.currentTarget.style.background = accentBg; } }}
                     onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.background = "rgba(0,0,0,0.4)"; } }}
                   >
-                    <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)" }}>
-                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                    <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {isBond ? (
+                        bondPortraits[hero.name] ? (
+                          <img src={`data:image/png;base64,${bondPortraits[hero.name]}`} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+                        ) : generatingBondPortrait === hero.name ? (
+                          <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: "2px solid #E8A02044", borderTop: "2px solid #E8A020", animation: "cc-spin 1s linear infinite" }} />
+                        ) : (
+                          <button onClick={(e) => { e.stopPropagation(); generateBondPortrait(hero.name); }} title="Generate AI portrait" style={{ background: "none", border: "none", fontSize: "0.9rem", cursor: "pointer", color: "#E8A02066", transition: "color 0.2s" }} onMouseEnter={e => (e.currentTarget.style.color = "#E8A020")} onMouseLeave={e => (e.currentTarget.style.color = "#E8A02066")}>✨</button>
+                        )
+                      ) : (
+                        <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                      )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="font-cinzel" style={{ fontSize: isMobile ? "0.78rem" : "0.75rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, marginBottom: "0.1rem", lineHeight: 1.2 }}>{hero.name}</div>
@@ -1405,10 +1481,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isTV = hero.universe === "TV";
                 const isGaming = hero.universe === "GAMING";
                 const isFilm = hero.universe === "FILM";
+                const isBond = hero.universe === "BOND";
                 const isSelected = selectedHeroes.some((h) => h.name === hero.name);
-                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
-                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : isGaming ? "rgba(52,211,153,0.12)" : isFilm ? "rgba(252,211,77,0.12)" : "rgba(0,100,220,0.15)";
-                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : isGaming ? "rgba(52,211,153,0.18)" : isFilm ? "rgba(252,211,77,0.18)" : "rgba(0,100,220,0.2)";
+                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : isBond ? "#E8A020" : "#60A0FF";
+                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : isGaming ? "rgba(52,211,153,0.12)" : isFilm ? "rgba(252,211,77,0.12)" : isBond ? "rgba(190,100,20,0.14)" : "rgba(0,100,220,0.15)";
+                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : isGaming ? "rgba(52,211,153,0.18)" : isFilm ? "rgba(252,211,77,0.18)" : isBond ? "rgba(190,100,20,0.22)" : "rgba(0,100,220,0.2)";
                 return (
                   <button
                     key={`${hero.universe}-${hero.name}`}
@@ -1433,10 +1510,26 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Remove from favorites" : "Add to favorites"} style={{ position: "absolute", top: "0.4rem", left: "0.4rem", width: "22px", height: "22px", borderRadius: "50%", background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.6)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", zIndex: 2, transition: "all 0.2s", backdropFilter: "blur(4px)" }}>
                       {favorites.includes(hero.name) ? "★" : "☆"}
                     </button>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)" }}>
-                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {isBond ? (
+                        bondPortraits[hero.name] ? (
+                          <img src={`data:image/png;base64,${bondPortraits[hero.name]}`} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
+                        ) : generatingBondPortrait === hero.name ? (
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
+                            <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: "2px solid #E8A02044", borderTop: "2px solid #E8A020", animation: "cc-spin 1s linear infinite" }} />
+                            <span style={{ fontSize: "0.45rem", color: "#E8A02066", fontFamily: "'Montserrat',sans-serif" }}>generating…</span>
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
+                            <span style={{ fontSize: "2rem", opacity: 0.15 }}>⛓</span>
+                            <button onClick={(e) => { e.stopPropagation(); generateBondPortrait(hero.name); }} style={{ padding: "0.3rem 0.6rem", background: "rgba(190,100,20,0.15)", border: "1px solid #E8A02033", borderRadius: "6px", color: "#E8A020", fontFamily: "'Cinzel',sans-serif", fontSize: "0.45rem", cursor: "pointer", letterSpacing: "1px" }}>✨ AI IMAGE</button>
+                          </div>
+                        )
+                      ) : (
+                        <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                      )}
                       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
-                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
+                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{isBond ? "BOND CAPTIVE" : hero.universe}</div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.15rem" }}>
                       <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, lineHeight: 1.3 }}>{hero.name}</div>
@@ -2685,7 +2778,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         const isAnim = loreHero.universe === "ANIMATED";
         const isSW = loreHero.universe === "SW";
         const isTV = loreHero.universe === "TV";
-        const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : loreHero.universe === "CUSTOM" ? "#C8A84B" : "#60A0FF";
+        const isBondLore = loreHero.universe === "BOND";
+        const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isBondLore ? "#E8A020" : loreHero.universe === "CUSTOM" ? "#C8A84B" : "#60A0FF";
         const universeBg = isMarvel ? "rgba(220,30,30,0.08)" : isCW ? "rgba(0,180,100,0.08)" : isTB ? "rgba(200,30,0,0.08)" : isPR ? "rgba(220,0,150,0.08)" : isAnim ? "rgba(160,0,255,0.08)" : isSW ? "rgba(0,180,255,0.08)" : isTV ? "rgba(255,150,60,0.08)" : "rgba(0,100,220,0.08)";
         const heroWeaknesses = WEAKNESS_CATALOG[loreHero.name as keyof typeof WEAKNESS_CATALOG];
         const isFav = favorites.includes(loreHero.name);
