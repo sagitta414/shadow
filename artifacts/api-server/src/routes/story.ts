@@ -3231,16 +3231,47 @@ router.post("/story/civilian-portrait", async (req, res) => {
     if (!veniceKey) throw new Error("VENICE_API_KEY not set");
 
     const subject = name?.trim() ? name.trim() : "a woman";
-    const rawPrompt = `Photorealistic portrait photograph of ${subject}. ${appearanceDescription.slice(0, 400)}. Natural studio lighting, sharp focus on face, 8k, cinematic, beautiful, elegant, realistic skin texture, professional photography.`;
-    const negativePrompt = "cartoon, anime, painting, drawing, sketch, watermark, text, logo, blurry, deformed, bad anatomy, ugly, nsfw explicit genitals, censored bar, mosaic";
+    const rawPrompt = `RAW photo, ultra-realistic portrait photograph of a real woman, ${appearanceDescription.slice(0, 350)}, Canon EOS R5 camera, 85mm f/1.4 portrait lens, natural window light, shallow depth of field, bokeh background, photorealistic skin texture, natural skin pores, subsurface scattering, sharp facial detail, DSLR photography, 8k uhd, hyperrealistic, professional editorial portrait, high quality, masterpiece`;
+    const negativePrompt = "cartoon, anime, illustration, painting, drawing, sketch, 3D render, CGI, digital art, watermark, text, logo, signature, blurry, out of focus, motion blur, noise, grain, deformed, disfigured, extra limbs, bad anatomy, mutated hands, poorly drawn face, bad proportions, oversaturated, plastic skin, airbrushed, fake, artificial, stylized, glossy, overprocessed, makeup artist, over-retouched";
 
     const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
       method: "POST",
       headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "lustify-sdxl", prompt: rawPrompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 25, safe_mode: false }),
+      body: JSON.stringify({ model: "lustify-sdxl", prompt: rawPrompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 30, safe_mode: false }),
     });
 
     if (!imgResp.ok) throw new Error(`Venice ${imgResp.status}`);
+    const json = await imgResp.json() as { images?: string[] };
+    if (!json.images?.[0]) throw new Error("No image returned");
+    res.json({ imageBase64: json.images[0] });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── BOND CAPTIVE: Dedicated high-realism portrait (lustify-sdxl) ─────────────
+
+router.post("/story/bond-portrait", async (req, res) => {
+  try {
+    const { appearanceDescription, name } = req.body as { appearanceDescription: string; name?: string };
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const desc = appearanceDescription.slice(0, 380);
+    const prompt = `RAW photograph, photorealistic, ${desc}, real person, natural beauty, Canon EOS R5, 85mm f/1.4 lens, natural studio lighting, Rembrandt lighting, catchlights in eyes, skin pores visible, natural hair texture, detailed iris, sharp focus on face, soft bokeh background, editorial portrait photography, Vogue magazine quality, 8k uhd resolution, hyperrealistic, masterpiece, perfect anatomy, film grain`;
+    const negativePrompt = "cartoon, anime, illustration, painting, watercolor, sketch, drawing, 3D render, CGI, digital art, artificial, fake, plastic skin, smooth skin, airbrushed, overprocessed, retouched, synthetic, wax figure, mannequin, doll-like, blurry, out of focus, motion blur, grainy, noisy, pixelated, low quality, deformed, disfigured, extra fingers, mutated hands, poorly drawn face, bad anatomy, extra limbs, cloned face, bad proportions, watermark, text, logo, signature, username, frame, border";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 32, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) {
+      const status = imgResp.status;
+      if (status === 429) return res.status(429).json({ error: "Rate limited — try again in 45 seconds" });
+      throw new Error(`Venice ${status}`);
+    }
     const json = await imgResp.json() as { images?: string[] };
     if (!json.images?.[0]) throw new Error("No image returned");
     res.json({ imageBase64: json.images[0] });
