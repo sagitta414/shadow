@@ -30,6 +30,9 @@ function heroImg(name: string): string {
   const jpgSlugs = ["ms-marvel", "mary-marvel", "cassandra-cain", "arrowette"];
   return `/heroes/${slug}.${jpgSlugs.includes(slug) ? "jpg" : "png"}`;
 }
+function bondImg(name: string): string {
+  return `/bond/${nameToSlug(name)}.png`;
+}
 function villainImg(name: string): string {
   return `/villains/${nameToSlug(name)}.png`;
 }
@@ -702,10 +705,6 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
   const [search, setSearch] = useState("");
   const [heroViewMode, setHeroViewMode] = useState<"grid" | "list">("grid");
-  const [bondPortraits, setBondPortraits] = useState<Record<string, string>>({});
-  const [generatingBondPortrait, setGeneratingBondPortrait] = useState<string | null>(null);
-  const bondQueuedRef = useRef<Set<string>>(new Set());
-  const bondGenRunning = useRef(false);
 
   // Selections
   const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
@@ -940,38 +939,6 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   }
   function canProceedStep1() { return selectedHeroes.length > 0; }
 
-  async function generateBondPortrait(name: string): Promise<void> {
-    const appearance = BOND_APPEARANCES[name];
-    if (!appearance) return;
-    setGeneratingBondPortrait(name);
-    try {
-      const res = await fetch("/api/story/bond-portrait", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appearanceDescription: appearance, name }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.imageBase64) setBondPortraits(prev => ({ ...prev, [name]: data.imageBase64 }));
-      }
-    } catch {}
-    finally { setGeneratingBondPortrait(null); }
-  }
-
-  useEffect(() => {
-    if (universeFilter !== "BOND") return;
-    const toQueue = BOND_CAPTIVES.filter(c => !bondQueuedRef.current.has(c.name));
-    if (toQueue.length === 0) return;
-    toQueue.forEach(c => bondQueuedRef.current.add(c.name));
-    if (bondGenRunning.current) return;
-    bondGenRunning.current = true;
-    (async () => {
-      for (let i = 0; i < toQueue.length; i++) {
-        await generateBondPortrait(toQueue[i].name);
-        if (i < toQueue.length - 1) await new Promise(r => setTimeout(r, 8000));
-      }
-      bondGenRunning.current = false;
-    })();
-  }, [universeFilter]);
   function canProceedStep2() {
     const primary = villainMode === "pick" ? !!selectedVillain : !!customVillain.trim();
     if (!primary) return false;
@@ -1285,8 +1252,6 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh" }}>
-      <style>{`@keyframes cc-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} @keyframes bond-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
-
       {/* ── Header ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: isMobile ? "1rem" : "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
         <div>
@@ -1465,13 +1430,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   >
                     <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {isBond ? (
-                        bondPortraits[hero.name] ? (
-                          <img src={`data:image/png;base64,${bondPortraits[hero.name]}`} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", background: "linear-gradient(110deg, rgba(190,100,20,0.06) 25%, rgba(190,100,20,0.14) 50%, rgba(190,100,20,0.06) 75%)", backgroundSize: "200% 100%", animation: "bond-shimmer 1.8s ease-in-out infinite", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            {generatingBondPortrait === hero.name && <div style={{ width: "12px", height: "12px", borderRadius: "50%", border: "2px solid #E8A02044", borderTop: "2px solid #E8A020", animation: "cc-spin 1s linear infinite" }} />}
-                          </div>
-                        )
+                        <img src={bondImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       ) : (
                         <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       )}
@@ -1533,20 +1492,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     </button>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {isBond ? (
-                        bondPortraits[hero.name] ? (
-                          <img src={`data:image/png;base64,${bondPortraits[hero.name]}`} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", background: "linear-gradient(110deg, rgba(190,100,20,0.05) 25%, rgba(190,100,20,0.13) 50%, rgba(190,100,20,0.05) 75%)", backgroundSize: "200% 100%", animation: "bond-shimmer 1.8s ease-in-out infinite", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                            {generatingBondPortrait === hero.name ? (
-                              <>
-                                <div style={{ width: "22px", height: "22px", borderRadius: "50%", border: "2px solid #E8A02044", borderTop: "2px solid #E8A020", animation: "cc-spin 1s linear infinite" }} />
-                                <span style={{ fontSize: "0.42rem", color: "#E8A02055", fontFamily: "'Montserrat',sans-serif", letterSpacing: "1px" }}>GENERATING…</span>
-                              </>
-                            ) : (
-                              <span style={{ fontSize: "1.6rem", opacity: 0.1 }}>⛓</span>
-                            )}
-                          </div>
-                        )
+                        <img src={bondImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       ) : (
                         <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       )}
@@ -2811,7 +2757,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
               <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start", marginBottom: "1.5rem" }}>
                 <div style={{ width: "80px", height: "107px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)", border: `1px solid ${accentColor}33` }}>
-                  <img src={heroImg(loreHero.name)} alt={loreHero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                  <img src={isBondLore ? bondImg(loreHero.name) : heroImg(loreHero.name)} alt={loreHero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: "0.55rem", color: `${accentColor}88`, letterSpacing: "2.5px", fontFamily: "'Cinzel', serif", marginBottom: "0.3rem", textTransform: "uppercase" }}>{loreHero.universe}</div>
