@@ -116,6 +116,31 @@ const ACTRESSES = [
   { name: "Eva Green",            known: "Casino Royale, Penny Dreadful, 300: Rise of an Empire" },
 ];
 
+// ── Bond Captives ────────────────────────────────────────────────
+const BOND_CAPTIVES_CM = [
+  { name: "Rachel Adams",      known: "The Quintessential Damsel" },
+  { name: "Paris Kennedy",     known: "The Blonde Classic" },
+  { name: "Callie Calypso",    known: "The Athletic Adventurer" },
+  { name: "Liz Tyler",         known: "The Expressive Redhead" },
+  { name: "Ariel Anderssen",   known: "The Elegant British Captive" },
+  { name: "Alexis Taylor",     known: "The Dark-Eyed Brunette" },
+  { name: "Sasha Fae",         known: "The Petite Platinum" },
+  { name: "Christina Carter",  known: "The Athletic All-American" },
+  { name: "Kendra James",      known: "The Statuesque Sophisticate" },
+  { name: "Dia Zerva",         known: "The Ink-Adorned Rebel" },
+  { name: "Harmony Rose",      known: "The Sweet-Faced Blonde" },
+  { name: "Veruca James",      known: "The Fierce Redhead" },
+  { name: "Monica Jene",       known: "The Dark Mysterious" },
+  { name: "Sadie Holmes",      known: "The Willowy Brunette" },
+  { name: "Shara Deane",       known: "The Dramatic Dark Beauty" },
+  { name: "Hannah Perez",      known: "The Spirited Latina" },
+  { name: "Jasmine St Claire", known: "The Exotic Icon" },
+  { name: "Dee Williams",      known: "The Toned Athlete" },
+  { name: "Sandra Silvers",    known: "The Refined Classic" },
+  { name: "Amanda Foxx",       known: "The Bubbly Blonde" },
+];
+const BOND_NAMES = new Set(BOND_CAPTIVES_CM.map(b => b.name));
+
 // ── Captor Archetypes ─────────────────────────────────────────────
 const CAPTOR_ARCHETYPES = [
   { id: "director",   label: "The Director",        icon: "🎬", color: "#CC6600", profile: "A powerful Hollywood executive who believes his industry position entitles him to anything — and anyone. His smile never wavers. His patience is infinite. His leverage is absolute.", motivation: "Power", methods: ["Manipulation", "Isolation", "Coercion"] },
@@ -252,6 +277,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const isMobile = useIsMobile();
   const [step, setStep] = useState<Step>(1);
   const [search, setSearch] = useState("");
+  const [actressTab, setActressTab] = useState<"celebrities" | "bond">("celebrities");
   const [actressViewMode, setActressViewMode] = useState<"grid" | "list">("grid");
   const [selectedActresses, setSelectedActresses] = useState<typeof ACTRESSES>([]);
   const [captorMode, setCaptorMode] = useState<"solo" | "team">("solo");
@@ -290,7 +316,8 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const API = import.meta.env.BASE_URL?.replace(/\/$/, "") + "/api";
-  const filtered = ACTRESSES.filter(a => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.known.toLowerCase().includes(search.toLowerCase()));
+  const activePool = actressTab === "bond" ? BOND_CAPTIVES_CM : ACTRESSES;
+  const filtered = activePool.filter(a => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.known.toLowerCase().includes(search.toLowerCase()));
 
   function toggleActress(a: typeof ACTRESSES[0]) {
     setSelectedActresses(prev => prev.some(x => x.name === a.name)
@@ -506,8 +533,18 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
       {/* ── STEP 1: Actress Selection ── */}
       {step === 1 && (
         <div>
+          {/* Tab switcher */}
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem" }}>
+            {([["celebrities", "🎬", `CELEBRITIES · ${ACTRESSES.length}`], ["bond", "⛓", `BOND CAPTIVES · ${BOND_CAPTIVES_CM.length}`]] as const).map(([tab, icon, label]) => (
+              <button key={tab} onClick={() => { setActressTab(tab); setSearch(""); }}
+                style={{ flex: 1, padding: "0.65rem 0.75rem", background: actressTab === tab ? goldBg : cardBg, border: `1px solid ${actressTab === tab ? gold + "88" : border}`, borderRadius: "10px", cursor: "pointer", color: "inherit", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}>
+                <span style={{ fontSize: "0.85rem" }}>{icon}</span>
+                <span style={{ fontSize: "0.6rem", fontFamily: "'Cinzel',serif", color: actressTab === tab ? gold : goldDim, letterSpacing: "1.5px", textTransform: "uppercase" }}>{label}</span>
+              </button>
+            ))}
+          </div>
           <div style={{ fontSize: "0.6rem", color: goldDim, letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem" }}>
-            Select up to 3 actresses · {ACTRESSES.length} in archive
+            Select up to 3 · {filtered.length} shown
           </div>
 
           {/* Selected chips */}
@@ -555,7 +592,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                     onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = borderHov; e.currentTarget.style.background = goldBg; } }}
                     onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = cardBg; } }}>
                     <div style={{ width: "40px", height: "53px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, background: "rgba(0,0,0,0.5)" }}>
-                      <img src={`/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                      <img src={BOND_NAMES.has(actress.name) ? `/bond/${slug}.png` : `/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: isMobile ? "0.78rem" : "0.75rem", fontFamily: "'Cinzel', serif", color: isSelected ? gold : "#E8E8F5", fontWeight: 600, marginBottom: "0.15rem", lineHeight: 1.2 }}>{actress.name}</div>
@@ -577,7 +614,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                     onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = borderHov; e.currentTarget.style.background = goldBg; } }}
                     onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = cardBg; } }}>
                     <div style={{ width: "100%", aspectRatio: "3/4", background: "rgba(0,0,0,0.6)", overflow: "hidden", position: "relative" }}>
-                      <img src={`/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                      <img src={BOND_NAMES.has(actress.name) ? `/bond/${slug}.png` : `/celebrities/${slug}.png`} alt={actress.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.currentTarget.style.display = "none"; }} />
                       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 55%)" }} />
                       {isSelected && <div style={{ position: "absolute", top: "8px", right: "8px", width: "22px", height: "22px", background: gold, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", color: "#000", fontWeight: 700 }}>✓</div>}
                     </div>
