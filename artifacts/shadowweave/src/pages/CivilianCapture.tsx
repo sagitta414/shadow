@@ -5,6 +5,57 @@ import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-").replace(/-{2,}/g, "-").replace(/^-|-$/g, "");
+}
+function bondImg(name: string): string { return `/bond/${nameToSlug(name)}.png`; }
+
+const BOND_CAPTIVES = [
+  { name: "Rachel Adams",     alias: "The Quintessential Damsel",    desc: "Long dark hair, expressive brown eyes, delicate feminine features, naturally pale skin, slender build — the gold standard of distressed beauty" },
+  { name: "Paris Kennedy",    alias: "The Blonde Classic",           desc: "Shoulder-length blonde hair, blue eyes, hourglass figure, girl-next-door charm" },
+  { name: "Callie Calypso",   alias: "The Athletic Adventurer",      desc: "Brunette with natural waves, hazel eyes, toned athletic build, sun-kissed skin" },
+  { name: "Liz Tyler",        alias: "The Expressive Redhead",       desc: "Long auburn-red hair, green eyes, full curves, porcelain complexion" },
+  { name: "Ariel Anderssen",  alias: "The Elegant British Captive",  desc: "Tall, willowy English beauty with light brown hair, blue-grey eyes, refined features" },
+  { name: "Alexis Taylor",    alias: "The Dark-Eyed Brunette",       desc: "Dark brown hair, intense dark eyes, slender Mediterranean build, high cheekbones" },
+  { name: "Sasha Fae",        alias: "The Petite Platinum",          desc: "Platinum blonde pixie-cut, wide blue eyes, petite elfin figure" },
+  { name: "Christina Carter", alias: "The Athletic All-American",    desc: "Dark chestnut hair, green eyes, sculpted athletic build, strong and capable" },
+  { name: "Kendra James",     alias: "The Statuesque Sophisticate",  desc: "Tall and commanding presence, dark hair, rich brown skin, structured features" },
+  { name: "Dia Zerva",        alias: "The Ink-Adorned Rebel",        desc: "Dark hair, piercing dark eyes, tattooed curves, fierce demeanour" },
+  { name: "Harmony Rose",     alias: "The Sweet-Faced Blonde",       desc: "Curly blonde hair, soft blue eyes, generous curves, innocent expression" },
+  { name: "Veruca James",     alias: "The Fierce Redhead",           desc: "Vivid red hair, sharp green eyes, slim toned figure, natural authority" },
+  { name: "Monica Jene",      alias: "The Dark Mysterious",          desc: "Jet black hair, dark smouldering eyes, olive complexion, angular features" },
+  { name: "Sadie Holmes",     alias: "The Willowy Brunette",         desc: "Dark hair, wide soft eyes, slim willowy build, gentle refined features" },
+  { name: "Shara Deane",      alias: "The Dramatic Dark Beauty",     desc: "Long raven hair, dramatic dark eyes, ivory skin, full lips" },
+  { name: "Hannah Perez",     alias: "The Spirited Latina",          desc: "Long dark brown hair, rich brown eyes, full warm curves, expressive face" },
+  { name: "Jasmine St Claire",alias: "The Exotic Icon",              desc: "Long dark layered hair, deep brown eyes, lightly bronzed complexion, statuesque curves" },
+  { name: "Dee Williams",     alias: "The Toned Athlete",            desc: "Short dark hair, brown eyes, compact athletic build, defined musculature" },
+  { name: "Sandra Silvers",   alias: "The Refined Classic",          desc: "Elegant silver-blonde hair, blue eyes, poised mature figure" },
+  { name: "Amanda Foxx",      alias: "The Bubbly Blonde",            desc: "Long golden blonde hair, bright blue eyes, full hourglass figure, natural radiance" },
+];
+
+const BOND_APPEARANCES: Record<string, string> = {
+  "Rachel Adams":     "Beautiful young woman, long wavy dark brown hair past shoulders, expressive large brown eyes, delicate soft facial features, slim slender build, fair pale skin, natural beauty",
+  "Paris Kennedy":    "Attractive woman, shoulder-length blonde hair, blue eyes, girl-next-door features, hourglass figure, warm smile, classic all-American looks",
+  "Callie Calypso":   "Attractive brunette woman, natural wavy mid-length brown hair, hazel eyes, toned athletic build, light olive skin, energetic and spirited appearance",
+  "Liz Tyler":        "Beautiful woman with long flowing auburn-red hair, green eyes, full curves, porcelain fair complexion, expressive face, sensual look",
+  "Ariel Anderssen":  "Tall slender elegant British woman, light brown hair worn loose, blue-grey eyes, refined aristocratic features, graceful willowy figure, sophisticated beauty",
+  "Alexis Taylor":    "Attractive brunette woman, dark brown straight hair, intense dark brown eyes, slender figure, high cheekbones, Mediterranean features, controlled composure",
+  "Sasha Fae":        "Petite woman with platinum white-blonde very short hair, wide blue eyes, elfin delicate features, tiny slim frame, fragile ethereal appearance",
+  "Christina Carter": "Fit athletic woman with chestnut brown hair, bright green eyes, toned sculpted physique, strong yet feminine build, capable confident look",
+  "Kendra James":     "Tall statuesque woman with dark hair, warm brown skin, structured elegant facial features, commanding presence, slim toned figure",
+  "Dia Zerva":        "Edgy woman with dark hair, dark eyes, visible tattoos, curvy figure, fierce expression, alternative punk aesthetic",
+  "Harmony Rose":     "Beautiful woman with curly blonde hair, soft blue eyes, generous full curves, round sweet face, innocent expression",
+  "Veruca James":     "Striking woman with vivid red hair, sharp green eyes, slim toned figure, natural authority in her bearing, fierce intelligent expression",
+  "Monica Jene":      "Mysterious woman with jet black hair, dark smouldering eyes, olive complexion, angular elegant features, slender exotic figure",
+  "Sadie Holmes":     "Slender woman with dark brunette hair, wide soft brown eyes, willowy slim build, gentle refined features, natural vulnerability in her expression",
+  "Shara Deane":      "Gothic beauty with long raven black hair, dramatic dark eyes, ivory porcelain skin, full lips, slim figure, dramatic elegant appearance",
+  "Hannah Perez":     "Beautiful Latina woman with long dark brown hair, rich brown eyes, full warm curves, expressive emotional face, naturally animated expressions",
+  "Jasmine St Claire":"Exotic statuesque woman with long dark layered hair, deep brown eyes, lightly bronzed complexion, full commanding curves, theatrical presence",
+  "Dee Williams":     "Athletic compact woman with short dark hair, warm brown eyes, defined muscular physique, toned fit body, powerful yet feminine build",
+  "Sandra Silvers":   "Elegant mature woman with silver-blonde hair, blue eyes, poised refined figure, graceful sophisticated appearance, timeless classical beauty",
+  "Amanda Foxx":      "Beautiful blonde woman with long golden blonde hair, bright blue eyes, full generous hourglass figure, warm radiant smile, naturally cheerful look",
+};
+
 interface Props { onBack: () => void; }
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -152,6 +203,7 @@ export default function CivilianCapture({ onBack }: Props) {
   const [outfitImageError, setOutfitImageError] = useState("");
   const [storyLength, setStoryLength] = useState<"Quick Strike" | "Standard" | "Epic">("Standard");
   const [storyStart, setStoryStart] = useState("just-after");
+  const [showBondGallery, setShowBondGallery] = useState(false);
 
   const [chapters, setChapters] = useState<string[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -369,6 +421,57 @@ export default function CivilianCapture({ onBack }: Props) {
             <div style={{ fontSize: "0.5rem", color: `${ACCENT}55`, letterSpacing: "5px", fontFamily: "'Montserrat',sans-serif", textTransform: "uppercase", marginBottom: "0.4rem" }}>CUSTOM SCENARIO</div>
             <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: "1.9rem", color: ACCENT, fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 0.5rem" }}>Civilian Capture</h1>
             <p style={{ fontSize: "0.72rem", color: "rgba(200,195,215,0.35)", fontFamily: "'Raleway',sans-serif" }}>Build her from scratch. A real person — no powers. Pure human vulnerability.</p>
+          </div>
+
+          {/* ── Bond Captives Quick-Select ── */}
+          <div style={{ marginBottom: "2rem" }}>
+            <button
+              onClick={() => setShowBondGallery(v => !v)}
+              style={{ width: "100%", padding: "0.75rem 1.25rem", background: showBondGallery ? "rgba(232,160,32,0.14)" : "rgba(0,0,0,0.35)", border: `1px solid ${showBondGallery ? "rgba(232,160,32,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", transition: "all 0.2s" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span style={{ fontSize: "1rem" }}>⛓</span>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontFamily: "'Cinzel',serif", fontSize: "0.75rem", color: showBondGallery ? "#E8A020" : "rgba(200,195,215,0.65)", fontWeight: 700, letterSpacing: "2px" }}>BOND CAPTIVES</div>
+                  <div style={{ fontFamily: "'Raleway',sans-serif", fontSize: "0.62rem", color: "rgba(200,195,215,0.3)", marginTop: "0.1rem" }}>20 curated captives — click any to pre-fill her profile instantly</div>
+                </div>
+              </div>
+              <span style={{ color: showBondGallery ? "#E8A020" : "rgba(200,195,215,0.3)", fontSize: "0.75rem", transition: "transform 0.2s", transform: showBondGallery ? "rotate(180deg)" : "none" }}>▾</span>
+            </button>
+
+            {showBondGallery && (
+              <div style={{ marginTop: "0.75rem", background: "rgba(0,0,0,0.35)", border: "1px solid rgba(232,160,32,0.15)", borderRadius: "12px", padding: "1rem", animation: "cc-rise 0.3s ease both" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "0.6rem" }}>
+                  {BOND_CAPTIVES.map(captive => (
+                    <button
+                      key={captive.name}
+                      onClick={() => {
+                        setP("name", captive.name);
+                        setP("appearanceDescription", BOND_APPEARANCES[captive.name] || captive.desc);
+                        setPortrait(null);
+                        setShowBondGallery(false);
+                        setStep(1);
+                      }}
+                      style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(232,160,32,0.18)", borderRadius: "10px", padding: "0", overflow: "hidden", cursor: "pointer", transition: "all 0.18s", textAlign: "center" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(232,160,32,0.6)"; e.currentTarget.style.transform = "scale(1.03)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(232,160,32,0.18)"; e.currentTarget.style.transform = "scale(1)"; }}
+                    >
+                      <div style={{ width: "100%", aspectRatio: "3/4", overflow: "hidden", position: "relative", background: "rgba(0,0,0,0.6)" }}>
+                        <img src={bondImg(captive.name)} alt={captive.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%)", pointerEvents: "none" }} />
+                      </div>
+                      <div style={{ padding: "0.35rem 0.3rem 0.4rem" }}>
+                        <div style={{ fontFamily: "'Cinzel',serif", fontSize: "0.55rem", color: "#E8A020", fontWeight: 700, lineHeight: 1.25, marginBottom: "0.1rem" }}>{captive.name}</div>
+                        <div style={{ fontFamily: "'Raleway',sans-serif", fontSize: "0.46rem", color: "rgba(200,195,215,0.35)", lineHeight: 1.2 }}>{captive.alias}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div style={{ textAlign: "center", marginTop: "0.85rem", fontSize: "0.58rem", color: "rgba(200,195,215,0.25)", fontFamily: "'Raleway',sans-serif" }}>
+                  Selecting a captive pre-fills her appearance — you can customise everything else
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Step indicator */}
