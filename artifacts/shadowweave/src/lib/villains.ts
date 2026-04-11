@@ -80,6 +80,7 @@ export const VILLAINS: Villain[] = [
   { name: "Fer-de-Lance",        universe: "Marvel", scheme: "Strike fast and fatally as the Serpent Society's most venomous and underestimated member",               icon: "🐍" },
   { name: "Death",               universe: "Marvel", scheme: "Draw all living things inevitably toward her embrace — patient, eternal, and utterly inevitable",         icon: "💀" },
   { name: "Bombshell",           universe: "Marvel", scheme: "Detonate her way through any opposition and collect whatever remains when the dust settles",              icon: "💣" },
+  { name: "Scarlet Witch",       universe: "Marvel", scheme: "Rewrite reality itself with three words and unmake a world that took everything she ever loved",         icon: "🔮" },
   // DC
   { name: "Darkseid",            universe: "DC",     scheme: "Discover the Anti-Life Equation",                                                                  icon: "💥" },
   { name: "Lex Luthor",          universe: "DC",     scheme: "Prove humanity's superiority over gods",                                                            icon: "💰" },
