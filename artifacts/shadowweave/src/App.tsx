@@ -216,6 +216,7 @@ function AppInner() {
   const [characterAnswers, setCharacterAnswers] = useState<Record<number, string>>({});
   const [surpriseActive, setSurpriseActive] = useState(false);
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
+  const [continuationStoryId, setContinuationStoryId] = useState<string | null>(null);
   const [dailyPlay, setDailyPlay] = useState<{
     dateKey: string;
     scenario: { heroine: { name: string; color: string; power: string }; villain: string; setting: string; title: string };
@@ -347,6 +348,7 @@ function AppInner() {
         <StoryArchive
           onBack={() => navigate("home")}
           onRemix={(heroName) => { setReimaginHero(heroName); setSurpriseActive(false); navigate("superhero-mode"); }}
+          onContinue={(storyId) => { setContinuationStoryId(storyId); navigate("story-continuation"); }}
         />
       )}
 
@@ -554,7 +556,10 @@ function AppInner() {
       )}
 
       {page === "story-continuation" && (
-        <StoryContinuation onBack={() => navigate("home")} />
+        <StoryContinuation
+          onBack={() => { setContinuationStoryId(null); navigate("home"); }}
+          initialStoryId={continuationStoryId ?? undefined}
+        />
       )}
 
       {page === "achievements" && (

@@ -11,6 +11,7 @@ import {
 interface Props {
   onBack: () => void;
   onRemix?: (heroName: string) => void;
+  onContinue?: (storyId: string) => void;
 }
 
 const UNIVERSE_COLORS: Record<string, string> = {
@@ -49,7 +50,7 @@ function timeAgo(ts: number): string {
 
 interface ReplayKey { storyId: string; chapterIdx: number; }
 
-export default function StoryArchive({ onBack, onRemix }: Props) {
+export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [stories, setStories] = useState<ArchivedStory[]>([]);
   const [search, setSearch] = useState("");
   const [filterFav, setFilterFav] = useState(false);
@@ -239,14 +240,14 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
                 </span>
               )}
             </div>
-            <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.5)", letterSpacing: "1px", marginBottom: "0.5rem" }}>
-              {s.characters.join(" · ")}
-              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
+            <div style={{ fontSize: "0.72rem", color: "rgba(200,200,220,0.5)", letterSpacing: "1px", marginBottom: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.15rem 0.5rem", alignItems: "center" }}>
+              <span>{s.characters.join(" · ")}</span>
+              <span style={{ opacity: 0.3 }}>|</span>
               <span style={{ color: col }}>{s.universe}</span>
-              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
-              {s.wordCount.toLocaleString()} words
-              <span style={{ margin: "0 0.5rem", opacity: 0.3 }}>|</span>
-              {s.chapters.length > 1 ? `${s.chapters.length} chapters · ` : ""}{timeAgo(s.createdAt)}
+              <span style={{ opacity: 0.3 }}>|</span>
+              <span>{s.wordCount.toLocaleString()} words</span>
+              <span style={{ opacity: 0.3 }}>|</span>
+              <span>{s.chapters.length > 1 ? `${s.chapters.length} ch · ` : ""}{timeAgo(s.createdAt)}</span>
             </div>
             {s.tags.length > 0 && (
               <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
@@ -263,28 +264,6 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
             )}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginTop: "0.15rem" }}>
-            {/* Quick delete — visible on row hover when not expanded */}
-            {!isOpen && hoverRow === s.id && (
-              confirmDelete === s.id ? (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-                >
-                  <button onClick={() => doDelete(s.id)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "rgba(200,0,0,0.22)", border: "1px solid rgba(200,0,0,0.45)", color: "#FF6060", fontSize: "0.65rem", cursor: "pointer", fontFamily: "'Cinzel',serif" }}>Yes</button>
-                  <button onClick={() => setConfirmDelete(null)} style={{ padding: "0.2rem 0.55rem", borderRadius: "5px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,200,220,0.4)", fontSize: "0.65rem", cursor: "pointer" }}>No</button>
-                </div>
-              ) : (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setConfirmDelete(s.id); }}
-                  title="Delete story"
-                  style={{ padding: "0.2rem 0.5rem", borderRadius: "5px", background: "rgba(200,0,0,0.06)", border: "1px solid rgba(200,0,0,0.18)", color: "rgba(200,100,100,0.45)", fontSize: "0.72rem", cursor: "pointer", transition: "all 0.18s", lineHeight: 1 }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.18)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.45)"; e.currentTarget.style.color = "#FF6060"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(200,0,0,0.06)"; e.currentTarget.style.borderColor = "rgba(200,0,0,0.18)"; e.currentTarget.style.color = "rgba(200,100,100,0.45)"; }}
-                >
-                  ✕
-                </button>
-              )
-            )}
             <span style={{ color: isOpen ? col : "rgba(200,200,220,0.25)", fontSize: "0.8rem", transition: "all 0.2s" }}>
               {isOpen ? "▲" : "▼"}
             </span>
@@ -476,8 +455,8 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                 <button
                   onClick={() => toggleFav(s.id, s.favourite)}
                   style={{
@@ -545,6 +524,19 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
                     ⟳ Reimagine
                   </button>
                 )}
+                {onContinue && (
+                  <button
+                    onClick={() => onContinue(s.id)}
+                    style={{
+                      padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                      fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                      background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.45)",
+                      color: "#34D399",
+                    }}
+                  >
+                    ▶ Continue Story
+                  </button>
+                )}
               </div>
               {confirmDelete === s.id ? (
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -573,7 +565,7 @@ export default function StoryArchive({ onBack, onRemix }: Props) {
   };
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem 1.25rem", minHeight: "100vh" }}>
+    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "1.5rem 0.85rem", minHeight: "100vh" }}>
       <button
         onClick={onBack}
         style={{

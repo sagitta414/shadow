@@ -4,14 +4,14 @@ import ReadingProgressBar from "../components/ReadingProgressBar";
 import { getAiProvider } from "../lib/aiProvider";
 import { getArchive, updateArchiveStory, type ArchivedStory } from "../lib/archive";
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; initialStoryId?: string; }
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const accent = "#34D399";
 
-export default function StoryContinuation({ onBack }: Props) {
+export default function StoryContinuation({ onBack, initialStoryId }: Props) {
   const [archive, setArchive] = useState<ArchivedStory[]>([]);
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<string>(initialStoryId ?? "");
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,18 @@ export default function StoryContinuation({ onBack }: Props) {
   const [showExisting, setShowExisting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setArchive(getArchive()); }, []);
+  useEffect(() => {
+    const loaded = getArchive();
+    setArchive(loaded);
+    if (initialStoryId) {
+      const story = loaded.find(s => s.id === initialStoryId);
+      if (story) {
+        setChapters(story.chapters);
+        setStep("reading");
+        generateChapter(story, story.chapters, "");
+      }
+    }
+  }, []);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [streamingText, chapters]);
 
   const selected = archive.find(s => s.id === selectedId);
