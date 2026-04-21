@@ -12,21 +12,35 @@ const FLASH_DARK  = "#92400E";
 const CROSS_COLOR = "#C084FC";
 const CROSS_DARK  = "#4C1D95";
 
+import saraLanceImg from "@assets/heroines/sara_lance.png";
+import laurelLanceImg from "@assets/heroines/laurel_lance.png";
+import theaQueenImg from "@assets/heroines/thea_queen.png";
+import nyssaAlGhulImg from "@assets/heroines/nyssa_al_ghul.png";
+import dinahDrakeImg from "@assets/heroines/dinah_drake.png";
+import emikoQueenImg from "@assets/heroines/emiko_queen.png";
+import felicitySmoakImg from "@assets/heroines/felicity_smoak.png";
+import irisWestAllenImg from "@assets/heroines/iris_west_allen.png";
+import caitlinSnowImg from "@assets/heroines/caitlin_snow.png";
+import jesseQuickImg from "@assets/heroines/jesse_quick.png";
+import noraWestAllenImg from "@assets/heroines/nora_west_allen.png";
+import cecileHortonImg from "@assets/heroines/cecile_horton.png";
+import alexDanversImg from "@assets/heroines/alex_danvers.png";
+
 // ── HEROINES ─────────────────────────────────────────────────────────────────
 const CW_HEROINES = [
-  { name: "Sara Lance",      alias: "White Canary",        show: "arrow", icon: "🕊", power: "League of Assassins master fighter & temporal agent" },
-  { name: "Laurel Lance",    alias: "Black Canary",        show: "arrow", icon: "🎵", power: "Canary Cry sonic device & expert martial artist" },
-  { name: "Thea Queen",      alias: "Speedy / Red Arrow",  show: "arrow", icon: "🏹", power: "Olympic archer & League-trained fighter, Lazarus Pit-enhanced" },
-  { name: "Nyssa al Ghul",   alias: "Heir to the Demon",   show: "arrow", icon: "🗡", power: "League of Assassins grandmaster — deadliest woman alive" },
-  { name: "Dinah Drake",     alias: "Black Canary III",    show: "arrow", icon: "🎤", power: "Metahuman Canary Cry & expert street fighter" },
-  { name: "Emiko Queen",     alias: "Green Arrow II",      show: "arrow", icon: "🟢", power: "Master archer & trained assassin — Oliver's sister" },
-  { name: "Felicity Smoak",  alias: "Overwatch",           show: "arrow", icon: "💻", power: "World-class hacker & tactical support, Palmer Tech CEO" },
-  { name: "Iris West-Allen", alias: "The Flash's Heart",   show: "flash", icon: "⚡", power: "Speed Force conduit — the lightning rod that calls Barry home" },
-  { name: "Caitlin Snow",    alias: "Killer Frost",        show: "flash", icon: "❄",  power: "Cryokinesis & frost generation — divided between two identities" },
-  { name: "Jesse Quick",     alias: "Speed Force Hero",    show: "flash", icon: "💛", power: "Speedster from Earth-2 & genius-level intellect" },
-  { name: "Nora West-Allen", alias: "XS",                  show: "flash", icon: "⚡", power: "Speedster from the future — Barry and Iris's daughter" },
-  { name: "Cecile Horton",   alias: "District Attorney",   show: "flash", icon: "⚖",  power: "Metahuman empath — reads emotions and projects fear" },
-  { name: "Alex Danvers",    alias: "DEO Director",        show: "both",  icon: "🛡", power: "ARGUS / DEO tactical director — no powers, no mercy" },
+  { name: "Sara Lance",      alias: "White Canary",        show: "arrow", icon: "🕊", image: saraLanceImg,      power: "League of Assassins master fighter & temporal agent" },
+  { name: "Laurel Lance",    alias: "Black Canary",        show: "arrow", icon: "🎵", image: laurelLanceImg,    power: "Canary Cry sonic device & expert martial artist" },
+  { name: "Thea Queen",      alias: "Speedy / Red Arrow",  show: "arrow", icon: "🏹", image: theaQueenImg,      power: "Olympic archer & League-trained fighter, Lazarus Pit-enhanced" },
+  { name: "Nyssa al Ghul",   alias: "Heir to the Demon",   show: "arrow", icon: "🗡", image: nyssaAlGhulImg,    power: "League of Assassins grandmaster — deadliest woman alive" },
+  { name: "Dinah Drake",     alias: "Black Canary III",    show: "arrow", icon: "🎤", image: dinahDrakeImg,     power: "Metahuman Canary Cry & expert street fighter" },
+  { name: "Emiko Queen",     alias: "Green Arrow II",      show: "arrow", icon: "🟢", image: emikoQueenImg,     power: "Master archer & trained assassin — Oliver's sister" },
+  { name: "Felicity Smoak",  alias: "Overwatch",           show: "arrow", icon: "💻", image: felicitySmoakImg,  power: "World-class hacker & tactical support, Palmer Tech CEO" },
+  { name: "Iris West-Allen", alias: "The Flash's Heart",   show: "flash", icon: "⚡", image: irisWestAllenImg,  power: "Speed Force conduit — the lightning rod that calls Barry home" },
+  { name: "Caitlin Snow",    alias: "Killer Frost",        show: "flash", icon: "❄",  image: caitlinSnowImg,    power: "Cryokinesis & frost generation — divided between two identities" },
+  { name: "Jesse Quick",     alias: "Speed Force Hero",    show: "flash", icon: "💛", image: jesseQuickImg,     power: "Speedster from Earth-2 & genius-level intellect" },
+  { name: "Nora West-Allen", alias: "XS",                  show: "flash", icon: "⚡", image: noraWestAllenImg,  power: "Speedster from the future — Barry and Iris's daughter" },
+  { name: "Cecile Horton",   alias: "District Attorney",   show: "flash", icon: "⚖",  image: cecileHortonImg,   power: "Metahuman empath — reads emotions and projects fear" },
+  { name: "Alex Danvers",    alias: "DEO Director",        show: "both",  icon: "🛡", image: alexDanversImg,    power: "ARGUS / DEO tactical director — no powers, no mercy" },
 ];
 
 // ── HEROES ───────────────────────────────────────────────────────────────────
@@ -293,7 +307,7 @@ export default function ArrowverseMode({ onBack }: Props) {
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [seasonStep, setSeasonStep] = useState<"seasons" | "episodes" | "configure" | "story">("seasons");
   const [progress, setProgress] = useState<Record<string, boolean>>(loadProgress);
-  const [selectedHeroine, setSelectedHeroine] = useState<typeof CW_HEROINES[number]>(CW_HEROINES[0]);
+  const [selectedHeroine, setSelectedHeroine] = useState<{ name: string; alias: string; show: string; icon: string; image?: string; power: string }>(CW_HEROINES[0]);
   const [protagonistType, setProtagonistType] = useState<"heroine" | "hero">("heroine");
   const [customVillain, setCustomVillain] = useState("");
   const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
@@ -460,18 +474,29 @@ export default function ArrowverseMode({ onBack }: Props) {
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "8px" }}>
-            {(protagonistType === "heroine" ? CW_HEROINES : CW_HEROES).map(h => (
-              <button key={h.name} onClick={() => setSelectedHeroine(h)}
-                style={{ background: selectedHeroine.name === h.name ? `${color}18` : "#0e0e18", border: `1px solid ${selectedHeroine.name === h.name ? color : "#222"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "16px" }}>{h.icon}</span>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: selectedHeroine.name === h.name ? color : "#ddd" }}>{h.name}</div>
-                    <div style={{ fontSize: "10px", color: "#555" }}>{h.alias}</div>
+            {(protagonistType === "heroine" ? CW_HEROINES : CW_HEROES).map(h => {
+              const isSel = selectedHeroine.name === h.name;
+              const img = (h as { image?: string }).image;
+              return (
+                <button key={h.name} onClick={() => setSelectedHeroine(h)}
+                  style={{ background: isSel ? `${color}18` : "#0e0e18", border: `1px solid ${isSel ? color : "#222"}`, borderRadius: "8px", padding: "0", cursor: "pointer", textAlign: "left", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+                  {img ? (
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#000", overflow: "hidden" }}>
+                      <img src={img} alt={h.name} style={{ width: "100%", height: "100%", objectFit: "cover", filter: isSel ? "none" : "grayscale(0.3) brightness(0.85)", transition: "filter 0.2s" }} />
+                      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 40%, ${isSel ? color + "22" : "#000"}cc 100%)` }} />
+                      <div style={{ position: "absolute", top: "6px", right: "6px", fontSize: "16px", textShadow: "0 1px 4px #000" }}>{h.icon}</div>
+                    </div>
+                  ) : null}
+                  <div style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                    {!img && <span style={{ fontSize: "16px" }}>{h.icon}</span>}
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: isSel ? color : "#ddd" }}>{h.name}</div>
+                      <div style={{ fontSize: "10px", color: "#555" }}>{h.alias}</div>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
         <div style={{ marginBottom: "24px" }}>

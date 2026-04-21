@@ -1,5 +1,82 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "iKKo_I07g7y_ga165cGTX"
+uri = "file://attached_assets/heroines/sara_lance.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "23wXY_e4h-dhkoLfRkK0u"
+uri = "file://attached_assets/heroines/laurel_lance.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "94hR2xEeNp8zPNctT2u27"
+uri = "file://attached_assets/heroines/thea_queen.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Co0ppqsToWSDPc5sli-KY"
+uri = "file://attached_assets/heroines/nyssa_al_ghul.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "aTdxNt0Mjcv1Zte91mXWC"
+uri = "file://attached_assets/heroines/dinah_drake.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "V6U3llyoS6uhjNa_Grm_M"
+uri = "file://attached_assets/heroines/emiko_queen.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "4ityMzXKeR8vg3xqt3kDd"
+uri = "file://attached_assets/heroines/felicity_smoak.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "INS5APQ7AKnAlvQYGAzej"
+uri = "file://attached_assets/heroines/iris_west_allen.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "rUJmczNll6w75JSdIwJR0"
+uri = "file://attached_assets/heroines/caitlin_snow.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "LoIA4tEvfcq1s4hp8Um2W"
+uri = "file://attached_assets/heroines/jesse_quick.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0vaUVWTH_cw5ST4zIXTzw"
+uri = "file://attached_assets/heroines/nora_west_allen.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "nqLGcu1enY8rUl5fzjsYj"
+uri = "file://attached_assets/heroines/cecile_horton.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "jmzByMoYfYf3v0nSeqka-"
+uri = "file://attached_assets/heroines/alex_danvers.png"
+type = "image"
+title = "generated_image"
 
 [[outputs]]
 id = "iHPE1tubD4I92S5VX7UI_"
