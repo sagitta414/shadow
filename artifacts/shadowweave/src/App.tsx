@@ -59,6 +59,7 @@ import StoryTimeline from "./pages/StoryTimeline";
 import RewriteCanonMode from "./pages/RewriteCanonMode";
 import SeasonArcMode from "./pages/SeasonArcMode";
 import DarkDossier from "./pages/DarkDossier";
+import CWSpecialistHub from "./pages/CWSpecialistHub";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -141,6 +142,7 @@ type Page =
   | "rewrite-canon"
   | "season-arc"
   | "dark-dossier"
+  | "cw-specialist"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -361,11 +363,9 @@ function AppInner() {
           onCivilianCapture={() => navigate("civilian-capture")}
           onBountyBoard={() => navigate("bounty-board")}
           onHeroineLore={() => navigate("heroine-lore")}
-          onArrowverseMode={() => navigate("arrowverse-mode")}
           onStoryTimeline={() => navigate("story-timeline")}
-          onRewriteCanon={() => navigate("rewrite-canon")}
-          onSeasonArc={() => navigate("season-arc")}
           onDarkDossier={() => navigate("dark-dossier")}
+          onCWSpecialist={() => navigate("cw-specialist")}
         />
       )}
 
@@ -654,6 +654,10 @@ function AppInner() {
 
       {page === "dark-dossier" && (
         <DarkDossier onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
+      )}
+
+      {page === "cw-specialist" && (
+        <CWSpecialistHub onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
       )}
     </div>
   );
