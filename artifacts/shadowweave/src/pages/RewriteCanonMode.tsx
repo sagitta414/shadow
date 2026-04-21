@@ -1,15 +1,15 @@
 import { useState, useRef } from "react";
-import { saveStoryToArchive } from "../lib/archive";
+import { saveStoryToArchive, getArchive } from "../lib/archive";
 import { buildVoiceInjection } from "../lib/villainVoices";
 import StoryReader from "../components/StoryReader";
 import { useIsMobile } from "../hooks/useIsMobile";
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; onContinue?: (storyId: string) => void; }
 
 interface CanonMoment {
   id: string; show: string; season: number; episode: string;
   title: string; what: string; canon: string; dark: string;
-  villain: string; heroine: string; color: string;
+  villain: string; heroine: string; color: string; secret?: boolean;
 }
 
 const CANON_MOMENTS: CanonMoment[] = [
@@ -25,6 +25,7 @@ const CANON_MOMENTS: CanonMoment[] = [
   { id: "sara-legends-timemaster", show: "LEGENDS", season: 1, episode: "S1E03", title: "SARA AND THE TIMEMASTERS", what: "The Legends' encounter with the Timemasters — who are secretly working for Vandal Savage", canon: "The Legends escape Timemaster custody. Rip Hunter's plan is exposed as more complicated than it seemed.", dark: "Sara is separated from the group during the escape. The Timemasters who recapture her have very specific orders from Vandal Savage — she is not to be killed. She is to be kept. Savage wants Hawkgirl, but Sara is an adequate substitute for what he has planned.", villain: "Vandal Savage", heroine: "Sara Lance", color: "#FB923C" },
   { id: "kendra-savage", show: "LEGENDS", season: 1, episode: "S1E01", title: "KENDRA'S THOUSAND-YEAR HISTORY WITH SAVAGE", what: "Vandal Savage's obsession with Hawkgirl across 4,000 years", canon: "Kendra learns to control her wings and fights Savage across multiple time periods.", dark: "The Legends arrive at one of the pivot points — but not in time to stop Savage's ritual. This particular cycle ends differently. Kendra is taken. And Savage, for the first time in four thousand years, doesn't immediately kill her. He's tired of the loop. He wants something else this time.", villain: "Vandal Savage", heroine: "Kendra Saunders (Hawkgirl)", color: "#FB923C" },
   { id: "alex-deo", show: "SUPERGIRL", season: 3, episode: "S3E09", title: "ALEX AND THE WORLDKILLER DATA", what: "Alex Danvers investigating the Worldkiller program — putting herself in range of Reign", canon: "Alex's investigation helps the team understand Reign's origin and weaknesses.", dark: "Alex's investigation takes her to a DEO black site that Reign has already found. Reign is not interested in the data. She is interested in Supergirl's human sister — and what her pain would do to Kara.", villain: "Reign (Worldkiller)", heroine: "Alex Danvers", color: "#60A5FA" },
+  { id: "prometheus-finale", show: "ARROW", season: 5, episode: "S5E23", title: "PROMETHEUS COLLECTS HIS DUE", what: "Adrian Chase's final gambit — the people Oliver loves, on Lian Yu, with a dead man's switch", canon: "Oliver confronts Prometheus on Lian Yu. Chase detonates the island to wound Oliver. Oliver is forced to save everyone, losing Chase.", dark: "Oliver makes a choice that Prometheus has been engineering for five years. Chase doesn't want to blow up the island — that was always the contingency. What he actually wants is simpler and worse: he wants to watch Oliver choose who he can't let die. The calculations are very specific. Felicity is the answer. Chase has known this since the first case file. This is the version where Oliver is five seconds too late to stop him from proving it.", villain: "Prometheus (Adrian Chase)", heroine: "Felicity Smoak", color: "#FF4060", secret: true },
 ];
 
 const CW_HEROINES = [
@@ -61,7 +62,7 @@ function streamRequest(endpoint: string, body: object, onChunk: (c: string) => v
 }
 function isAbort(e: unknown) { return e instanceof Error && e.name === "AbortError"; }
 
-export default function RewriteCanonMode({ onBack }: Props) {
+export default function RewriteCanonMode({ onBack, onContinue }: Props) {
   const isMobile = useIsMobile(640);
   const [step, setStep] = useState<"browse" | "configure" | "story">("browse");
   const [selected, setSelected] = useState<CanonMoment | null>(null);
@@ -172,7 +173,7 @@ export default function RewriteCanonMode({ onBack }: Props) {
             </button>
           </div>
         </div>
-        {readingMode && savedId && <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} />}
+        {readingMode && savedId && <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} onContinue={onContinue} />}
       </div>
     );
   }
@@ -277,6 +278,8 @@ export default function RewriteCanonMode({ onBack }: Props) {
   }
 
   /* ── BROWSE VIEW ── */
+  const rewritesDone = getArchive().filter(s => s.tool === "Rewrite the Canon").length;
+  const prometheusUnlocked = rewritesDone >= 5;
   const showGroups = ["ARROW", "THE FLASH", "LEGENDS", "SUPERGIRL"];
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -301,15 +304,16 @@ export default function RewriteCanonMode({ onBack }: Props) {
         </div>
 
         {showGroups.map(show => {
-          const moments = CANON_MOMENTS.filter(m => m.show === show);
-          if (!moments.length) return null;
-          const col = moments[0].color;
+          const moments = CANON_MOMENTS.filter(m => m.show === show && !m.secret);
+          const secretMoments = CANON_MOMENTS.filter(m => m.show === show && m.secret);
+          if (!moments.length && !secretMoments.length) return null;
+          const col = moments[0]?.color ?? "#FF4060";
           return (
             <div key={show} style={{ marginBottom: "36px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "4px", color: col }}>{show}</div>
                 <div style={{ flex: 1, height: "1px", background: `linear-gradient(to right, ${col}44, transparent)` }} />
-                <div style={{ fontSize: "10px", color: "#333" }}>{moments.length}</div>
+                <div style={{ fontSize: "10px", color: "#333" }}>{moments.length + (prometheusUnlocked ? secretMoments.length : 0)}</div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: "10px" }}>
                 {moments.map(m => (
@@ -330,6 +334,42 @@ export default function RewriteCanonMode({ onBack }: Props) {
                     </div>
                   </button>
                 ))}
+
+                {/* Secret unlocked moments */}
+                {prometheusUnlocked && secretMoments.map(m => (
+                  <button key={m.id} className="rcm-card"
+                    onClick={() => { setSelected(m); setHeroine(m.heroine); setStep("configure"); }}
+                    style={{ background: `linear-gradient(135deg, ${m.color}0d, #0a0a12)`, border: `1px solid ${m.color}44`, borderRadius: "12px", padding: isMobile ? "16px" : "18px", textAlign: "left", WebkitTapHighlightColor: "transparent", position: "relative" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}88`; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}44`; }}>
+                    <div style={{ position: "absolute", top: "10px", right: "10px", background: `${m.color}22`, border: `1px solid ${m.color}55`, borderRadius: "20px", padding: "2px 8px", fontSize: "8px", color: m.color, letterSpacing: "1px", fontWeight: 700 }}>🔮 CLASSIFIED</div>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", paddingRight: "80px" }}>
+                      <div style={{ background: `${m.color}22`, border: `1px solid ${m.color}44`, borderRadius: "3px", padding: "2px 8px", fontSize: "9px", color: m.color, letterSpacing: "1px", fontWeight: 700 }}>{m.episode}</div>
+                      <div style={{ fontSize: "9px", color: m.color + "88", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.villain}</div>
+                    </div>
+                    <div style={{ fontSize: isMobile ? "13px" : "14px", fontWeight: 900, color: m.color, letterSpacing: "1px", marginBottom: "6px", lineHeight: 1.2 }}>{m.title}</div>
+                    <div style={{ fontSize: "11px", color: "#888", lineHeight: 1.5, marginBottom: "10px" }}>{m.what}</div>
+                    <div style={{ background: `${m.color}08`, border: `1px solid ${m.color}22`, borderRadius: "6px", padding: "10px 12px" }}>
+                      <div style={{ fontSize: "8px", letterSpacing: "2px", color: m.color, marginBottom: "4px", fontWeight: 700 }}>THIS VERSION</div>
+                      <div style={{ fontSize: "11px", color: "#777", lineHeight: 1.6, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: isMobile ? 2 : 3, WebkitBoxOrient: "vertical" }}>{m.dark}</div>
+                    </div>
+                  </button>
+                ))}
+
+                {/* Classified teaser when not unlocked */}
+                {!prometheusUnlocked && secretMoments.length > 0 && (
+                  <div style={{ background: "rgba(255,64,96,0.04)", border: "1px solid rgba(255,64,96,0.18)", borderRadius: "12px", padding: isMobile ? "16px" : "18px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px", minHeight: "120px" }}>
+                    <div style={{ fontSize: "20px", filter: "grayscale(1)", opacity: 0.4 }}>🔮</div>
+                    <div style={{ fontSize: "11px", fontWeight: 900, color: "#444", letterSpacing: "2px", textAlign: "center" }}>CLASSIFIED SCENARIO</div>
+                    <div style={{ fontSize: "10px", color: "#333", textAlign: "center", lineHeight: 1.5 }}>
+                      Complete {5 - rewritesDone} more canon rewrite{5 - rewritesDone !== 1 ? "s" : ""} to unlock
+                    </div>
+                    <div style={{ height: "2px", width: "80%", background: "rgba(255,255,255,0.04)", borderRadius: "2px", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${(rewritesDone / 5) * 100}%`, background: "rgba(255,64,96,0.4)", borderRadius: "2px" }} />
+                    </div>
+                    <div style={{ fontSize: "9px", color: "#333" }}>{rewritesDone} / 5</div>
+                  </div>
+                )}
               </div>
             </div>
           );

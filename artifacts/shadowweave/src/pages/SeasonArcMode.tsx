@@ -4,7 +4,7 @@ import { buildVoiceInjection } from "../lib/villainVoices";
 import StoryReader from "../components/StoryReader";
 import { useIsMobile } from "../hooks/useIsMobile";
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; onContinue?: (storyId: string) => void; }
 
 interface SeasonConfig {
   arcName: string; villain: string; heroines: string[];
@@ -52,7 +52,7 @@ function isAbort(e: unknown) { return e instanceof Error && e.name === "AbortErr
 
 const accent = "#A855F7";
 
-export default function SeasonArcMode({ onBack }: Props) {
+export default function SeasonArcMode({ onBack, onContinue }: Props) {
   const isMobile = useIsMobile(640);
   const [step, setStep] = useState<"setup" | "arc">("setup");
   const [config, setConfig] = useState<SeasonConfig>({
@@ -259,7 +259,7 @@ export default function SeasonArcMode({ onBack }: Props) {
           </div>
         </div>
 
-        {readingMode && fakeStory && <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} />}
+        {readingMode && fakeStory && <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} onContinue={onContinue} />}
       </div>
     );
   }

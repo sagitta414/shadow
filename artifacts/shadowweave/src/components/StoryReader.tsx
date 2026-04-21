@@ -5,6 +5,7 @@ interface Props {
   story: ArchivedStory;
   onClose: () => void;
   initialChapter?: number;
+  onContinue?: (storyId: string) => void;
 }
 
 const MOOD_WORDS: { words: string[]; label: string; color: string }[] = [
@@ -32,7 +33,7 @@ function estimateReadTime(text: string): string {
   return `${mins} min read`;
 }
 
-export default function StoryReader({ story, onClose, initialChapter = 0 }: Props) {
+export default function StoryReader({ story, onClose, initialChapter = 0, onContinue }: Props) {
   const [chapter, setChapter] = useState(initialChapter);
   const [fontSize, setFontSize] = useState(19);
   const [shown, setShown] = useState(false);
@@ -271,19 +272,20 @@ export default function StoryReader({ story, onClose, initialChapter = 0 }: Prop
       {/* Bottom nav */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0.75rem 2rem",
+        padding: "0.75rem 1.25rem",
         borderTop: "1px solid rgba(255,255,255,0.045)",
         background: "rgba(2,0,8,0.95)",
         backdropFilter: "blur(20px)",
-        flexShrink: 0, gap: "1rem",
+        flexShrink: 0, gap: "0.6rem",
         position: "relative", zIndex: 2,
+        flexWrap: "wrap",
       }}>
         <button
           className="sr-nav-btn"
           onClick={goPrev}
           disabled={chapter === 0}
           style={{
-            padding: "0.5rem 1.25rem",
+            padding: "0.5rem 1rem",
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: "10px",
@@ -301,16 +303,38 @@ export default function StoryReader({ story, onClose, initialChapter = 0 }: Prop
           fontFamily: "'Cinzel', serif",
           fontSize: "0.5rem", letterSpacing: "2px",
           color: "rgba(255,255,255,0.2)",
+          flexShrink: 0,
         }}>
           {chapter + 1} / {total}
         </div>
+
+        {onContinue && story.id !== "tmp" && (
+          <button
+            onClick={() => { handleClose(); setTimeout(() => onContinue(story.id), 320); }}
+            style={{
+              padding: "0.5rem 1rem",
+              background: "rgba(52,211,153,0.1)",
+              border: "1px solid rgba(52,211,153,0.35)",
+              borderRadius: "10px",
+              color: "#34D399",
+              fontFamily: "'Cinzel', serif",
+              fontSize: "0.55rem", letterSpacing: "1.5px",
+              cursor: "pointer",
+              transition: "all 0.15s",
+              flexShrink: 0,
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            ➕ Continue
+          </button>
+        )}
 
         <button
           className="sr-nav-btn"
           onClick={goNext}
           disabled={chapter === total - 1}
           style={{
-            padding: "0.5rem 1.25rem",
+            padding: "0.5rem 1rem",
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: "10px",

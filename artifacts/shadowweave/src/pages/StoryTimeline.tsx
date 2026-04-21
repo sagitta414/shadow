@@ -3,7 +3,7 @@ import { getArchive, ArchivedStory } from "../lib/archive";
 import StoryReader from "../components/StoryReader";
 import { useIsMobile } from "../hooks/useIsMobile";
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; onContinue?: (storyId: string) => void; }
 
 const UNIVERSE_COLORS: Record<string, string> = {
   MARVEL: "#FF6060", DC: "#60A0FF", CW: "#40E090", "The Boys": "#FF3D00",
@@ -28,7 +28,7 @@ function dayKey(ts: number) {
 
 type GroupBy = "date" | "tool" | "villain";
 
-export default function StoryTimeline({ onBack }: Props) {
+export default function StoryTimeline({ onBack, onContinue }: Props) {
   const stories = getArchive();
   const isMobile = useIsMobile(640);
   const [groupBy, setGroupBy] = useState<GroupBy>("date");
@@ -260,7 +260,7 @@ export default function StoryTimeline({ onBack }: Props) {
         <div style={{ marginLeft: "auto", fontSize: "10px", color: "#2a2a2a" }}>← scroll →</div>
       </div>
 
-      {readingStory && <StoryReader story={readingStory} onClose={() => setReadingStory(null)} />}
+      {readingStory && <StoryReader story={readingStory} onClose={() => setReadingStory(null)} onContinue={onContinue} />}
     </div>
   );
 }

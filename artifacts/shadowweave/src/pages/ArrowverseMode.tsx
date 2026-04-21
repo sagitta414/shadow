@@ -355,9 +355,9 @@ function episodesCompleted(progress: Record<string, boolean>, seasonId: string, 
 }
 
 // ── COMPONENT ──────────────────────────────────────────────────────────────────
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; onContinue?: (storyId: string) => void; }
 
-export default function ArrowverseMode({ onBack }: Props) {
+export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [mainView, setMainView] = useState<"scenarios" | "seasons">("scenarios");
   const [activeShow, setActiveShow] = useState<"all" | "arrow" | "flash">("all");
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
@@ -955,7 +955,7 @@ export default function ArrowverseMode({ onBack }: Props) {
           favourite: false,
           wordCount: chapters.join(" ").split(/\s+/).filter(Boolean).length,
         };
-        return <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} />;
+        return <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} onContinue={onContinue} />;
       })()}
     </div>
   );

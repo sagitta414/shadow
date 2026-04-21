@@ -58,6 +58,7 @@ import ArrowverseMode from "./pages/ArrowverseMode";
 import StoryTimeline from "./pages/StoryTimeline";
 import RewriteCanonMode from "./pages/RewriteCanonMode";
 import SeasonArcMode from "./pages/SeasonArcMode";
+import DarkDossier from "./pages/DarkDossier";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -139,6 +140,7 @@ type Page =
   | "story-timeline"
   | "rewrite-canon"
   | "season-arc"
+  | "dark-dossier"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -363,6 +365,7 @@ function AppInner() {
           onStoryTimeline={() => navigate("story-timeline")}
           onRewriteCanon={() => navigate("rewrite-canon")}
           onSeasonArc={() => navigate("season-arc")}
+          onDarkDossier={() => navigate("dark-dossier")}
         />
       )}
 
@@ -634,19 +637,23 @@ function AppInner() {
       )}
 
       {page === "arrowverse-mode" && (
-        <ArrowverseMode onBack={() => navigate("home")} />
+        <ArrowverseMode onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
       )}
 
       {page === "story-timeline" && (
-        <StoryTimeline onBack={() => navigate("home")} />
+        <StoryTimeline onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
       )}
 
       {page === "rewrite-canon" && (
-        <RewriteCanonMode onBack={() => navigate("home")} />
+        <RewriteCanonMode onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
       )}
 
       {page === "season-arc" && (
-        <SeasonArcMode onBack={() => navigate("home")} />
+        <SeasonArcMode onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
+      )}
+
+      {page === "dark-dossier" && (
+        <DarkDossier onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
       )}
     </div>
   );

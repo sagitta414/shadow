@@ -68,6 +68,7 @@ interface HomepageProps {
   onStoryTimeline: () => void;
   onRewriteCanon: () => void;
   onSeasonArc: () => void;
+  onDarkDossier?: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -447,6 +448,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🎯", title: "BOUNTY BOARD", badge: "Weekly · Challenges", desc: "Six rotating weekly contracts. Complete them across modes to earn exclusive rewards. New bounties drop every Monday.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onBountyBoard, img: `${BASE}/heroes/tool-bounty-board.png` },
     { icon: "📜", title: "HEROINE LORE", badge: "Living Record · AI Portrait", desc: "A living chronicle of every heroine who has passed through the dark — how she changed, what broke her, and what endured. AI-generated portraits included.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onHeroineLore, img: `${BASE}/heroes/tool-heroine-dossier.png` },
     { icon: "🗓", title: "STORY TIMELINE", badge: "Archive · Visual Timeline", desc: "See every story laid out as a visual horizontal timeline — grouped by date, mode, or villain. Click any story to open it in full reading mode.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onStoryTimeline, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "📊", title: "DARK DOSSIER", badge: "Stats · Milestones · Secrets", desc: "Your complete shadow record — total stories, words written, mode breakdown, top villains and heroines. Five milestones gate hidden scenarios and rewards.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onDarkDossier, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   return (
