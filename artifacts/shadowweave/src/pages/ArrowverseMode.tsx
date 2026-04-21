@@ -5,12 +5,50 @@ import { saveStoryToArchive, updateArchiveStory } from "../lib/archive";
 const _BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // ── COLOURS ──────────────────────────────────────────────────────────────────
-const ARROW_COLOR = "#4ADE80";
-const FLASH_COLOR = "#FCD34D";
-const ARROW_DARK  = "#166534";
-const FLASH_DARK  = "#92400E";
-const CROSS_COLOR = "#C084FC";
-const CROSS_DARK  = "#4C1D95";
+const ARROW_COLOR  = "#4ADE80";
+const FLASH_COLOR  = "#FCD34D";
+const ARROW_DARK   = "#166534";
+const FLASH_DARK   = "#92400E";
+const CROSS_COLOR  = "#C084FC";
+const CROSS_DARK   = "#4C1D95";
+const LEGEND_COLOR = "#FB923C";
+const LEGEND_DARK  = "#7C2D12";
+const SUPRA_COLOR  = "#60A5FA";
+const SUPRA_DARK   = "#1E3A5F";
+
+// ── LOCATIONS ────────────────────────────────────────────────────────────────
+const AV_LOCATIONS = [
+  { id: "default",        label: "Default (from scenario)",    show: "all",    desc: "Use the location defined by the chosen scenario" },
+  { id: "bunker",         label: "The Bunker",                 show: "arrow",  desc: "Team Arrow's underground headquarters — screens, gear, and secrets buried beneath Star City" },
+  { id: "nanda-parbat",   label: "Nanda Parbat",              show: "arrow",  desc: "The League of Assassins' mountain fortress — ancient, isolated, inescapable" },
+  { id: "iron-heights",   label: "Iron Heights Penitentiary",  show: "arrow",  desc: "Star City's maximum security prison — built for metahumans and filled with Oliver's enemies" },
+  { id: "lian-yu",        label: "Lian Yu",                    show: "arrow",  desc: "The island that made Oliver Queen. Remote, jungle-covered, nowhere to run" },
+  { id: "star-labs",      label: "STAR Labs",                  show: "flash",  desc: "The Flash's base — accelerator corridors, the Pipeline, and Harrison Wells' hidden rooms" },
+  { id: "pipeline",       label: "The Pipeline",               show: "flash",  desc: "STAR Labs' metahuman containment cells — designed to hold powered individuals indefinitely" },
+  { id: "argus",          label: "ARGUS Black Site",           show: "both",   desc: "Off-the-books government facility. No records. No oversight. Whatever happens here doesn't exist." },
+  { id: "hive-bunker",    label: "HIVE Genesis Bunker",        show: "arrow",  desc: "Damien Darhk's underground ark — built for the apocalypse and running on dark magic" },
+  { id: "waverider",      label: "Waverider",                  show: "legends",desc: "The Legends' time-ship — somewhere between centuries, no backup, no signal" },
+  { id: "deo",            label: "DEO Headquarters",           show: "both",   desc: "National City's alien-response facility. Alex Danvers built the protocols. Someone else is using them now." },
+  { id: "abandoned",      label: "Abandoned Warehouse",        show: "all",    desc: "Every city has them. No cameras, no neighbours, no help coming" },
+  { id: "rooftop",        label: "Queen Consolidated Rooftop", show: "arrow",  desc: "The crown of Star City — dramatic, exposed, and owned by the villain tonight" },
+];
+
+// ── SCENE FOCUS ───────────────────────────────────────────────────────────────
+const SCENE_FOCUS = [
+  { id: "psychological", label: "PSYCHOLOGICAL", desc: "Mind games, manipulation, power dynamics, the slow erosion of will" },
+  { id: "physical",      label: "PHYSICAL",      desc: "Combat, restraint, dominance, the body as the battleground" },
+  { id: "explicit",      label: "EXPLICIT",      desc: "Fully sexual — graphic, detailed, no softening" },
+] as const;
+type SceneFocusId = typeof SCENE_FOCUS[number]["id"];
+
+// ── ENDING FATE ───────────────────────────────────────────────────────────────
+const ENDING_FATES = [
+  { id: "no-escape",     label: "NO ESCAPE",     icon: "⛓",  desc: "Captivity is absolute. The story ends with her still held, situation worsened or deepened" },
+  { id: "cliffhanger",   label: "CLIFFHANGER",   icon: "⚡",  desc: "Unresolved tension at the peak — a final image, a door left open, rescue cut off at the last moment" },
+  { id: "failed-escape", label: "FAILED ESCAPE", icon: "🔄",  desc: "She tries. She almost makes it. It doesn't work. The villain's grip tightens as a consequence" },
+  { id: "ambiguous",     label: "AMBIGUOUS",     icon: "🌑",  desc: "Deliberately unresolved — fate unknown, neither escape nor confirmed doom" },
+] as const;
+type EndingFateId = typeof ENDING_FATES[number]["id"];
 
 import saraLanceImg from "@assets/heroines/sara_lance.png";
 import laurelLanceImg from "@assets/heroines/laurel_lance.png";
@@ -67,6 +105,7 @@ interface Scenario {
   title: string; tagline: string; villain: string; villainDetail: string;
   setting: string; tone: string; captureMethod: string; restraints: string;
   stakes: string; details: string; storyContext: string;
+  universe?: string;
 }
 
 const SCENARIOS: Scenario[] = [
@@ -88,6 +127,15 @@ const SCENARIOS: Scenario[] = [
   { id: "flash-s4-thinker", show: "flash", season: 4, episodeRef: "S4E9 — 'Don't Run' / S4E10", title: "THE THINKER", tagline: "DeVoe has planned 4,527 possible outcomes. This is one of them.", villain: "Clifford DeVoe (The Thinker)", villainDetail: "Clifford DeVoe — a man whose intelligence has been artificially elevated past the limits of human cognition.", setting: "DeVoe's constructed scenario — he chose the location, the timing, and the variables.", tone: "Intellectual horror — a villain who is genuinely smarter than the heroes and has already won", captureMethod: "Amunet Black was hired to handle the physical side. DeVoe handled the planning.", restraints: "Amunet's metallic shards — or DeVoe's mental control fields.", stakes: "DeVoe's Enlightenment will lobotomise the entire human population. Barry is being framed for murder.", details: "DeVoe doesn't gloat because gloating wastes processing power.", storyContext: "Based on The Flash Season 4's split-capture episode — DeVoe takes Barry and Amunet takes Caitlin simultaneously." },
   { id: "flash-s5-cicada", show: "flash", season: 5, episodeRef: "S5E11 — 'Seeing Red'", title: "CICADA'S DAGGER", tagline: "One wound from the dagger and every metahuman power switches off. She just found that out.", villain: "Cicada (Orlin Dwyer)", villainDetail: "Cicada — a metahuman serial killer who hunts other metahumans. His dagger negates their powers on contact.", setting: "Wherever Cicada hunts — dark streets, industrial areas, no witnesses", tone: "Stalker horror — a killer who targets the exact population she belongs to", captureMethod: "One throw. The dagger hit her before she knew he was there.", restraints: "The dagger's field — as long as it's near her, her powers are simply absent.", stakes: "Cicada has killed fourteen metahumans. She is number fifteen.", details: "Cicada is grieving and he has weaponised his grief.", storyContext: "Based on The Flash Season 5's most brutal moment — Cicada breaks Nora West-Allen's back, her healing suppressed by the dagger's field." },
   { id: "flash-s6-speed-force", show: "flash", season: 6, episodeRef: "S6 — Death of the Speed Force Arc", title: "DEATH OF THE SPEED FORCE", tagline: "The Speed Force is dying. Her powers are dying with it. He planned for exactly this.", villain: "Bloodwork (Ramsey Rosso)", villainDetail: "Ramsey Rosso — a former physician who infected himself with dark matter and can reanimate the dead.", setting: "Crisis-era Central City — the Speed Force is collapsing, every speedster is losing power", tone: "Apocalyptic, body horror, the terror of losing the power that defined you", captureMethod: "She couldn't run. That's the point.", restraints: "Bloodwork's living darkness — organic, responsive, and utterly alien", stakes: "Crisis on Infinite Earths is happening above them. The Speed Force is dead.", details: "Bloodwork is dying of a degenerative illness and wants immortality.", storyContext: "Based on The Flash Season 6's pre-Crisis arc — the Speed Force begins dying, leaving Barry's powers fluctuating." },
+  // ── LEGENDS OF TOMORROW ──────────────────────────────────────────────────────
+  { id: "legends-vandal-savage", universe: "🌀 LEGENDS", show: "flash" as "arrow" | "flash", season: 1, episodeRef: "Legends S1 — 'Pilot' / Vandal Savage Arc", title: "VANDAL SAVAGE", tagline: "He has killed her before. Across four thousand years, always the same ending.", villain: "Vandal Savage", villainDetail: "Vandal Savage — an immortal conqueror alive since 4000 BC who has hunted Hawkman and Hawkgirl across every century. He has never lost.", setting: "Savage's private fortress — could be any era. He has owned them all.", tone: "Ancient, inevitable, the horror of a predator who has had millennia to perfect his methods", captureMethod: "He has had centuries to learn her patterns. She never had a chance.", restraints: "Savage's artefact bindings — older than recorded history", stakes: "Rip Hunter assembled the Legends to stop Vandal Savage. They have not succeeded. He is tired of the interruptions.", details: "Savage knows her name in seventeen dead languages. He has been waiting for this particular loop to close.", storyContext: "Based on Legends of Tomorrow Season 1's core antagonist — Vandal Savage, immortal conqueror hunting the Hawks across history." },
+  { id: "legends-constantine", universe: "🌀 LEGENDS", show: "flash" as "arrow" | "flash", season: 4, episodeRef: "Legends S4 — Constantine Arc", title: "THE DEMON'S BARGAIN", tagline: "John Constantine made a deal. The demon is calling in the debt — using her as currency.", villain: "Neron (Possessing Ray Palmer)", villainDetail: "Neron — a powerful demon lord whose currency is souls, and whose patience across geological time makes him uniquely dangerous.", setting: "Neron's hell-adjacent pocket dimension — baroque, opulent, and utterly outside conventional rescue", tone: "Supernatural horror, the baroque logic of demonic bargains, no conventional escape routes", captureMethod: "A binding was placed on her without her knowledge. When Neron activated it, she simply stopped being able to resist.", restraints: "Demonic binding contract — her own name written in an agreement she never signed but is bound by nonetheless", stakes: "Constantine is the only one who can undo it. Constantine's price for help is always something worse than the original problem.", details: "Neron's possessing Ray Palmer's body. The face she trusts is the threat.", storyContext: "Based on Legends of Tomorrow Season 4's supernatural arc — the demon Neron possessing Ray Palmer and Constantine's soul debt." },
+  { id: "legends-time-bureau", universe: "🌀 LEGENDS", show: "flash" as "arrow" | "flash", season: 3, episodeRef: "Legends S3 — Darhk Returns / Time Bureau Arc", title: "TIME ANACHRONISM", tagline: "The Time Bureau has jurisdiction. Director Sharpe has handed her over. She has no idea why.", villain: "Damien Darhk (resurrected)", villainDetail: "Damien Darhk returned from the dead — now operating through legitimate Time Bureau channels as a supposedly-reformed asset. He is not reformed.", setting: "Time Bureau facility — officially decommissioned, officially off the books, officially not happening", tone: "Bureaucratic horror — the nightmare of a threat using institutional cover", captureMethod: "Processed through official channels. Every form filed correctly.", restraints: "Time Bureau standard containment — modern, sterile, and utterly legal", stakes: "Darhk's resurrection has made him more patient. He is building something. She is a component.", details: "The really horrifying thing is that the paperwork checks out.", storyContext: "Based on Legends of Tomorrow Season 3 — Damien Darhk resurrected and manipulating both the Legends and the Time Bureau." },
+  // ── SUPERGIRL ────────────────────────────────────────────────────────────────
+  { id: "supergirl-lex", universe: "🦸 SUPERGIRL", show: "arrow" as "arrow" | "flash", season: 4, episodeRef: "Supergirl S4E15 — 'O Brother, Where Art Thou?' / Lex Arc", title: "LEX LUTHOR'S GAMBIT", tagline: "Lex Luthor has been planning this since long before she ever became a threat.", villain: "Lex Luthor", villainDetail: "Lex Luthor — a man whose intelligence is genuinely in a different category. He doesn't improvise. He has already finished.", setting: "LuthorCorp black site — a facility that doesn't appear on any property records", tone: "Cold intelligence, the horror of being known completely by the wrong mind", captureMethod: "Lex didn't capture her. He manoeuvred her into a position where capture was the only remaining move.", restraints: "Kryptonite-threaded restraints — elegant, specific, irreversible until he chooses otherwise", stakes: "Lex has Kryptonite. He has the President. He has the DEO's firing codes. He has been five steps ahead since the pilot.", details: "Lex is unfailingly polite. He considers rudeness a sign of a weak intellect.", storyContext: "Based on Supergirl Season 4's defining villain — Lex Luthor, who manipulated every event from his prison cell before his triumphant return." },
+  { id: "supergirl-reign", universe: "🦸 SUPERGIRL", show: "arrow" as "arrow" | "flash", season: 3, episodeRef: "Supergirl S3 — 'Reign' Arc", title: "REIGN", tagline: "The Worldkiller has been activated. It doesn't negotiate.", villain: "Reign (Samantha Arias)", villainDetail: "Reign — a Kryptonian Worldkiller, engineered to judge and cleanse. She experiences no doubt, no mercy, no hesitation.", setting: "National City ruins — wherever Reign has most recently left destruction", tone: "Apocalyptic, physical, the horror of a force that cannot be reasoned with", captureMethod: "Reign is stronger than Superman. Taking her was not difficult.", restraints: "Reign's Kryptonian shackles — she brought them from Argo specifically for this", stakes: "Reign is one of three Worldkillers. The other two are still dormant.", details: "Reign is a personality Samantha Arias cannot access or control. Sam is still in there, trying to claw back.", storyContext: "Based on Supergirl Season 3's devastating Reign arc — the Worldkiller who nearly killed Supergirl in their first encounter." },
+  // ── CRISIS CROSSOVER ─────────────────────────────────────────────────────────
+  { id: "crisis-anti-monitor", universe: "🌌 CRISIS", show: "flash" as "arrow" | "flash", season: 99, episodeRef: "Crisis on Infinite Earths — 2019 Crossover", title: "CRISIS ON INFINITE EARTHS", tagline: "Anti-Monitor is consuming entire universes. She is trapped in one of the last ones.", villain: "Anti-Monitor", villainDetail: "The Anti-Monitor — a cosmic entity consuming the positive matter multiverse. He has already destroyed thousands of Earths.", setting: "The last surviving Earth — her Earth, surrounded by antimatter consuming the edges of reality", tone: "Cosmic horror, scale beyond comprehension, the end of everything as the backdrop", captureMethod: "The antimatter wave separates her from every ally across every dimension.", restraints: "Anti-Monitor's shadow demons — beings of pure antimatter that dissolve light", stakes: "There are only three Earths left. The Monitor is dying. The heroes are running out of time.", details: "The Anti-Monitor has consumed thousands of years and trillions of lives. She is not a threat. She is a detail.", storyContext: "Based on the Crisis on Infinite Earths 2019 CW crossover — the most ambitious Arrowverse event, ending with Oliver Queen's sacrifice." },
 ];
 
 // ── SEASON DATA ────────────────────────────────────────────────────────────────
@@ -311,6 +359,9 @@ export default function ArrowverseMode({ onBack }: Props) {
   const [protagonistType, setProtagonistType] = useState<"heroine" | "hero">("heroine");
   const [customVillain, setCustomVillain] = useState("");
   const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
+  const [sceneFocus, setSceneFocus] = useState<SceneFocusId>("psychological");
+  const [endingFate, setEndingFate] = useState<EndingFateId>("cliffhanger");
+  const [locationId, setLocationId] = useState<string>("default");
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -361,6 +412,10 @@ export default function ArrowverseMode({ onBack }: Props) {
     const intensityLabel = intensity === 1 ? "Tense — psychological pressure, power exchange, minimal graphic content"
       : intensity === 3 ? "Brutal — absolute maximum depravity, no limits, extreme explicit detail, full degradation"
       : "Explicit — graphic sexual content and domination, full explicit detail";
+    const focusLabel = SCENE_FOCUS.find(f => f.id === sceneFocus)?.desc ?? "";
+    const fateLabel = ENDING_FATES.find(f => f.id === endingFate)?.desc ?? "";
+    const locationOverride = locationId !== "default" ? AV_LOCATIONS.find(l => l.id === locationId) : null;
+    const locationLabel = locationOverride ? `OVERRIDE LOCATION: ${locationOverride.label} — ${locationOverride.desc}` : "";
     const previouslyOnContext = isEpisodic && ep && ep.previouslyOn
       ? `\n\nPREVIOUSLY ON ${season?.show === "flash" ? "THE FLASH" : "ARROW"}: ${ep.previouslyOn}` : "";
     const episodeContext = isEpisodic && ep && season
@@ -374,7 +429,7 @@ export default function ArrowverseMode({ onBack }: Props) {
         setting: ep ? ep.setting : sc!.setting, stakes: ep ? ep.stakes : sc!.stakes,
         tone: ep ? ep.tone : sc!.tone, captureMethod: ep ? ep.captureMethod : sc!.captureMethod,
         restraints: ep ? ep.restraints : sc!.restraints, intensity: intensityLabel, storyLength: "Epic Saga",
-        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology. Reference Arrowverse locations, organisations, and lore wherever possible.`,
+        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}SCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology. Reference Arrowverse locations, organisations, and lore wherever possible.`,
       }, (c) => { accumulated += c; setStreamingText(accumulated); }, ctrl.signal);
       setChapters([full]);
       if (isEpisodic) {
@@ -505,6 +560,59 @@ export default function ArrowverseMode({ onBack }: Props) {
           <input value={customVillain} onChange={e => setCustomVillain(e.target.value)} placeholder="Override villain (leave blank for episode villain)"
             style={{ width: "100%", background: "#0e0e18", border: "1px solid #222", borderRadius: "8px", padding: "10px 14px", color: "#ddd", fontSize: "13px", boxSizing: "border-box" }} />
         </div>
+
+        {/* LOCATION SELECTOR */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>📍 LOCATION OVERRIDE</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "6px" }}>
+            {AV_LOCATIONS.map(loc => {
+              const sel = locationId === loc.id;
+              return (
+                <button key={loc.id} onClick={() => setLocationId(loc.id)}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "6px", padding: "8px 10px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#888", letterSpacing: "0.5px" }}>{loc.label}</div>
+                  {sel && <div style={{ fontSize: "10px", color: "#555", marginTop: "3px", lineHeight: 1.4 }}>{loc.desc.slice(0, 60)}…</div>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* SCENE FOCUS */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🎯 SCENE FOCUS</div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {SCENE_FOCUS.map(f => {
+              const sel = sceneFocus === f.id;
+              return (
+                <button key={f.id} onClick={() => setSceneFocus(f.id as SceneFocusId)}
+                  style={{ flex: 1, background: sel ? `${color}18` : "#0e0e18", border: `1px solid ${sel ? color : "#222"}`, borderRadius: "8px", padding: "10px 8px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "4px" }}>{f.label}</div>
+                  <div style={{ fontSize: "10px", color: "#444", lineHeight: 1.4 }}>{f.desc.slice(0, 55)}…</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ENDING FATE */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>⛓ ENDING FATE</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            {ENDING_FATES.map(f => {
+              const sel = endingFate === f.id;
+              return (
+                <button key={f.id} onClick={() => setEndingFate(f.id as EndingFateId)}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "12px 12px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ fontSize: "14px", marginBottom: "4px" }}>{f.icon}</div>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#777", letterSpacing: "1px", marginBottom: "3px" }}>{f.label}</div>
+                  <div style={{ fontSize: "10px", color: "#444", lineHeight: 1.4 }}>{f.desc.slice(0, 65)}…</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div style={{ marginBottom: "28px" }}>
           <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "12px" }}>INTENSITY</div>
           <div style={{ display: "flex", gap: "8px" }}>
@@ -729,8 +837,12 @@ export default function ArrowverseMode({ onBack }: Props) {
                           style={{ background: "linear-gradient(135deg, #0e0e18, #0a0a12)", border: `1px solid ${color}22`, borderRadius: "12px", padding: "18px", cursor: "pointer", textAlign: "left", transition: "all 0.2s", display: "flex", flexDirection: "column", gap: "8px" }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${color}66`; (e.currentTarget as HTMLElement).style.background = `linear-gradient(135deg, ${dark}33, #0a0a12)`; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${color}22`; (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #0e0e18, #0a0a12)"; }}>
-                          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                            <div style={{ background: `${color}18`, border: `1px solid ${color}33`, borderRadius: "4px", padding: "2px 8px", fontSize: "10px", color, letterSpacing: "1px", fontWeight: 700 }}>S{s.season}</div>
+                          <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                            {s.universe ? (
+                              <div style={{ background: `${color}18`, border: `1px solid ${color}33`, borderRadius: "4px", padding: "2px 8px", fontSize: "10px", color, letterSpacing: "1px", fontWeight: 700 }}>{s.universe}</div>
+                            ) : (
+                              <div style={{ background: `${color}18`, border: `1px solid ${color}33`, borderRadius: "4px", padding: "2px 8px", fontSize: "10px", color, letterSpacing: "1px", fontWeight: 700 }}>S{s.season}</div>
+                            )}
                             <div style={{ fontSize: "10px", color: "#444", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{s.episodeRef.split("—")[1]?.trim() ?? s.episodeRef}</div>
                           </div>
                           <div style={{ fontSize: "15px", fontWeight: 900, color, letterSpacing: "1.5px" }}>{s.title}</div>
