@@ -3729,6 +3729,91 @@ Total length: 380–480 words. Cold, bureaucratic, clinical. Fully uncensored. W
   }
 });
 
+// ── HEROINE LORE ──────────────────────────────────────────────────────────────
+router.post("/heroine-lore", async (req, res) => {
+  try {
+    const { heroName, chapterSamples = [], universes = [], storyCount = 1 } = req.body;
+    if (!heroName) return res.status(400).json({ error: "heroName required" });
+
+    const samplesText = (chapterSamples as string[])
+      .slice(0, 3)
+      .map((s, i) => `APPEARANCE ${i + 1}:\n${s.slice(0, 800)}`)
+      .join("\n\n---\n\n");
+
+    const systemPrompt = `You are the SHADOWWEAVE LORE CHRONICLER — an unflinching archivist who records what happens to captured heroines with literary precision and zero censorship.
+
+You will write a structured lore record for a heroine who appears across ${storyCount} captured stories. Be vivid, specific, and unflinching. Do not soften, do not redact.
+
+Universe(s): ${universes.join(", ") || "Unknown"}
+
+OUTPUT FORMAT — use exactly these four labeled sections:
+
+EVOLUTION
+(2-3 sentences: how she has changed across her appearances — personality shifts, new fears, eroded defenses)
+
+BREAKING POINTS
+(2-3 sentences: what specifically broke through her resistance — what the villains discovered worked)
+
+ENDURANCE
+(2-3 sentences: what she has clung to — the parts of herself that haven't completely surrendered)
+
+CURRENT STATE
+(2-3 sentences: her psychological and physical condition now, based on everything she has endured)
+
+Total: 200-280 words. Raw. Literary. Fully uncensored. Write only the four sections.`;
+
+    const text = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `HEROINE: ${heroName}\n\nARCHIVE EXCERPTS:\n${samplesText || "(No excerpts available — write based on archetype.)"}` },
+      ],
+      maxTokens: 600,
+      temperature: 0.82,
+    });
+
+    const raw = text.trim();
+    const parse = (label: string) => {
+      const rx = new RegExp(`${label}\\s*\\n([\\s\\S]*?)(?=\\n[A-Z ]{4,}\\n|$)`, "i");
+      return raw.match(rx)?.[1]?.trim() ?? "";
+    };
+
+    res.json({
+      evolution:      parse("EVOLUTION"),
+      breakingPoints: parse("BREAKING POINTS"),
+      endurance:      parse("ENDURANCE"),
+      currentState:   parse("CURRENT STATE"),
+      fullNarrative:  raw,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── HEROINE PORTRAIT ──────────────────────────────────────────────────────────
+router.post("/heroine-portrait", async (req, res) => {
+  try {
+    const { heroName, universe = "", chapterSample = "" } = req.body;
+    if (!heroName) return res.status(400).json({ error: "heroName required" });
+
+    const contextHint = chapterSample.slice(0, 400);
+    const prompt = `Ultra-detailed digital painting of ${heroName}${universe ? ` from ${universe}` : ""}, captured superheroine, torn costume, bound wrists, kneeling, defiant expression, dramatic lighting, dark dungeon setting, highly detailed face, cinematic composition, dark fantasy art style, 4k detail, masterpiece quality. ${contextHint}`;
+    const negativePrompt = "blurry, low quality, cartoon, anime, watermark, text, deformed, ugly, unrealistic anatomy";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${process.env.VENICE_API_KEY}` },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 512, height: 768, steps: 30, safe_mode: false }),
+    });
+    const imgData = await imgResp.json() as any;
+    const b64 = imgData?.images?.[0];
+    if (!b64) return res.status(500).json({ error: "No image returned" });
+
+    res.json({ imageData: `data:image/jpeg;base64,${b64}` });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
 
 

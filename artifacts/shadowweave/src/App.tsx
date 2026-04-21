@@ -53,6 +53,7 @@ import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
 import BountyBoard from "./pages/BountyBoard";
+import HeroineLore from "./pages/HeroineLore";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -127,6 +128,7 @@ type Page =
   | "civilian-capture"
   | "heroine-image-gen"
   | "bounty-board"
+  | "heroine-lore"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -344,6 +346,7 @@ function AppInner() {
           onVillainInterrogation={() => navigate("villain-interrogation")}
           onCivilianCapture={() => navigate("civilian-capture")}
           onBountyBoard={() => navigate("bounty-board")}
+          onHeroineLore={() => navigate("heroine-lore")}
         />
       )}
 
@@ -604,6 +607,10 @@ function AppInner() {
 
       {page === "bounty-board" && (
         <BountyBoard onBack={() => navigate("home")} />
+      )}
+
+      {page === "heroine-lore" && (
+        <HeroineLore onBack={() => navigate("home")} />
       )}
     </div>
   );

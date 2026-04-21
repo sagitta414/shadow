@@ -5,6 +5,8 @@ import { getUnlockCount, getTotalXP } from "../lib/achievements";
 import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { getArchive } from "../lib/archive";
+import DarknessRankBadge from "../components/DarknessRankBadge";
+import { getUnlockStatus } from "../lib/modeUnlocks";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -59,6 +61,7 @@ interface HomepageProps {
   onVillainInterrogation: () => void;
   onCivilianCapture: () => void;
   onBountyBoard: () => void;
+  onHeroineLore: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -432,6 +435,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", desc: "Plot who controls whom, who wants what, and who is expendable. Every dynamic laid bare in a single power-web.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap, img: `${BASE}/heroes/tool-relationship-map.png` },
     { icon: "🎨", title: "IMAGE GENERATOR", badge: "AI Art · Uncensored", desc: "Describe any scene from your story. The AI writes the perfect prompt — then Venice AI renders it uncensored in stunning detail.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onHeroineImageGen, img: `${BASE}/heroes/tool-image-generator.png` },
     { icon: "🎯", title: "BOUNTY BOARD", badge: "Weekly · Challenges", desc: "Six rotating weekly contracts. Complete them across modes to earn exclusive rewards. New bounties drop every Monday.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onBountyBoard, img: `${BASE}/heroes/tool-bounty-board.png` },
+    { icon: "📜", title: "HEROINE LORE", badge: "Living Record · AI Portrait", desc: "A living chronicle of every heroine who has passed through the dark — how she changed, what broke her, and what endured. AI-generated portraits included.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onHeroineLore, img: `${BASE}/heroes/tool-heroine-dossier.png` },
   ];
 
   return (
@@ -560,6 +564,15 @@ export default function Homepage(props: HomepageProps) {
             whiteSpace: "nowrap",
           }}>Chronicle</button>
         </div>
+      </div>
+
+      {/* ══ DARKNESS RANK ════════════════════════════════════════════════════════ */}
+      <div style={{
+        padding: isMobile ? "1rem 1rem 0" : "1.5rem 2.5rem 0",
+        position: "relative", zIndex: 2,
+        animation: "fadeUp 0.6s 0.08s ease both",
+      }}>
+        <DarknessRankBadge />
       </div>
 
       {/* ══ HERO SECTION — THREE MAIN MODES ══════════════════════════════════════ */}
@@ -770,56 +783,85 @@ export default function Homepage(props: HomepageProps) {
           }}>
             {specialtyModes.map((m, i) => {
               const isActive = i === carouselIdx;
+              const lockStatus = getUnlockStatus(m.title);
+              const locked = lockStatus?.locked ?? false;
               return (
                 <div
                   key={m.title}
-                  onClick={m.onClick}
+                  onClick={locked ? undefined : m.onClick}
                   style={{
                     flex: `0 0 ${isMobile ? "82vw" : "292px"}`,
                     width: isMobile ? "82vw" : "292px",
                     height: isMobile ? "370px" : "390px",
                     borderRadius: "20px", overflow: "hidden",
-                    position: "relative", cursor: "pointer",
-                    border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`,
-                    boxShadow: isActive ? `0 12px 48px rgba(${m.r},${m.g},${m.b},0.28), 0 0 0 1px rgba(${m.r},${m.g},${m.b},0.12)` : "none",
+                    position: "relative", cursor: locked ? "default" : "pointer",
+                    border: `1px solid ${locked ? "rgba(80,70,100,0.35)" : `rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`}`,
+                    boxShadow: isActive && !locked ? `0 12px 48px rgba(${m.r},${m.g},${m.b},0.28), 0 0 0 1px rgba(${m.r},${m.g},${m.b},0.12)` : "none",
                     transform: isActive ? "scale(1.02)" : "scale(0.97)",
                     transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.55s, box-shadow 0.55s",
                     background: "rgba(4,1,12,0.9)",
                   }}
-                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLDivElement).style.transform = "scale(1.0)"; } (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},0.55)`; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = isActive ? "scale(1.02)" : "scale(0.97)"; (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`; }}
+                  onMouseEnter={e => { if (locked) return; if (!isActive) { (e.currentTarget as HTMLDivElement).style.transform = "scale(1.0)"; } (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},0.55)`; }}
+                  onMouseLeave={e => { if (locked) return; (e.currentTarget as HTMLDivElement).style.transform = isActive ? "scale(1.02)" : "scale(0.97)"; (e.currentTarget as HTMLDivElement).style.borderColor = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.45 : 0.15})`; }}
                 >
                   {/* Background image */}
                   <img
                     src={m.img} alt={m.title}
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.55, transition: "opacity 0.3s" }}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: locked ? 0.18 : 0.55, transition: "opacity 0.3s", filter: locked ? "grayscale(0.7) blur(1px)" : "none" }}
                   />
                   {/* Gradient overlay */}
-                  <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(${m.r},${m.g},${m.b},0.05) 0%, rgba(4,1,12,0.45) 38%, rgba(4,1,12,0.92) 65%, rgba(4,1,12,0.99) 100%)` }} />
+                  <div style={{ position: "absolute", inset: 0, background: locked ? "linear-gradient(to bottom, rgba(4,1,12,0.55) 0%, rgba(4,1,12,0.85) 50%, rgba(4,1,12,0.99) 100%)" : `linear-gradient(to bottom, rgba(${m.r},${m.g},${m.b},0.05) 0%, rgba(4,1,12,0.45) 38%, rgba(4,1,12,0.92) 65%, rgba(4,1,12,0.99) 100%)` }} />
                   {/* Accent top bar */}
-                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${m.r},${m.g},${m.b},${isActive ? 0.9 : 0.3}), transparent)`, transition: "opacity 0.4s" }} />
+                  {!locked && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(${m.r},${m.g},${m.b},${isActive ? 0.9 : 0.3}), transparent)`, transition: "opacity 0.4s" }} />}
 
-                  {/* Content */}
-                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: "1.25rem 1.35rem" }}>
-                    {/* Badge */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "auto" }}>
-                      <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", color: m.accent, fontFamily: "'Cinzel', serif", background: `rgba(${m.r},${m.g},${m.b},0.1)`, border: `1px solid rgba(${m.r},${m.g},${m.b},0.28)`, borderRadius: "20px", padding: "0.22rem 0.7rem" }}>{m.badge}</span>
-                      <span style={{ fontSize: "1.2rem", opacity: 0.7 }}>{m.icon}</span>
+                  {/* Lock overlay */}
+                  {locked && lockStatus && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem", zIndex: 5 }}>
+                      <div style={{ fontSize: "2rem", marginBottom: "0.75rem", filter: "drop-shadow(0 0 12px rgba(168,85,247,0.5))" }}>🔒</div>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.85rem", fontWeight: 700, color: "#D4BBF5", letterSpacing: "2px", marginBottom: "0.5rem", textAlign: "center", lineHeight: 1.3 }}>{m.title}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(168,85,247,0.7)", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px", marginBottom: "1rem", textAlign: "center" }}>
+                        LOCKED
+                      </div>
+                      <div style={{ fontSize: "0.65rem", color: "rgba(200,185,225,0.5)", fontFamily: "'EB Garamond', serif", fontStyle: "italic", textAlign: "center", marginBottom: "1rem" }}>
+                        {lockStatus.hint}
+                      </div>
+                      {/* Progress bar */}
+                      <div style={{ width: "100%", maxWidth: "160px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.35rem" }}>
+                          <span style={{ fontSize: "0.5rem", color: "rgba(168,85,247,0.5)", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>PROGRESS</span>
+                          <span style={{ fontSize: "0.5rem", color: "rgba(168,85,247,0.7)", fontFamily: "'Cinzel', serif" }}>
+                            {lockStatus.current.toLocaleString()} / {lockStatus.threshold.toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={{ height: "3px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
+                          <div style={{ height: "100%", borderRadius: "2px", background: "linear-gradient(90deg, rgba(168,85,247,0.6), rgba(192,132,252,0.9))", width: `${lockStatus.progress * 100}%`, boxShadow: "0 0 6px rgba(168,85,247,0.4)", transition: "width 1s ease" }} />
+                        </div>
+                      </div>
                     </div>
+                  )}
 
-                    {/* Bottom content */}
-                    <div>
-                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#F4F0FF", letterSpacing: "0.5px", marginBottom: "0.6rem", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>{m.title}</div>
-                      <p style={{ fontSize: "0.78rem", color: "rgba(215,208,245,0.72)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, margin: "0 0 1.1rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{m.desc}</p>
-                      <button
-                        onClick={e => { e.stopPropagation(); m.onClick(); }}
-                        style={{ display: "block", width: "100%", padding: "0.7rem", background: `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`, border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.55 : 0.3})`, borderRadius: "12px", color: m.accent, fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "3px", cursor: "pointer", transition: "all 0.22s", textTransform: "uppercase" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},0.3)`; e.currentTarget.style.boxShadow = `0 0 20px rgba(${m.r},${m.g},${m.b},0.3)`; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`; e.currentTarget.style.boxShadow = "none"; }}
-                      >ENTER MODE</button>
+                  {/* Content (hidden when locked) */}
+                  {!locked && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: "1.25rem 1.35rem" }}>
+                      {/* Badge */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "auto" }}>
+                        <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", color: m.accent, fontFamily: "'Cinzel', serif", background: `rgba(${m.r},${m.g},${m.b},0.1)`, border: `1px solid rgba(${m.r},${m.g},${m.b},0.28)`, borderRadius: "20px", padding: "0.22rem 0.7rem" }}>{m.badge}</span>
+                        <span style={{ fontSize: "1.2rem", opacity: 0.7 }}>{m.icon}</span>
+                      </div>
+                      {/* Bottom content */}
+                      <div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#F4F0FF", letterSpacing: "0.5px", marginBottom: "0.6rem", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>{m.title}</div>
+                        <p style={{ fontSize: "0.78rem", color: "rgba(215,208,245,0.72)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.6, margin: "0 0 1.1rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{m.desc}</p>
+                        <button
+                          onClick={e => { e.stopPropagation(); m.onClick(); }}
+                          style={{ display: "block", width: "100%", padding: "0.7rem", background: `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`, border: `1px solid rgba(${m.r},${m.g},${m.b},${isActive ? 0.55 : 0.3})`, borderRadius: "12px", color: m.accent, fontFamily: "'Cinzel', serif", fontSize: "0.52rem", letterSpacing: "3px", cursor: "pointer", transition: "all 0.22s", textTransform: "uppercase" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},0.3)`; e.currentTarget.style.boxShadow = `0 0 20px rgba(${m.r},${m.g},${m.b},0.3)`; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = `rgba(${m.r},${m.g},${m.b},${isActive ? 0.2 : 0.1})`; e.currentTarget.style.boxShadow = "none"; }}
+                        >ENTER MODE</button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
