@@ -1,5 +1,7 @@
 import { recordStoryDay } from "./streak";
 import { checkAndUnlockAchievements, recordModeCompletion } from "./achievements";
+import { recordMasteryGain } from "./modeMastery";
+import { invalidateMetrics } from "./modeUnlocks";
 
 export interface ArchivedStory {
   id: string;
@@ -44,6 +46,8 @@ export function saveStoryToArchive(
   localStorage.setItem(KEY, JSON.stringify([full, ...existing]));
   recordStoryDay();
   recordModeCompletion(story.tool);
+  recordMasteryGain(story.tool, { wordCount: full.wordCount });
+  invalidateMetrics();
   checkAndUnlockAchievements();
   return id;
 }

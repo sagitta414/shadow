@@ -7,6 +7,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { getArchive } from "../lib/archive";
 import DarknessRankBadge from "../components/DarknessRankBadge";
 import { getUnlockStatus } from "../lib/modeUnlocks";
+import { getTotalUnspentValue } from "../lib/vaultKeys";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -47,6 +48,7 @@ interface HomepageProps {
   onVillainBuilder: () => void;
   onRelationshipMap: () => void;
   onAchievements: () => void;
+  onVault?: () => void;
   onTimeLoop: () => void;
   onDreamSequence: () => void;
   onSequelGenerator: () => void;
@@ -345,6 +347,7 @@ export default function Homepage(props: HomepageProps) {
   const [streak] = useState(() => getStreak());
   const [achCount] = useState(() => getUnlockCount());
   const [achXP] = useState(() => getTotalXP());
+  const [vaultKeyValue] = useState(() => { try { return getTotalUnspentValue(); } catch { return 0; } });
   const [activitySlots] = useState(() => buildActivitySlots(91));
   const [activitySet] = useState(() => getWritingActivitySet(91));
   const [archiveStats] = useState(() => {
@@ -514,6 +517,15 @@ export default function Homepage(props: HomepageProps) {
             <span style={{ fontSize: "0.65rem" }}>🏆</span>
             {!isMobile && <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(245,214,122,0.75)", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>{achCount > 0 ? `${achCount} · ${achXP} XP` : "Trophies"}</span>}
           </button>
+          {props.onVault && (
+            <button onClick={props.onVault}
+              style={{ display: "flex", alignItems: "center", gap: "0.42rem", padding: "0.38rem 0.85rem", background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.3)", borderRadius: "30px", cursor: "pointer", transition: "all 0.22s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.18)"; e.currentTarget.style.boxShadow = "0 0 18px rgba(124,58,237,0.25)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.08)"; e.currentTarget.style.boxShadow = "none"; }}>
+              <span style={{ fontSize: "0.65rem", color: "#C084FC" }}>🜏</span>
+              {!isMobile && <span style={{ fontSize: "0.5rem", letterSpacing: "1.5px", textTransform: "uppercase", color: "#C084FC", fontWeight: 700, fontFamily: "'Cinzel', serif" }}>Vault{vaultKeyValue > 0 ? ` · ${vaultKeyValue}🔑` : ""}</span>}
+            </button>
+          )}
           <button onClick={props.onStoryArchive}
             style={{ display: "flex", alignItems: "center", gap: "0.42rem", padding: "0.38rem 0.9rem", background: "rgba(168,85,247,0.09)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: "30px", cursor: "pointer", transition: "all 0.22s" }}
             onMouseEnter={e => { e.currentTarget.style.background = "rgba(168,85,247,0.2)"; e.currentTarget.style.boxShadow = "0 0 22px rgba(168,85,247,0.25)"; }}

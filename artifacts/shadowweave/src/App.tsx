@@ -60,6 +60,7 @@ import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
 import RelationshipMap from "./pages/RelationshipMap";
 import AchievementsPage from "./pages/AchievementsPage";
+import VaultPage from "./pages/VaultPage";
 import AchievementToastManager from "./components/AchievementToast";
 import SessionTimer from "./components/SessionTimer";
 import NightmareOverlay from "./components/NightmareOverlay";
@@ -119,6 +120,7 @@ type Page =
   | "sequel-generator"
   | "story-continuation"
   | "achievements"
+  | "vault"
   | "director-mode"
   | "escape-attempt"
   | "negotiation-room"
@@ -335,6 +337,7 @@ function AppInner() {
           onVillainBuilder={() => navigate("villain-builder")}
           onRelationshipMap={() => navigate("relationship-map")}
           onAchievements={() => navigate("achievements")}
+          onVault={() => navigate("vault")}
           onTimeLoop={() => navigate("time-loop")}
           onDreamSequence={() => navigate("dream-sequence")}
           onSequelGenerator={() => navigate("sequel-generator")}
@@ -574,6 +577,10 @@ function AppInner() {
 
       {page === "achievements" && (
         <AchievementsPage onBack={() => navigate("home")} />
+      )}
+
+      {page === "vault" && (
+        <VaultPage onBack={() => navigate("home")} />
       )}
 
       {page === "director-mode" && (

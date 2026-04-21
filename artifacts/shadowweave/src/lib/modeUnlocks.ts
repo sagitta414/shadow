@@ -1,9 +1,15 @@
 import { getArchive } from "./archive";
 import { evaluateChallenges } from "./bountyBoard";
+import { getTotalMasteryLevels } from "./modeMastery";
+import { getPatronCount } from "./patrons";
+import { isVaultUnlocked, getUnlockCost } from "./vaultKeys";
+import { getNightfallStatus, isNightfallMode } from "./nightfall";
+
+export type UnlockType = "stories" | "bounties" | "words" | "mastery" | "patrons";
 
 export interface UnlockCondition {
   modeTitle: string;
-  type: "stories" | "bounties" | "words";
+  type: UnlockType;
   threshold: number;
   hint: string;
 }
@@ -15,6 +21,13 @@ export const LOCKED_MODES: UnlockCondition[] = [
   { modeTitle: "PUBLIC PROPERTY", type: "bounties", threshold: 5,     hint: "Complete 5 bounty challenges" },
   { modeTitle: "ESCAPE ATTEMPT",  type: "stories",  threshold: 18,    hint: "Save 18 stories" },
   { modeTitle: "VILLAIN MODE",    type: "words",    threshold: 12000, hint: "Write 12,000 total words" },
+  // New mastery / patron-gated modes
+  { modeTitle: "MIND BREAK",          type: "mastery", threshold: 8,     hint: "Earn 8 total mastery levels across modes" },
+  { modeTitle: "OBEDIENCE TRAINING",  type: "mastery", threshold: 14,    hint: "Earn 14 total mastery levels" },
+  { modeTitle: "ETERNAL CAPTIVE",     type: "patrons", threshold: 1,     hint: "Elevate 1 villain to Patron tier (Favored or higher)" },
+  { modeTitle: "VILLAIN TEAM-UP",     type: "patrons", threshold: 2,     hint: "Have 2 Patron-tier villains" },
+  { modeTitle: "TROPHY DISPLAY",      type: "stories", threshold: 30,    hint: "Save 30 stories" },
+  { modeTitle: "LONG GAME",           type: "words",   threshold: 35000, hint: "Write 35,000 total words" },
 ];
 
 export interface UnlockStatus {
@@ -23,20 +36,30 @@ export interface UnlockStatus {
   threshold: number;
   hint: string;
   progress: number;
+  type: UnlockType;
+  /** Cost in vault-key value to bypass. */
+  keyCost: number;
+  /** True when user has spent keys to unlock this. */
+  bypassed: boolean;
+  /** Nightfall window status when applicable. */
+  nightfall: { open: boolean; label: string; flavor: string } | null;
 }
 
-let _metrics: { stories: number; words: number; bounties: number } | null = null;
+let _metrics: { stories: number; words: number; bounties: number; mastery: number; patrons: number } | null = null;
 let _metricsTs = 0;
 
 function getMetrics() {
   const now = Date.now();
-  if (_metrics && now - _metricsTs < 10000) return _metrics;
+  if (_metrics && now - _metricsTs < 5000) return _metrics;
   const archive = getArchive();
   const stories = archive.length;
   const words = archive.reduce((t, s) => t + (s.wordCount ?? 0), 0);
   let bounties = 0;
   try { bounties = evaluateChallenges().filter(b => b.complete).length; } catch {}
-  _metrics = { stories, words, bounties };
+  let mastery = 0, patrons = 0;
+  try { mastery = getTotalMasteryLevels(); } catch {}
+  try { patrons = getPatronCount(); } catch {}
+  _metrics = { stories, words, bounties, mastery, patrons };
   _metricsTs = now;
   return _metrics;
 }
@@ -47,17 +70,47 @@ export function invalidateMetrics() {
 
 export function getUnlockStatus(modeTitle: string): UnlockStatus | null {
   const cond = LOCKED_MODES.find(m => m.modeTitle === modeTitle);
-  if (!cond) return null;
+  const nightStatus = getNightfallStatus(modeTitle);
+
+  if (!cond && !nightStatus) return null;
+
+  // Pure nightfall mode (no other condition) — locked when window closed
+  if (!cond && nightStatus) {
+    return {
+      locked: !nightStatus.open,
+      current: nightStatus.open ? 1 : 0,
+      threshold: 1,
+      hint: nightStatus.flavor,
+      progress: nightStatus.open ? 1 : 0,
+      type: "stories",
+      keyCost: 1,
+      bypassed: isVaultUnlocked(modeTitle),
+      nightfall: { open: nightStatus.open, label: nightStatus.label, flavor: nightStatus.flavor },
+    };
+  }
+
   const m = getMetrics();
   const current =
-    cond.type === "stories" ? m.stories :
-    cond.type === "bounties" ? m.bounties : m.words;
+    cond!.type === "stories" ? m.stories :
+    cond!.type === "bounties" ? m.bounties :
+    cond!.type === "words" ? m.words :
+    cond!.type === "mastery" ? m.mastery :
+    m.patrons;
+  const baseLocked = current < cond!.threshold;
+  const bypassed = isVaultUnlocked(modeTitle);
+  const nightWindow = nightStatus ? { open: nightStatus.open, label: nightStatus.label, flavor: nightStatus.flavor } : null;
+  const nightLocked = isNightfallMode(modeTitle) ? !(nightStatus?.open) : false;
+  const locked = bypassed ? (nightLocked) : (baseLocked || nightLocked);
   return {
-    locked: current < cond.threshold,
+    locked,
     current,
-    threshold: cond.threshold,
-    hint: cond.hint,
-    progress: Math.min(1, current / cond.threshold),
+    threshold: cond!.threshold,
+    hint: cond!.hint,
+    progress: Math.min(1, current / cond!.threshold),
+    type: cond!.type,
+    keyCost: getUnlockCost(cond!.threshold),
+    bypassed,
+    nightfall: nightWindow,
   };
 }
 
