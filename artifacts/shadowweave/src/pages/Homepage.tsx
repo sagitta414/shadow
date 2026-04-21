@@ -58,6 +58,7 @@ interface HomepageProps {
   onConfinedSpace: () => void;
   onVillainInterrogation: () => void;
   onCivilianCapture: () => void;
+  onBountyBoard: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -430,6 +431,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🔮", title: "VILLAIN BUILDER", badge: "Custom · Original", desc: "Create a completely original villain from scratch — appearance, psychology, history, and the darkness that made them.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onVillainBuilder, img: `${BASE}/heroes/tool-villain-builder.png` },
     { icon: "🕸", title: "RELATIONSHIP MAP", badge: "Network · Web", desc: "Plot who controls whom, who wants what, and who is expendable. Every dynamic laid bare in a single power-web.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onRelationshipMap, img: `${BASE}/heroes/tool-relationship-map.png` },
     { icon: "🎨", title: "IMAGE GENERATOR", badge: "AI Art · Uncensored", desc: "Describe any scene from your story. The AI writes the perfect prompt — then Venice AI renders it uncensored in stunning detail.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onHeroineImageGen, img: `${BASE}/heroes/tool-image-generator.png` },
+    { icon: "🎯", title: "BOUNTY BOARD", badge: "Weekly · Challenges", desc: "Six rotating weekly contracts. Complete them across modes to earn exclusive rewards. New bounties drop every Monday.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onBountyBoard, img: `${BASE}/heroes/tool-bounty-board.png` },
   ];
 
   return (
@@ -877,7 +879,7 @@ export default function Homepage(props: HomepageProps) {
           <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(52,211,153,0.95), rgba(52,211,153,0.08))", boxShadow: "0 0 12px rgba(52,211,153,0.5)", flexShrink: 0 }} />
           <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(52,211,153,0.72)", textTransform: "uppercase", fontWeight: 700 }}>Studio Tools</span>
           <div style={{ padding: "0.18rem 0.7rem", background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.18)", borderRadius: "20px" }}>
-            <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(52,211,153,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>8 TOOLS</span>
+            <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(52,211,153,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>10 TOOLS</span>
           </div>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(52,211,153,0.15), transparent)" }} />
           {isMobile ? (

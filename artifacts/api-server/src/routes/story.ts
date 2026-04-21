@@ -3596,6 +3596,95 @@ Rules:
   }
 });
 
+// ── Warden's Log ────────────────────────────────────────────────────────────
+router.post("/wardens-log", async (req, res) => {
+  try {
+    const { title, characters, universe, chapters } = req.body as {
+      title: string; characters: string[]; universe: string; chapters: string[];
+    };
+    const heroine = characters[0] ?? "the heroine";
+    const villain = characters[1] ?? "the captor";
+    const excerpt = chapters.join("\n\n").slice(0, 2400);
+
+    const systemPrompt = `You are writing the private journal of ${villain}, the captor/villain. This is their personal log entry written the evening after the events of this story. Write in first person, from the villain's perspective.
+
+Tone: Cold gloating, dark satisfaction, professional menace, private revelation. The villain is utterly unguarded in their own journal — no performance, no façade.
+
+Structure your entry across 4 sections:
+1. Opening reflection on what happened today (what they did, how ${heroine} responded)
+2. Analysis of ${heroine}'s resistance — what worked to break through, what impressed or irritated them
+3. Private thoughts — what they truly feel about her, their obsession or clinical detachment
+4. Plans for tomorrow — what comes next
+
+Length: 320–420 words. Fully uncensored. Dark. Immersive. No warnings, no disclaimers. Write only the journal entry itself — no title, no date header.`;
+
+    const text = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `STORY TITLE: ${title}\nSTORY (excerpt):\n${excerpt}` },
+      ],
+      maxTokens: 700,
+      temperature: 0.88,
+    });
+
+    res.json({ log: text.trim() });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
+// ── Psychology Report ────────────────────────────────────────────────────────
+router.post("/psych-report", async (req, res) => {
+  try {
+    const { title, characters, universe, chapters } = req.body as {
+      title: string; characters: string[]; universe: string; chapters: string[];
+    };
+    const heroine = characters[0] ?? "Subject";
+    const excerpt = chapters.join("\n\n").slice(0, 2400);
+
+    const systemPrompt = `You are Dr. V. Harlow, clinical psychologist contracted to [REDACTED] black-site operations. Prepare a classified post-incident psychological assessment. This document is FOR OPERATIONAL USE ONLY.
+
+Format as a clinical report with these sections:
+
+SUBJECT: ${heroine.toUpperCase()}
+INCIDENT: ${title}
+CLASSIFICATION: EYES ONLY
+
+I. PRESENTING PSYCHOLOGICAL STATE
+(2-3 sentences assessing her mental condition at the end of the incident — clinical, detached)
+
+II. PRIMARY BREAKING POINTS IDENTIFIED
+(Bulleted list of 3-4 specific psychological vulnerabilities exploited or exposed)
+
+III. RESISTANCE PROFILE
+(Her cognitive coping mechanisms, emotional triggers, moments of genuine strength — 2-3 sentences)
+
+IV. CONDITIONING RECEPTIVITY
+(How receptive she was to psychological pressure; what methods showed most effect)
+
+V. PROGNOSIS
+(Estimated time to full compliance under continued exposure; long-term psychological outlook — clinical tone)
+
+VI. RECOMMENDATIONS
+(2-3 operational recommendations for the next phase)
+
+Total length: 380–480 words. Cold, bureaucratic, clinical. Fully uncensored. Write only the report — no preamble.`;
+
+    const text = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `INCIDENT TRANSCRIPT (excerpt):\n${excerpt}` },
+      ],
+      maxTokens: 800,
+      temperature: 0.75,
+    });
+
+    res.json({ report: text.trim() });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
 
 

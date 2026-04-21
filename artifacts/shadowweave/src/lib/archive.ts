@@ -13,6 +13,8 @@ export interface ArchivedStory {
   favourite: boolean;
   wordCount: number;
   rating?: number;
+  wardensLog?: string;
+  psychReport?: string;
 }
 
 const KEY = "sw_archive_v1";

@@ -7,6 +7,9 @@ import {
   exportStoryAsPDF,
   ArchivedStory,
 } from "../lib/archive";
+import { getThreatLevel } from "../lib/threatLevel";
+
+const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 interface Props {
   onBack: () => void;
@@ -67,6 +70,40 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [replayLoading, setReplayLoading] = useState(false);
   const [replaySaved, setReplaySaved] = useState(false);
   const replayAbortRef = useRef<AbortController | null>(null);
+
+  const [logLoading, setLogLoading] = useState<string | null>(null);
+  const [reportLoading, setReportLoading] = useState<string | null>(null);
+  const [threatLevel] = useState(() => getThreatLevel());
+
+  async function generateWardensLog(story: ArchivedStory) {
+    if (logLoading) return;
+    setLogLoading(story.id);
+    try {
+      const resp = await fetch(`${BASE}/api/story/wardens-log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: story.title, characters: story.characters, universe: story.universe, chapters: story.chapters }),
+      });
+      const data = await resp.json();
+      if (data.log) { updateArchiveStory(story.id, { wardensLog: data.log }); reload(); }
+    } catch {}
+    finally { setLogLoading(null); }
+  }
+
+  async function generatePsychReport(story: ArchivedStory) {
+    if (reportLoading) return;
+    setReportLoading(story.id);
+    try {
+      const resp = await fetch(`${BASE}/api/story/psych-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: story.title, characters: story.characters, universe: story.universe, chapters: story.chapters }),
+      });
+      const data = await resp.json();
+      if (data.report) { updateArchiveStory(story.id, { psychReport: data.report }); reload(); }
+    } catch {}
+    finally { setReportLoading(null); }
+  }
 
   function reload() {
     setStories(getArchive());
@@ -392,6 +429,22 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
               })}
             </div>
 
+            {/* ── Warden's Log ── */}
+            {s.wardensLog && (
+              <div style={{ marginBottom: "1rem", padding: "1rem 1.1rem", background: "rgba(200,0,0,0.05)", border: "1px solid rgba(200,0,0,0.2)", borderRadius: "8px" }}>
+                <div style={{ fontSize: "0.55rem", letterSpacing: "2.5px", color: "rgba(255,100,100,0.55)", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>📋 WARDEN'S LOG</div>
+                <div style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.88rem", lineHeight: 1.8, color: "rgba(220,200,200,0.82)", whiteSpace: "pre-wrap" }}>{s.wardensLog}</div>
+              </div>
+            )}
+
+            {/* ── Psych Report ── */}
+            {s.psychReport && (
+              <div style={{ marginBottom: "1rem", padding: "1rem 1.1rem", background: "rgba(52,211,153,0.03)", border: "1px solid rgba(52,211,153,0.18)", borderRadius: "8px" }}>
+                <div style={{ fontSize: "0.55rem", letterSpacing: "2.5px", color: "rgba(52,211,153,0.55)", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>🧠 PSYCHOLOGY REPORT — CLASSIFIED</div>
+                <div style={{ fontFamily: "'Courier New', monospace", fontSize: "0.8rem", lineHeight: 1.75, color: "rgba(200,220,210,0.78)", whiteSpace: "pre-wrap" }}>{s.psychReport}</div>
+              </div>
+            )}
+
             {/* ── Star Rating ── */}
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
               <div style={{ fontSize: "0.58rem", letterSpacing: "2px", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", textTransform: "uppercase" }}>Rate this story</div>
@@ -537,6 +590,34 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
                     ▶ Continue Story
                   </button>
                 )}
+                <button
+                  onClick={() => generateWardensLog(s)}
+                  disabled={logLoading === s.id}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: logLoading === s.id ? "not-allowed" : "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: s.wardensLog ? "rgba(255,100,100,0.08)" : "rgba(200,0,0,0.06)",
+                    border: `1px solid ${s.wardensLog ? "rgba(255,100,100,0.35)" : "rgba(200,0,0,0.2)"}`,
+                    color: s.wardensLog ? "rgba(255,130,130,0.9)" : "rgba(200,100,100,0.55)",
+                    opacity: logLoading === s.id ? 0.6 : 1,
+                  }}
+                >
+                  {logLoading === s.id ? "⟳ Writing…" : s.wardensLog ? "📋 Regenerate Log" : "📋 Warden's Log"}
+                </button>
+                <button
+                  onClick={() => generatePsychReport(s)}
+                  disabled={reportLoading === s.id}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: reportLoading === s.id ? "not-allowed" : "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: s.psychReport ? "rgba(52,211,153,0.08)" : "rgba(52,211,153,0.04)",
+                    border: `1px solid ${s.psychReport ? "rgba(52,211,153,0.35)" : "rgba(52,211,153,0.15)"}`,
+                    color: s.psychReport ? "rgba(52,211,153,0.9)" : "rgba(52,211,153,0.4)",
+                    opacity: reportLoading === s.id ? 0.6 : 1,
+                  }}
+                >
+                  {reportLoading === s.id ? "⟳ Analysing…" : s.psychReport ? "🧠 Regenerate Report" : "🧠 Psych Report"}
+                </button>
               </div>
               {confirmDelete === s.id ? (
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -630,6 +711,31 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
           <option value="rated">Top Rated</option>
         </select>
       </div>
+
+      {/* ── Threat Level Banner ── */}
+      {threatLevel && stories.length > 0 && (
+        <div style={{
+          margin: "0 0 1.2rem",
+          padding: "0.75rem 1.2rem",
+          background: "rgba(0,0,0,0.35)",
+          border: `1px solid ${threatLevel.color}33`,
+          borderRadius: "10px",
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          boxShadow: `0 0 24px ${threatLevel.color}18`,
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "0.52rem", letterSpacing: "2.5px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", marginBottom: "0.2rem" }}>THREAT LEVEL {threatLevel.level} / 10</div>
+            <div style={{ fontSize: "0.75rem", fontFamily: "'Cinzel', serif", letterSpacing: "1px", color: threatLevel.color, fontWeight: 700 }}>{threatLevel.title}</div>
+            <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.55)", marginTop: "0.15rem" }}>{threatLevel.subtitle}</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", marginBottom: "0.25rem" }}>SCORE</div>
+            <div style={{ fontSize: "1rem", fontFamily: "'Cinzel', serif", color: threatLevel.color, fontWeight: 700 }}>{threatLevel.score}</div>
+          </div>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "5rem 2rem" }}>

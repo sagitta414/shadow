@@ -52,6 +52,7 @@ import CivilianCapture from "./pages/CivilianCapture";
 import HeroineImageGen from "./pages/HeroineImageGen";
 import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
+import BountyBoard from "./pages/BountyBoard";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -125,6 +126,7 @@ type Page =
   | "villain-interrogation"
   | "civilian-capture"
   | "heroine-image-gen"
+  | "bounty-board"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -341,6 +343,7 @@ function AppInner() {
           onConfinedSpace={() => navigate("confined-space")}
           onVillainInterrogation={() => navigate("villain-interrogation")}
           onCivilianCapture={() => navigate("civilian-capture")}
+          onBountyBoard={() => navigate("bounty-board")}
         />
       )}
 
@@ -597,6 +600,10 @@ function AppInner() {
 
       {page === "heroine-image-gen" && (
         <HeroineImageGen onBack={() => navigate("home")} />
+      )}
+
+      {page === "bounty-board" && (
+        <BountyBoard onBack={() => navigate("home")} />
       )}
     </div>
   );
