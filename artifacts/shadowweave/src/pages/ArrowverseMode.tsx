@@ -29,6 +29,24 @@ const CW_HEROINES = [
   { name: "Alex Danvers",    alias: "DEO Director",        show: "both",  icon: "🛡", power: "ARGUS / DEO tactical director — no powers, no mercy" },
 ];
 
+// ── HEROES ───────────────────────────────────────────────────────────────────
+const CW_HEROES = [
+  { name: "Oliver Queen",    alias: "Green Arrow",         show: "arrow", icon: "🏹", power: "Master archer, League-trained, five years of hell forged into a weapon" },
+  { name: "John Diggle",     alias: "Spartan",             show: "arrow", icon: "🛡", power: "Ex-Special Forces, ARGUS operative — tactical precision, unbreakable loyalty" },
+  { name: "Roy Harper",      alias: "Arsenal",             show: "arrow", icon: "🎯", power: "Mirakuru-survivor, street-fighter, Oliver's first protégé" },
+  { name: "Tommy Merlyn",    alias: "Dark Archer's Son",   show: "arrow", icon: "🖤", power: "Heir to the Merlyn legacy — the friend who knew Oliver's secret first" },
+  { name: "Connor Hawke",    alias: "Green Arrow (Future)",show: "arrow", icon: "🏹", power: "Diggle's son, future Green Arrow — trained by the original" },
+  { name: "Rene Ramirez",    alias: "Wild Dog",            show: "arrow", icon: "🐺", power: "Ex-Marine vigilante — hockey mask, no rules, no mercy" },
+  { name: "Curtis Holt",     alias: "Mr. Terrific",        show: "arrow", icon: "🧠", power: "Olympic decathlete & Palmer Tech genius — T-spheres deployed in combat" },
+  { name: "Barry Allen",     alias: "The Flash",           show: "flash", icon: "⚡", power: "Speed Force conduit — fastest man alive, lightning incarnate" },
+  { name: "Wally West",      alias: "Kid Flash",           show: "flash", icon: "⚡", power: "Speedster — Iris's brother, Speed Force lightning in his blood" },
+  { name: "Cisco Ramon",     alias: "Vibe",                show: "flash", icon: "🌀", power: "Vibrational metahuman — interdimensional breaches & concussive blasts" },
+  { name: "Ronnie Raymond",  alias: "Firestorm",           show: "flash", icon: "🔥", power: "Nuclear-powered fusion metahuman — flight, plasma, atomic restructuring" },
+  { name: "Martin Stein",    alias: "Firestorm Matrix",    show: "flash", icon: "⚛", power: "Nobel-prize physicist & Firestorm matrix — intellect fused with power" },
+  { name: "Julian Albert",   alias: "Doctor Alchemy",      show: "flash", icon: "🗿", power: "CCPD metahuman specialist — the Philosopher's Stone's chosen vessel" },
+  { name: "Ralph Dibny",     alias: "Elongated Man",       show: "flash", icon: "🤸", power: "Elastic metahuman PI — flexible body, sharper instincts" },
+];
+
 // ── STANDALONE SCENARIOS ──────────────────────────────────────────────────────
 interface Scenario {
   id: string; show: "arrow" | "flash"; season: number; episodeRef: string;
@@ -275,7 +293,8 @@ export default function ArrowverseMode({ onBack }: Props) {
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [seasonStep, setSeasonStep] = useState<"seasons" | "episodes" | "configure" | "story">("seasons");
   const [progress, setProgress] = useState<Record<string, boolean>>(loadProgress);
-  const [selectedHeroine, setSelectedHeroine] = useState(CW_HEROINES[0]);
+  const [selectedHeroine, setSelectedHeroine] = useState<typeof CW_HEROINES[number]>(CW_HEROINES[0]);
+  const [protagonistType, setProtagonistType] = useState<"heroine" | "hero">("heroine");
   const [customVillain, setCustomVillain] = useState("");
   const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
   const [chapters, setChapters] = useState<string[]>([]);
@@ -429,9 +448,19 @@ export default function ArrowverseMode({ onBack }: Props) {
           )}
         </div>
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "12px" }}>CHOOSE HEROINE</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>CHOOSE {protagonistType === "heroine" ? "HEROINE" : "HERO"}</div>
+            <div style={{ display: "flex", gap: "4px", background: "#0a0a14", border: "1px solid #1a1a26", borderRadius: "6px", padding: "3px" }}>
+              {(["heroine", "hero"] as const).map(t => (
+                <button key={t} onClick={() => { setProtagonistType(t); setSelectedHeroine((t === "heroine" ? CW_HEROINES : CW_HEROES)[0]); }}
+                  style={{ background: protagonistType === t ? `${color}22` : "transparent", border: "none", borderRadius: "4px", padding: "5px 12px", cursor: "pointer", color: protagonistType === t ? color : "#666", fontSize: "10px", letterSpacing: "2px", fontWeight: 700 }}>
+                  {t === "heroine" ? "HEROINES" : "HEROES"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "8px" }}>
-            {CW_HEROINES.map(h => (
+            {(protagonistType === "heroine" ? CW_HEROINES : CW_HEROES).map(h => (
               <button key={h.name} onClick={() => setSelectedHeroine(h)}
                 style={{ background: selectedHeroine.name === h.name ? `${color}18` : "#0e0e18", border: `1px solid ${selectedHeroine.name === h.name ? color : "#222"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
