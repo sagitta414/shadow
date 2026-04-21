@@ -29,7 +29,7 @@ export function resolveTokens(base: number, body: unknown): number {
   const b = body as Record<string, unknown>;
   const sl = b?.storyLength as string | undefined;
   if (sl === "short") return Math.round(base * 0.6);
-  if (sl === "long")  return Math.min(Math.round(base * 1.6), 3000);
+  if (sl === "long")  return Math.min(Math.round(base * 1.6), 10000);
   return base;
 }
 
