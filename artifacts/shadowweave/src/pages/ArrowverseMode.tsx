@@ -432,13 +432,19 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
       .then(async reader => {
         if (!reader) return;
         const dec = new TextDecoder();
-        let out = "";
+        let raw = "";
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          out += dec.decode(value, { stream: true });
+          raw += dec.decode(value, { stream: true });
         }
-        out = out.replace(/\n{3,}/g, "\n\n").trim();
+        // Parse SSE chunks: each line is  "data: {"chunk":"…"}"
+        const parsed = raw
+          .split("\n")
+          .filter(line => line.startsWith("data: "))
+          .map(line => { try { return JSON.parse(line.slice(6)).chunk ?? ""; } catch { return ""; } })
+          .join("");
+        const out = (parsed.length > 10 ? parsed : raw).replace(/\n{3,}/g, "\n\n").trim();
         if (out.length > 10) setPrevOnText(out);
       })
       .catch(() => {})
