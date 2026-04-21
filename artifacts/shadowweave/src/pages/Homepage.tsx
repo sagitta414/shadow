@@ -62,6 +62,7 @@ interface HomepageProps {
   onCivilianCapture: () => void;
   onBountyBoard: () => void;
   onHeroineLore: () => void;
+  onArrowverseMode: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -422,6 +423,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Weeks of Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", r: 124, g: 58, b: 237, accent: "#7C3AED", onClick: props.onSlowBurn, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", r: 14, g: 165, b: 233, accent: "#0EA5E9", onClick: props.onConfinedSpace, img: `${BASE}/heroes/mode-director.png` },
     { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "🏹", title: "ARROWVERSE DARK EPISODES", badge: "Arrow · The Flash · 17 Scenarios", desc: "Every darkest episode from Arrow and The Flash — Prometheus's chamber, Enter Zoom, Infantino Street, The Undertaking — playable as fully immersive stories.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onArrowverseMode, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   const studioTools = [

@@ -54,6 +54,7 @@ import SequelGenerator from "./pages/SequelGenerator";
 import StoryContinuation from "./pages/StoryContinuation";
 import BountyBoard from "./pages/BountyBoard";
 import HeroineLore from "./pages/HeroineLore";
+import ArrowverseMode from "./pages/ArrowverseMode";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -129,6 +130,7 @@ type Page =
   | "heroine-image-gen"
   | "bounty-board"
   | "heroine-lore"
+  | "arrowverse-mode"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -142,6 +144,7 @@ const STORY_MODE_PAGES = new Set<Page>([
   "time-loop","dream-sequence","sequel-generator","story-continuation",
   "director-mode","escape-attempt","negotiation-room","faction-mode",
   "slow-burn","confined-space","villain-interrogation","civilian-capture",
+  "arrowverse-mode",
 ]);
 
 function BackgroundEffects() {
@@ -347,6 +350,7 @@ function AppInner() {
           onCivilianCapture={() => navigate("civilian-capture")}
           onBountyBoard={() => navigate("bounty-board")}
           onHeroineLore={() => navigate("heroine-lore")}
+          onArrowverseMode={() => navigate("arrowverse-mode")}
         />
       )}
 
@@ -611,6 +615,10 @@ function AppInner() {
 
       {page === "heroine-lore" && (
         <HeroineLore onBack={() => navigate("home")} />
+      )}
+
+      {page === "arrowverse-mode" && (
+        <ArrowverseMode onBack={() => navigate("home")} />
       )}
     </div>
   );
