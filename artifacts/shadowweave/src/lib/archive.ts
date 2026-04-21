@@ -15,6 +15,7 @@ export interface ArchivedStory {
   rating?: number;
   wardensLog?: string;
   psychReport?: string;
+  journalEntries?: Record<number, string>;
 }
 
 const KEY = "sw_archive_v1";

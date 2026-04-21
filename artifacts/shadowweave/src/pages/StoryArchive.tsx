@@ -8,6 +8,7 @@ import {
   ArchivedStory,
 } from "../lib/archive";
 import { getThreatLevel } from "../lib/threatLevel";
+import StoryReader from "../components/StoryReader";
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -73,7 +74,9 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
 
   const [logLoading, setLogLoading] = useState<string | null>(null);
   const [reportLoading, setReportLoading] = useState<string | null>(null);
+  const [journalLoading, setJournalLoading] = useState<string | null>(null);
   const [threatLevel] = useState(() => getThreatLevel());
+  const [readingStory, setReadingStory] = useState<ArchivedStory | null>(null);
 
   async function generateWardensLog(story: ArchivedStory) {
     if (logLoading) return;
@@ -103,6 +106,32 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
       if (data.report) { updateArchiveStory(story.id, { psychReport: data.report }); reload(); }
     } catch {}
     finally { setReportLoading(null); }
+  }
+
+  async function generateJournalEntry(story: ArchivedStory, chapterIdx: number) {
+    const key = `${story.id}-${chapterIdx}`;
+    if (journalLoading) return;
+    setJournalLoading(key);
+    try {
+      const resp = await fetch(`${BASE}/api/story/journal-entry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: story.title,
+          characters: story.characters,
+          universe: story.universe,
+          chapterText: story.chapters[chapterIdx],
+          chapterIndex: chapterIdx,
+        }),
+      });
+      const data = await resp.json();
+      if (data.entry) {
+        const existing = story.journalEntries ?? {};
+        updateArchiveStory(story.id, { journalEntries: { ...existing, [chapterIdx]: data.entry } });
+        reload();
+      }
+    } catch {}
+    finally { setJournalLoading(null); }
   }
 
   function reload() {
@@ -423,6 +452,50 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
                         )}
                       </div>
                     )}
+                    {/* ── Heroine's Journal ── */}
+                    <div style={{ marginTop: "1rem" }}>
+                      {s.journalEntries?.[i] && (
+                        <div style={{
+                          margin: "0 -0.25rem 0.75rem",
+                          padding: "1rem 1.1rem",
+                          background: "rgba(0,0,0,0.45)",
+                          border: "1px solid rgba(168,100,200,0.15)",
+                          borderLeft: "2px solid rgba(168,100,200,0.4)",
+                          borderRadius: "6px",
+                        }}>
+                          <div style={{ fontSize: "0.48rem", letterSpacing: "2.5px", color: "rgba(168,100,200,0.5)", fontFamily: "'Cinzel', serif", marginBottom: "0.6rem" }}>
+                            ✍ HER JOURNAL — CHAPTER {i + 1}
+                          </div>
+                          <div style={{
+                            fontFamily: "'EB Garamond', Georgia, serif",
+                            fontSize: "0.88rem", lineHeight: 1.85,
+                            color: "rgba(210,195,225,0.78)",
+                            fontStyle: "italic",
+                            whiteSpace: "pre-wrap",
+                          }}>
+                            {s.journalEntries[i]}
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); generateJournalEntry(s, i); }}
+                        disabled={journalLoading === `${s.id}-${i}`}
+                        style={{
+                          padding: "0.2rem 0.65rem", borderRadius: "5px",
+                          cursor: journalLoading === `${s.id}-${i}` ? "not-allowed" : "pointer",
+                          fontSize: "0.58rem", letterSpacing: "1.5px",
+                          fontFamily: "'Cinzel', serif",
+                          background: s.journalEntries?.[i] ? "rgba(168,100,200,0.06)" : "rgba(168,100,200,0.03)",
+                          border: `1px solid ${s.journalEntries?.[i] ? "rgba(168,100,200,0.28)" : "rgba(168,100,200,0.12)"}`,
+                          color: s.journalEntries?.[i] ? "rgba(168,100,200,0.7)" : "rgba(168,100,200,0.35)",
+                          opacity: journalLoading === `${s.id}-${i}` ? 0.5 : 1,
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {journalLoading === `${s.id}-${i}` ? "⟳ Writing…" : s.journalEntries?.[i] ? "✍ Regenerate Journal" : "✍ Her Journal"}
+                      </button>
+                    </div>
+
                     {i < s.chapters.length - 1 && <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.06)", margin: "1.5rem auto", width: "50%" }} />}
                   </div>
                 );
@@ -618,6 +691,18 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
                 >
                   {reportLoading === s.id ? "⟳ Analysing…" : s.psychReport ? "🧠 Regenerate Report" : "🧠 Psych Report"}
                 </button>
+                <button
+                  onClick={() => setReadingStory(s)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    color: "rgba(240,235,255,0.8)",
+                  }}
+                >
+                  📖 Read Mode
+                </button>
               </div>
               {confirmDelete === s.id ? (
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -647,6 +732,9 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "1.5rem 0.85rem", minHeight: "100vh" }}>
+      {readingStory && (
+        <StoryReader story={readingStory} onClose={() => setReadingStory(null)} />
+      )}
       <button
         onClick={onBack}
         style={{

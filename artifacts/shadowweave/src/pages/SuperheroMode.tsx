@@ -8,6 +8,7 @@ import { getPreset, savePreset } from "../lib/presets";
 import { useTheme } from "../context/ThemeContext";
 import { VILLAINS } from "../lib/villains";
 import PsycheMeter, { type PsycheEvent } from "../components/PsycheMeter";
+import AtmosphericLoader from "../components/AtmosphericLoader";
 
 interface SuperheroModeProps {
   onBack: () => void;
@@ -2414,16 +2415,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Loading */}
-          {loading && (
-            <div style={{ textAlign: "center", padding: "3rem 2rem", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,184,0,0.1)", borderRadius: "20px", marginBottom: "1.5rem" }}>
-              <div style={{ fontSize: "2rem", marginBottom: "1rem", animation: "orbFloat 2s ease-in-out infinite" }}>⚡</div>
-              <p className="font-cinzel" style={{ color: "#FFB800", fontSize: "0.9rem", letterSpacing: "2px", marginBottom: "0.5rem" }}>Forging your story…</p>
-              <div style={{ display: "flex", gap: "6px", justifyContent: "center", marginTop: "1rem", marginBottom: "1.25rem" }}>
-                {[0,1,2,3].map((i) => <div key={i} style={{ width: "6px", height: "6px", borderRadius: "50%", background: i % 2 === 0 ? "#FFB800" : "#FF4060", animation: `progressGlow 1s ${i*0.2}s ease-in-out infinite` }} />)}
-              </div>
-              <button onClick={stopGeneration} style={{ padding: "0.4rem 1.25rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
-            </div>
-          )}
+          <AtmosphericLoader
+            isActive={loading}
+            onStop={stopGeneration}
+            accentColor="#FFB800"
+            label="Forging your story"
+            chapterNum={chapters.length + 1}
+          />
 
           {/* Heroine Status */}
           {psycheLog.length > 0 && (
@@ -2654,12 +2652,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           )}
 
           {/* Continuing spinner */}
-          {continuing && (
-            <div style={{ textAlign: "center", padding: "1.5rem", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(192,96,224,0.15)", borderRadius: "12px", marginBottom: "1.5rem" }}>
-              <p className="font-cinzel" style={{ color: "#C060E0", fontSize: "0.85rem", letterSpacing: "2px", marginBottom: "0.75rem" }}>Writing Chapter {chapters.length + 1}…</p>
-              <button onClick={stopGeneration} style={{ padding: "0.35rem 1.1rem", background: "rgba(200,40,40,0.15)", border: "1px solid rgba(200,40,40,0.5)", borderRadius: "10px", color: "#FF5555", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "2px", cursor: "pointer" }}>■ Stop</button>
-            </div>
-          )}
+          <AtmosphericLoader
+            isActive={continuing}
+            onStop={stopGeneration}
+            accentColor="#C060E0"
+            label={`Writing Chapter ${chapters.length + 1}`}
+            chapterNum={chapters.length + 1}
+          />
 
           {/* Actions */}
           <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "space-between" }}>

@@ -3597,6 +3597,50 @@ Rules:
 });
 
 // ── Warden's Log ────────────────────────────────────────────────────────────
+// ── Heroine's Journal ─────────────────────────────────────────────────────────
+router.post("/journal-entry", async (req, res) => {
+  try {
+    const { title, characters, universe, chapterText, chapterIndex } = req.body as {
+      title: string; characters: string[]; universe: string;
+      chapterText: string; chapterIndex: number;
+    };
+    const heroine = characters[0] ?? "the heroine";
+    const villain = characters[1] ?? "the captor";
+    const excerpt = chapterText.slice(0, 2800);
+
+    const systemPrompt = `You are writing the secret, private journal of ${heroine}. She writes this after the events of today — in stolen moments, when she is briefly unwatched. This is real. This is raw. No performance, no bravery, no mask.
+
+Voice: First person. Fragmented where she is fragmented. Run-on where she is overwhelmed. Present tense where she cannot escape the present.
+
+She writes:
+- What just happened to her, from the inside — the sensations, the shame, the confusion she can't say out loud
+- What she is pretending to feel vs what she actually feels
+- The thing she is most afraid to admit even to herself
+- Something that surprised her — about him, about herself
+- What she is holding onto (a memory, a plan, a name, a belief) and whether it is still working
+- One small, specific physical detail that keeps intruding
+
+She does NOT write: summaries, explanations for an audience, heroic resolve speeches, or anything that sounds like a narrator. This is a woman alone with a page.
+
+Tone: Intimate, raw, sometimes incoherent. The handwriting would be uneven. Some sentences trail off. Some contradict the ones before.
+
+Length: 260–380 words. No title. No date. No salutation. Just the entry.`;
+
+    const text = await completeChat({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `STORY: ${title}\nHEROINE: ${heroine}\nCAPTOR: ${villain}\nUNIVERSE: ${universe}\nCHAPTER ${chapterIndex + 1} (what happened):\n${excerpt}` },
+      ],
+      maxTokens: 750,
+      temperature: 0.92,
+    });
+
+    res.json({ entry: text.trim() });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 router.post("/wardens-log", async (req, res) => {
   try {
     const { title, characters, universe, chapters } = req.body as {
