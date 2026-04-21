@@ -2,21 +2,14 @@ import { useState, useRef } from "react";
 import { saveStoryToArchive } from "../lib/archive";
 import { buildVoiceInjection } from "../lib/villainVoices";
 import StoryReader from "../components/StoryReader";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface Props { onBack: () => void; }
 
 interface CanonMoment {
-  id: string;
-  show: string;
-  season: number;
-  episode: string;
-  title: string;
-  what: string;
-  canon: string;
-  dark: string;
-  villain: string;
-  heroine: string;
-  color: string;
+  id: string; show: string; season: number; episode: string;
+  title: string; what: string; canon: string; dark: string;
+  villain: string; heroine: string; color: string;
 }
 
 const CANON_MOMENTS: CanonMoment[] = [
@@ -69,6 +62,7 @@ function streamRequest(endpoint: string, body: object, onChunk: (c: string) => v
 function isAbort(e: unknown) { return e instanceof Error && e.name === "AbortError"; }
 
 export default function RewriteCanonMode({ onBack }: Props) {
+  const isMobile = useIsMobile(640);
   const [step, setStep] = useState<"browse" | "configure" | "story">("browse");
   const [selected, setSelected] = useState<CanonMoment | null>(null);
   const [heroine, setHeroine] = useState("Sara Lance");
@@ -82,6 +76,8 @@ export default function RewriteCanonMode({ onBack }: Props) {
   const [readingMode, setReadingMode] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
+  const px = isMobile ? "16px" : "24px";
+
   async function generate() {
     if (!selected) return;
     const ctrl = new AbortController();
@@ -91,12 +87,10 @@ export default function RewriteCanonMode({ onBack }: Props) {
     const voiceNote = buildVoiceInjection(selected.villain);
     try {
       const full = await streamRequest("/api/story/superhero", {
-        hero: heroine,
-        villain: selected.villain,
+        hero: heroine, villain: selected.villain,
         setting: `The divergence point: ${selected.episode} — ${selected.what}`,
         stakes: "The canon is being rewritten. This is the version that stayed buried.",
-        tone: toneObj.label,
-        captureMethod: "The canon moment goes differently",
+        tone: toneObj.label, captureMethod: "The canon moment goes differently",
         restraints: "Whatever the villain chooses",
         intensity: tone === "psychological" ? "Tense — psychological, no graphic content" : "Explicit — fully graphic, dark, kinky",
         storyLength: "Epic Saga",
@@ -118,7 +112,9 @@ export default function RewriteCanonMode({ onBack }: Props) {
     } finally { setLoading(false); setStreaming(""); abortRef.current = null; }
   }
 
+  /* ── STORY VIEW ── */
   if (step === "story" && story) {
+    const col = selected?.color ?? "#888";
     const fakeStory = {
       id: savedId ?? "tmp",
       title: `[REWRITE] ${selected?.title} — ${heroine}`,
@@ -126,26 +122,54 @@ export default function RewriteCanonMode({ onBack }: Props) {
       universe: selected?.show ?? "CW",
       tool: "Rewrite the Canon",
       characters: [heroine, selected?.villain ?? ""],
-      chapters: [story],
-      tags: [],
-      favourite: false,
+      chapters: [story], tags: [], favourite: false,
       wordCount: story.split(/\s+/).filter(Boolean).length,
     };
     return (
       <div style={{ minHeight: "100vh" }}>
-        <div style={{ maxWidth: "860px", margin: "0 auto", padding: "32px 24px" }}>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-            <div style={{ background: `${selected?.color ?? "#888"}18`, border: `1px solid ${selected?.color ?? "#888"}44`, borderRadius: "6px", padding: "4px 12px", fontSize: "10px", color: selected?.color ?? "#888", letterSpacing: "2px", fontWeight: 700 }}>REWRITE</div>
-            <div style={{ fontSize: "16px", fontWeight: 900, color: selected?.color ?? "#ddd", letterSpacing: "2px" }}>{selected?.title}</div>
+        <style>{`.rcm-btn{transition:all 0.15s;}.rcm-btn:active{opacity:0.7;transform:scale(0.97);}`}</style>
+        <div style={{ maxWidth: "860px", margin: "0 auto", padding: `24px ${px}` }}>
+          {/* Breadcrumb */}
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
+            <div style={{ background: `${col}18`, border: `1px solid ${col}44`, borderRadius: "4px", padding: "3px 10px", fontSize: "9px", color: col, letterSpacing: "2px", fontWeight: 700 }}>REWRITE</div>
+            <div style={{ fontSize: isMobile ? "13px" : "16px", fontWeight: 900, color: col, letterSpacing: "1px" }}>{selected?.episode} — {selected?.title}</div>
           </div>
-          <div style={{ background: "#0e0e18", border: `1px solid ${selected?.color ?? "#333"}22`, borderRadius: "8px", padding: "32px", lineHeight: 1.85, fontSize: "15px", color: "#ddd", whiteSpace: "pre-wrap", fontFamily: "Georgia, serif" }}>
+
+          {/* Story text */}
+          <div style={{
+            background: "linear-gradient(180deg, #0e0e1c 0%, #090910 100%)",
+            border: `1px solid ${col}22`,
+            borderRadius: "10px",
+            padding: isMobile ? "20px 16px" : "36px 32px",
+            lineHeight: 1.9,
+            fontSize: isMobile ? "14px" : "15px",
+            color: "#d8d4e8",
+            whiteSpace: "pre-wrap",
+            fontFamily: "Georgia, 'Times New Roman', serif",
+          }}>
             {story}
           </div>
-          <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
-            {savedId && <button onClick={() => setReadingMode(true)} style={{ background: "#0a0a14", border: `1px solid ${selected?.color ?? "#888"}44`, color: selected?.color ?? "#888", borderRadius: "8px", padding: "12px 20px", cursor: "pointer", fontWeight: 700, letterSpacing: "1px", fontSize: "12px" }}>📖 READ</button>}
-            <button onClick={() => { setStep("configure"); setStory(""); }} style={{ background: "transparent", border: "1px solid #333", color: "#666", borderRadius: "8px", padding: "12px 20px", cursor: "pointer" }}>Rewrite Again</button>
-            <button onClick={() => { setStep("browse"); setSelected(null); setStory(""); }} style={{ background: "transparent", border: "1px solid #333", color: "#666", borderRadius: "8px", padding: "12px 20px", cursor: "pointer" }}>← Pick Another Moment</button>
-            <button onClick={onBack} style={{ background: "transparent", border: "1px solid #333", color: "#555", borderRadius: "8px", padding: "12px 20px", cursor: "pointer" }}>Home</button>
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
+            {savedId && (
+              <button className="rcm-btn" onClick={() => setReadingMode(true)}
+                style={{ background: `${col}14`, border: `1px solid ${col}44`, color: col, borderRadius: "8px", padding: "12px 18px", cursor: "pointer", fontWeight: 700, letterSpacing: "1px", fontSize: "12px", WebkitTapHighlightColor: "transparent" }}>
+                📖 READ
+              </button>
+            )}
+            <button className="rcm-btn" onClick={() => { setStep("configure"); setStory(""); }}
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid #2a2a2a", color: "#666", borderRadius: "8px", padding: "12px 18px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+              Rewrite Again
+            </button>
+            <button className="rcm-btn" onClick={() => { setStep("browse"); setSelected(null); setStory(""); }}
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid #2a2a2a", color: "#666", borderRadius: "8px", padding: "12px 18px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+              ← Moments
+            </button>
+            <button className="rcm-btn" onClick={onBack}
+              style={{ background: "transparent", border: "none", color: "#444", padding: "12px 10px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+              Home
+            </button>
           </div>
         </div>
         {readingMode && savedId && <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} />}
@@ -153,82 +177,97 @@ export default function RewriteCanonMode({ onBack }: Props) {
     );
   }
 
+  /* ── CONFIGURE VIEW ── */
   if (step === "configure" && selected) {
     const col = selected.color;
     return (
       <div style={{ minHeight: "100vh" }}>
-        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 24px" }}>
+        <style>{`.rcm-btn{transition:all 0.15s;}.rcm-btn:active{opacity:0.7;transform:scale(0.97);}`}</style>
+        <div style={{ maxWidth: "720px", margin: "0 auto", padding: `20px ${px}` }}>
+
           {/* Breadcrumb */}
-          <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "28px" }}>
-            <button onClick={() => setStep("browse")} style={{ background: "transparent", border: "none", color: "#555", cursor: "pointer", fontSize: "12px", letterSpacing: "1px" }}>← MOMENTS</button>
-            <div style={{ fontSize: "11px", color: "#333" }}>/</div>
-            <div style={{ fontSize: "11px", color: "#777", letterSpacing: "1px" }}>{selected.title}</div>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
+            <button className="rcm-btn" onClick={() => setStep("browse")}
+              style={{ background: "transparent", border: "1px solid #2a2a2a", color: "#555", cursor: "pointer", fontSize: "12px", letterSpacing: "1px", borderRadius: "6px", padding: "6px 12px", WebkitTapHighlightColor: "transparent" }}>
+              ← MOMENTS
+            </button>
+            <div style={{ fontSize: "10px", color: col, letterSpacing: "1px", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: isMobile ? "180px" : "none" }}>{selected.title}</div>
           </div>
 
           {/* Moment card */}
-          <div style={{ background: `linear-gradient(135deg, ${col}11, #0a0a0f)`, border: `1px solid ${col}33`, borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
-              <div style={{ background: `${col}18`, border: `1px solid ${col}33`, borderRadius: "4px", padding: "3px 10px", fontSize: "10px", color: col, letterSpacing: "2px", fontWeight: 700 }}>{selected.show} {selected.episode}</div>
+          <div style={{ background: `linear-gradient(135deg, ${col}0d, #09090e)`, border: `1px solid ${col}33`, borderRadius: "12px", padding: isMobile ? "16px" : "22px", marginBottom: "24px" }}>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", flexWrap: "wrap" }}>
+              <div style={{ background: `${col}18`, border: `1px solid ${col}33`, borderRadius: "4px", padding: "2px 8px", fontSize: "9px", color: col, letterSpacing: "2px", fontWeight: 700 }}>{selected.show} {selected.episode}</div>
             </div>
-            <div style={{ fontSize: "18px", fontWeight: 900, color: col, letterSpacing: "2px", marginBottom: "6px" }}>{selected.title}</div>
-            <div style={{ fontSize: "12px", color: "#666", marginBottom: "12px", fontStyle: "italic" }}>Canon: {selected.canon}</div>
-            <div style={{ background: "#04040c", border: `1px solid ${col}22`, borderRadius: "6px", padding: "14px", fontSize: "12px", color: "#999", lineHeight: 1.7 }}>
-              <div style={{ fontSize: "9px", letterSpacing: "3px", color: col, marginBottom: "8px", fontWeight: 700 }}>THIS VERSION</div>
+            <div style={{ fontSize: isMobile ? "15px" : "17px", fontWeight: 900, color: col, letterSpacing: "1.5px", marginBottom: "6px", lineHeight: 1.2 }}>{selected.title}</div>
+            <div style={{ fontSize: "11px", color: "#555", marginBottom: "10px", fontStyle: "italic" }}>Canon: {selected.canon}</div>
+            <div style={{ background: "#04040b", border: `1px solid ${col}18`, borderRadius: "6px", padding: "12px", fontSize: "12px", color: "#888", lineHeight: 1.7 }}>
+              <div style={{ fontSize: "8px", letterSpacing: "3px", color: col, marginBottom: "6px", fontWeight: 700 }}>THIS VERSION</div>
               {selected.dark}
             </div>
           </div>
 
           {/* Heroine */}
-          <div style={{ marginBottom: "24px" }}>
-            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "12px" }}>HEROINE</div>
+          <div style={{ marginBottom: "22px" }}>
+            <div style={{ fontSize: "10px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>HEROINE</div>
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
               {CW_HEROINES.map(h => (
-                <button key={h} onClick={() => setHeroine(h)}
-                  style={{ background: heroine === h ? `${col}18` : "#0e0e18", border: `1px solid ${heroine === h ? col : "#222"}`, color: heroine === h ? col : "#555", borderRadius: "6px", padding: "6px 12px", cursor: "pointer", fontWeight: 700, fontSize: "11px", letterSpacing: "1px" }}>
-                  {h}
+                <button key={h} className="rcm-btn" onClick={() => setHeroine(h)}
+                  style={{ background: heroine === h ? `${col}18` : "rgba(255,255,255,0.03)", border: `1px solid ${heroine === h ? col : "#252525"}`, color: heroine === h ? col : "#555", borderRadius: "20px", padding: isMobile ? "5px 10px" : "6px 12px", cursor: "pointer", fontWeight: 700, fontSize: isMobile ? "10px" : "11px", letterSpacing: "0.5px", WebkitTapHighlightColor: "transparent" }}>
+                  {isMobile ? h.split(" ")[0] : h}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Tone */}
-          <div style={{ marginBottom: "24px" }}>
-            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "12px" }}>REWRITE TONE</div>
+          <div style={{ marginBottom: "22px" }}>
+            <div style={{ fontSize: "10px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>REWRITE TONE</div>
             <div style={{ display: "flex", gap: "8px", flexDirection: "column" }}>
               {REWRITE_TONES.map(t => (
-                <button key={t.id} onClick={() => setTone(t.id)}
-                  style={{ background: tone === t.id ? `${col}12` : "#0a0a12", border: `1px solid ${tone === t.id ? col : "#1e1e2e"}`, borderRadius: "8px", padding: "12px 16px", cursor: "pointer", textAlign: "left" }}>
-                  <div style={{ fontSize: "11px", fontWeight: 700, color: tone === t.id ? col : "#666", letterSpacing: "1.5px", marginBottom: "4px" }}>{t.label}</div>
+                <button key={t.id} className="rcm-btn" onClick={() => setTone(t.id)}
+                  style={{ background: tone === t.id ? `${col}0f` : "rgba(255,255,255,0.02)", border: `1px solid ${tone === t.id ? col : "#1e1e2a"}`, borderRadius: "8px", padding: "12px 14px", cursor: "pointer", textAlign: "left", WebkitTapHighlightColor: "transparent" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: tone === t.id ? col : "#555", letterSpacing: "1.5px", marginBottom: "3px" }}>{t.label}</div>
                   <div style={{ fontSize: "10px", color: "#444", lineHeight: 1.5 }}>{t.desc}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Custom note */}
-          <div style={{ marginBottom: "24px" }}>
-            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>WRITER'S NOTE <span style={{ color: "#333", fontWeight: 400 }}>(optional)</span></div>
+          {/* Writer's note */}
+          <div style={{ marginBottom: "22px" }}>
+            <div style={{ fontSize: "10px", letterSpacing: "3px", color: "#555", marginBottom: "8px" }}>
+              WRITER'S NOTE <span style={{ color: "#333", fontWeight: 400 }}>(optional)</span>
+            </div>
             <textarea
               value={customNote}
               onChange={e => setCustomNote(e.target.value)}
-              placeholder="Add any specific direction — 'keep the restraints physical', 'end on her breaking', 'more of the villain's voice'..."
-              style={{ width: "100%", background: "#0a0a12", border: "1px solid #222", borderRadius: "8px", padding: "12px 14px", color: "#ccc", fontSize: "13px", lineHeight: 1.6, resize: "vertical", minHeight: "80px", fontFamily: "inherit", boxSizing: "border-box" }}
+              placeholder="Any specific direction — 'keep the restraints physical', 'end on her breaking', 'more of the villain's voice'..."
+              style={{ width: "100%", background: "#0a0a12", border: "1px solid #222", borderRadius: "8px", padding: "12px 14px", color: "#ccc", fontSize: "13px", lineHeight: 1.6, resize: "vertical", minHeight: "72px", fontFamily: "inherit", boxSizing: "border-box" }}
             />
           </div>
 
-          {error && <div style={{ color: "#f87171", background: "#1a0000", border: "1px solid #7f1d1d", borderRadius: "6px", padding: "12px", marginBottom: "16px" }}>{error}</div>}
+          {error && <div style={{ color: "#f87171", background: "#1a0000", border: "1px solid #7f1d1d", borderRadius: "6px", padding: "12px", marginBottom: "16px", fontSize: "13px" }}>{error}</div>}
 
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button onClick={generate} disabled={loading}
-              style={{ flex: 1, background: `linear-gradient(135deg, ${col}22, ${col}33)`, border: `1px solid ${col}55`, color: col, borderRadius: "10px", padding: "16px", cursor: loading ? "not-allowed" : "pointer", fontWeight: 900, letterSpacing: "3px", fontSize: "14px", opacity: loading ? 0.6 : 1 }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button className="rcm-btn" onClick={generate} disabled={loading}
+              style={{ flex: 1, background: `linear-gradient(135deg, ${col}1a, ${col}28)`, border: `1px solid ${col}55`, color: col, borderRadius: "10px", padding: isMobile ? "14px" : "16px", cursor: loading ? "not-allowed" : "pointer", fontWeight: 900, letterSpacing: "2px", fontSize: isMobile ? "13px" : "14px", opacity: loading ? 0.6 : 1, WebkitTapHighlightColor: "transparent" }}>
               {loading ? "REWRITING…" : "REWRITE THE CANON"}
             </button>
-            {loading && <button onClick={() => abortRef.current?.abort()} style={{ background: "#1a0000", border: "1px solid #7f1d1d", color: "#f87171", borderRadius: "10px", padding: "16px 20px", cursor: "pointer", fontWeight: 700 }}>STOP</button>}
-            <button onClick={() => setStep("browse")} style={{ background: "transparent", border: "1px solid #333", color: "#666", borderRadius: "10px", padding: "16px 20px", cursor: "pointer" }}>←</button>
+            {loading && (
+              <button className="rcm-btn" onClick={() => abortRef.current?.abort()}
+                style={{ background: "#1a0000", border: "1px solid #7f1d1d", color: "#f87171", borderRadius: "10px", padding: "14px 18px", cursor: "pointer", fontWeight: 700, fontSize: "12px", WebkitTapHighlightColor: "transparent" }}>
+                STOP
+              </button>
+            )}
+            <button className="rcm-btn" onClick={() => setStep("browse")}
+              style={{ background: "transparent", border: "1px solid #2a2a2a", color: "#555", borderRadius: "10px", padding: "14px 18px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+              ←
+            </button>
           </div>
 
-          {loading && (
-            <div style={{ marginTop: "24px", background: "#0a0a12", border: "1px solid #1a1a2a", borderRadius: "8px", padding: "24px", color: "#666", fontSize: "14px", lineHeight: 1.85, whiteSpace: "pre-wrap", fontFamily: "Georgia, serif" }}>
+          {loading && streaming && (
+            <div style={{ marginTop: "20px", background: "#09090e", border: "1px solid #1a1a28", borderRadius: "8px", padding: isMobile ? "16px" : "24px", color: "#555", fontSize: "14px", lineHeight: 1.85, whiteSpace: "pre-wrap", fontFamily: "Georgia, serif" }}>
               {streaming}
             </div>
           )}
@@ -237,45 +276,57 @@ export default function RewriteCanonMode({ onBack }: Props) {
     );
   }
 
-  // Browse view
+  /* ── BROWSE VIEW ── */
   const showGroups = ["ARROW", "THE FLASH", "LEGENDS", "SUPERGIRL"];
   return (
     <div style={{ minHeight: "100vh" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 24px" }}>
+      <style>{`
+        .rcm-card { transition: all 0.2s; cursor: pointer; }
+        .rcm-card:active { opacity: 0.8; transform: scale(0.98); }
+        @media (hover: hover) { .rcm-card:hover { transform: translateY(-2px); } }
+      `}</style>
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: `24px ${px}` }}>
+
         {/* Header */}
-        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "32px" }}>
-          <button onClick={onBack} style={{ background: "transparent", border: "1px solid #333", color: "#666", borderRadius: "8px", padding: "10px 16px", cursor: "pointer", fontSize: "12px", letterSpacing: "1px", flexShrink: 0 }}>←</button>
+        <div style={{ display: "flex", gap: "14px", alignItems: "flex-start", marginBottom: "28px" }}>
+          <button onClick={onBack}
+            style={{ background: "transparent", border: "1px solid #2a2a2a", color: "#555", borderRadius: "8px", padding: "10px 14px", cursor: "pointer", fontSize: "14px", letterSpacing: "0.5px", flexShrink: 0, WebkitTapHighlightColor: "transparent" }}>
+            ←
+          </button>
           <div>
-            <div style={{ fontSize: "11px", letterSpacing: "4px", color: "#555", marginBottom: "4px" }}>SHADOWWEAVE</div>
-            <div style={{ fontSize: "22px", fontWeight: 900, letterSpacing: "3px", color: "#ddd", marginBottom: "6px" }}>REWRITE THE CANON</div>
+            <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "4px" }}>SHADOWWEAVE</div>
+            <div style={{ fontSize: isMobile ? "18px" : "22px", fontWeight: 900, letterSpacing: "2px", color: "#ddd", marginBottom: "6px" }}>REWRITE THE CANON</div>
             <div style={{ fontSize: "12px", color: "#555", lineHeight: 1.6 }}>Pick a pivotal episode moment. Choose the version that stayed buried.</div>
           </div>
         </div>
 
         {showGroups.map(show => {
-          const moments = CANON_MOMENTS.filter(m => m.show === show || (show === "THE FLASH" && m.show === "THE FLASH"));
+          const moments = CANON_MOMENTS.filter(m => m.show === show);
           if (!moments.length) return null;
+          const col = moments[0].color;
           return (
-            <div key={show} style={{ marginBottom: "40px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ fontSize: "13px", fontWeight: 900, letterSpacing: "4px", color: moments[0].color }}>{show}</div>
-                <div style={{ flex: 1, height: "1px", background: `linear-gradient(to right, ${moments[0].color}44, transparent)` }} />
+            <div key={show} style={{ marginBottom: "36px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "4px", color: col }}>{show}</div>
+                <div style={{ flex: 1, height: "1px", background: `linear-gradient(to right, ${col}44, transparent)` }} />
+                <div style={{ fontSize: "10px", color: "#333" }}>{moments.length}</div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "12px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: "10px" }}>
                 {moments.map(m => (
-                  <button key={m.id} onClick={() => { setSelected(m); setHeroine(m.heroine); setStep("configure"); }}
-                    style={{ background: "linear-gradient(135deg, #0e0e18, #0a0a12)", border: `1px solid ${m.color}22`, borderRadius: "12px", padding: "18px", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}55`; (e.currentTarget as HTMLElement).style.background = `linear-gradient(135deg, ${m.color}11, #0a0a12)`; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}22`; (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #0e0e18, #0a0a12)"; }}>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "10px" }}>
+                  <button key={m.id} className="rcm-card"
+                    onClick={() => { setSelected(m); setHeroine(m.heroine); setStep("configure"); }}
+                    style={{ background: "linear-gradient(135deg, #0e0e1c, #0a0a12)", border: `1px solid ${m.color}22`, borderRadius: "12px", padding: isMobile ? "16px" : "18px", textAlign: "left", WebkitTapHighlightColor: "transparent" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}55`; (e.currentTarget as HTMLElement).style.background = `linear-gradient(135deg, ${m.color}0d, #0a0a12)`; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${m.color}22`; (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #0e0e1c, #0a0a12)"; }}>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px" }}>
                       <div style={{ background: `${m.color}18`, border: `1px solid ${m.color}33`, borderRadius: "3px", padding: "2px 8px", fontSize: "9px", color: m.color, letterSpacing: "1px", fontWeight: 700 }}>{m.episode}</div>
                       <div style={{ fontSize: "9px", color: "#444", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.villain}</div>
                     </div>
-                    <div style={{ fontSize: "14px", fontWeight: 900, color: m.color, letterSpacing: "1.5px", marginBottom: "8px" }}>{m.title}</div>
+                    <div style={{ fontSize: isMobile ? "13px" : "14px", fontWeight: 900, color: m.color, letterSpacing: "1px", marginBottom: "6px", lineHeight: 1.2 }}>{m.title}</div>
                     <div style={{ fontSize: "11px", color: "#666", lineHeight: 1.5, marginBottom: "10px" }}>{m.what}</div>
-                    <div style={{ background: "#04040c", borderRadius: "6px", padding: "10px 12px" }}>
-                      <div style={{ fontSize: "9px", letterSpacing: "2px", color: m.color, marginBottom: "5px", fontWeight: 700 }}>THIS VERSION</div>
-                      <div style={{ fontSize: "10px", color: "#555", lineHeight: 1.6, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>{m.dark}</div>
+                    <div style={{ background: "#04040b", borderRadius: "6px", padding: "10px 12px" }}>
+                      <div style={{ fontSize: "8px", letterSpacing: "2px", color: m.color, marginBottom: "4px", fontWeight: 700 }}>THIS VERSION</div>
+                      <div style={{ fontSize: "11px", color: "#555", lineHeight: 1.6, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: isMobile ? 2 : 3, WebkitBoxOrient: "vertical" }}>{m.dark}</div>
                     </div>
                   </button>
                 ))}
