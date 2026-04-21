@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import AtmosphericLoader from "../components/AtmosphericLoader";
-import { saveStoryToArchive, updateArchiveStory } from "../lib/archive";
+import { saveStoryToArchive, updateArchiveStory, getArchive } from "../lib/archive";
+import { buildVoiceInjection } from "../lib/villainVoices";
+import StoryReader from "../components/StoryReader";
 
 const _BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -136,6 +138,16 @@ const SCENARIOS: Scenario[] = [
   { id: "supergirl-reign", universe: "🦸 SUPERGIRL", show: "arrow" as "arrow" | "flash", season: 3, episodeRef: "Supergirl S3 — 'Reign' Arc", title: "REIGN", tagline: "The Worldkiller has been activated. It doesn't negotiate.", villain: "Reign (Samantha Arias)", villainDetail: "Reign — a Kryptonian Worldkiller, engineered to judge and cleanse. She experiences no doubt, no mercy, no hesitation.", setting: "National City ruins — wherever Reign has most recently left destruction", tone: "Apocalyptic, physical, the horror of a force that cannot be reasoned with", captureMethod: "Reign is stronger than Superman. Taking her was not difficult.", restraints: "Reign's Kryptonian shackles — she brought them from Argo specifically for this", stakes: "Reign is one of three Worldkillers. The other two are still dormant.", details: "Reign is a personality Samantha Arias cannot access or control. Sam is still in there, trying to claw back.", storyContext: "Based on Supergirl Season 3's devastating Reign arc — the Worldkiller who nearly killed Supergirl in their first encounter." },
   // ── CRISIS CROSSOVER ─────────────────────────────────────────────────────────
   { id: "crisis-anti-monitor", universe: "🌌 CRISIS", show: "flash" as "arrow" | "flash", season: 99, episodeRef: "Crisis on Infinite Earths — 2019 Crossover", title: "CRISIS ON INFINITE EARTHS", tagline: "Anti-Monitor is consuming entire universes. She is trapped in one of the last ones.", villain: "Anti-Monitor", villainDetail: "The Anti-Monitor — a cosmic entity consuming the positive matter multiverse. He has already destroyed thousands of Earths.", setting: "The last surviving Earth — her Earth, surrounded by antimatter consuming the edges of reality", tone: "Cosmic horror, scale beyond comprehension, the end of everything as the backdrop", captureMethod: "The antimatter wave separates her from every ally across every dimension.", restraints: "Anti-Monitor's shadow demons — beings of pure antimatter that dissolve light", stakes: "There are only three Earths left. The Monitor is dying. The heroes are running out of time.", details: "The Anti-Monitor has consumed thousands of years and trillions of lives. She is not a threat. She is a detail.", storyContext: "Based on the Crisis on Infinite Earths 2019 CW crossover — the most ambitious Arrowverse event, ending with Oliver Queen's sacrifice." },
+
+  // ── ELSEWORLDS CROSSOVER (2018) ───────────────────────────────────────────
+  { id: "elseworlds-deegan", universe: "🔮 ELSEWORLDS", show: "arrow" as "arrow" | "flash", season: 98, episodeRef: "Elseworlds Crossover — 2018", title: "DR. DEEGAN'S REWRITE", tagline: "Dr. Deegan has the Book of Destiny. He has rewritten reality. In this version, she belongs to him.", villain: "Dr. John Deegan (Superman of this Earth)", villainDetail: "Dr. John Deegan — an asylum psychiatrist who used the Book of Destiny to rewrite reality and make himself Superman. In this reality, heroes are criminals and Deegan is untouchable law.", setting: "Arkham Asylum — now Deegan's personal fortress, the cells repurposed for heroes he's declared fugitives", tone: "Wrong-universe horror — the world is recognisable but every rule has flipped, her allies are fugitives, and Deegan has absolute institutional authority", captureMethod: "In Deegan's rewritten world, she is a wanted criminal. His 'officers' brought her in. The paperwork is perfect.", restraints: "Medical restraints in Arkham — Deegan has repurposed the psychiatric wing specifically for powered individuals. The suppressors are experimental, personalised, and cruel.", stakes: "The Book of Destiny is still active. Deegan can rewrite the world again at any moment. She needs to stall — or it ends.", details: "Deegan is intoxicated by power he doesn't fully understand. The sexual undercurrent of his authority trips over into genuine obsession — she represents everything the old world denied him. He wants to keep her. He wants to study her. He wants her to understand that in this world, she has no allies. Make this kinky, possessive, and darkly explicit — Deegan's power over reality makes every boundary negotiable. He can literally rewrite what she remembers. He is unstable, brilliant, and completely unchecked.", storyContext: "Based on the 2018 Elseworlds crossover — the Monitor gave Dr. John Deegan the Book of Destiny, allowing him to rewrite reality and cast himself as Superman." },
+
+  { id: "elseworlds-evil-oliver", universe: "🔮 ELSEWORLDS", show: "arrow" as "arrow" | "flash", season: 98, episodeRef: "Elseworlds — Earth-X Adjacent / Alt-Oliver Arc", title: "THE DARK ARROW", tagline: "This Oliver Queen never had a conscience. She's about to understand the difference.", villain: "Dark Arrow (Earth-X Oliver Queen)", villainDetail: "The Oliver Queen of Earth-X — the same face, the same skills, the same ruthlessness, but stripped of every moral restraint. On his Earth, the Nazis won. He is their general. He crossed to her Earth because he wants her, specifically.", setting: "A Star City that doesn't know it's being hunted — this Oliver moves through her world like he owns it, because on his Earth, he owned everything", tone: "Doppelgänger horror and dark possessive desire — the man she trusts wearing the face of something that has never been good", captureMethod: "He impersonated Oliver Queen long enough to get close. By the time she realised the difference, she was already in his grip.", restraints: "Earth-X binding tech — engineered for metahumans, elegant and absolute", stakes: "Earth-X Oliver doesn't want to conquer this Earth. He wants her. This is personal. That makes it worse.", details: "Dark Arrow's interest in her is obsessive and explicitly sexual — she represents something his own Earth could never produce. He has watched her across the multiverse. He has wanted her for years in his subjective timeline. Make this darkly kinky, possessively explicit — a villain who has rehearsed this exact scenario, who knows her as well as Oliver does but has no restraints about acting on that knowledge. He is tender in a way that makes it more horrifying. He calls her by her name with a reverence that is completely at odds with what he wants.", storyContext: "Based on the Elseworlds and Crisis crossovers — Dark Arrow, the Earth-X doppelgänger of Oliver Queen, Nazi general and wielder of his own corrupted bow." },
+
+  // ── INVASION! CROSSOVER (2016) ────────────────────────────────────────────
+  { id: "invasion-dominators", universe: "👽 INVASION!", show: "flash" as "arrow" | "flash", season: 97, episodeRef: "Invasion! Crossover — 2016", title: "THE DOMINATORS", tagline: "The Dominators have been studying metahumans for six decades. They know exactly what she is. And they want more data.", villain: "Dominator Scientists (alien collective)", villainDetail: "The Dominators — an alien species whose entire civilisation is built on biological study and enhancement. They have been monitoring Earth's metahumans since 1951. They are not malicious by their own ethics. They are researchers, which is somehow worse.", setting: "The Dominators' harvest vessel — a ship in Earth's upper atmosphere, clinically beautiful, designed entirely around the acquisition and study of biological specimens. Cold light. Frictionless surfaces. Medical precision.", tone: "Alien clinical horror — the violation of being an experiment, of being studied rather than fought, of facing something that doesn't experience guilt about what it wants from her body", captureMethod: "Abducted mid-battle. One moment she was fighting alongside the team; the next she was here.", restraints: "Dominator examination restraints — designed for a dozen species. Hers fit perfectly. They had prepared for this anatomy specifically.", stakes: "The Dominators have been negotiating with ARGUS. There's a political dimension to this. Rescuing her may mean ignoring a treaty.", details: "Make this explicitly kinky in an alien-clinical way — the Dominators have no shame about their methods because they have no concept of consent as a moral category. They are thorough. Their instruments are precise and intimate. They want complete biological data, and they define 'complete' expansively. She is aware the entire time. They speak to her like she is both subject and observer in an experiment. There is something in their thoroughness that her body responds to despite herself, which horrifies her more than the restraints do. Be explicit, be clinical, be alien — this is not cruelty. This is science. That's the horror.", storyContext: "Based on the 2016 Invasion! crossover — the Dominators arrived to study Earth's metahuman population, abducting heroes and erasing their memories as part of a long-running biological research program." },
+
+  { id: "invasion-mindwipe", universe: "👽 INVASION!", show: "arrow" as "arrow" | "flash", season: 97, episodeRef: "Invasion! — The Dominator Hive Simulations", title: "DOMINATOR SIMULATION", tagline: "The Dominators built her a perfect simulation of her life. The only thing that wasn't in it was her own free will.", villain: "Dominator Hive Intelligence", villainDetail: "The Dominator Hive — not individual aliens but a distributed intelligence that processes individual specimens through shared consciousness. They can construct any memory, any reality, any version of a person they want. And then dissolve it.", setting: "A simulation of her city, indistinguishable from reality — until the edges fray, which they are designed to do, slowly, just enough to remind her she is a subject", tone: "Reality-horror and identity violation — the terror of not knowing what's real, of having her own mind used as the laboratory", captureMethod: "She was in the simulation before she was captured. She doesn't know when it started.", restraints: "Neurological — the simulation itself is the restraint. Her body is in a Dominator pod. Her mind is elsewhere, doing what they've designed it to do.", stakes: "The Dominators can extract any memory she has. Every secret she knows about the team, about their weaknesses, about their loved ones.", details: "The simulation includes versions of people she trusts — which the Dominators use to study her emotional and physiological responses to intimacy and threat simultaneously. Make this darkly explicit — the Dominators have designed scenarios specifically to study her responses to desire, submission, and fear in combination. The simulated encounters are real to her nervous system. She knows they're artificial. She responds anyway. The data they're collecting is intimate and complete. Be explicit about what they are taking from her and how her body cooperates while her mind resists.", storyContext: "Based on the Invasion! crossover's use of Dominator simulations — the aliens trapped the heroes in a shared hallucination to study their psychology and extract intelligence." },
 ];
 
 // ── SEASON DATA ────────────────────────────────────────────────────────────────
@@ -367,6 +379,9 @@ export default function ArrowverseMode({ onBack }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [readingMode, setReadingMode] = useState(false);
+  const [prevOnText, setPrevOnText] = useState<string | null>(null);
+  const [prevOnLoading, setPrevOnLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const [displayedText, setDisplayedText] = useState("");
   const typeRef = useRef<number | null>(null);
@@ -391,6 +406,45 @@ export default function ArrowverseMode({ onBack }: Props) {
   const storyDark  = selectedSeason?.dark  ?? (selectedScenario?.show === "flash" ? FLASH_DARK  : ARROW_DARK);
 
   function resetStory() { setChapters([]); setStreamingText(""); setError(""); setSavedId(null); setDisplayedText(""); }
+
+  useEffect(() => {
+    if (step !== "configure") return;
+    const archive = getArchive();
+    if (archive.length === 0) return;
+    const last = archive[0];
+    if (!last.chapters[0]) return;
+    setPrevOnText(null);
+    setPrevOnLoading(true);
+    const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+    const snippet = last.chapters[0].slice(0, 1400);
+    fetch(`${base}/api/story/superhero`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        hero: last.characters[0] ?? "the heroine",
+        villain: last.characters[1] ?? "the villain",
+        setting: "—", stakes: "—", tone: "TV drama", captureMethod: "—",
+        restraints: "—", intensity: "Tense", storyLength: "Micro",
+        details: `You are a TV showrunner writing a 2-sentence "Previously on..." recap. Based on this story excerpt, write exactly two dramatic sentences — the first sets the scene, the second ends on a lingering dread or unresolved tension. No dialogue. Past tense. Maximum impact, minimum words.\n\nSTORY EXCERPT:\n${snippet}`,
+      }),
+    })
+      .then(r => r.body?.getReader())
+      .then(async reader => {
+        if (!reader) return;
+        const dec = new TextDecoder();
+        let out = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          out += dec.decode(value, { stream: true });
+        }
+        out = out.replace(/\n{3,}/g, "\n\n").trim();
+        if (out.length > 10) setPrevOnText(out);
+      })
+      .catch(() => {})
+      .finally(() => setPrevOnLoading(false));
+  }, [step]);
+
   function selectScenario(s: Scenario) { setSelectedScenario(s); setStep("configure"); resetStory(); }
   function selectSeason(s: Season) { setSelectedSeason(s); setSeasonStep("episodes"); }
   function selectEpisode(ep: Episode) {
@@ -429,7 +483,7 @@ export default function ArrowverseMode({ onBack }: Props) {
         setting: ep ? ep.setting : sc!.setting, stakes: ep ? ep.stakes : sc!.stakes,
         tone: ep ? ep.tone : sc!.tone, captureMethod: ep ? ep.captureMethod : sc!.captureMethod,
         restraints: ep ? ep.restraints : sc!.restraints, intensity: intensityLabel, storyLength: "Epic Saga",
-        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}SCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology. Reference Arrowverse locations, organisations, and lore wherever possible.`,
+        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}SCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}${buildVoiceInjection(villain)}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology. Reference Arrowverse locations, organisations, and lore wherever possible.`,
       }, (c) => { accumulated += c; setStreamingText(accumulated); }, ctrl.signal);
       setChapters([full]);
       if (isEpisodic) {
@@ -513,6 +567,16 @@ export default function ArrowverseMode({ onBack }: Props) {
               <div style={{ fontSize: "19px", fontWeight: 900, color, letterSpacing: "2px", marginBottom: "4px" }}>{sc.title}</div>
               <div style={{ fontSize: "12px", color: "#aaa", fontStyle: "italic", marginBottom: "14px" }}>"{sc.tagline}"</div>
               <div style={{ fontSize: "12px", color: "#777", lineHeight: 1.7 }}>{sc.storyContext}</div>
+              {(prevOnLoading || prevOnText) && (
+                <div style={{ background: "#04040c", border: `1px solid ${color}22`, borderRadius: "6px", padding: "14px 16px", marginTop: "16px" }}>
+                  <div style={{ fontSize: "10px", letterSpacing: "3px", color, marginBottom: "8px", fontWeight: 700 }}>PREVIOUSLY ON SHADOWWEAVE…</div>
+                  {prevOnLoading && !prevOnText ? (
+                    <div style={{ fontSize: "11px", color: "#444", fontStyle: "italic" }}>Generating recap…</div>
+                  ) : (
+                    <div style={{ fontSize: "12px", color: "#888", lineHeight: 1.8, fontStyle: "italic" }}>{prevOnText}</div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -663,7 +727,10 @@ export default function ArrowverseMode({ onBack }: Props) {
         )}
         {error && <div style={{ color: "#f87171", background: "#1a0000", border: "1px solid #7f1d1d", borderRadius: "6px", padding: "12px", marginTop: "16px" }}>{error}</div>}
         <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
-          {!loading && <button onClick={() => continueStory(isEpisodic)} style={{ background: `linear-gradient(135deg, ${dark}, ${color}33)`, border: `1px solid ${color}55`, color, borderRadius: "8px", padding: "12px 24px", cursor: "pointer", fontWeight: 700, letterSpacing: "1px", fontSize: "13px" }}>+ NEXT CHAPTER</button>}
+          {!loading && chapters.length > 0 && savedId && (
+          <button onClick={() => setReadingMode(true)} style={{ background: "#0a0a14", border: `1px solid ${color}44`, color, borderRadius: "8px", padding: "12px 20px", cursor: "pointer", fontWeight: 700, letterSpacing: "1px", fontSize: "12px" }}>📖 READ</button>
+        )}
+        {!loading && <button onClick={() => continueStory(isEpisodic)} style={{ background: `linear-gradient(135deg, ${dark}, ${color}33)`, border: `1px solid ${color}55`, color, borderRadius: "8px", padding: "12px 24px", cursor: "pointer", fontWeight: 700, letterSpacing: "1px", fontSize: "13px" }}>+ NEXT CHAPTER</button>}
           {!loading && nextEp && <button onClick={() => { setSelectedEpisode(nextEp); setSeasonStep("configure"); resetStory(); setCustomVillain(""); }} style={{ background: `${color}22`, border: `1px solid ${color}55`, color, borderRadius: "8px", padding: "12px 24px", cursor: "pointer", fontWeight: 700, fontSize: "13px", letterSpacing: "1px" }}>▶ NEXT EPISODE: E{nextEp.number}</button>}
           {loading && <button onClick={() => abortRef.current?.abort()} style={{ background: "#1a0000", border: "1px solid #7f1d1d", color: "#f87171", borderRadius: "8px", padding: "12px 24px", cursor: "pointer", fontWeight: 700 }}>STOP</button>}
           <button onClick={() => { isEpisodic ? setSeasonStep("configure") : setStep("configure"); setChapters([]); }} style={{ background: "transparent", border: "1px solid #333", color: "#888", borderRadius: "8px", padding: "12px 20px", cursor: "pointer" }}>Change Setup</button>
@@ -871,6 +938,25 @@ export default function ArrowverseMode({ onBack }: Props) {
           {seasonStep === "story" && <StoryView isEpisodic={true} />}
         </>
       )}
+
+      {readingMode && savedId && chapters.length > 0 && (() => {
+        const sc = selectedScenario;
+        const ep = selectedEpisode;
+        const s = selectedSeason;
+        const fakeStory = {
+          id: savedId,
+          title: ep && s ? `${s.title} E${ep.number}: ${ep.title}` : sc?.title ?? "Story",
+          createdAt: Date.now(),
+          universe: "CW Arrowverse",
+          tool: "Arrowverse Mode",
+          characters: [selectedHeroine.name, customVillain.trim() || (ep?.villain ?? sc?.villain ?? "")],
+          chapters,
+          tags: [],
+          favourite: false,
+          wordCount: chapters.join(" ").split(/\s+/).filter(Boolean).length,
+        };
+        return <StoryReader story={fakeStory} onClose={() => setReadingMode(false)} />;
+      })()}
     </div>
   );
 }

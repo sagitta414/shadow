@@ -65,6 +65,9 @@ interface HomepageProps {
   onBountyBoard: () => void;
   onHeroineLore: () => void;
   onArrowverseMode: () => void;
+  onStoryTimeline: () => void;
+  onRewriteCanon: () => void;
+  onSeasonArc: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -426,7 +429,9 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Weeks of Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", r: 124, g: 58, b: 237, accent: "#7C3AED", onClick: props.onSlowBurn, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", r: 14, g: 165, b: 233, accent: "#0EA5E9", onClick: props.onConfinedSpace, img: `${BASE}/heroes/mode-director.png` },
     { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "🏹", title: "ARROWVERSE DARK EPISODES", badge: "Arrow · The Flash · 17 Scenarios", desc: "Every darkest episode from Arrow and The Flash — Prometheus's chamber, Enter Zoom, Infantino Street, The Undertaking — playable as fully immersive stories.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onArrowverseMode, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "🏹", title: "ARROWVERSE DARK EPISODES", badge: "Arrow · The Flash · 21 Scenarios", desc: "Every darkest episode from Arrow and The Flash — Prometheus's chamber, Enter Zoom, Infantino Street, Elseworlds, Invasion! — playable as fully immersive stories.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onArrowverseMode, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "📝", title: "REWRITE THE CANON", badge: "12 Pivot Moments · Alternate History", desc: "Pick a pivotal CW episode moment and write the version that stayed buried. Sara and the Mirakuru pit. Iris and Savitar's deadline. The night Darhk didn't let Thea go.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onRewriteCanon, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "🎬", title: "SEASON ARC", badge: "Multi-Chapter · Full Season Build", desc: "Design a full villain arc — pick your villain, up to 3 heroines, and a season premise. Each chapter ends on a cliffhanger. The grip deepens with every episode.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onSeasonArc, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   const studioTools = [
@@ -441,6 +446,7 @@ export default function Homepage(props: HomepageProps) {
     { icon: "🎨", title: "IMAGE GENERATOR", badge: "AI Art · Uncensored", desc: "Describe any scene from your story. The AI writes the perfect prompt — then Venice AI renders it uncensored in stunning detail.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onHeroineImageGen, img: `${BASE}/heroes/tool-image-generator.png` },
     { icon: "🎯", title: "BOUNTY BOARD", badge: "Weekly · Challenges", desc: "Six rotating weekly contracts. Complete them across modes to earn exclusive rewards. New bounties drop every Monday.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onBountyBoard, img: `${BASE}/heroes/tool-bounty-board.png` },
     { icon: "📜", title: "HEROINE LORE", badge: "Living Record · AI Portrait", desc: "A living chronicle of every heroine who has passed through the dark — how she changed, what broke her, and what endured. AI-generated portraits included.", r: 168, g: 85, b: 247, accent: "#A855F7", onClick: props.onHeroineLore, img: `${BASE}/heroes/tool-heroine-dossier.png` },
+    { icon: "🗓", title: "STORY TIMELINE", badge: "Archive · Visual Timeline", desc: "See every story laid out as a visual horizontal timeline — grouped by date, mode, or villain. Click any story to open it in full reading mode.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onStoryTimeline, img: `${BASE}/heroes/mode-director.png` },
   ];
 
   return (

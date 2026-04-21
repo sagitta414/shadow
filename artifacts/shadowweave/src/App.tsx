@@ -55,6 +55,9 @@ import StoryContinuation from "./pages/StoryContinuation";
 import BountyBoard from "./pages/BountyBoard";
 import HeroineLore from "./pages/HeroineLore";
 import ArrowverseMode from "./pages/ArrowverseMode";
+import StoryTimeline from "./pages/StoryTimeline";
+import RewriteCanonMode from "./pages/RewriteCanonMode";
+import SeasonArcMode from "./pages/SeasonArcMode";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -133,6 +136,9 @@ type Page =
   | "bounty-board"
   | "heroine-lore"
   | "arrowverse-mode"
+  | "story-timeline"
+  | "rewrite-canon"
+  | "season-arc"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -354,6 +360,9 @@ function AppInner() {
           onBountyBoard={() => navigate("bounty-board")}
           onHeroineLore={() => navigate("heroine-lore")}
           onArrowverseMode={() => navigate("arrowverse-mode")}
+          onStoryTimeline={() => navigate("story-timeline")}
+          onRewriteCanon={() => navigate("rewrite-canon")}
+          onSeasonArc={() => navigate("season-arc")}
         />
       )}
 
@@ -626,6 +635,18 @@ function AppInner() {
 
       {page === "arrowverse-mode" && (
         <ArrowverseMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "story-timeline" && (
+        <StoryTimeline onBack={() => navigate("home")} />
+      )}
+
+      {page === "rewrite-canon" && (
+        <RewriteCanonMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "season-arc" && (
+        <SeasonArcMode onBack={() => navigate("home")} />
       )}
     </div>
   );
