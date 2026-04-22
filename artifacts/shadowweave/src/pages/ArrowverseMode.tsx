@@ -329,7 +329,7 @@ function streamRequest(endpoint: string, body: object, onChunk: (c: string) => v
         if (line.startsWith("data: ")) {
           const data = line.slice(6).trim();
           if (data === "[DONE]") continue;
-          try { const p = JSON.parse(data); const t = p.choices?.[0]?.delta?.content ?? ""; if (t) { full += t; onChunk(t); } } catch {}
+          try { const p = JSON.parse(data); const t = p.chunk ?? p.choices?.[0]?.delta?.content ?? ""; if (t) { full += t; onChunk(t); } } catch {}
         }
       }
     }
