@@ -52,6 +52,7 @@
 - 4 visual themes: Void / Cold Blue / Candlelight / Glitch
 - **HeroinePicker** — `src/components/HeroinePicker.tsx` — searchable grid with universe tabs (All/Marvel/DC/CW/StarWars/etc), 180+ heroines from `src/lib/heroines.ts`; replaces pill lists in all 19 specialist modes
 - **VillainPicker** — `src/components/VillainPicker.tsx` — searchable grid with universe tabs, 63 villains from `src/lib/villains.ts`; replaces villain pill lists in all applicable specialist modes
+- **Villain Unlock Progression** — `src/lib/villainUnlocks.ts` — 15 prestige villains (Loki, Thanos, Mephisto, Dark Phoenix, Hela, Kang, Dormammu, Galactus, Darkseid, Apocalypse, etc.) are locked behind story/word/bounty/mastery milestones across 3 tiers; VillainPicker shows grayscale lock overlays with per-villain progress bars, tier badges, and a "NEW UNLOCK" notification banner; locked villains open a lore modal showing unlock condition + flavor text instead of being selectable
 - **PsycheMeter** — `src/components/PsycheMeter.tsx` — dual sanity/hope meters with expandable event log; used in MindBreakMode
 - **ReadingProgressBar** — `src/components/ReadingProgressBar.tsx` — thin chapter progress bar shown in reading views of all 15 specialist modes
 - **Shared Data Libraries** — `src/lib/heroines.ts` (180+ heroines across 8 universes) + `src/lib/villains.ts` (63 villains across Marvel/DC/CW/TB/PR/SW/Animated)
