@@ -60,6 +60,7 @@ import RewriteCanonMode from "./pages/RewriteCanonMode";
 import SeasonArcMode from "./pages/SeasonArcMode";
 import DarkDossier from "./pages/DarkDossier";
 import CWSpecialistHub from "./pages/CWSpecialistHub";
+import GenericHub from "./pages/GenericHub";
 import StoryArcs from "./pages/StoryArcs";
 import HeroineDossier from "./pages/HeroineDossier";
 import VillainBuilder from "./pages/VillainBuilder";
@@ -143,6 +144,9 @@ type Page =
   | "season-arc"
   | "dark-dossier"
   | "cw-specialist"
+  | "psych-dark"
+  | "spectacle-hub"
+  | "captivity-hub"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -236,6 +240,7 @@ function AppInner() {
   const [surpriseActive, setSurpriseActive] = useState(false);
   const [reimagineHero, setReimaginHero] = useState<string | null>(null);
   const [continuationStoryId, setContinuationStoryId] = useState<string | null>(null);
+  const [hubSource, setHubSource] = useState<Page | null>(null);
   const [dailyPlay, setDailyPlay] = useState<{
     dateKey: string;
     scenario: { heroine: { name: string; color: string; power: string }; villain: string; setting: string; title: string };
@@ -260,10 +265,13 @@ function AppInner() {
   }, []);
 
   function navigate(p: Page) {
+    if (p === "home") setHubSource(null);
     recordModeVisit(p);
     setPage(p);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+  function backFromMode() { const src = hubSource; setHubSource(null); navigate(src ?? "home"); }
+  function enterFromHub(hub: Page, dest: Page) { setHubSource(hub); navigate(dest); }
 
   const bgColor = theme.vars["--t-bg"] ?? "#000000";
   const textColor = theme.vars["--t-text"] ?? "#C8C8D8";
@@ -318,28 +326,12 @@ function AppInner() {
           onSoundingBoard={() => navigate("sounding-board")}
           onCaptorLogic={() => navigate("captor-logic")}
           onSuperheroMode={() => navigate("superhero-mode")}
-          onInterrogationRoom={() => navigate("interrogation-room")}
           onCelebrityMode={() => navigate("celebrity-mode")}
           onStoryArchive={() => navigate("story-archive")}
           onDailyScenario={() => navigate("daily-scenario")}
           onDailyChronicle={() => navigate("daily-chronicle")}
-          onMindBreak={() => navigate("mind-break")}
-          onDualCapture={() => navigate("dual-capture")}
           onRescueGoneWrong={() => navigate("rescue-gone-wrong")}
           onPowerDrain={() => navigate("power-drain")}
-          onMassCapture={() => navigate("mass-capture")}
-          onCorruptionArc={() => navigate("corruption-arc")}
-          onHeroAuction={() => navigate("hero-auction")}
-          onTrophyDisplay={() => navigate("trophy-display")}
-          onObedienceTraining={() => navigate("obedience-training")}
-          onShowcase={() => navigate("showcase")}
-          onPublicProperty={() => navigate("public-property")}
-          onBettingPool={() => navigate("betting-pool")}
-          onVillainTeamUp={() => navigate("villain-team-up")}
-          onChainOfCustody={() => navigate("chain-of-custody")}
-          onLongGame={() => navigate("long-game")}
-          onDarkMirror={() => navigate("dark-mirror")}
-          onArenaMode={() => navigate("arena-mode")}
           onTheHandler={() => navigate("the-handler")}
           onSurpriseMe={() => { setSurpriseActive(true); setReimaginHero(null); navigate("superhero-mode"); }}
           onStoryArcs={() => navigate("story-arcs")}
@@ -349,16 +341,10 @@ function AppInner() {
           onAchievements={() => navigate("achievements")}
           onVault={() => navigate("vault")}
           onTimeLoop={() => navigate("time-loop")}
-          onDreamSequence={() => navigate("dream-sequence")}
-          onSequelGenerator={() => navigate("sequel-generator")}
           onStoryContinuation={() => navigate("story-continuation")}
           onDirectorMode={() => navigate("director-mode")}
           onEscapeAttempt={() => navigate("escape-attempt")}
-          onNegotiationRoom={() => navigate("negotiation-room")}
-          onFactionMode={() => navigate("faction-mode")}
           onHeroineImageGen={() => navigate("heroine-image-gen")}
-          onSlowBurn={() => navigate("slow-burn")}
-          onConfinedSpace={() => navigate("confined-space")}
           onVillainInterrogation={() => navigate("villain-interrogation")}
           onCivilianCapture={() => navigate("civilian-capture")}
           onBountyBoard={() => navigate("bounty-board")}
@@ -366,6 +352,9 @@ function AppInner() {
           onStoryTimeline={() => navigate("story-timeline")}
           onDarkDossier={() => navigate("dark-dossier")}
           onCWSpecialist={() => navigate("cw-specialist")}
+          onPsychDark={() => navigate("psych-dark")}
+          onSpectacleHub={() => navigate("spectacle-hub")}
+          onCaptivityHub={() => navigate("captivity-hub")}
         />
       )}
 
@@ -473,7 +462,7 @@ function AppInner() {
       )}
 
       {page === "interrogation-room" && (
-        <InterrogationRoom onBack={() => navigate("home")} />
+        <InterrogationRoom onBack={backFromMode} />
       )}
 
       {page === "celebrity-mode" && (
@@ -481,11 +470,11 @@ function AppInner() {
       )}
 
       {page === "mind-break" && (
-        <MindBreakMode onBack={() => navigate("home")} />
+        <MindBreakMode onBack={backFromMode} />
       )}
 
       {page === "dual-capture" && (
-        <DualCaptureMode onBack={() => navigate("home")} />
+        <DualCaptureMode onBack={backFromMode} />
       )}
 
       {page === "rescue-gone-wrong" && (
@@ -497,55 +486,55 @@ function AppInner() {
       )}
 
       {page === "mass-capture" && (
-        <MassCaptureMode onBack={() => navigate("home")} />
+        <MassCaptureMode onBack={backFromMode} />
       )}
 
       {page === "corruption-arc" && (
-        <CorruptionArcMode onBack={() => navigate("home")} />
+        <CorruptionArcMode onBack={backFromMode} />
       )}
 
       {page === "hero-auction" && (
-        <HeroAuctionMode onBack={() => navigate("home")} />
+        <HeroAuctionMode onBack={backFromMode} />
       )}
 
       {page === "trophy-display" && (
-        <TrophyDisplayMode onBack={() => navigate("home")} />
+        <TrophyDisplayMode onBack={backFromMode} />
       )}
 
       {page === "obedience-training" && (
-        <ObedienceTrainingMode onBack={() => navigate("home")} />
+        <ObedienceTrainingMode onBack={backFromMode} />
       )}
 
       {page === "showcase" && (
-        <ShowcaseMode onBack={() => navigate("home")} />
+        <ShowcaseMode onBack={backFromMode} />
       )}
 
       {page === "public-property" && (
-        <PublicPropertyMode onBack={() => navigate("home")} />
+        <PublicPropertyMode onBack={backFromMode} />
       )}
 
       {page === "betting-pool" && (
-        <BettingPoolMode onBack={() => navigate("home")} />
+        <BettingPoolMode onBack={backFromMode} />
       )}
 
       {page === "villain-team-up" && (
-        <VillainTeamUpMode onBack={() => navigate("home")} />
+        <VillainTeamUpMode onBack={backFromMode} />
       )}
 
       {page === "chain-of-custody" && (
-        <ChainOfCustodyMode onBack={() => navigate("home")} />
+        <ChainOfCustodyMode onBack={backFromMode} />
       )}
 
       {page === "long-game" && (
-        <LongGameMode onBack={() => navigate("home")} />
+        <LongGameMode onBack={backFromMode} />
       )}
 
       {page === "dark-mirror" && (
-        <DarkMirrorMode onBack={() => navigate("home")} />
+        <DarkMirrorMode onBack={backFromMode} />
       )}
 
       {page === "arena-mode" && (
-        <ArenaMode onBack={() => navigate("home")} />
+        <ArenaMode onBack={backFromMode} />
       )}
 
       {page === "the-handler" && (
@@ -573,11 +562,11 @@ function AppInner() {
       )}
 
       {page === "dream-sequence" && (
-        <DreamSequenceMode onBack={() => navigate("home")} />
+        <DreamSequenceMode onBack={backFromMode} />
       )}
 
       {page === "sequel-generator" && (
-        <SequelGenerator onBack={() => navigate("home")} />
+        <SequelGenerator onBack={backFromMode} />
       )}
 
       {page === "story-continuation" && (
@@ -602,10 +591,10 @@ function AppInner() {
         <EscapeAttemptMode onBack={() => navigate("home")} />
       )}
       {page === "negotiation-room" && (
-        <NegotiationRoomMode onBack={() => navigate("home")} />
+        <NegotiationRoomMode onBack={backFromMode} />
       )}
       {page === "faction-mode" && (
-        <FactionMode onBack={() => navigate("home")} />
+        <FactionMode onBack={backFromMode} />
       )}
 
       {page === "slow-burn" && (
@@ -658,6 +647,64 @@ function AppInner() {
 
       {page === "cw-specialist" && (
         <CWSpecialistHub onBack={() => navigate("home")} onContinue={(id) => { setContinuationStoryId(id); navigate("story-continuation"); }} />
+      )}
+
+      {page === "psych-dark" && (
+        <GenericHub
+          title="PSYCH DARK" icon="🧠" accent="#C084FC"
+          subtitle="PSYCHOLOGICAL WARFARE · 6 MODES"
+          tagline="Six modes of psychological pressure. From interrogation to nightmare — the mind is the real battlefield."
+          onBack={() => navigate("home")}
+          onSelectMode={(id) => enterFromHub("psych-dark", id as Page)}
+          modes={[
+            { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension", desc: "Bright lights, tight restraints. The villain breaks her spirit one question at a time — or tries to.", color: "#F87171", r: 248, g: 113, b: 113, pageId: "interrogation-room" },
+            { icon: "🌀", title: "MIND BREAK", badge: "5 Phases · Deep Psych", desc: "Five-phase descent into psychological submission. Her will fractures layer by layer until nothing remains.", color: "#C084FC", r: 192, g: 132, b: 252, pageId: "mind-break" },
+            { icon: "🪞", title: "DARK MIRROR", badge: "Duality · Psych", desc: "Face to face with her own darkness. Is the villain truly the opposite — or simply what she'd become?", color: "#E879F9", r: 232, g: 121, b: 249, pageId: "dark-mirror" },
+            { icon: "◈", title: "DREAM SEQUENCE", badge: "5 Depths · Nightmare", desc: "Five depths of nightmare. The villain reaches her where she feels safest — in sleep — and remakes her.", color: "#A78BFA", r: 167, g: 139, b: 250, pageId: "dream-sequence" },
+            { icon: "🤝", title: "NEGOTIATION ROOM", badge: "Psych · Turn-Based Chat", desc: "No restraints. Just words. The villain wants something — and he's very good at getting it. You play her.", color: "#38BDF8", r: 56, g: 189, b: 248, pageId: "negotiation-room" },
+            { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", color: "#0EA5E9", r: 14, g: 165, b: 233, pageId: "confined-space" },
+          ]}
+        />
+      )}
+
+      {page === "spectacle-hub" && (
+        <GenericHub
+          title="POWER & SPECTACLE" icon="🏛" accent="#FCA311"
+          subtitle="DISPLAY · DOMINANCE · AUDIENCE · 7 MODES"
+          tagline="Seven modes built around power made visible — auctions, arenas, displays, wagers. Victory as performance."
+          onBack={() => navigate("home")}
+          onSelectMode={(id) => enterFromHub("spectacle-hub", id as Page)}
+          modes={[
+            { icon: "⚖", title: "HERO AUCTION", badge: "Bid · Live Auction", desc: "The highest bidder gets everything. Rising stakes, live bids, one inevitable outcome on the auction block.", color: "#FCA311", r: 252, g: 163, b: 17, pageId: "hero-auction" },
+            { icon: "👁", title: "TROPHY DISPLAY", badge: "Display · Public", desc: "Victory displayed for all to see. The heroine becomes the centerpiece of the villain's prized collection.", color: "#EF4444", r: 239, g: 68, b: 68, pageId: "trophy-display" },
+            { icon: "🎭", title: "THE SHOWCASE", badge: "Staged · Audience", desc: "Staged for an audience. Every movement choreographed, every reaction studied and savored by the crowd.", color: "#E879F9", r: 232, g: 121, b: 249, pageId: "showcase" },
+            { icon: "🏛", title: "ARENA MODE", badge: "Combat · Versus", desc: "Combat as spectacle. The villain pits the heroine against impossible odds while a crowd watches and bets.", color: "#EF4444", r: 239, g: 68, b: 68, pageId: "arena-mode" },
+            { icon: "🎲", title: "BETTING POOL", badge: "Wager · Live Odds", desc: "Her fate decided by strangers placing bets in real time. Live odds, rising wagers, one winner takes all.", color: "#34D399", r: 52, g: 211, b: 153, pageId: "betting-pool" },
+            { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", desc: "Exposed, available, owned. The villain strips away every boundary while the world watches and does nothing.", color: "#FBBF24", r: 251, g: 191, b: 36, pageId: "public-property" },
+            { icon: "🤝", title: "VILLAIN TEAM-UP", badge: "Duo Villain · Conflict", desc: "Two villains, one objective. The heroine faces double the cunning and not a shred of mercy between them.", color: "#F87171", r: 248, g: 113, b: 113, pageId: "villain-team-up" },
+          ]}
+        />
+      )}
+
+      {page === "captivity-hub" && (
+        <GenericHub
+          title="CAPTIVITY ARCS" icon="⛓" accent="#34D399"
+          subtitle="LONG-FORM · ARC MODES · 9 MODES"
+          tagline="Nine modes for long-form captivity — conditioning, erosion, transfer, and the slow collapse of resistance over time."
+          onBack={() => navigate("home")}
+          onSelectMode={(id) => enterFromHub("captivity-hub", id as Page)}
+          modes={[
+            { icon: "🌑", title: "CORRUPTION ARC", badge: "7 Chapters · Arc", desc: "Seven chapters. One slow-burn transformation from defiance to devotion the heroine never saw coming.", color: "#F472B6", r: 244, g: 114, b: 182, pageId: "corruption-arc" },
+            { icon: "📋", title: "OBEDIENCE TRAINING", badge: "Session · Tracked", desc: "Structured sessions, tracked progress. The villain reshapes behavior with clinical precision and patience.", color: "#2DD4BF", r: 45, g: 212, b: 191, pageId: "obedience-training" },
+            { icon: "⏳", title: "THE LONG GAME", badge: "Long Burn · Chapters", desc: "Months of slow manipulation. No rush, no force — just patience, proximity, and inevitability.", color: "#C084FC", r: 168, g: 85, b: 247, pageId: "long-game" },
+            { icon: "🔗", title: "CHAIN OF CUSTODY", badge: "Transfer · Multi-Arc", desc: "Passed between captors. Each handler leaves their mark before the transfer. None leave empty-handed.", color: "#60A5FA", r: 96, g: 165, b: 250, pageId: "chain-of-custody" },
+            { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", color: "#7C3AED", r: 124, g: 58, b: 237, pageId: "slow-burn" },
+            { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", desc: "Two heroines, one cell. Shared captivity breeds desperation — and bonds neither expected.", color: "#34D399", r: 52, g: 211, b: 153, pageId: "dual-capture" },
+            { icon: "🗡", title: "MASS CAPTURE", badge: "Group · 3–5 Heroines", desc: "Three to five heroines swept up in one operation. The villain's greatest conquest — delivered all at once.", color: "#F87171", r: 248, g: 113, b: 113, pageId: "mass-capture" },
+            { icon: "⚔️", title: "FACTION WAR", badge: "5 Factions · Dark Alliance", desc: "Avengers vs HYDRA. Justice League vs Gotham Rogues. The Guild vs the Sith. Pick two factions and write the conflict.", color: "#C8A830", r: 200, g: 168, b: 75, pageId: "faction-mode" },
+            { icon: "⟴", title: "SEQUEL GENERATOR", badge: "Archive · New Chapter", desc: "A story from your archive earns a new chapter. The villain returns, wiser and far more prepared than before.", color: "#F59E0B", r: 245, g: 158, b: 11, pageId: "sequel-generator" },
+          ]}
+        />
       )}
     </div>
   );

@@ -19,28 +19,12 @@ interface HomepageProps {
   onSoundingBoard: () => void;
   onCaptorLogic: () => void;
   onSuperheroMode: () => void;
-  onInterrogationRoom: () => void;
   onCelebrityMode: () => void;
   onStoryArchive: () => void;
   onDailyScenario: () => void;
   onDailyChronicle: () => void;
-  onMindBreak: () => void;
-  onDualCapture: () => void;
   onRescueGoneWrong: () => void;
   onPowerDrain: () => void;
-  onMassCapture: () => void;
-  onCorruptionArc: () => void;
-  onHeroAuction: () => void;
-  onTrophyDisplay: () => void;
-  onObedienceTraining: () => void;
-  onShowcase: () => void;
-  onPublicProperty: () => void;
-  onBettingPool: () => void;
-  onVillainTeamUp: () => void;
-  onChainOfCustody: () => void;
-  onLongGame: () => void;
-  onDarkMirror: () => void;
-  onArenaMode: () => void;
   onTheHandler: () => void;
   onSurpriseMe: () => void;
   onStoryArcs: () => void;
@@ -50,16 +34,10 @@ interface HomepageProps {
   onAchievements: () => void;
   onVault?: () => void;
   onTimeLoop: () => void;
-  onDreamSequence: () => void;
-  onSequelGenerator: () => void;
   onStoryContinuation: () => void;
   onDirectorMode: () => void;
   onEscapeAttempt: () => void;
-  onNegotiationRoom: () => void;
-  onFactionMode: () => void;
   onHeroineImageGen: () => void;
-  onSlowBurn: () => void;
-  onConfinedSpace: () => void;
   onVillainInterrogation: () => void;
   onCivilianCapture: () => void;
   onBountyBoard: () => void;
@@ -67,6 +45,9 @@ interface HomepageProps {
   onStoryTimeline: () => void;
   onDarkDossier?: () => void;
   onCWSpecialist?: () => void;
+  onPsychDark?: () => void;
+  onSpectacleHub?: () => void;
+  onCaptivityHub?: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -398,37 +379,18 @@ export default function Homepage(props: HomepageProps) {
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   const specialtyModes = [
-    { icon: "🎬", title: "DIRECTOR MODE", badge: "You Control · Scene by Scene", desc: "You write every direction. The AI executes it exactly — non-sexual by default, explicit on your command. No random events, no surprises.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDirectorMode, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "🔦", title: "INTERROGATION ROOM", badge: "Psych · High Tension", desc: "Bright lights, tight restraints. The villain breaks her spirit one question at a time — or tries to.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onInterrogationRoom, img: `${BASE}/heroes/mode-interrogation-room.png` },
-    { icon: "🌀", title: "MIND BREAK", badge: "5 Phases · Deep Psych", desc: "Five-phase descent into psychological submission. Her will fractures layer by layer until nothing remains.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onMindBreak, img: `${BASE}/heroes/mode-mind-break.png` },
-    { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", desc: "Two heroines, one cell. Shared captivity breeds desperation — and bonds neither expected.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDualCapture, img: `${BASE}/heroes/mode-dual-capture.png` },
+    { icon: "🎬", title: "DIRECTOR MODE", badge: "You Control · Scene by Scene", desc: "You write every direction. The AI executes it exactly — no random events, no surprises. Full creative control.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onDirectorMode, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🕸", title: "RESCUE GONE WRONG", badge: "Trap · Ambush", desc: "The cavalry never comes. The trap springs and the would-be rescuer becomes the villain's newest prize.", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onRescueGoneWrong, img: `${BASE}/heroes/mode-rescue-gone-wrong.png` },
     { icon: "⚡", title: "POWER DRAIN", badge: "Meter · Drain Arc", desc: "Watch the meter fall. Her abilities bleed out with every passing hour as control shifts to the villain.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onPowerDrain, img: `${BASE}/heroes/mode-power-drain.png` },
-    { icon: "🗡", title: "MASS CAPTURE", badge: "Group · 3–5 Heroines", desc: "Three to five heroines swept up in one operation. The villain's greatest conquest — delivered all at once.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onMassCapture, img: `${BASE}/heroes/mode-mass-capture.png` },
-    { icon: "🌑", title: "CORRUPTION ARC", badge: "7 Chapters · Arc", desc: "Seven chapters. One slow-burn transformation from defiance to devotion the heroine never saw coming.", r: 244, g: 114, b: 182, accent: "#F472B6", onClick: props.onCorruptionArc, img: `${BASE}/heroes/mode-corruption-arc.png` },
-    { icon: "📋", title: "OBEDIENCE TRAINING", badge: "Session · Tracked", desc: "Structured sessions, tracked progress. The villain reshapes behavior with clinical precision and patience.", r: 45, g: 212, b: 191, accent: "#2DD4BF", onClick: props.onObedienceTraining, img: `${BASE}/heroes/mode-obedience-training.png` },
-    { icon: "🤝", title: "VILLAIN TEAM-UP", badge: "Duo Villain · Conflict", desc: "Two villains, one objective. The heroine faces double the cunning and not a shred of mercy between them.", r: 248, g: 113, b: 113, accent: "#F87171", onClick: props.onVillainTeamUp, img: `${BASE}/heroes/mode-villain-team-up.png` },
-    { icon: "🔗", title: "CHAIN OF CUSTODY", badge: "Transfer · Multi-Arc", desc: "Passed between captors. Each handler leaves their mark before the transfer. None leave empty-handed.", r: 96, g: 165, b: 250, accent: "#60A5FA", onClick: props.onChainOfCustody, img: `${BASE}/heroes/mode-chain-of-custody.png` },
-    { icon: "⏳", title: "THE LONG GAME", badge: "Long Burn · Chapters", desc: "Months of slow manipulation. No rush, no force — just patience, proximity, and inevitability.", r: 168, g: 85, b: 247, accent: "#C084FC", onClick: props.onLongGame, img: `${BASE}/heroes/mode-the-long-game.png` },
-    { icon: "🪞", title: "DARK MIRROR", badge: "Duality · Psych", desc: "Face to face with her own darkness. Is the villain truly the opposite — or simply what she'd become?", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onDarkMirror, img: `${BASE}/heroes/mode-dark-mirror.png` },
-    { icon: "🏛", title: "ARENA MODE", badge: "Combat · Versus", desc: "Combat as spectacle. The villain pits the heroine against impossible odds while a crowd watches and bets.", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onArenaMode, img: `${BASE}/heroes/mode-arena-mode.png` },
     { icon: "🕵", title: "THE HANDLER", badge: "Covert · Intimate", desc: "Control through closeness. The villain gets close enough that escape starts to feel like betrayal.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onTheHandler, img: `${BASE}/heroes/mode-the-handler.png` },
-    { icon: "⚖", title: "HERO AUCTION", badge: "Bid · Live Auction", desc: "The highest bidder gets everything. Rising stakes, live bids, one inevitable outcome on the auction block.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onHeroAuction, img: `${BASE}/heroes/mode-hero-auction.png` },
-    { icon: "👁", title: "TROPHY DISPLAY", badge: "Display · Public", desc: "Victory displayed for all to see. The heroine becomes the centerpiece of the villain's prized collection.", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onTrophyDisplay, img: `${BASE}/heroes/mode-trophy-display.png` },
-    { icon: "🎭", title: "THE SHOWCASE", badge: "Staged · Audience", desc: "Staged for an audience. Every movement choreographed, every reaction studied and savored by the crowd.", r: 232, g: 121, b: 249, accent: "#E879F9", onClick: props.onShowcase, img: `${BASE}/heroes/mode-the-showcase.png` },
-    { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", desc: "Exposed, available, owned. The villain strips away every boundary while the world watches and does nothing.", r: 251, g: 191, b: 36, accent: "#FBBF24", onClick: props.onPublicProperty, img: `${BASE}/heroes/mode-public-property.png` },
-    { icon: "🎲", title: "BETTING POOL", badge: "Wager · Live Odds", desc: "Her fate decided by strangers placing bets in real time. Live odds, rising wagers, one winner takes all.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onBettingPool, img: `${BASE}/heroes/mode-betting-pool.png` },
     { icon: "⟳", title: "TIME LOOP", badge: "Loop · Villain Knows All", desc: "She resets. He remembers. Each loop teaches the villain exactly how to break her a little bit faster.", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onTimeLoop, img: `${BASE}/heroes/mode-time-loop.png` },
-    { icon: "◈", title: "DREAM SEQUENCE", badge: "5 Depths · Nightmare", desc: "Five depths of nightmare. The villain reaches her where she feels safest — in sleep — and remakes her.", r: 167, g: 139, b: 250, accent: "#A78BFA", onClick: props.onDreamSequence, img: `${BASE}/heroes/mode-dream-sequence.png` },
-    { icon: "⟴", title: "SEQUEL GENERATOR", badge: "Archive · New Chapter", desc: "A story from your archive earns a new chapter. The villain returns, wiser and far more prepared than before.", r: 245, g: 158, b: 11, accent: "#F59E0B", onClick: props.onSequelGenerator, img: `${BASE}/heroes/mode-sequel-generator.png` },
-    { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
     { icon: "🏃", title: "ESCAPE ATTEMPT", badge: "Turn-Based · 8 Beats", desc: "One shot. You choose every action — the AI plays out the brutal consequences. Escape or be recaptured.", r: 251, g: 146, b: 60, accent: "#FB923C", onClick: props.onEscapeAttempt, img: `${BASE}/heroes/mode-escape-attempt.png` },
-    { icon: "🤝", title: "NEGOTIATION ROOM", badge: "Psych · Turn-Based Chat", desc: "No restraints. Just words. The villain wants something — and he's very good at getting it. You play her.", r: 56, g: 189, b: 248, accent: "#38BDF8", onClick: props.onNegotiationRoom, img: `${BASE}/heroes/mode-negotiation-room.png` },
-    { icon: "⚔️", title: "FACTION WAR", badge: "5 Factions · Dark Alliance", desc: "Avengers vs HYDRA. Justice League vs Gotham Rogues. The Guild vs the Sith. Pick two factions and write the conflict.", r: 200, g: 168, b: 75, accent: "#C8A830", onClick: props.onFactionMode, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Weeks of Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", r: 124, g: 58, b: 237, accent: "#7C3AED", onClick: props.onSlowBurn, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "🔒", title: "CONFINED SPACE", badge: "One Room · One Night", desc: "Locked in a single room with nowhere to go. Pure psychological pressure — the drama lives entirely between them.", r: 14, g: 165, b: 233, accent: "#0EA5E9", onClick: props.onConfinedSpace, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "💀", title: "VILLAIN MODE", badge: "Live Dialogue · You're the Villain", desc: "You play the villain. Type every line. The AI plays the heroine — afraid, defiant, cracking. Watch her psyche shatter in real time.", r: 220, g: 38, b: 38, accent: "#DC2626", onClick: props.onVillainInterrogation, img: `${BASE}/heroes/mode-director.png` },
-    { icon: "⚡", title: "CW SPECIALIST MODE", badge: "Dark Episodes · Canon Rewrites · Season Arcs", desc: "Three CW dark-universe tools in one hub — play the darkest Arrow/Flash episodes, rewrite pivotal canon moments, or build a full multi-chapter villain season arc.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onCWSpecialist, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
+    { icon: "⚡", title: "CW SPECIALIST MODE", badge: "Arrow · The Flash · Canon Rewrites · Seasons", desc: "Three CW dark-universe tools in one hub — play the darkest Arrow/Flash episodes, rewrite pivotal canon moments, or build a full villain season arc.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onCWSpecialist, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "🧠", title: "PSYCH DARK", badge: "6 Modes · Psychological Warfare", desc: "Six modes of psychological pressure — interrogation, mind break, dark mirror, dream sequences, negotiation, confined spaces. The mind is the real battlefield.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onPsychDark, img: `${BASE}/heroes/mode-mind-break.png` },
+    { icon: "🏛", title: "POWER & SPECTACLE", badge: "7 Modes · Display · Dominance", desc: "Seven modes built around power made visible — hero auctions, trophy displays, arenas, betting pools, villain team-ups. Victory as performance.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onSpectacleHub, img: `${BASE}/heroes/mode-arena-mode.png` },
+    { icon: "⛓", title: "CAPTIVITY ARCS", badge: "9 Modes · Long-Form Captivity", desc: "Nine long-form modes — corruption arcs, conditioning, slow burn, dual captures, faction wars, sequel generation. The grip deepens over time.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onCaptivityHub, img: `${BASE}/heroes/mode-corruption-arc.png` },
   ];
 
   const studioTools = [
