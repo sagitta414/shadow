@@ -1,5 +1,25 @@
 [
   {
+    "id": "mo9apjdhf6nru",
+    "timestamp": 1776816569429,
+    "type": "story_generate",
+    "path": "/story/superhero",
+    "ip": "76.181.115.135",
+    "sessionId": "NzYuMTgxLjExNS4x",
+    "villain": "Malcolm Merlyn (Dark Archer) — Malcolm Merlyn — architect of the Undertaking, Dark Archer, League of Assassins veteran. Cold, patrician, absolute.",
+    "setting": "Merlyn Global Group sublevel — a private corporate vault below Star City"
+  },
+  {
+    "id": "mo9apdm01r4l9",
+    "timestamp": 1776816561960,
+    "type": "story_generate",
+    "path": "/story/superhero",
+    "ip": "76.181.115.135",
+    "sessionId": "NzYuMTgxLjExNS4x",
+    "villain": "Kang the Conqueror",
+    "setting": "—"
+  },
+  {
     "id": "mo90i4fakoecn",
     "timestamp": 1776799427302,
     "type": "story_generate",
