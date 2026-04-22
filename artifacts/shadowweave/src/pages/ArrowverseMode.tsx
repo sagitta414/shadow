@@ -18,6 +18,27 @@ const LEGEND_DARK  = "#7C2D12";
 const SUPRA_COLOR  = "#60A5FA";
 const SUPRA_DARK   = "#1E3A5F";
 
+// ── CW SHOWS ─────────────────────────────────────────────────────────────────
+const CW_SHOWS = [
+  { id: "arrow",         name: "Arrow",               icon: "🏹", color: ARROW_COLOR,  dark: ARROW_DARK,  city: "Star City",     tone: "gritty crime drama — morally complex heroes, League of Assassins mythology, Oliver Queen's legacy of darkness",                                              cast: "Team Arrow: John Diggle (Spartan), Felicity Smoak (Overwatch), Roy Harper (Arsenal)",              homeBase: "The Bunker beneath Star City" },
+  { id: "flash",         name: "The Flash",            icon: "⚡", color: FLASH_COLOR,  dark: FLASH_DARK,  city: "Central City",  tone: "sci-fi action drama — metahuman threats, Speed Force mythology, STAR Labs family dynamics and the weight of hope turning dark",                         cast: "STAR Labs team: Cisco Ramon (Vibe), Caitlin Snow (Killer Frost), Harrison Wells",                   homeBase: "STAR Labs, Central City" },
+  { id: "supergirl",     name: "Supergirl",            icon: "☀", color: SUPRA_COLOR,  dark: SUPRA_DARK,  city: "National City", tone: "hopeful-turned-dark superhero drama — alien threats, DEO black operations, Kryptonian mythology and what hope costs when it breaks",                   cast: "DEO: Alex Danvers, J'onn J'onzz (Martian Manhunter), Lena Luthor, Brainy",                         homeBase: "DEO Headquarters, National City" },
+  { id: "legends",       name: "Legends of Tomorrow", icon: "🌀", color: LEGEND_COLOR, dark: LEGEND_DARK, city: "Across time",   tone: "time-travel isolation horror — anachronistic threats, historical settings, Waverider claustrophobia with no rescue signal across centuries",               cast: "The Legends: Sara Lance (White Canary), Nate Heywood, Zari Tomaz, Ray Palmer",                     homeBase: "The Waverider, adrift in time" },
+  { id: "batwoman",      name: "Batwoman",             icon: "🦇", color: "#DC2626",   dark: "#7F1D1D",   city: "Gotham City",   tone: "dark neo-noir — Gotham's institutional rot, the Wayne legacy weaponised against its heir, Alice's Wonderland-theme psychological terror",               cast: "The Bat Team: Luke Fox (Batwing), Mary Hamilton, Jacob Kane (GCPD)",                                homeBase: "The Batcave beneath Wayne Tower, Gotham City" },
+  { id: "blacklightning", name: "Black Lightning",    icon: "⚡", color: "#7C3AED",   dark: "#3B0764",   city: "Freeland",      tone: "social justice superhero drama — The 100 gang, ASA meta-experiments, systemic corruption in a community fighting to survive",                           cast: "Pierce family: Jennifer (Lightning), Anissa (Thunder/Blackbird), Lynn Stewart",                     homeBase: "The Pierce house, Freeland" },
+  { id: "superman",      name: "Superman & Lois",     icon: "🌾", color: "#B45309",   dark: "#78350F",   city: "Smallville",    tone: "small-town family drama with superhero stakes — X-Kryptonite experiments, the Inverse Society, Clark Kent's dual life unravelling",                   cast: "Kent-Lane family: Jonathan Kent, Jordan Kent, Lois Lane, General Sam Lane",                        homeBase: "The Kent Farm, Smallville, Kansas" },
+] as const;
+type ShowId = typeof CW_SHOWS[number]["id"];
+
+const FINALE_THRESHOLD = 8;
+const BIG_BAD_KEY = "sw_arrowverse_bigbad_v1";
+function getBigBad(): { villain: string; seasonId: string; episodeCount: number } | null {
+  try { return JSON.parse(localStorage.getItem(BIG_BAD_KEY) ?? "null"); } catch { return null; }
+}
+function saveBigBad(villain: string, seasonId: string, episodeCount: number) {
+  localStorage.setItem(BIG_BAD_KEY, JSON.stringify({ villain, seasonId, episodeCount }));
+}
+
 // ── LOCATIONS ────────────────────────────────────────────────────────────────
 const AV_LOCATIONS = [
   { id: "default",        label: "Default (from scenario)",    show: "all",    desc: "Use the location defined by the chosen scenario" },
@@ -384,6 +405,11 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [prevOnLoading, setPrevOnLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const [displayedText, setDisplayedText] = useState("");
+  const [selectedShowId, setSelectedShowId] = useState<ShowId>("arrow");
+  const [isCrossover, setIsCrossover] = useState(false);
+  const [crossoverHeroine2, setCrossoverHeroine2] = useState(CW_HEROINES[12]);
+  const [useColdOpenFormat, setUseColdOpenFormat] = useState(true);
+  const [bigBad, setBigBad] = useState<{ villain: string; seasonId: string; episodeCount: number } | null>(() => getBigBad());
   const typeRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -481,15 +507,32 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     const episodeContext = isEpisodic && ep && season
       ? `ARROWVERSE EPISODIC SEASON: This is Episode ${ep.number} of Season "${season.title}" — "${ep.title}". ${ep.premise}${previouslyOnContext}\n\nEnd with a cliffhanger: ${ep.cliffhanger || "a final image of unresolved tension."}`
       : `ARROWVERSE EPISODE CONTEXT: ${sc!.storyContext}`;
+    const selectedShow = CW_SHOWS.find(s => s.id === selectedShowId);
+    const showContext = selectedShow
+      ? `\n\nSHOW: ${selectedShow.name} | CITY: ${selectedShow.city} | TONE: ${selectedShow.tone} | SUPPORTING CAST POOL: ${selectedShow.cast} | HOME BASE: ${selectedShow.homeBase}. Ground every location, reference, and supporting character mention in this show's specific world.`
+      : "";
+    const coldOpenDirective = useColdOpenFormat
+      ? `\n\n═══ CW EPISODE FORMAT ═══\nStructure this as a proper CW television episode:\n• Open with a COLD OPEN (2–3 punchy paragraphs — in medias res, a shocking image or mid-action moment that hooks before any title card)\n• Then write: ★ ACT ONE ★\n• Then: ★ ACT TWO ★ (second turning point — the situation worsens decisively)\n• Then: ★ ACT THREE ★ (final escalation — no relief, the villain's hold becomes absolute)\n• Close with exactly: ── TO BE CONTINUED ──\nEach act is 2–4 dense paragraphs. Pacing should feel like television: punchy dialogue, sharp cuts, emotionally loaded beats.`
+      : "";
+    const crossoverContext = isCrossover
+      ? `\n\nCROSSOVER EVENT: This is a multi-show crossover episode featuring BOTH ${selectedHeroine.name} (${selectedHeroine.alias}) AND ${crossoverHeroine2.name} (${crossoverHeroine2.alias}). They come from different shows and don't normally operate together — write the friction between their styles, their different approaches to crisis, and the specific dynamic that only exists when these two characters share a scene. The crossover format means higher stakes, more chaos, and neither can rely on their usual backup.`
+      : "";
+    const isFinale = isEpisodic && ep?.number === selectedSeason?.episodes.length;
+    const finaleDirective = isFinale
+      ? `\n\nSEASON FINALE: This is the SEASON FINALE of "${season?.title}". The stakes are the highest they have ever been. The villain achieves something irreversible. The season's core theme reaches its most explicit, devastating expression. Write it as a true finale — longer, heavier, more explicit, more psychologically complete than any previous episode. End on an image that closes this season while making the next feel inevitable.`
+      : "";
     let accumulated = "";
     try {
+      const heroField = isCrossover
+        ? `CROSSOVER — ${selectedHeroine.name} (${selectedHeroine.alias}), Power: ${selectedHeroine.power} / ${crossoverHeroine2.name} (${crossoverHeroine2.alias}), Power: ${crossoverHeroine2.power} — CW Arrowverse Multi-Show Crossover`
+        : `${selectedHeroine.name} (${selectedHeroine.alias}) — Power: ${selectedHeroine.power} — Universe: CW Arrowverse`;
       const full = await streamRequest("/api/story/superhero", {
-        hero: `${selectedHeroine.name} (${selectedHeroine.alias}) — Power: ${selectedHeroine.power} — Universe: CW Arrowverse`,
+        hero: heroField,
         villain: `${villain} — ${ep ? ep.villainDetail : sc!.villainDetail}`,
         setting: ep ? ep.setting : sc!.setting, stakes: ep ? ep.stakes : sc!.stakes,
         tone: ep ? ep.tone : sc!.tone, captureMethod: ep ? ep.captureMethod : sc!.captureMethod,
-        restraints: ep ? ep.restraints : sc!.restraints, intensity: intensityLabel, storyLength: "Epic Saga",
-        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}SCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}${buildVoiceInjection(villain)}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology. Reference Arrowverse locations, organisations, and lore wherever possible.`,
+        restraints: ep ? ep.restraints : sc!.restraints, intensity: intensityLabel, storyLength: isFinale ? "Epic Saga" : "Epic Saga",
+        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}${showContext}${coldOpenDirective}${crossoverContext}${finaleDirective}\n\nSCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}${buildVoiceInjection(villain)}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology.`,
       }, (c) => { accumulated += c; setStreamingText(accumulated); }, ctrl.signal);
       setChapters([full]);
       if (isEpisodic) {
@@ -499,12 +542,22 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
         newProgress[`${season!.id}_ep${ep!.number}`] = true;
         setProgress(newProgress);
       } else { setStep("story"); }
+      const episodeTag = isEpisodic && season && ep ? `S${season.seasonNumber}E${ep.number}` : "";
+      const crossTag = isCrossover ? ` [CROSSOVER]` : "";
+      const finaleTag = isFinale ? ` [SEASON FINALE]` : "";
       const id = saveStoryToArchive({
-        title: isEpisodic ? `${season?.title} S${season?.seasonNumber}E${ep?.number}: ${ep?.title} — ${selectedHeroine.name}` : `${sc!.title} — ${selectedHeroine.name}`,
+        title: isEpisodic
+          ? `${season?.title} ${episodeTag}: ${ep?.title}${finaleTag} — ${selectedHeroine.name}${crossTag}`
+          : `${sc!.title} — ${selectedHeroine.name}${crossTag}`,
         hero: selectedHeroine.name, villain,
         mode: isEpisodic ? `Arrowverse Season Mode — ${season?.title} Ep ${ep?.number}` : `Arrowverse Mode — ${sc!.episodeRef}`,
         chapters: [full], wordCount: full.split(/\s+/).filter(Boolean).length,
       });
+      if (bigBad && bigBad.villain === villain) {
+        const updated = { ...bigBad, episodeCount: bigBad.episodeCount + 1 };
+        saveBigBad(updated.villain, updated.seasonId, updated.episodeCount);
+        setBigBad(updated);
+      }
       setSavedId(id);
     } catch (e) {
       if (isAbort(e)) { if (accumulated.trim()) { setChapters([accumulated]); isEpisodic ? setSeasonStep("story") : setStep("story"); } }
@@ -624,12 +677,114 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
             })}
           </div>
         </div>
+        {/* ── SHOW SELECTOR ───────────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>📺 WHICH SHOW</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+            {CW_SHOWS.map(show => {
+              const sel = selectedShowId === show.id;
+              return (
+                <button key={show.id} onClick={() => setSelectedShowId(show.id as ShowId)}
+                  style={{ background: sel ? `${show.color}18` : "#0e0e18", border: `1px solid ${sel ? show.color : "#222"}`, borderRadius: "8px", padding: "8px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "14px" }}>{show.icon}</span>
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: sel ? show.color : "#666", letterSpacing: "1px" }}>{show.name}</span>
+                </button>
+              );
+            })}
+          </div>
+          {(() => {
+            const show = CW_SHOWS.find(s => s.id === selectedShowId);
+            return show ? <div style={{ fontSize: "10px", color: "#444", marginTop: "8px", lineHeight: 1.5 }}>{show.city} · {show.homeBase}</div> : null;
+          })()}
+        </div>
+
+        {/* ── COLD OPEN FORMAT ────────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🎬 EPISODE FORMAT</div>
+          <button onClick={() => setUseColdOpenFormat(v => !v)}
+            style={{ background: useColdOpenFormat ? `${color}15` : "#0a0a12", border: `1px solid ${useColdOpenFormat ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "12px 16px", cursor: "pointer", width: "100%", textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: useColdOpenFormat ? color : "#222", border: `2px solid ${useColdOpenFormat ? color : "#444"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {useColdOpenFormat && <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#000" }} />}
+              </div>
+              <div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: useColdOpenFormat ? color : "#666", letterSpacing: "1px" }}>CW EPISODE FORMAT</div>
+                <div style={{ fontSize: "10px", color: "#444", marginTop: "2px" }}>Cold Open · Act 1 · Act 2 · Act 3 · ── TO BE CONTINUED ──</div>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* ── CROSSOVER EVENT ─────────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🌌 CROSSOVER EVENT</div>
+          <button onClick={() => setIsCrossover(v => !v)}
+            style={{ background: isCrossover ? "rgba(192,132,252,0.12)" : "#0a0a12", border: `1px solid ${isCrossover ? "#C084FC" : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 14px", cursor: "pointer", marginBottom: "10px", width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: isCrossover ? "#C084FC" : "#222", border: `2px solid ${isCrossover ? "#C084FC" : "#444"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {isCrossover && <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#000" }} />}
+            </div>
+            <div>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: isCrossover ? "#C084FC" : "#555", letterSpacing: "1px" }}>CROSSOVER EVENT</div>
+              <div style={{ fontSize: "10px", color: "#444", marginTop: "2px" }}>Pull in a second heroine from a different show</div>
+            </div>
+          </button>
+          {isCrossover && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "6px" }}>
+              {CW_HEROINES.filter(h => h.name !== selectedHeroine.name).map(h => {
+                const isSel2 = crossoverHeroine2.name === h.name;
+                const img = (h as { image?: string }).image;
+                return (
+                  <button key={h.name} onClick={() => setCrossoverHeroine2(h)}
+                    style={{ background: isSel2 ? "rgba(192,132,252,0.15)" : "#0e0e18", border: `1px solid ${isSel2 ? "#C084FC" : "#222"}`, borderRadius: "6px", padding: "0", cursor: "pointer", overflow: "hidden", textAlign: "left" }}>
+                    {img ? <img src={img} alt={h.name} style={{ width: "100%", height: "70px", objectFit: "cover", filter: isSel2 ? "none" : "grayscale(0.5) brightness(0.8)" }} /> : null}
+                    <div style={{ padding: "6px 8px" }}>
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: isSel2 ? "#C084FC" : "#888" }}>{h.name}</div>
+                      <div style={{ fontSize: "9px", color: "#444" }}>{h.alias}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <div style={{ marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "6px" }}>VILLAIN OVERRIDE (optional)</div>
           <div style={{ fontSize: "12px", color: "#555", marginBottom: "8px" }}>Default: <span style={{ color }}>{ep ? ep.villain : sc?.villain}</span></div>
           <input value={customVillain} onChange={e => setCustomVillain(e.target.value)} placeholder="Override villain (leave blank for episode villain)"
             style={{ width: "100%", background: "#0e0e18", border: "1px solid #222", borderRadius: "8px", padding: "10px 14px", color: "#ddd", fontSize: "13px", boxSizing: "border-box" }} />
         </div>
+
+        {/* ── SEASON BIG BAD TRACKER ──────────────────────────────── */}
+        {(() => {
+          const effectiveVillain = customVillain.trim() || (isEpisodic ? selectedEpisode?.villain : sc?.villain) || "";
+          const seasonId = isEpisodic ? selectedSeason?.id ?? "" : sc?.episodeRef ?? "";
+          const isBigBad = bigBad?.villain === effectiveVillain;
+          return effectiveVillain ? (
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>⚡ SEASON BIG BAD</div>
+              {bigBad && (
+                <div style={{ background: "#0a0008", border: "1px solid #7C3AED44", borderRadius: "8px", padding: "10px 14px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "18px" }}>👁</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "#C084FC", letterSpacing: "1px" }}>{bigBad.villain}</div>
+                    <div style={{ fontSize: "10px", color: "#555", marginTop: "2px" }}>
+                      Season Villain · {bigBad.episodeCount} episode{bigBad.episodeCount !== 1 ? "s" : ""} featured
+                    </div>
+                  </div>
+                  <button onClick={() => { localStorage.removeItem(BIG_BAD_KEY); setBigBad(null); }}
+                    style={{ background: "none", border: "1px solid #333", color: "#555", borderRadius: "4px", padding: "3px 8px", cursor: "pointer", fontSize: "10px" }}>CLEAR</button>
+                </div>
+              )}
+              {!isBigBad && effectiveVillain && (
+                <button onClick={() => { saveBigBad(effectiveVillain, seasonId, 0); setBigBad({ villain: effectiveVillain, seasonId, episodeCount: 0 }); }}
+                  style={{ background: "rgba(124,58,237,0.12)", border: "1px solid #7C3AED44", borderRadius: "8px", padding: "10px 16px", cursor: "pointer", width: "100%", color: "#9966CC", fontSize: "11px", fontWeight: 700, letterSpacing: "1px" }}>
+                  👁 DECLARE "{effectiveVillain}" AS SEASON BIG BAD
+                </button>
+              )}
+            </div>
+          ) : null;
+        })()}
 
         {/* LOCATION SELECTOR */}
         <div style={{ marginBottom: "24px" }}>
@@ -800,6 +955,11 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   function EpisodeList() {
     if (!selectedSeason) return null;
     const color = selectedSeason.color; const dark = selectedSeason.dark;
+    const totalEps = selectedSeason.episodes.length;
+    const completedCount = episodesCompleted(progress, selectedSeason.id, totalEps);
+    const finaleUnlocked = completedCount >= Math.min(FINALE_THRESHOLD, totalEps - 1) && totalEps > 0;
+    const finaleEp = selectedSeason.episodes[totalEps - 1];
+    const finaleDone = finaleEp ? isEpisodeDone(progress, selectedSeason.id, finaleEp.number) : false;
     return (
       <div style={{ maxWidth: "760px", margin: "0 auto", padding: "28px 24px" }}>
         <button onClick={() => setSeasonStep("seasons")} style={{ background: "none", border: "1px solid #333", color: "#777", borderRadius: "6px", padding: "6px 14px", cursor: "pointer", marginBottom: "20px", fontSize: "13px" }}>← All Seasons</button>
@@ -809,36 +969,73 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
         </div>
         <div style={{ fontSize: "12px", color: "#666", marginBottom: "6px" }}>{selectedSeason.villain}</div>
         <div style={{ fontSize: "12px", color: "#777", marginBottom: "24px", lineHeight: 1.6 }}>{selectedSeason.logline}</div>
+
+        {/* Big Bad tracker display */}
+        {bigBad && (
+          <div style={{ background: "linear-gradient(135deg, #0a0008, #0d0010)", border: "1px solid #7C3AED44", borderRadius: "8px", padding: "10px 16px", marginBottom: "18px", display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "20px" }}>👁</span>
+            <div>
+              <div style={{ fontSize: "10px", letterSpacing: "2px", color: "#7C3AED", marginBottom: "2px" }}>SEASON BIG BAD</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#C084FC" }}>{bigBad.villain}</div>
+              <div style={{ fontSize: "10px", color: "#555", marginTop: "1px" }}>{bigBad.episodeCount} episode{bigBad.episodeCount !== 1 ? "s" : ""} featured across this season</div>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {selectedSeason.episodes.map(ep => {
             const done = isEpisodeDone(progress, selectedSeason.id, ep.number);
             const unlocked = ep.number === 1 || isEpisodeDone(progress, selectedSeason.id, ep.number - 1);
+            const isLastEp = ep.number === totalEps;
+            const isFinaleEp = isLastEp && finaleUnlocked;
+            const finaleColor = "#F59E0B";
+            const finaleDark = "#78350F";
+            const epColor = isFinaleEp ? finaleColor : color;
+            const epDark = isFinaleEp ? finaleDark : dark;
             return (
-              <button key={ep.number} onClick={() => selectEpisode(ep)} disabled={!unlocked}
-                style={{ background: done ? `${color}12` : unlocked ? "linear-gradient(135deg, #0e0e18, #0a0a12)" : "#0a0a0f", border: `1px solid ${done ? color : unlocked ? `${color}33` : "#1a1a1a"}`, borderRadius: "10px", padding: "16px 18px", cursor: unlocked ? "pointer" : "not-allowed", textAlign: "left", opacity: unlocked ? 1 : 0.4, transition: "all 0.15s" }}>
+              <button key={ep.number}
+                onClick={() => { if (isFinaleEp) { setSelectedEpisode(ep); setSeasonStep("configure"); resetStory(); setCustomVillain(""); } else { selectEpisode(ep); } }}
+                disabled={!unlocked && !isFinaleEp}
+                style={{ background: done ? `${epColor}12` : (unlocked || isFinaleEp) ? `linear-gradient(135deg, ${isFinaleEp ? finaleDark + "22" : "#0e0e18"}, #0a0a12)` : "#0a0a0f", border: `2px solid ${done ? epColor : (unlocked || isFinaleEp) ? (isFinaleEp ? finaleColor + "66" : `${epColor}33`) : "#1a1a1a"}`, borderRadius: "10px", padding: isFinaleEp ? "20px 18px" : "16px 18px", cursor: (unlocked || isFinaleEp) ? "pointer" : "not-allowed", textAlign: "left", opacity: (unlocked || isFinaleEp) ? 1 : 0.4, transition: "all 0.15s", boxShadow: isFinaleEp ? `0 0 20px ${finaleColor}22` : "none" }}>
+                {isFinaleEp && !done && (
+                  <div style={{ fontSize: "10px", letterSpacing: "3px", color: finaleColor, fontWeight: 900, marginBottom: "8px" }}>
+                    ★ SEASON FINALE UNLOCKED ★
+                  </div>
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: done ? color : `${color}22`, border: `1px solid ${color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 900, color: done ? dark : color, flexShrink: 0 }}>
-                    {done ? "✓" : ep.number}
+                  <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: done ? epColor : `${epColor}22`, border: `1px solid ${epColor}66`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: isFinaleEp ? "16px" : "12px", fontWeight: 900, color: done ? epDark : epColor, flexShrink: 0 }}>
+                    {done ? "✓" : isFinaleEp ? "★" : ep.number}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
-                      <div style={{ fontSize: "14px", fontWeight: 700, color: unlocked ? (done ? color : "#ddd") : "#444" }}>{ep.title}</div>
-                      {done && <span style={{ fontSize: "10px", color, letterSpacing: "1px", background: `${color}18`, border: `1px solid ${color}33`, borderRadius: "3px", padding: "1px 6px" }}>PLAYED</span>}
-                      {!unlocked && <span style={{ fontSize: "10px", color: "#444", letterSpacing: "1px" }}>🔒 LOCKED</span>}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", flexWrap: "wrap" }}>
+                      <div style={{ fontSize: isFinaleEp ? "15px" : "14px", fontWeight: 700, color: (unlocked || isFinaleEp) ? (done ? epColor : isFinaleEp ? finaleColor : "#ddd") : "#444" }}>{ep.title}</div>
+                      {done && <span style={{ fontSize: "10px", color: epColor, letterSpacing: "1px", background: `${epColor}18`, border: `1px solid ${epColor}33`, borderRadius: "3px", padding: "1px 6px" }}>PLAYED</span>}
+                      {isFinaleEp && !done && <span style={{ fontSize: "10px", color: finaleColor, letterSpacing: "1px", background: `${finaleColor}18`, border: `1px solid ${finaleColor}44`, borderRadius: "3px", padding: "1px 6px" }}>FINALE</span>}
+                      {!unlocked && !isFinaleEp && <span style={{ fontSize: "10px", color: "#444", letterSpacing: "1px" }}>🔒 LOCKED</span>}
                     </div>
                     <div style={{ fontSize: "11px", color: "#555", fontStyle: "italic" }}>"{ep.subtitle}"</div>
-                    {unlocked && <div style={{ fontSize: "11px", color: "#666", marginTop: "4px", lineHeight: 1.5 }}>{ep.premise.slice(0, 120)}…</div>}
+                    {(unlocked || isFinaleEp) && <div style={{ fontSize: "11px", color: isFinaleEp ? "#7a5800" : "#666", marginTop: "4px", lineHeight: 1.5 }}>{ep.premise.slice(0, 120)}…</div>}
                   </div>
                 </div>
               </button>
             );
           })}
         </div>
+
+        {/* Progress bar + finale teaser */}
         <div style={{ marginTop: "20px", display: "flex", gap: "3px" }}>
-          {selectedSeason.episodes.map(ep => <div key={ep.number} style={{ flex: 1, height: "4px", borderRadius: "2px", background: isEpisodeDone(progress, selectedSeason.id, ep.number) ? color : "#1a1a1a" }} />)}
+          {selectedSeason.episodes.map((ep, i) => {
+            const done = isEpisodeDone(progress, selectedSeason.id, ep.number);
+            const isLast = i === totalEps - 1;
+            return <div key={ep.number} style={{ flex: 1, height: "4px", borderRadius: "2px", background: done ? (isLast ? "#F59E0B" : color) : "#1a1a1a" }} />;
+          })}
         </div>
-        <div style={{ fontSize: "11px", color: "#444", marginTop: "6px" }}>
-          {episodesCompleted(progress, selectedSeason.id, selectedSeason.episodes.length)}/{selectedSeason.episodes.length} episodes complete
+        <div style={{ fontSize: "11px", color: "#444", marginTop: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>{completedCount}/{totalEps} episodes complete</span>
+          {!finaleUnlocked && totalEps > FINALE_THRESHOLD && (
+            <span style={{ color: "#333" }}>Season Finale unlocks after {FINALE_THRESHOLD} episodes</span>
+          )}
+          {finaleDone && <span style={{ color: "#F59E0B", fontWeight: 700, letterSpacing: "1px" }}>★ SEASON COMPLETE ★</span>}
         </div>
       </div>
     );
