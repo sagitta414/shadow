@@ -31,6 +31,56 @@ const CW_SHOWS = [
 type ShowId = typeof CW_SHOWS[number]["id"];
 
 const FINALE_THRESHOLD = 8;
+
+// ── VILLAIN OBSESSION ─────────────────────────────────────────────────────────
+const VILLAIN_OBSESSION = [
+  { id: "professional", label: "PROFESSIONAL", icon: "🎭", desc: "A job. She's an obstacle or a trophy. Nothing personal.",
+    prompt: "The villain is coldly professional — she is an asset, an obstacle removed, a trophy earned. Efficient, controlled, no particular feelings about her as a person beyond what she represents. He treats the whole thing like a transaction." },
+  { id: "fixated",      label: "FIXATED",      icon: "🎯", desc: "He noticed her specifically. She's become a project.",
+    prompt: "The villain has a growing personal fixation on her — she caught his attention in a way others haven't. He has studied her, watched her, chosen her deliberately above anyone else. She is a project he has been building toward. Make that feeling of being specifically selected feel visceral in the writing." },
+  { id: "obsessed",     label: "OBSESSED",     icon: "🔥", desc: "He thinks about her constantly. This is personal now.",
+    prompt: "The villain is genuinely obsessed with her — she occupies his thoughts, this capture has been anticipated and planned in intimate detail, and being near her now carries an intensity he barely conceals. Make his attention feel consuming and personal. He knows things. He has been waiting." },
+  { id: "possessed",    label: "POSSESSED",    icon: "👁",  desc: "She is everything. He cannot stop. He believes she belongs to him.",
+    prompt: "The villain's fixation has crossed into something absolute and total — she is the centre of his world, his obsession sincere and all-consuming. He would burn everything for her. He believes she belongs to him in a way that is not possessive but factual — a truth about the universe he has accepted. Write this as terrifyingly sincere rather than theatrical. He is calm. He is certain." },
+] as const;
+type ObsessionId = typeof VILLAIN_OBSESSION[number]["id"];
+
+// ── CAPTURE ENTRY STATE ───────────────────────────────────────────────────────
+const CAPTURE_STATES = [
+  { id: "mid",      label: "MID-CAPTURE",     icon: "⚡", desc: "Story opens during the capture — she's still fighting and losing.",
+    prompt: "CAPTURE STATE: Open in medias res — the capture is actively happening. She is still fighting, still trying to get free, and losing in real time. The cold open is the exact moment she realises she will not escape this time. Write the transition from fighting to captured as a specific physical and psychological beat." },
+  { id: "waking",   label: "ALREADY CAPTIVE", icon: "😴", desc: "She wakes up restrained. No memory of how she got here.",
+    prompt: "CAPTURE STATE: She wakes up already restrained — no memory of how she arrived. The first things she registers are that she cannot move, that she is in his space, and that she has been here long enough for arrangements to have been made. Open on that first moment of conscious captivity. Write her assessment of her situation with specific physical detail." },
+  { id: "lured",    label: "WALKED INTO IT",  icon: "🕸", desc: "She came willingly — until the trap closed behind her.",
+    prompt: "CAPTURE STATE: She came willingly — a false lead, a distress call, someone she trusts. She realised what was happening a few seconds too late. Open with the exact moment the trap closed — what she saw, what clicked, the expression on her face. Write her response to realising she walked in herself." },
+  { id: "returned", label: "BACK AGAIN",      icon: "🔄", desc: "She's been here before. She escaped once. He was ready this time.",
+    prompt: "CAPTURE STATE: She has been here before — she escaped or was released the last time. He has been expecting her return and prepared specifically for it. The cold open makes clear he is not surprised to see her. Reference the first capture briefly but specifically. Make it plain that this time, the arrangements are different. He learned from last time." },
+] as const;
+type CaptureStateId = typeof CAPTURE_STATES[number]["id"];
+
+// ── DARK FLAVORS ──────────────────────────────────────────────────────────────
+const DARK_FLAVORS = [
+  { id: "negotiation",  label: "THE NEGOTIATION",     icon: "⚖",  desc: "She bargains for her team piece by piece. She doesn't notice what she's agreed to until the end.",
+    prompt: "DARK FLAVOR — THE NEGOTIATION: Structure the story around a series of explicit bargains. She negotiates for her team's safety, information, her freedom — and wins small victories each time. By Act Three, write the moment she counts what she has actually agreed to across all of it. Make the reader see both what she thought she was doing and what she actually did. The horror is cumulative." },
+  { id: "conditional",  label: "CONDITIONAL FREEDOM", icon: "🚪", desc: "She can leave anytime. He said so. She hasn't left.",
+    prompt: "DARK FLAVOR — CONDITIONAL FREEDOM: She is not locked up. He tells her explicitly she can leave — the door is right there, he gestures to it — and then tells her exactly what happens to her team, her city, the people she loves if she walks through it. She stays. Write each subsequent scene as a moment where she actively chooses to stay again. Make the voluntary quality of her captivity explicit, uncomfortable, and real." },
+  { id: "suit",         label: "SUIT TO SKIN",        icon: "🎭", desc: "Each act of the story takes something else from her — until the name goes too.",
+    prompt: "DARK FLAVOR — SUIT TO SKIN: Structure the story around the progressive, deliberate removal of her heroic identity. Each act removes something specific — the comms, the mask, the belt, the name. By Act Three she has introduced herself by her civilian name. Write each removal as a specific weighted moment with physical detail. Describe what is taken and what she looks like without it. The final removal is the name." },
+  { id: "conditioning", label: "CONDITIONING ARC",    icon: "🔁", desc: "Slow. Patient. He doesn't rush. She doesn't notice it working.",
+    prompt: "DARK FLAVOR — CONDITIONING ARC: The villain is not in a hurry. Track a slow, deliberate conditioning process across all three acts — stimulus, response, adjustment. She resists initially and believes she is continuing to resist throughout. By Act Three, write a specific moment where she corrects her own behaviour before he has to ask — then write what her face does when she notices she did it." },
+  { id: "assignment",   label: "THE ASSIGNMENT",      icon: "📋", desc: "He sends her on a mission for him. In costume. Her team thinks she's running their op.",
+    prompt: "DARK FLAVOR — THE ASSIGNMENT: She has agreed to complete a mission for him — she is in full costume, her team's comms are in her ear, and they believe she is running their operation. She completes his assignment while her team directs her. Write the cognitive experience of that dual reality — what she tells each side, the moments she nearly breaks, what she actually does. The self-betrayal is the centre of the story." },
+  { id: "public",       label: "PUBLIC / PRIVATE",    icon: "🎪", desc: "Trophy in public. Something else entirely in private.",
+    prompt: "DARK FLAVOR — PUBLIC VS PRIVATE: Structure the story in two registers. In public — before his associates, rivals, underlings — she is composed, controlled, presented as a trophy. Write that register fully: her posture, her silence, what she is and is not allowed to show. Then write what happens in private when the audience is gone, with equal specificity and detail. The contrast between the two registers is the story. Neither register spares the reader." },
+  { id: "collar",       label: "THE COLLAR SCENE",    icon: "📿", desc: "He offers her the choice — he can do it for her, or she can put it on herself.",
+    prompt: "DARK FLAVOR — THE COLLAR SCENE: Build the story toward a single moment in Act Two: he presents her with a collar, restraint device, or binding, and offers her an explicit choice — he can put it on her, or she can put it on herself. Write the full weight of this moment: what she thinks, what she considers, what she does, what his expression is when she does it. Make this the emotional pivot of the entire story. Everything before it is setup. Everything after is consequence." },
+  { id: "memory",       label: "MEMORY EXPOSED",      icon: "🧠", desc: "He knows things he shouldn't. Private things. She can't figure out how much he knows.",
+    prompt: "DARK FLAVOR — MEMORY EXPOSED: He knows things about her that he should not know — private memories, intimate moments, things she has never told her team or anyone. Reveal these across the story one at a time, writing her reaction each time the depth of his knowledge becomes clear. He does not explain how he has it. By Act Three, deploy one memory so private that her reaction to him knowing it is the story's emotional climax. Do not soften it." },
+  { id: "betrayal",     label: "INSIDE JOB",          icon: "🗡",  desc: "Someone on her team helped set this up. She figures it out mid-story.",
+    prompt: "DARK FLAVOR — INSIDE JOB: Someone on her team is responsible for this — fed information, turned off a system at the right moment, gave her location. She does not know at the start. Build in specific details across Acts One and Two that she begins to notice don't add up. By Act Three she knows. Write the moment of realisation and what she does with it — she cannot call for help because the help is compromised. Name the traitor specifically. Make their motive human." },
+] as const;
+type DarkFlavorId = typeof DARK_FLAVORS[number]["id"];
+
 const BIG_BAD_KEY = "sw_arrowverse_bigbad_v1";
 function getBigBad(): { villain: string; seasonId: string; episodeCount: number } | null {
   try { return JSON.parse(localStorage.getItem(BIG_BAD_KEY) ?? "null"); } catch { return null; }
@@ -410,6 +460,9 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [crossoverHeroine2, setCrossoverHeroine2] = useState(CW_HEROINES[12]);
   const [useColdOpenFormat, setUseColdOpenFormat] = useState(true);
   const [bigBad, setBigBad] = useState<{ villain: string; seasonId: string; episodeCount: number } | null>(() => getBigBad());
+  const [obsessionLevel, setObsessionLevel] = useState<ObsessionId>("fixated");
+  const [captureState, setCaptureState] = useState<CaptureStateId>("mid");
+  const [darkFlavor, setDarkFlavor] = useState<DarkFlavorId | null>(null);
   const typeRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -517,6 +570,10 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     const crossoverContext = isCrossover
       ? `\n\nCROSSOVER EVENT: This is a multi-show crossover episode featuring BOTH ${selectedHeroine.name} (${selectedHeroine.alias}) AND ${crossoverHeroine2.name} (${crossoverHeroine2.alias}). They come from different shows and don't normally operate together — write the friction between their styles, their different approaches to crisis, and the specific dynamic that only exists when these two characters share a scene. The crossover format means higher stakes, more chaos, and neither can rely on their usual backup.`
       : "";
+    const obsessionObj = VILLAIN_OBSESSION.find(o => o.id === obsessionLevel);
+    const captureStateObj = CAPTURE_STATES.find(c => c.id === captureState);
+    const flavorObj = darkFlavor ? DARK_FLAVORS.find(f => f.id === darkFlavor) : null;
+    const kinkContext = `\n\nVILLAIN OBSESSION LEVEL: ${obsessionObj?.prompt}\n\n${captureStateObj?.prompt}${flavorObj ? `\n\n${flavorObj.prompt}` : ""}`;
     const isFinale = isEpisodic && ep?.number === selectedSeason?.episodes.length;
     const finaleDirective = isFinale
       ? `\n\nSEASON FINALE: This is the SEASON FINALE of "${season?.title}". The stakes are the highest they have ever been. The villain achieves something irreversible. The season's core theme reaches its most explicit, devastating expression. Write it as a true finale — longer, heavier, more explicit, more psychologically complete than any previous episode. End on an image that closes this season while making the next feel inevitable.`
@@ -532,7 +589,7 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
         setting: ep ? ep.setting : sc!.setting, stakes: ep ? ep.stakes : sc!.stakes,
         tone: ep ? ep.tone : sc!.tone, captureMethod: ep ? ep.captureMethod : sc!.captureMethod,
         restraints: ep ? ep.restraints : sc!.restraints, intensity: intensityLabel, storyLength: isFinale ? "Epic Saga" : "Epic Saga",
-        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}${showContext}${coldOpenDirective}${crossoverContext}${finaleDirective}\n\nSCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}${buildVoiceInjection(villain)}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology.`,
+        details: `${episodeContext}\n\nKEY DETAILS: ${ep ? ep.details : sc!.details}\n\n${locationLabel ? locationLabel + "\n\n" : ""}${showContext}${coldOpenDirective}${crossoverContext}${kinkContext}${finaleDirective}\n\nSCENE FOCUS: ${focusLabel}\n\nENDING DIRECTIVE: ${fateLabel}${buildVoiceInjection(villain)}\n\nWrite with authentic Arrowverse tone — dark, character-driven, grounded in the show's specific mythology.`,
       }, (c) => { accumulated += c; setStreamingText(accumulated); }, ctrl.signal);
       setChapters([full]);
       if (isEpisodic) {
@@ -746,6 +803,61 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
               })}
             </div>
           )}
+        </div>
+
+        {/* ── VILLAIN OBSESSION LEVEL ─────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🎭 VILLAIN OBSESSION</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            {VILLAIN_OBSESSION.map(o => {
+              const sel = obsessionLevel === o.id;
+              return (
+                <button key={o.id} onClick={() => setObsessionLevel(o.id as ObsessionId)}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ fontSize: "14px", marginBottom: "4px" }}>{o.icon}</div>
+                  <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{o.label}</div>
+                  <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{o.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── CAPTURE ENTRY STATE ─────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>⛓ CAPTURE ENTRY</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            {CAPTURE_STATES.map(c => {
+              const sel = captureState === c.id;
+              return (
+                <button key={c.id} onClick={() => setCaptureState(c.id as CaptureStateId)}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ fontSize: "14px", marginBottom: "4px" }}>{c.icon}</div>
+                  <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{c.label}</div>
+                  <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{c.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── DARK FLAVOR ─────────────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "4px" }}>🩸 DARK FLAVOR <span style={{ color: "#333", fontWeight: 400, letterSpacing: 0 }}>(optional — click to select, click again to remove)</span></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            {DARK_FLAVORS.map(f => {
+              const sel = darkFlavor === f.id;
+              return (
+                <button key={f.id} onClick={() => setDarkFlavor(sel ? null : f.id as DarkFlavorId)}
+                  style={{ background: sel ? "rgba(220,38,38,0.12)" : "#0a0a12", border: `1px solid ${sel ? "#DC2626" : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color: "#DC2626" }}>✓</div>}
+                  <div style={{ fontSize: "14px", marginBottom: "4px" }}>{f.icon}</div>
+                  <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? "#F87171" : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{f.label}</div>
+                  <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{f.desc}</div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div style={{ marginBottom: "24px" }}>
