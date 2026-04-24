@@ -5,6 +5,7 @@ import {
   deleteArchiveStory,
   exportStoryAsTXT,
   exportStoryAsPDF,
+  exportStoryAsEBook,
   ArchivedStory,
 } from "../lib/archive";
 import { getThreatLevel } from "../lib/threatLevel";
@@ -57,6 +58,7 @@ interface ReplayKey { storyId: string; chapterIdx: number; }
 export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [stories, setStories] = useState<ArchivedStory[]>([]);
   const [search, setSearch] = useState("");
+  const [fullTextSearch, setFullTextSearch] = useState(false);
   const [filterFav, setFilterFav] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "words" | "alpha" | "rated">("newest");
   const [copyState, setCopyState] = useState<Record<string, boolean>>({});
@@ -64,6 +66,9 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [tagInput, setTagInput] = useState<Record<string, string>>({});
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [hoverRow, setHoverRow] = useState<string | null>(null);
+  const [readFontSize, setReadFontSize] = useState<"sm" | "md" | "lg" | "xl">("md");
+  const [sceneImageData, setSceneImageData] = useState<Record<string, string>>({});
+  const [sceneImageLoading, setSceneImageLoading] = useState<string | null>(null);
 
   const [replayKey, setReplayKey] = useState<ReplayKey | null>(null);
   const [replayDir, setReplayDir] = useState("");
@@ -132,6 +137,30 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
       }
     } catch {}
     finally { setJournalLoading(null); }
+  }
+
+  async function generateSceneImage(story: ArchivedStory) {
+    if (sceneImageLoading) return;
+    setSceneImageLoading(story.id);
+    try {
+      const snippet = story.chapters[0]?.slice(0, 600) ?? story.title;
+      const resp = await fetch(`${BASE}/api/story/generate-scene-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sceneSummary: snippet,
+          characterName: story.characters[0] ?? "the heroine",
+          shotType: "medium shot",
+          mood: "dark and intense",
+          style: "photorealistic",
+        }),
+      });
+      const data = await resp.json();
+      if (data.imageBase64) {
+        setSceneImageData(prev => ({ ...prev, [story.id]: data.imageBase64 }));
+      }
+    } catch {}
+    finally { setSceneImageLoading(null); }
   }
 
   function reload() {
@@ -245,6 +274,8 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
     reload();
   }
 
+  const READ_FONT: Record<string, string> = { sm: "0.82rem", md: "0.95rem", lg: "1.08rem", xl: "1.22rem" };
+
   const filtered = stories
     .filter((s) => {
       const q = search.toLowerCase();
@@ -253,7 +284,8 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
         s.title.toLowerCase().includes(q) ||
         s.characters.some((c) => c.toLowerCase().includes(q)) ||
         s.tags.some((t) => t.toLowerCase().includes(q)) ||
-        s.universe.toLowerCase().includes(q);
+        s.universe.toLowerCase().includes(q) ||
+        (fullTextSearch && s.chapters.some(ch => ch.toLowerCase().includes(q)));
       const matchFav = !filterFav || s.favourite;
       return matchSearch && matchFav;
     })
@@ -338,10 +370,33 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
 
         {isOpen && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "1.25rem" }}>
+            {/* ── Reading controls + reading time ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.8rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.55rem", letterSpacing: "2px", color: "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif" }}>TEXT SIZE</span>
+              {(["sm","md","lg","xl"] as const).map(sz => (
+                <button key={sz} onClick={() => setReadFontSize(sz)} style={{
+                  padding: "0.18rem 0.5rem", borderRadius: "4px", cursor: "pointer",
+                  fontSize: sz === "sm" ? "0.58rem" : sz === "md" ? "0.65rem" : sz === "lg" ? "0.72rem" : "0.8rem",
+                  fontFamily: "'Cinzel', serif",
+                  background: readFontSize === sz ? "rgba(200,168,75,0.15)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${readFontSize === sz ? "rgba(200,168,75,0.4)" : "rgba(255,255,255,0.08)"}`,
+                  color: readFontSize === sz ? "#C8A84B" : "rgba(200,200,220,0.35)",
+                }}>A</button>
+              ))}
+              <div style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", letterSpacing: "1px" }}>
+                ~{Math.max(1, Math.ceil(s.wordCount / 200))} min read &nbsp;·&nbsp; {s.wordCount.toLocaleString()} words
+              </div>
+            </div>
+            {/* ── Scene image ── */}
+            {sceneImageData[s.id] && (
+              <div style={{ marginBottom: "1rem", borderRadius: "8px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <img src={`data:image/png;base64,${sceneImageData[s.id]}`} alt="AI scene" style={{ width: "100%", display: "block", maxHeight: "360px", objectFit: "cover" }} />
+              </div>
+            )}
             <div style={{
               background: "rgba(0,0,0,0.4)", borderRadius: "8px", padding: "1.25rem",
               maxHeight: "380px", overflowY: "auto", marginBottom: "1rem",
-              fontFamily: "'EB Garamond', Georgia, serif", fontSize: "0.95rem",
+              fontFamily: "'EB Garamond', Georgia, serif", fontSize: READ_FONT[readFontSize],
               lineHeight: "1.85", color: "rgba(220,210,200,0.88)",
             }}>
               {s.chapters.map((ch, i) => {
@@ -637,6 +692,31 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
                 >
                   ↓ PDF
                 </button>
+                <button
+                  onClick={() => exportStoryAsEBook(s)}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: "rgba(200,168,75,0.07)", border: "1px solid rgba(200,168,75,0.25)",
+                    color: "rgba(200,168,75,0.75)",
+                  }}
+                >
+                  ↓ E-Book
+                </button>
+                <button
+                  onClick={() => generateSceneImage(s)}
+                  disabled={sceneImageLoading === s.id}
+                  style={{
+                    padding: "0.5rem 0.9rem", borderRadius: "8px", cursor: sceneImageLoading === s.id ? "not-allowed" : "pointer", fontSize: "0.72rem",
+                    fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+                    background: sceneImageData[s.id] ? "rgba(192,132,252,0.1)" : "rgba(192,132,252,0.06)",
+                    border: `1px solid ${sceneImageData[s.id] ? "rgba(192,132,252,0.4)" : "rgba(192,132,252,0.2)"}`,
+                    color: sceneImageData[s.id] ? "#C084FC" : "rgba(192,132,252,0.5)",
+                    opacity: sceneImageLoading === s.id ? 0.6 : 1,
+                  }}
+                >
+                  {sceneImageLoading === s.id ? "⟳ Generating…" : sceneImageData[s.id] ? "🎨 Regenerate Image" : "🎨 Scene Image"}
+                </button>
                 {onRemix && s.characters?.length > 0 && (
                   <button
                     onClick={() => onRemix(s.characters[0])}
@@ -762,7 +842,7 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search title, character, tag…"
+          placeholder={fullTextSearch ? "Search inside story text…" : "Search title, character, tag…"}
           style={{
             flex: 1, minWidth: "200px", background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px",
@@ -770,6 +850,19 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
             fontFamily: "'Cinzel', serif",
           }}
         />
+        <button
+          onClick={() => setFullTextSearch(!fullTextSearch)}
+          title={fullTextSearch ? "Searching inside story text" : "Click to search inside story text"}
+          style={{
+            padding: "0.65rem 1rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.75rem",
+            fontFamily: "'Cinzel', serif", letterSpacing: "1px", transition: "all 0.2s",
+            background: fullTextSearch ? "rgba(192,132,252,0.15)" : "rgba(255,255,255,0.04)",
+            border: `1px solid ${fullTextSearch ? "rgba(192,132,252,0.4)" : "rgba(255,255,255,0.1)"}`,
+            color: fullTextSearch ? "#C084FC" : "rgba(200,200,220,0.5)",
+          }}
+        >
+          ¶ Full Text
+        </button>
         <button
           onClick={() => setFilterFav(!filterFav)}
           style={{

@@ -218,3 +218,82 @@ export function exportStoryAsPDF(story: ArchivedStory) {
 </html>`);
   w.document.close();
 }
+
+export function exportStoryAsEBook(story: ArchivedStory) {
+  const date = new Date(story.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const readingMins = Math.max(1, Math.ceil(story.wordCount / 200));
+  const safe = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const chaptersHTML = story.chapters.map((ch, i) => `
+    <section class="chapter" id="ch${i + 1}">
+      ${story.chapters.length > 1 ? `<h2 class="chapter-heading">Chapter ${i + 1}</h2>` : ""}
+      ${ch.split("\n").filter(Boolean).map(p => `<p>${safe(p)}</p>`).join("")}
+    </section>
+    ${i < story.chapters.length - 1 ? '<div class="chapter-sep">⁂</div>' : ""}
+  `).join("");
+  const tocHTML = story.chapters.length > 1 ? `
+    <nav class="toc"><h3>Contents</h3>
+      ${story.chapters.map((_, i) => `<a href="#ch${i + 1}">Chapter ${i + 1}</a>`).join("")}
+    </nav>` : "";
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>${safe(story.title)}</title>
+  <style>
+    :root{--bg:#0f0d1a;--text:#e0d8cc;--accent:#c8a84b;--dim:rgba(200,200,220,0.38);--max:66ch;--fs:18px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:var(--fs)}
+    body{background:var(--bg);color:var(--text);font-family:Georgia,'EB Garamond',serif;line-height:1.92;padding:3rem 1.5rem;max-width:var(--max);margin:0 auto}
+    .controls{position:fixed;top:1rem;right:1rem;display:flex;gap:.4rem;z-index:10}
+    .ctrl{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:rgba(200,200,220,.7);font-size:.75rem;padding:.35rem .65rem;border-radius:6px;cursor:pointer;font-family:inherit}
+    .ctrl:hover{background:rgba(255,255,255,.13)}
+    .book-header{border-bottom:1px solid rgba(200,168,75,.28);padding-bottom:2rem;margin-bottom:3rem}
+    .book-title{font-family:Palatino,'Cinzel',serif;font-size:2rem;color:var(--accent);line-height:1.25;margin-bottom:1rem}
+    .book-meta{font-size:.72rem;color:var(--dim);letter-spacing:.06em;line-height:2.1}
+    .book-meta strong{color:var(--text)}
+    .toc{margin:0 0 3rem;padding:1.4rem 1.6rem;background:rgba(255,255,255,.028);border:1px solid rgba(200,168,75,.15);border-radius:8px}
+    .toc h3{font-family:Palatino,serif;font-size:.62rem;letter-spacing:4px;color:var(--dim);margin-bottom:.9rem;text-transform:uppercase}
+    .toc a{display:block;color:var(--accent);font-size:.88rem;text-decoration:none;padding:.28rem 0;opacity:.65}
+    .toc a:hover{opacity:1}
+    .chapter-heading{font-family:Palatino,serif;font-size:.6rem;letter-spacing:5px;text-align:center;color:var(--dim);text-transform:uppercase;margin:0 0 2.5rem}
+    p{text-indent:1.8em;margin-bottom:.28em}
+    p:first-of-type,p:first-child{text-indent:0}
+    .chapter-sep{text-align:center;color:var(--dim);font-size:1.1rem;margin:3rem 0;letter-spacing:.8em}
+    .book-footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.07);font-size:.6rem;color:rgba(200,200,220,.22);text-align:center;letter-spacing:3px}
+    @media(prefers-color-scheme:light){:root{--bg:#faf7f2;--text:#1a1612;--dim:rgba(80,70,60,.5)}}
+    @media print{body{background:#fff;color:#111;max-width:100%}.controls{display:none}}
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button class="ctrl" onclick="adj(-2)">A−</button>
+    <button class="ctrl" onclick="adj(2)">A+</button>
+    <button class="ctrl" onclick="window.print()">Print</button>
+  </div>
+  <header class="book-header">
+    <div class="book-title">${safe(story.title)}</div>
+    <div class="book-meta">
+      <strong>Characters</strong> — ${story.characters.map(safe).join(", ")}<br/>
+      <strong>Universe</strong> — ${safe(story.universe)} &nbsp;·&nbsp; <strong>Mode</strong> — ${safe(story.tool)}<br/>
+      <strong>Written</strong> — ${date} &nbsp;·&nbsp; <strong>Words</strong> — ${story.wordCount.toLocaleString()} (~${readingMins} min read)
+      ${story.tags.length ? `<br/><strong>Tags</strong> — ${story.tags.map(safe).join(", ")}` : ""}
+    </div>
+  </header>
+  ${tocHTML}
+  ${chaptersHTML}
+  <footer class="book-footer">SHADOWWEAVE — Dark Narrative Studio</footer>
+  <script>
+    var sz=18;
+    function adj(d){sz=Math.min(26,Math.max(13,sz+d));document.documentElement.style.setProperty('--fs',sz+'px')}
+  </script>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${story.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_shadowweave.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}

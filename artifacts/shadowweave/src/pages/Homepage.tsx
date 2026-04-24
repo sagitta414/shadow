@@ -716,6 +716,49 @@ export default function Homepage(props: HomepageProps) {
         </div>
       </div>
 
+      {/* ══ QUICK STARTS ════════════════════════════════════════════════════════ */}
+      <div style={{ padding: isMobile ? "1.5rem 0 0" : "2rem 0 0", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.28s ease both" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: isMobile ? "0 1rem 1rem" : "0 2.5rem 1rem" }}>
+          <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, rgba(245,158,11,0.95), rgba(245,158,11,0.08))", boxShadow: "0 0 12px rgba(245,158,11,0.4)", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.44rem", letterSpacing: "4px", color: "rgba(245,158,11,0.8)", textTransform: "uppercase", fontWeight: 700 }}>Quick Starts</span>
+          <div style={{ padding: "0.18rem 0.7rem", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.33rem", letterSpacing: "2px", color: "rgba(245,158,11,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>ONE CLICK</span>
+          </div>
+          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(245,158,11,0.18), transparent)" }} />
+        </div>
+        <div style={{ overflowX: "auto", paddingLeft: isMobile ? "1rem" : "2.5rem", paddingRight: isMobile ? "1rem" : "2.5rem", paddingBottom: "1rem", scrollbarWidth: "none" }}>
+          <div style={{ display: "flex", gap: "0.6rem", width: "max-content" }}>
+            {[
+              { icon: "🏹", label: "Arrowverse Standalone", desc: "Dark CW episode — Arrow · Flash · Supergirl", color: "#4ADE80", onClick: props.onSuperheroMode },
+              { icon: "🧠", label: "Mind Break", desc: "Psychological pressure, three acts, full break", color: "#C084FC", onClick: props.onCWSpecialist },
+              { icon: "📺", label: "Season Mode", desc: "Start a full episodic Arrowverse season arc", color: "#FCD34D", onClick: props.onSuperheroMode },
+              { icon: "⚡", label: "Flash Villain", desc: "Speed force, meta prison, Central City", color: "#60A5FA", onClick: props.onSuperheroMode },
+              { icon: "👁", label: "Slow Burn", desc: "Long-form captivity — week-by-week arc", color: "#FB923C", onClick: props.onCaptivityHub },
+              { icon: "🎭", label: "Celebrity Captive", desc: "Famous target, private captor, controlled exposure", color: "#F87171", onClick: props.onCelebrityMode },
+              { icon: "⛓", label: "Dual Capture", desc: "Two heroines — same villain, different terms", color: "#34D399", onClick: props.onPsychDark },
+              { icon: "🏛", label: "Hero Auction", desc: "Public display, bidders, maximum exposure", color: "#FCA311", onClick: props.onSpectacleHub },
+              { icon: "🔄", label: "Time Loop", desc: "He remembers every loop. She never does.", color: "#38BDF8", onClick: props.onTimeLoop },
+              { icon: "🎬", label: "Director Mode", desc: "Full creative control — you write every direction", color: "#34D399", onClick: props.onDirectorMode },
+            ].map(qs => (
+              <button key={qs.label} onClick={qs.onClick} style={{
+                background: "rgba(10,8,16,0.85)", border: `1px solid ${qs.color}28`,
+                borderLeft: `3px solid ${qs.color}`, borderRadius: "10px",
+                padding: "0.75rem 1rem", cursor: "pointer", textAlign: "left",
+                minWidth: "160px", maxWidth: "180px", transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${qs.color}66`; (e.currentTarget as HTMLElement).style.background = `${qs.color}09`; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${qs.color}28`; (e.currentTarget as HTMLElement).style.background = "rgba(10,8,16,0.85)"; }}
+              >
+                <div style={{ fontSize: "1.1rem", marginBottom: "0.4rem" }}>{qs.icon}</div>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", color: qs.color, letterSpacing: "0.5px", fontWeight: 700, marginBottom: "0.25rem", lineHeight: 1.2 }}>{qs.label}</div>
+                <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.38)", lineHeight: 1.4 }}>{qs.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ══ SPECIALIST MODES — CAROUSEL ════════════════════════════════════════ */}
       <div style={{
         padding: isMobile ? "1.6rem 0 0" : "2rem 0 0",

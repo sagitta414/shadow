@@ -497,6 +497,7 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [captureState, setCaptureState] = useState<CaptureStateId>("mid");
   const [darkFlavor, setDarkFlavor] = useState<DarkFlavorId | null>(null);
   const [bondageTrapMode, setBondageTrapMode] = useState<BondageTrapId | null>(null);
+  const [seasonCompleteModal, setSeasonCompleteModal] = useState<Season | null>(null);
   const typeRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -633,6 +634,9 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
         markEpisodeDone(season!.id, ep!.number);
         newProgress[`${season!.id}_ep${ep!.number}`] = true;
         setProgress(newProgress);
+        const totalEps = season!.episodes.length;
+        const doneCount = season!.episodes.filter((e) => newProgress[`${season!.id}_ep${e.number}`]).length;
+        if (doneCount === totalEps) { setSeasonCompleteModal(season!); }
       } else { setStep("story"); }
       const episodeTag = isEpisodic && season && ep ? `S${season.seasonNumber}E${ep.number}` : "";
       const crossTag = isCrossover ? ` [CROSSOVER]` : "";
@@ -1214,6 +1218,32 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0a0a0f", color: "#f0f0f0", paddingBottom: "80px" }}>
+
+      {/* ── SEASON COMPLETION MODAL ── */}
+      {seasonCompleteModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }} onClick={() => setSeasonCompleteModal(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "linear-gradient(135deg, #0a100a, #0f0a00)", border: `2px solid ${seasonCompleteModal.color}55`, borderRadius: "16px", padding: "2.5rem 2rem", maxWidth: "420px", width: "100%", textAlign: "center", boxShadow: `0 0 80px ${seasonCompleteModal.color}30` }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>{seasonCompleteModal.icon}</div>
+            <div style={{ fontSize: "0.55rem", letterSpacing: "5px", color: seasonCompleteModal.color, marginBottom: "0.6rem", fontWeight: 700 }}>SEASON COMPLETE</div>
+            <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "#F0E8D0", letterSpacing: "2px", marginBottom: "0.4rem" }}>{seasonCompleteModal.title}</div>
+            <div style={{ fontSize: "0.75rem", color: "#666", marginBottom: "1.5rem" }}>{seasonCompleteModal.show} · All {seasonCompleteModal.episodes.length} episodes completed</div>
+            <div style={{ background: `${seasonCompleteModal.color}12`, border: `1px solid ${seasonCompleteModal.color}30`, borderRadius: "10px", padding: "1.1rem", marginBottom: "1.5rem" }}>
+              <div style={{ fontSize: "0.6rem", letterSpacing: "3px", color: seasonCompleteModal.color, marginBottom: "0.5rem" }}>SEASON BADGE UNLOCKED</div>
+              <div style={{ fontSize: "1.4rem", marginBottom: "0.4rem" }}>🎖</div>
+              <div style={{ fontSize: "0.8rem", color: "#D4C090", fontWeight: 700 }}>{seasonCompleteModal.title} — Full Season</div>
+              <div style={{ fontSize: "0.62rem", color: "#666", marginTop: "0.25rem" }}>You've written through the complete arc. The season is yours.</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.9rem", marginBottom: "1.5rem", textAlign: "left" }}>
+              <div style={{ fontSize: "0.5rem", letterSpacing: "3px", color: "rgba(200,200,220,0.3)", marginBottom: "0.5rem" }}>SEASON ARC</div>
+              <div style={{ fontSize: "0.78rem", color: "rgba(200,200,220,0.6)", lineHeight: 1.6 }}>{seasonCompleteModal.logline}</div>
+            </div>
+            <button onClick={() => setSeasonCompleteModal(null)} style={{ padding: "0.7rem 2rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.7rem", letterSpacing: "2px", fontWeight: 700, background: `${seasonCompleteModal.color}20`, border: `1px solid ${seasonCompleteModal.color}55`, color: seasonCompleteModal.color }}>
+              CONTINUE
+            </button>
+          </div>
+        </div>
+      )}
+
       <div style={{ background: "linear-gradient(135deg, #0d1f0d 0%, #0a0a0f 40%, #1a0d00 100%)", borderBottom: "1px solid #1a2a1a", padding: "24px 24px 0" }}>
         <button onClick={onBack} style={{ background: "none", border: "1px solid #333", color: "#999", borderRadius: "6px", padding: "6px 14px", cursor: "pointer", marginBottom: "16px", fontSize: "13px" }}>← Back</button>
         <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
