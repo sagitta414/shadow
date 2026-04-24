@@ -47,3 +47,7 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Runtime data files (may contain PII)
+artifacts/api-server/data/visitors.json
+artifacts/api-server/data/events.json
