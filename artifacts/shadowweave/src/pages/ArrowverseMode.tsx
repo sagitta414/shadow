@@ -475,9 +475,9 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [protagonistType, setProtagonistType] = useState<"heroine" | "hero">("heroine");
   const [customVillain, setCustomVillain] = useState("");
   const [intensity, setIntensity] = useState<1 | 2 | 3>(2);
-  const [sceneFocus, setSceneFocus] = useState<SceneFocusId>("psychological");
-  const [endingFate, setEndingFate] = useState<EndingFateId>("cliffhanger");
-  const [locationId, setLocationId] = useState<string>("default");
+  const [sceneFocuses, setSceneFocuses] = useState<SceneFocusId[]>(["psychological"]);
+  const [endingFates, setEndingFates] = useState<EndingFateId[]>(["cliffhanger"]);
+  const [locationIds, setLocationIds] = useState<string[]>(["default"]);
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -493,10 +493,10 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [crossoverHeroine2, setCrossoverHeroine2] = useState(CW_HEROINES[12]);
   const [useColdOpenFormat, setUseColdOpenFormat] = useState(true);
   const [bigBad, setBigBad] = useState<{ villain: string; seasonId: string; episodeCount: number } | null>(() => getBigBad());
-  const [obsessionLevel, setObsessionLevel] = useState<ObsessionId>("fixated");
-  const [captureState, setCaptureState] = useState<CaptureStateId>("mid");
-  const [darkFlavor, setDarkFlavor] = useState<DarkFlavorId | null>(null);
-  const [bondageTrapMode, setBondageTrapMode] = useState<BondageTrapId | null>(null);
+  const [obsessionLevels, setObsessionLevels] = useState<ObsessionId[]>(["fixated"]);
+  const [captureStates, setCaptureStates] = useState<CaptureStateId[]>(["mid"]);
+  const [darkFlavors, setDarkFlavors] = useState<DarkFlavorId[]>([]);
+  const [bondageTrapModes, setBondageTrapModes] = useState<BondageTrapId[]>([]);
   const [seasonCompleteModal, setSeasonCompleteModal] = useState<Season | null>(null);
   const typeRef = useRef<number | null>(null);
 
@@ -586,10 +586,10 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     const intensityLabel = intensity === 1 ? "Tense — psychological pressure, power exchange, minimal graphic content"
       : intensity === 3 ? "Brutal — absolute maximum depravity, no limits, extreme explicit detail, full degradation"
       : "Explicit — graphic sexual content and domination, full explicit detail";
-    const focusLabel = SCENE_FOCUS.find(f => f.id === sceneFocus)?.desc ?? "";
-    const fateLabel = ENDING_FATES.find(f => f.id === endingFate)?.desc ?? "";
-    const locationOverride = locationId !== "default" ? AV_LOCATIONS.find(l => l.id === locationId) : null;
-    const locationLabel = locationOverride ? `OVERRIDE LOCATION: ${locationOverride.label} — ${locationOverride.desc}` : "";
+    const focusLabel = sceneFocuses.map(id => SCENE_FOCUS.find(f => f.id === id)?.desc ?? "").filter(Boolean).join(" + ");
+    const fateLabel = endingFates.map(id => ENDING_FATES.find(f => f.id === id)?.desc ?? "").filter(Boolean).join("; alternatively: ");
+    const activeLocations = locationIds.filter(id => id !== "default").map(id => AV_LOCATIONS.find(l => l.id === id)).filter(Boolean);
+    const locationLabel = activeLocations.length ? activeLocations.map(l => `${l!.label} — ${l!.desc}`).join(" / ") : "";
     const previouslyOnContext = isEpisodic && ep && ep.previouslyOn
       ? `\n\nPREVIOUSLY ON ${season?.show === "flash" ? "THE FLASH" : "ARROW"}: ${ep.previouslyOn}` : "";
     const episodeContext = isEpisodic && ep && season
@@ -605,11 +605,11 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     const crossoverContext = isCrossover
       ? `\n\nCROSSOVER EVENT: This is a multi-show crossover episode featuring BOTH ${selectedHeroine.name} (${selectedHeroine.alias}) AND ${crossoverHeroine2.name} (${crossoverHeroine2.alias}). They come from different shows and don't normally operate together — write the friction between their styles, their different approaches to crisis, and the specific dynamic that only exists when these two characters share a scene. The crossover format means higher stakes, more chaos, and neither can rely on their usual backup.`
       : "";
-    const obsessionObj = VILLAIN_OBSESSION.find(o => o.id === obsessionLevel);
-    const captureStateObj = CAPTURE_STATES.find(c => c.id === captureState);
-    const flavorObj = darkFlavor ? DARK_FLAVORS.find(f => f.id === darkFlavor) : null;
-    const bondageObj = bondageTrapMode ? BONDAGE_TRAP_MODES.find(b => b.id === bondageTrapMode) : null;
-    const kinkContext = `\n\nVILLAIN OBSESSION LEVEL: ${obsessionObj?.prompt}\n\n${captureStateObj?.prompt}${flavorObj ? `\n\n${flavorObj.prompt}` : ""}${bondageObj ? `\n\n${bondageObj.prompt}` : ""}`;
+    const obsessionPrompts = obsessionLevels.map(id => VILLAIN_OBSESSION.find(o => o.id === id)?.prompt).filter(Boolean).join("\n\n");
+    const capturePrompts = captureStates.map(id => CAPTURE_STATES.find(c => c.id === id)?.prompt).filter(Boolean).join("\n\n");
+    const flavorPrompts = darkFlavors.map(id => DARK_FLAVORS.find(f => f.id === id)?.prompt).filter(Boolean).join("\n\n");
+    const bondagePrompts = bondageTrapModes.map(id => BONDAGE_TRAP_MODES.find(b => b.id === id)?.prompt).filter(Boolean).join("\n\n");
+    const kinkContext = `\n\nVILLAIN OBSESSION: ${obsessionPrompts}\n\n${capturePrompts}${flavorPrompts ? `\n\n${flavorPrompts}` : ""}${bondagePrompts ? `\n\n${bondagePrompts}` : ""}`;
     const isFinale = isEpisodic && ep?.number === selectedSeason?.episodes.length;
     const finaleDirective = isFinale
       ? `\n\nSEASON FINALE: This is the SEASON FINALE of "${season?.title}". The stakes are the highest they have ever been. The villain achieves something irreversible. The season's core theme reaches its most explicit, devastating expression. Write it as a true finale — longer, heavier, more explicit, more psychologically complete than any previous episode. End on an image that closes this season while making the next feel inevitable.`
@@ -846,13 +846,18 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* ── VILLAIN OBSESSION LEVEL ─────────────────────────────── */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🎭 VILLAIN OBSESSION</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>🎭 VILLAIN OBSESSION</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>pick multiple</div>
+            {obsessionLevels.length > 0 && <div style={{ fontSize: "9px", color: color, letterSpacing: "1px" }}>{obsessionLevels.length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
             {VILLAIN_OBSESSION.map(o => {
-              const sel = obsessionLevel === o.id;
+              const sel = obsessionLevels.includes(o.id as ObsessionId);
               return (
-                <button key={o.id} onClick={() => setObsessionLevel(o.id as ObsessionId)}
-                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
+                <button key={o.id} onClick={() => setObsessionLevels(prev => sel ? prev.filter(x => x !== o.id) : [...prev, o.id as ObsessionId])}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color }}> ✓</div>}
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{o.icon}</div>
                   <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{o.label}</div>
                   <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{o.desc}</div>
@@ -864,13 +869,18 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* ── CAPTURE ENTRY STATE ─────────────────────────────────── */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>⛓ CAPTURE ENTRY</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>⛓ CAPTURE ENTRY</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>pick multiple</div>
+            {captureStates.length > 0 && <div style={{ fontSize: "9px", color: color, letterSpacing: "1px" }}>{captureStates.length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
             {CAPTURE_STATES.map(c => {
-              const sel = captureState === c.id;
+              const sel = captureStates.includes(c.id as CaptureStateId);
               return (
-                <button key={c.id} onClick={() => setCaptureState(c.id as CaptureStateId)}
-                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
+                <button key={c.id} onClick={() => setCaptureStates(prev => sel ? prev.filter(x => x !== c.id) : [...prev, c.id as CaptureStateId])}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color }}> ✓</div>}
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{c.icon}</div>
                   <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{c.label}</div>
                   <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{c.desc}</div>
@@ -882,12 +892,16 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* ── DARK FLAVOR ─────────────────────────────────────────── */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "4px" }}>🩸 DARK FLAVOR <span style={{ color: "#333", fontWeight: 400, letterSpacing: 0 }}>(optional — click to select, click again to remove)</span></div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>🩸 DARK FLAVOR</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>optional · pick multiple</div>
+            {darkFlavors.length > 0 && <div style={{ fontSize: "9px", color: "#F87171", letterSpacing: "1px" }}>{darkFlavors.length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
             {DARK_FLAVORS.map(f => {
-              const sel = darkFlavor === f.id;
+              const sel = darkFlavors.includes(f.id as DarkFlavorId);
               return (
-                <button key={f.id} onClick={() => setDarkFlavor(sel ? null : f.id as DarkFlavorId)}
+                <button key={f.id} onClick={() => setDarkFlavors(prev => sel ? prev.filter(x => x !== f.id) : [...prev, f.id as DarkFlavorId])}
                   style={{ background: sel ? "rgba(220,38,38,0.12)" : "#0a0a12", border: `1px solid ${sel ? "#DC2626" : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
                   {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color: "#DC2626" }}>✓</div>}
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{f.icon}</div>
@@ -901,12 +915,16 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* ── BONDAGE & TRAPS ──────────────────────────────────────── */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "4px" }}>⛓ BONDAGE &amp; TRAPS <span style={{ color: "#333", fontWeight: 400, letterSpacing: 0 }}>(optional — pick one)</span></div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>⛓ BONDAGE &amp; TRAPS</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>optional · pick multiple</div>
+            {bondageTrapModes.length > 0 && <div style={{ fontSize: "9px", color: "#FCD34D", letterSpacing: "1px" }}>{bondageTrapModes.length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
             {BONDAGE_TRAP_MODES.map(b => {
-              const sel = bondageTrapMode === b.id;
+              const sel = bondageTrapModes.includes(b.id as BondageTrapId);
               return (
-                <button key={b.id} onClick={() => setBondageTrapMode(sel ? null : b.id as BondageTrapId)}
+                <button key={b.id} onClick={() => setBondageTrapModes(prev => sel ? prev.filter(x => x !== b.id) : [...prev, b.id as BondageTrapId])}
                   style={{ background: sel ? "rgba(245,158,11,0.12)" : "#0a0a12", border: `1px solid ${sel ? "#F59E0B" : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
                   {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color: "#F59E0B" }}>✓</div>}
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{b.icon}</div>
@@ -958,15 +976,26 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* LOCATION SELECTOR */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>📍 LOCATION OVERRIDE</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>📍 LOCATION OVERRIDE</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>pick multiple</div>
+            {locationIds.filter(id => id !== "default").length > 0 && <div style={{ fontSize: "9px", color: color, letterSpacing: "1px" }}>{locationIds.filter(id => id !== "default").length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "6px" }}>
             {AV_LOCATIONS.map(loc => {
-              const sel = locationId === loc.id;
+              const sel = locationIds.includes(loc.id);
               return (
-                <button key={loc.id} onClick={() => setLocationId(loc.id)}
-                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "6px", padding: "8px 10px", cursor: "pointer", textAlign: "left" }}>
+                <button key={loc.id} onClick={() => {
+                  if (loc.id === "default") { setLocationIds(["default"]); return; }
+                  setLocationIds(prev => {
+                    const withoutDefault = prev.filter(id => id !== "default");
+                    return sel ? (withoutDefault.filter(id => id !== loc.id).length === 0 ? ["default"] : withoutDefault.filter(id => id !== loc.id)) : [...withoutDefault, loc.id];
+                  });
+                }}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "6px", padding: "8px 10px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && loc.id !== "default" && <div style={{ position: "absolute", top: "5px", right: "7px", fontSize: "9px", color }}>✓</div>}
                   <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#888", letterSpacing: "0.5px" }}>{loc.label}</div>
-                  {sel && <div style={{ fontSize: "10px", color: "#555", marginTop: "3px", lineHeight: 1.4 }}>{loc.desc.slice(0, 60)}…</div>}
+                  {sel && loc.id !== "default" && <div style={{ fontSize: "10px", color: "#555", marginTop: "3px", lineHeight: 1.4 }}>{loc.desc.slice(0, 60)}…</div>}
                 </button>
               );
             })}
@@ -975,13 +1004,18 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* SCENE FOCUS */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>🎯 SCENE FOCUS</div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>🎯 SCENE FOCUS</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>pick multiple</div>
+            {sceneFocuses.length > 0 && <div style={{ fontSize: "9px", color: color, letterSpacing: "1px" }}>{sceneFocuses.length} selected</div>}
+          </div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {SCENE_FOCUS.map(f => {
-              const sel = sceneFocus === f.id;
+              const sel = sceneFocuses.includes(f.id as SceneFocusId);
               return (
-                <button key={f.id} onClick={() => setSceneFocus(f.id as SceneFocusId)}
-                  style={{ flex: 1, background: sel ? `${color}18` : "#0e0e18", border: `1px solid ${sel ? color : "#222"}`, borderRadius: "8px", padding: "10px 8px", cursor: "pointer", textAlign: "left" }}>
+                <button key={f.id} onClick={() => setSceneFocuses(prev => sel ? prev.filter(x => x !== f.id) : [...prev, f.id as SceneFocusId])}
+                  style={{ flex: 1, minWidth: "120px", background: sel ? `${color}18` : "#0e0e18", border: `1px solid ${sel ? color : "#222"}`, borderRadius: "8px", padding: "10px 8px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "9px", color }}>✓</div>}
                   <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#666", letterSpacing: "1px", marginBottom: "4px" }}>{f.label}</div>
                   <div style={{ fontSize: "10px", color: "#444", lineHeight: 1.4 }}>{f.desc.slice(0, 55)}…</div>
                 </button>
@@ -992,13 +1026,18 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
 
         {/* ENDING FATE */}
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "10px" }}>⛓ ENDING FATE</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555" }}>⛓ ENDING FATE</div>
+            <div style={{ fontSize: "9px", color: "#333", letterSpacing: "1px" }}>pick multiple</div>
+            {endingFates.length > 0 && <div style={{ fontSize: "9px", color: color, letterSpacing: "1px" }}>{endingFates.length} selected</div>}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             {ENDING_FATES.map(f => {
-              const sel = endingFate === f.id;
+              const sel = endingFates.includes(f.id as EndingFateId);
               return (
-                <button key={f.id} onClick={() => setEndingFate(f.id as EndingFateId)}
-                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "12px 12px", cursor: "pointer", textAlign: "left" }}>
+                <button key={f.id} onClick={() => setEndingFates(prev => sel ? prev.filter(x => x !== f.id) : [...prev, f.id as EndingFateId])}
+                  style={{ background: sel ? `${color}15` : "#0a0a12", border: `1px solid ${sel ? color : "#1e1e2e"}`, borderRadius: "8px", padding: "12px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "9px", color }}>✓</div>}
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{f.icon}</div>
                   <div style={{ fontSize: "11px", fontWeight: 700, color: sel ? color : "#777", letterSpacing: "1px", marginBottom: "3px" }}>{f.label}</div>
                   <div style={{ fontSize: "10px", color: "#444", lineHeight: 1.4 }}>{f.desc.slice(0, 65)}…</div>
