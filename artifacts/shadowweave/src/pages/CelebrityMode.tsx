@@ -790,7 +790,11 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
 
           {/* Setting */}
           <div>
-            <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>Setting <span style={{ color: "#FF4060" }}>*</span></label>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Setting <span style={{ color: "#FF4060" }}>*</span></label>
+              <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: "rgba(200,168,75,0.35)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700, border: "1px solid rgba(200,168,75,0.2)", borderRadius: "10px", padding: "1px 6px" }}>PICK MULTIPLE</span>
+              {selectedSettings.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.4rem", letterSpacing: "1.5px", color: gold, fontFamily: "'Montserrat', sans-serif", fontWeight: 900, background: "rgba(200,168,75,0.12)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "10px", padding: "1px 8px" }}>{selectedSettings.length} SELECTED</span>}
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "150px" : "220px"}, 1fr))`, gap: "0.5rem" }}>
               {SETTINGS.map(s => {
                 const sel = selectedSettings.includes(s.id);
@@ -808,7 +812,11 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
 
           {/* Encounter type */}
           <div>
-            <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>How It Begins <span style={{ color: "#FF4060" }}>*</span></label>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>How It Begins <span style={{ color: "#FF4060" }}>*</span></label>
+              <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: "rgba(200,168,75,0.35)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700, border: "1px solid rgba(200,168,75,0.2)", borderRadius: "10px", padding: "1px 6px" }}>PICK MULTIPLE</span>
+              {selectedEncounters.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.4rem", letterSpacing: "1.5px", color: gold, fontFamily: "'Montserrat', sans-serif", fontWeight: 900, background: "rgba(200,168,75,0.12)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "10px", padding: "1px 8px" }}>{selectedEncounters.length} SELECTED</span>}
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
               {ENCOUNTERS.map(e => {
                 const sel = selectedEncounters.includes(e.id);
@@ -824,7 +832,11 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
 
           {/* Tone */}
           <div>
-            <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>Tone <span style={{ color: "#FF4060" }}>*</span></label>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif" }}>Tone <span style={{ color: "#FF4060" }}>*</span></label>
+              <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: "rgba(200,168,75,0.35)", fontFamily: "'Montserrat', sans-serif", fontWeight: 700, border: "1px solid rgba(200,168,75,0.2)", borderRadius: "10px", padding: "1px 6px" }}>PICK MULTIPLE</span>
+              {selectedTones.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.4rem", letterSpacing: "1.5px", color: gold, fontFamily: "'Montserrat', sans-serif", fontWeight: 900, background: "rgba(200,168,75,0.12)", border: "1px solid rgba(200,168,75,0.3)", borderRadius: "10px", padding: "1px 8px" }}>{selectedTones.length} SELECTED</span>}
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
               {TONES.map(t => {
                 const sel = selectedTones.includes(t.id);

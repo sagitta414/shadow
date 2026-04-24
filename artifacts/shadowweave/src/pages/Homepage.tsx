@@ -427,6 +427,10 @@ export default function Homepage(props: HomepageProps) {
         @keyframes statPop { from{opacity:0;transform:scale(0.85) translateY(6px);}to{opacity:1;transform:scale(1) translateY(0);} }
         @keyframes cardIn { from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);} }
         @keyframes accordionOpen { from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);} }
+        @keyframes barShimmer { 0%{transform:translateX(-150%);opacity:0;}30%{opacity:0.7;}70%{opacity:0.7;}100%{transform:translateX(200%);opacity:0;} }
+        @keyframes threatPulse { 0%,100%{box-shadow:0 0 12px var(--tl-color);} 50%{box-shadow:0 0 28px var(--tl-color),0 0 50px var(--tl-color);} }
+        @keyframes iconPulse { 0%,100%{box-shadow:0 0 8px var(--tl-color),0 0 20px var(--tl-color-faint);} 50%{box-shadow:0 0 20px var(--tl-color),0 0 50px var(--tl-color-faint);} }
+        @keyframes qsHoverIn { from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);} }
         .cm-in { animation: cardIn 0.42s cubic-bezier(0.22,1,0.36,1) both; }
         .ac-in { animation: accordionOpen 0.38s cubic-bezier(0.22,1,0.36,1) both; }
         @media(max-width:900px){ .hp-hero{ flex-direction:column !important; } .hp-hero > div { height: clamp(240px,38vw,320px) !important; } .hp-sub{grid-template-columns:repeat(2,1fr)!important;} .hp-tools{grid-template-columns:repeat(2,1fr)!important;} }
@@ -725,34 +729,44 @@ export default function Homepage(props: HomepageProps) {
         const ptsToNext = tl.nextThreshold - tl.score;
         return (
           <div style={{ padding: isMobile ? "0.75rem 1rem 0" : "0.75rem 2.5rem 0", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.5s 0.31s ease both" : "none" }}>
-            <div style={{ background: "rgba(4,1,12,0.72)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", padding: "0.7rem 1.2rem", backdropFilter: "blur(20px)", display: "flex", alignItems: "center", gap: "1rem" }}>
+            <div style={{ background: "rgba(4,1,12,0.72)", border: `1px solid ${tl.level >= 5 ? tl.color + "22" : "rgba(255,255,255,0.04)"}`, borderRadius: "12px", padding: "0.7rem 1.2rem", backdropFilter: "blur(20px)", display: "flex", alignItems: "center", gap: "1rem", transition: "border-color 0.6s ease" }}>
               <div style={{ flexShrink: 0 }}>
                 <div style={{ fontSize: "0.35rem", letterSpacing: "3px", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "2px" }}>THREAT LEVEL</div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "5px" }}>
-                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: tl.color }}>{tl.level}</span>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: tl.color, textShadow: tl.level >= 7 ? `0 0 18px ${tl.color}` : "none" }}>{tl.level}</span>
                   <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, color: tl.color, letterSpacing: "1px" }}>{tl.title.toUpperCase()}</span>
                 </div>
                 <div style={{ fontSize: "0.35rem", color: "rgba(200,200,220,0.3)", letterSpacing: "1.5px", fontFamily: "'Montserrat', sans-serif", marginTop: "2px" }}>{tl.subtitle}</div>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ height: "6px", background: "rgba(255,255,255,0.05)", borderRadius: "3px", overflow: "hidden", position: "relative" }}>
+                <div style={{ height: "7px", background: "rgba(255,255,255,0.05)", borderRadius: "4px", overflow: "hidden", position: "relative" }}>
                   <div style={{
-                    height: "100%", borderRadius: "3px", transition: "width 1s ease",
+                    height: "100%", borderRadius: "4px", transition: "width 1.2s cubic-bezier(0.22,1,0.36,1)",
                     width: `${pct}%`,
-                    background: `linear-gradient(90deg, ${tl.color}88, ${tl.color})`,
-                    boxShadow: `0 0 10px ${tl.color}66`,
-                  }} />
+                    background: `linear-gradient(90deg, ${tl.color}66, ${tl.color}cc, ${tl.color})`,
+                    boxShadow: `0 0 ${tl.level >= 7 ? "16px" : "8px"} ${tl.color}${tl.level >= 5 ? "99" : "55"}`,
+                    position: "relative",
+                  }}>
+                    {/* shimmer sweep */}
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%)", animation: "barShimmer 3s 1.2s ease-in-out infinite", borderRadius: "4px" }} />
+                  </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
                   <span style={{ fontSize: "0.32rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>SCORE: {tl.score}</span>
                   {tl.level < 10 ? (
-                    <span style={{ fontSize: "0.32rem", color: `${tl.color}88`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>{ptsToNext} PTS TO LEVEL {tl.level + 1}</span>
+                    <span style={{ fontSize: "0.32rem", color: `${tl.color}99`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>{ptsToNext} PTS TO LEVEL {tl.level + 1}</span>
                   ) : (
                     <span style={{ fontSize: "0.32rem", color: tl.color, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>MAX THREAT ACHIEVED</span>
                   )}
                 </div>
               </div>
-              <div style={{ flexShrink: 0, width: "32px", height: "32px", borderRadius: "50%", background: `${tl.color}18`, border: `1px solid ${tl.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem" }}>
+              <div style={{
+                flexShrink: 0, width: "34px", height: "34px", borderRadius: "50%",
+                background: `${tl.color}18`, border: `1px solid ${tl.color}55`,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.78rem",
+                animation: tl.level >= 5 ? "iconPulse 2.5s ease-in-out infinite" : "none",
+                "--tl-color": tl.color, "--tl-color-faint": tl.color + "33",
+              } as React.CSSProperties}>
                 {["👁","⚡","🌑","💀","🔥","🗝","⛓","🩸","🌀","🕳"][tl.level - 1]}
               </div>
             </div>
@@ -788,12 +802,25 @@ export default function Homepage(props: HomepageProps) {
                 background: "rgba(10,8,16,0.85)", border: `1px solid ${qs.color}28`,
                 borderLeft: `3px solid ${qs.color}`, borderRadius: "10px",
                 padding: "0.75rem 1rem", cursor: "pointer", textAlign: "left",
-                minWidth: "160px", maxWidth: "180px", transition: "all 0.2s",
-                flexShrink: 0,
+                minWidth: "160px", maxWidth: "180px", transition: "all 0.22s cubic-bezier(0.22,1,0.36,1)",
+                flexShrink: 0, position: "relative", overflow: "hidden",
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${qs.color}66`; (e.currentTarget as HTMLElement).style.background = `${qs.color}09`; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${qs.color}28`; (e.currentTarget as HTMLElement).style.background = "rgba(10,8,16,0.85)"; }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = `${qs.color}55`;
+                el.style.background = `rgba(10,8,16,0.95)`;
+                el.style.transform = "translateY(-3px)";
+                el.style.boxShadow = `0 8px 28px ${qs.color}22, 0 0 0 1px ${qs.color}22`;
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = `${qs.color}28`;
+                el.style.background = "rgba(10,8,16,0.85)";
+                el.style.transform = "translateY(0)";
+                el.style.boxShadow = "none";
+              }}
               >
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: `linear-gradient(90deg, transparent, ${qs.color}55, transparent)`, opacity: 0.7 }} />
                 <div style={{ fontSize: "1.1rem", marginBottom: "0.4rem" }}>{qs.icon}</div>
                 <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.65rem", color: qs.color, letterSpacing: "0.5px", fontWeight: 700, marginBottom: "0.25rem", lineHeight: 1.2 }}>{qs.label}</div>
                 <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.38)", lineHeight: 1.4 }}>{qs.desc}</div>

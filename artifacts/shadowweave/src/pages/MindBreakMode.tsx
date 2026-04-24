@@ -216,14 +216,14 @@ export default function MindBreakMode({ onBack }: Props) {
         <button onClick={() => setStep(1)} style={{ background: "transparent", border: `1px solid rgba(${accRgb},0.3)`, color: acc, borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontSize: "0.75rem", fontFamily: "'Cinzel', serif", letterSpacing: "1px", marginBottom: "2rem" }}>← BACK</button>
         <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.3rem", color: acc, letterSpacing: "3px", marginBottom: "2rem" }}>CONFIGURE THE CHAMBER</h1>
 
-        <Section title="SETTING" rgb={accRgb} acc={acc}>
+        <Section title="SETTING" rgb={accRgb} acc={acc} multiSelect count={settings.length}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
             {SETTINGS.map(s => pill(s, settings.includes(s), () => { setSettings(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]); setCustomSetting(""); }))}
           </div>
           <input value={customSetting} onChange={e => { setCustomSetting(e.target.value); setSettings([]); }} placeholder="Or describe your own setting…" style={inputStyle} />
         </Section>
 
-        <Section title="HER BREAKING POINT" rgb={accRgb} acc={acc}>
+        <Section title="HER BREAKING POINT" rgb={accRgb} acc={acc} multiSelect count={breakingPoints.length}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
             {BREAKING_POINTS.map(b => pill(b, breakingPoints.includes(b), () => { setBreakingPoints(prev => prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b]); setCustomBreakingPoint(""); }))}
           </div>
@@ -298,10 +298,18 @@ export default function MindBreakMode({ onBack }: Props) {
   );
 }
 
-function Section({ title, children, rgb, acc }: { title: string; children: React.ReactNode; rgb: string; acc: string }) {
+function Section({ title, children, rgb, acc, count, multiSelect }: { title: string; children: React.ReactNode; rgb: string; acc: string; count?: number; multiSelect?: boolean }) {
   return (
     <div style={{ marginBottom: "1.5rem" }}>
-      <div style={{ fontSize: "0.55rem", color: `rgba(${rgb},0.6)`, letterSpacing: "3px", fontFamily: "'Cinzel', serif", marginBottom: "0.75rem", borderBottom: `1px solid rgba(${rgb},0.12)`, paddingBottom: "0.5rem" }}>{title}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", borderBottom: `1px solid rgba(${rgb},0.12)`, paddingBottom: "0.5rem", marginBottom: "0.75rem" }}>
+        <span style={{ fontSize: "0.55rem", color: `rgba(${rgb},0.6)`, letterSpacing: "3px", fontFamily: "'Cinzel', serif" }}>{title}</span>
+        {multiSelect && (
+          <span style={{ fontSize: "0.38rem", letterSpacing: "2px", color: `rgba(${rgb},0.35)`, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, textTransform: "uppercase", border: `1px solid rgba(${rgb},0.2)`, borderRadius: "10px", padding: "1px 6px" }}>PICK MULTIPLE</span>
+        )}
+        {count !== undefined && count > 0 && (
+          <span style={{ marginLeft: "auto", fontSize: "0.4rem", letterSpacing: "1.5px", color: acc, fontFamily: "'Montserrat', sans-serif", fontWeight: 900, background: `rgba(${rgb},0.12)`, border: `1px solid rgba(${rgb},0.3)`, borderRadius: "10px", padding: "1px 8px" }}>{count} SELECTED</span>
+        )}
+      </div>
       {children}
     </div>
   );
