@@ -81,6 +81,39 @@ const DARK_FLAVORS = [
 ] as const;
 type DarkFlavorId = typeof DARK_FLAVORS[number]["id"];
 
+// ── BONDAGE & TRAP MODES ──────────────────────────────────────────────────────
+const BONDAGE_TRAP_MODES = [
+  { id: "custom_fit",    label: "CUSTOM-FIT",         icon: "🔩", desc: "He built these for her specifically. Every detail is personal.",
+    prompt: "BONDAGE MODE — CUSTOM-FIT RESTRAINTS: The restraints were designed and built specifically for her. The story reveals this detail by detail — what he learned about her physiology, her power mechanics, her pressure points and pain thresholds that led to each design choice. Name each restraint component and the specific reason it exists. She realizes, across the story, that none of this was generic equipment. He made this for her before he ever had her." },
+  { id: "suspended",     label: "SUSPENDED",           icon: "🕸",  desc: "She's off the ground. Write every physical consequence of that.",
+    prompt: "BONDAGE MODE — SUSPENDED: She is not on the ground. The restraint system holds her elevated — arms, wrists, or full body. Write the physical reality of this in granular detail: what she can and cannot reach, what her body is doing to compensate, what changes in her as time passes. Each act should note how long she has been suspended and what that duration costs her. The position is the story's central physical fact." },
+  { id: "ratchet",       label: "RESTRAINT BY RESTRAINT", icon: "🔗", desc: "One added per act. Named. Explained. Inventoried at the end.",
+    prompt: "BONDAGE MODE — RESTRAINT BY RESTRAINT: She begins with one restraint. Across Acts One, Two, and Three, additional restraints are added — each one named, each described in physical detail, each explained out loud by the villain with his specific reason for choosing it. In the final act, write a full inventory of everything she is wearing and why. The accumulation is the story arc." },
+  { id: "the_trade",     label: "THE TRADE",           icon: "⚖",  desc: "Earn one off. Agree to something else. Both lists grow.",
+    prompt: "BONDAGE MODE — THE TRADE: For every restraint removed, she agrees to something in return. Track both lists simultaneously throughout the story — what has been taken off and what she has agreed to in exchange. She negotiates carefully and believes she is making progress. By Act Three, have her count both lists. One is shorter than she thought. The other is longer than she realized. Write the moment she does that arithmetic." },
+  { id: "mechanism",     label: "THE MECHANISM",       icon: "⚙",  desc: "Moving parts. Resistance triggers consequences. She learns to stop.",
+    prompt: "BONDAGE MODE — THE MECHANISM: The restraint or trap has moving parts that respond to her attempts to escape or resist. Resistance triggers a specific consequence — not punishment, a mechanical response. The story teaches her this through experience. Act One: she fights and learns. Act Two: she tests the limits of what's allowed. Act Three: write what she has settled into and what that looks like from the outside. The mechanism is patient. It has time." },
+  { id: "gauntlet",      label: "ESCAPE GAUNTLET",     icon: "🏃", desc: "Three attempts. Three different failures. Each one tightens something.",
+    prompt: "BONDAGE MODE — ESCAPE GAUNTLET: She attempts to escape once per act — three attempts total, three different methods. Each one fails for a distinct reason. Each failure results in something additional being applied or restricted. By Act Three she has stopped trying. Write her final act not as defeat but as a specific decision — name the moment she makes it and what her face does." },
+  { id: "clock",         label: "TICKING CLOCK",       icon: "⏱",  desc: "A deadline. Stated upfront. The story tracks time act by act.",
+    prompt: "BONDAGE MODE — TICKING CLOCK: She is given a deadline at the story's opening. What happens when time runs out is stated to her explicitly and in full. The story tracks time across each act — how much remains, what she does with each interval, how her calculations change as it gets smaller. The clock is non-negotiable. Write the final minute of the story with specific attention to what she decides." },
+  { id: "on_display",    label: "ON DISPLAY",          icon: "🎪", desc: "A position designed to be seen. Audience present or incoming.",
+    prompt: "BONDAGE MODE — ON DISPLAY: She has been placed in a position specifically designed for visibility — not for security, for presentation. There is an audience watching or one that is expected. She cannot hide, cannot compose herself fully, cannot control what is seen. Write what she does with her face, her posture, her breathing, knowing she is being seen. Write what the audience sees. Both matter equally." },
+  { id: "mirror",        label: "MIRROR ROOM",         icon: "🪞", desc: "She can see herself. He wants her to look. Two registers at once.",
+    prompt: "BONDAGE MODE — MIRROR ROOM: She can see herself from multiple angles — mirrors, reflective surfaces, a screen showing her. He specifically directs her attention to her own reflection at key moments. Run the story in two registers simultaneously: what she sees when she looks at herself, and what he sees when he looks at her. Do not let them match. The gap between those two observations is where the story lives." },
+  { id: "inventory",     label: "THE INVENTORY",       icon: "📋", desc: "He catalogs her. Methodically. Out loud. She hears all of it.",
+    prompt: "BONDAGE MODE — THE INVENTORY: He catalogs her. Methodically, out loud, while she is restrained and present. Everything — her reactions, her tells, her thresholds, her scars, her specific responses to specific stimuli, what she does when she thinks he's not watching. He notes all of it in a way she can hear. Structure the story around what he finds and records. The most disturbing entries are the accurate ones." },
+  { id: "wired",         label: "WIRED",               icon: "📡", desc: "Her readings are live. He narrates what the data shows him.",
+    prompt: "BONDAGE MODE — WIRED: Her restraints are connected to a monitoring system. He has access to her readings in real time — biometrics, stress responses, involuntary physiological reactions. Throughout the story he narrates what the data shows him, calmly and precisely, including things she would prefer he not be able to measure. She can hear him doing it. Write the specific gap between what she says she is feeling and what the readings show." },
+  { id: "upgrade",       label: "THE UPGRADE",         icon: "🔧", desc: "Every time she finds a way to cope, he improves the restraints.",
+    prompt: "BONDAGE MODE — THE UPGRADE: Each time she finds a way to cope with, compensate for, or partially work around her restraints, he notices and upgrades them. The story tracks three iterations across the three acts: what she found, what he changed in response, and what she now faces. By Act Three she understands that her adaptability is being used as a design tool against her. Write the moment that realization arrives." },
+  { id: "controlled",    label: "CONTROLLED RELEASE",  icon: "🔓", desc: "Timed partial freedoms. She has intervals. Write what she does with them.",
+    prompt: "BONDAGE MODE — CONTROLLED RELEASE: She is given brief, timed partial freedoms at set intervals — one hand free for a specific window, limited range of movement, a door left unlocked for eight minutes. The story tracks each interval: how much time she has, what she chooses to do with it, and how it closes again. The intervals are getting shorter. By Act Three she has stopped using them for escape and started using them for something else. Write what that is." },
+  { id: "auction_prep",  label: "PREPARED FOR SALE",  icon: "💎", desc: "A buyer is coming. The story is the preparation for that arrival.",
+    prompt: "BONDAGE MODE — PREPARED FOR SALE: She is being held for presentation to a buyer. The buyer is coming — the story does not say when exactly, only that preparations are being made. Write the preparation in full: what is done, what is said about what the buyer expects, what she understands about what 'ready' means in this context. The buyer never appears in the story. Their shadow is enough. The anticipation of their arrival is the engine." },
+] as const;
+type BondageTrapId = typeof BONDAGE_TRAP_MODES[number]["id"];
+
 const BIG_BAD_KEY = "sw_arrowverse_bigbad_v1";
 function getBigBad(): { villain: string; seasonId: string; episodeCount: number } | null {
   try { return JSON.parse(localStorage.getItem(BIG_BAD_KEY) ?? "null"); } catch { return null; }
@@ -463,6 +496,7 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
   const [obsessionLevel, setObsessionLevel] = useState<ObsessionId>("fixated");
   const [captureState, setCaptureState] = useState<CaptureStateId>("mid");
   const [darkFlavor, setDarkFlavor] = useState<DarkFlavorId | null>(null);
+  const [bondageTrapMode, setBondageTrapMode] = useState<BondageTrapId | null>(null);
   const typeRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -573,7 +607,8 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     const obsessionObj = VILLAIN_OBSESSION.find(o => o.id === obsessionLevel);
     const captureStateObj = CAPTURE_STATES.find(c => c.id === captureState);
     const flavorObj = darkFlavor ? DARK_FLAVORS.find(f => f.id === darkFlavor) : null;
-    const kinkContext = `\n\nVILLAIN OBSESSION LEVEL: ${obsessionObj?.prompt}\n\n${captureStateObj?.prompt}${flavorObj ? `\n\n${flavorObj.prompt}` : ""}`;
+    const bondageObj = bondageTrapMode ? BONDAGE_TRAP_MODES.find(b => b.id === bondageTrapMode) : null;
+    const kinkContext = `\n\nVILLAIN OBSESSION LEVEL: ${obsessionObj?.prompt}\n\n${captureStateObj?.prompt}${flavorObj ? `\n\n${flavorObj.prompt}` : ""}${bondageObj ? `\n\n${bondageObj.prompt}` : ""}`;
     const isFinale = isEpisodic && ep?.number === selectedSeason?.episodes.length;
     const finaleDirective = isFinale
       ? `\n\nSEASON FINALE: This is the SEASON FINALE of "${season?.title}". The stakes are the highest they have ever been. The villain achieves something irreversible. The season's core theme reaches its most explicit, devastating expression. Write it as a true finale — longer, heavier, more explicit, more psychologically complete than any previous episode. End on an image that closes this season while making the next feel inevitable.`
@@ -854,6 +889,25 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
                   <div style={{ fontSize: "14px", marginBottom: "4px" }}>{f.icon}</div>
                   <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? "#F87171" : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{f.label}</div>
                   <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{f.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── BONDAGE & TRAPS ──────────────────────────────────────── */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "11px", letterSpacing: "3px", color: "#555", marginBottom: "4px" }}>⛓ BONDAGE &amp; TRAPS <span style={{ color: "#333", fontWeight: 400, letterSpacing: 0 }}>(optional — pick one)</span></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            {BONDAGE_TRAP_MODES.map(b => {
+              const sel = bondageTrapMode === b.id;
+              return (
+                <button key={b.id} onClick={() => setBondageTrapMode(sel ? null : b.id as BondageTrapId)}
+                  style={{ background: sel ? "rgba(245,158,11,0.12)" : "#0a0a12", border: `1px solid ${sel ? "#F59E0B" : "#1e1e2e"}`, borderRadius: "8px", padding: "10px 12px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                  {sel && <div style={{ position: "absolute", top: "6px", right: "8px", fontSize: "10px", color: "#F59E0B" }}>✓</div>}
+                  <div style={{ fontSize: "14px", marginBottom: "4px" }}>{b.icon}</div>
+                  <div style={{ fontSize: "10px", fontWeight: 700, color: sel ? "#FCD34D" : "#666", letterSpacing: "1px", marginBottom: "3px" }}>{b.label}</div>
+                  <div style={{ fontSize: "10px", color: "#3a3a4a", lineHeight: 1.4 }}>{b.desc}</div>
                 </button>
               );
             })}
