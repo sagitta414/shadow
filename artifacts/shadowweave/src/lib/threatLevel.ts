@@ -6,6 +6,7 @@ export interface ThreatLevel {
   title: string;
   subtitle: string;
   color: string;
+  currentThreshold: number;
   nextThreshold: number;
 }
 
@@ -67,5 +68,5 @@ export function getThreatLevel(): ThreatLevel {
   }
   const nextIdx = LEVELS.indexOf(current) + 1;
   const nextThreshold = nextIdx < LEVELS.length ? LEVELS[nextIdx].threshold : 100;
-  return { score, ...current, nextThreshold };
+  return { score, ...current, currentThreshold: current.threshold, nextThreshold };
 }

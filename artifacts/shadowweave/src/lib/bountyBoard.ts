@@ -88,7 +88,7 @@ export function getWeeklyChallenges(): Challenge[] {
 export function evaluateChallenges(): { challenge: Challenge; complete: boolean }[] {
   const archive = getArchive();
   const challenges = getWeeklyChallenges();
-  return challenges.map(c => ({ challenge: c, complete: c.check(archive) }));
+  return challenges.map(c => ({ challenge: c, complete: c.check(archive) || isChallengeComplete(c.id) }));
 }
 
 export const RARITY_COLORS = {

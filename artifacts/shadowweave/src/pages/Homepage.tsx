@@ -5,6 +5,7 @@ import { getUnlockCount, getTotalXP } from "../lib/achievements";
 import { getWritingActivitySet, buildActivitySlots } from "../lib/activityMap";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { getArchive } from "../lib/archive";
+import { getThreatLevel } from "../lib/threatLevel";
 import DarknessRankBadge from "../components/DarknessRankBadge";
 import { getUnlockStatus } from "../lib/modeUnlocks";
 import { getTotalUnspentValue } from "../lib/vaultKeys";
@@ -715,6 +716,49 @@ export default function Homepage(props: HomepageProps) {
           )}
         </div>
       </div>
+
+      {/* ══ THREAT LEVEL BAR ════════════════════════════════════════════════════ */}
+      {(() => {
+        const tl = getThreatLevel();
+        const range = tl.nextThreshold - tl.currentThreshold;
+        const pct = range > 0 ? Math.min(100, ((tl.score - tl.currentThreshold) / range) * 100) : 100;
+        const ptsToNext = tl.nextThreshold - tl.score;
+        return (
+          <div style={{ padding: isMobile ? "0.75rem 1rem 0" : "0.75rem 2.5rem 0", opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.5s 0.31s ease both" : "none" }}>
+            <div style={{ background: "rgba(4,1,12,0.72)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", padding: "0.7rem 1.2rem", backdropFilter: "blur(20px)", display: "flex", alignItems: "center", gap: "1rem" }}>
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ fontSize: "0.35rem", letterSpacing: "3px", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "2px" }}>THREAT LEVEL</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "5px" }}>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: tl.color }}>{tl.level}</span>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", fontWeight: 700, color: tl.color, letterSpacing: "1px" }}>{tl.title.toUpperCase()}</span>
+                </div>
+                <div style={{ fontSize: "0.35rem", color: "rgba(200,200,220,0.3)", letterSpacing: "1.5px", fontFamily: "'Montserrat', sans-serif", marginTop: "2px" }}>{tl.subtitle}</div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ height: "6px", background: "rgba(255,255,255,0.05)", borderRadius: "3px", overflow: "hidden", position: "relative" }}>
+                  <div style={{
+                    height: "100%", borderRadius: "3px", transition: "width 1s ease",
+                    width: `${pct}%`,
+                    background: `linear-gradient(90deg, ${tl.color}88, ${tl.color})`,
+                    boxShadow: `0 0 10px ${tl.color}66`,
+                  }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+                  <span style={{ fontSize: "0.32rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>SCORE: {tl.score}</span>
+                  {tl.level < 10 ? (
+                    <span style={{ fontSize: "0.32rem", color: `${tl.color}88`, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>{ptsToNext} PTS TO LEVEL {tl.level + 1}</span>
+                  ) : (
+                    <span style={{ fontSize: "0.32rem", color: tl.color, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px" }}>MAX THREAT ACHIEVED</span>
+                  )}
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, width: "32px", height: "32px", borderRadius: "50%", background: `${tl.color}18`, border: `1px solid ${tl.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem" }}>
+                {["👁","⚡","🌑","💀","🔥","🗝","⛓","🩸","🌀","🕳"][tl.level - 1]}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ══ QUICK STARTS ════════════════════════════════════════════════════════ */}
       <div style={{ padding: isMobile ? "1.5rem 0 0" : "2rem 0 0", position: "relative", zIndex: 2, opacity: mounted ? 1 : 0, animation: mounted ? "fadeUp 0.55s 0.28s ease both" : "none" }}>

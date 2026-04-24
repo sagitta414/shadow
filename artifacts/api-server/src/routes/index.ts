@@ -5,6 +5,7 @@ import soundboardRouter from "./soundboard";
 import plottwistRouter from "./plottwist";
 import visitorsRouter from "./visitors";
 import adminRouter from "./admin";
+import cloudSaveRouter from "./cloudsave";
 import { logEvent } from "../lib/eventLogger";
 
 const router: IRouter = Router();
@@ -22,5 +23,6 @@ router.use(soundboardRouter);
 router.use(plottwistRouter);
 router.use(visitorsRouter);
 router.use(adminRouter);
+router.use(cloudSaveRouter);
 
 export default router;

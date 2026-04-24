@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWeeklyChallenges, evaluateChallenges, RARITY_COLORS, type Challenge } from "../lib/bountyBoard";
+import { getWeeklyChallenges, evaluateChallenges, markChallengeComplete, RARITY_COLORS, type Challenge } from "../lib/bountyBoard";
 
 interface Props { onBack: () => void; }
 
@@ -17,11 +17,18 @@ export default function BountyBoard({ onBack }: Props) {
   const [results, setResults] = useState<{ challenge: Challenge; complete: boolean }[]>([]);
   const [timer, setTimer] = useState(msUntilNextWeek());
 
+  function refresh() { setResults(evaluateChallenges()); }
+
   useEffect(() => {
-    setResults(evaluateChallenges());
+    refresh();
     const iv = setInterval(() => setTimer(msUntilNextWeek()), 60000);
     return () => clearInterval(iv);
   }, []);
+
+  function handleMarkDone(id: string) {
+    markChallengeComplete(id);
+    refresh();
+  }
 
   const completed = results.filter(r => r.complete).length;
   const total = results.length;
@@ -109,8 +116,8 @@ export default function BountyBoard({ onBack }: Props) {
                 </div>
               </div>
 
-              {/* Status */}
-              <div style={{ flexShrink: 0 }}>
+              {/* Status / Mark Done */}
+              <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem" }}>
                 {complete ? (
                   <div style={{
                     width: "32px", height: "32px", borderRadius: "50%",
@@ -119,12 +126,28 @@ export default function BountyBoard({ onBack }: Props) {
                     fontSize: "0.85rem", color: "#34D399",
                   }}>✓</div>
                 ) : (
-                  <div style={{
-                    width: "32px", height: "32px", borderRadius: "50%",
-                    background: "rgba(255,255,255,0.03)", border: `1px solid ${rc.border}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "0.7rem", color: rc.text,
-                  }}>○</div>
+                  <>
+                    <div style={{
+                      width: "32px", height: "32px", borderRadius: "50%",
+                      background: "rgba(255,255,255,0.03)", border: `1px solid ${rc.border}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "0.7rem", color: rc.text,
+                    }}>○</div>
+                    <button
+                      onClick={() => handleMarkDone(c.id)}
+                      title="Mark as manually completed"
+                      style={{
+                        background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)",
+                        borderRadius: "6px", padding: "0.2rem 0.45rem", cursor: "pointer",
+                        fontSize: "0.48rem", color: "rgba(245,158,11,0.75)", letterSpacing: "1px",
+                        fontFamily: "'Cinzel', serif", whiteSpace: "nowrap", transition: "all 0.15s",
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(245,158,11,0.2)"; (e.currentTarget as HTMLElement).style.color = "#F59E0B"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(245,158,11,0.1)"; (e.currentTarget as HTMLElement).style.color = "rgba(245,158,11,0.75)"; }}
+                    >
+                      MARK DONE
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -135,8 +158,8 @@ export default function BountyBoard({ onBack }: Props) {
       {/* Footer note */}
       <div style={{ marginTop: "2rem", padding: "1rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", textAlign: "center" }}>
         <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.3)", letterSpacing: "1px", lineHeight: 1.7 }}>
-          Challenges are checked automatically against your archive.<br />
-          Warden's Log &amp; Psychology Report challenges require generating those reports on archived stories.
+          Challenges auto-complete when your archive meets the criteria.<br />
+          Use <span style={{ color: "rgba(245,158,11,0.5)" }}>MARK DONE</span> to manually claim any contract you've earned.
         </div>
       </div>
     </div>

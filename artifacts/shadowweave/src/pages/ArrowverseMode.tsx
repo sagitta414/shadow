@@ -525,21 +525,28 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
     if (step !== "configure") return;
     const archive = getArchive();
     if (archive.length === 0) return;
-    const last = archive[0];
-    if (!last.chapters[0]) return;
+    const CW_TOOLS = ["arrowverse", "arrow", "flash", "cw", "legends", "supergirl"];
+    const cwStories = archive.filter(s =>
+      CW_TOOLS.some(k => s.tool?.toLowerCase().includes(k) || s.universe?.toLowerCase().includes(k) || s.title?.toLowerCase().includes(k))
+    );
+    const showName = selectedSeason?.show === "flash" ? "THE FLASH" : selectedScenario?.show === "flash" ? "THE FLASH" : "ARROW";
+    const seasonVillain = selectedSeason?.episodes[0]?.villain ?? selectedScenario?.villain ?? "";
+    const prior = cwStories.find(s => seasonVillain && (s.characters?.some(c => c.toLowerCase().includes(seasonVillain.toLowerCase().split(" ")[0]))));
+    const source = prior ?? cwStories[0] ?? archive[0];
+    if (!source?.chapters?.[0]) return;
     setPrevOnText(null);
     setPrevOnLoading(true);
     const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
-    const snippet = last.chapters[0].slice(0, 1400);
+    const allChapters = source.chapters.join("\n\n").slice(0, 2000);
     fetch(`${base}/api/story/superhero`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        hero: last.characters[0] ?? "the heroine",
-        villain: last.characters[1] ?? "the villain",
-        setting: "—", stakes: "—", tone: "TV drama", captureMethod: "—",
+        hero: source.characters[0] ?? "the heroine",
+        villain: source.characters[1] ?? "the villain",
+        setting: "—", stakes: "—", tone: "TV drama recap", captureMethod: "—",
         restraints: "—", intensity: "Tense", storyLength: "Micro",
-        details: `You are a TV showrunner writing a 2-sentence "Previously on..." recap. Based on this story excerpt, write exactly two dramatic sentences — the first sets the scene, the second ends on a lingering dread or unresolved tension. No dialogue. Past tense. Maximum impact, minimum words.\n\nSTORY EXCERPT:\n${snippet}`,
+        details: `You are a TV showrunner writing the "Previously on ${showName}..." cold open recap card.\n\nWrite 2–3 tightly-crafted sentences in past tense. Each sentence should feel like a dramatic freeze-frame pulled from the episode. No dialogue, no explanations — just vivid, dread-laced images that leave a viewer holding their breath before the new episode starts. Maximum impact, minimum words.\n\nSOURCE MATERIAL:\n${allChapters}`,
       }),
     })
       .then(r => r.body?.getReader())
@@ -552,7 +559,6 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
           if (done) break;
           raw += dec.decode(value, { stream: true });
         }
-        // Parse SSE chunks: each line is  "data: {"chunk":"…"}"
         const parsed = raw
           .split("\n")
           .filter(line => line.startsWith("data: "))
@@ -563,7 +569,7 @@ export default function ArrowverseMode({ onBack, onContinue }: Props) {
       })
       .catch(() => {})
       .finally(() => setPrevOnLoading(false));
-  }, [step]);
+  }, [step, selectedSeason, selectedScenario]);
 
   function selectScenario(s: Scenario) { setSelectedScenario(s); setStep("configure"); resetStory(); }
   function selectSeason(s: Season) { setSelectedSeason(s); setSeasonStep("episodes"); }

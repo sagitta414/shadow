@@ -9,6 +9,7 @@ import {
   ArchivedStory,
 } from "../lib/archive";
 import { getThreatLevel } from "../lib/threatLevel";
+import { pushToCloud, pullFromCloud, applyCloudData } from "../lib/cloudSave";
 import StoryReader from "../components/StoryReader";
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -82,6 +83,36 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [journalLoading, setJournalLoading] = useState<string | null>(null);
   const [threatLevel] = useState(() => getThreatLevel());
   const [readingStory, setReadingStory] = useState<ArchivedStory | null>(null);
+  const [cloudStatus, setCloudStatus] = useState<"idle" | "saving" | "loading" | "saved" | "loaded" | "error">("idle");
+  const [cloudMsg, setCloudMsg] = useState("");
+
+  async function handleCloudSave() {
+    setCloudStatus("saving"); setCloudMsg("");
+    const result = await pushToCloud();
+    if (result.ok) {
+      setCloudStatus("saved");
+      setCloudMsg(`Saved ${new Date(result.savedAt!).toLocaleTimeString()}`);
+    } else {
+      setCloudStatus("error"); setCloudMsg(result.error ?? "Unknown error");
+    }
+    setTimeout(() => setCloudStatus("idle"), 4000);
+  }
+
+  async function handleCloudLoad() {
+    if (!window.confirm("Load from cloud? This will overwrite your local archive, achievements and streak with the cloud version.")) return;
+    setCloudStatus("loading"); setCloudMsg("");
+    const result = await pullFromCloud();
+    if (!result.data) {
+      setCloudStatus("error"); setCloudMsg("No cloud save found");
+      setTimeout(() => setCloudStatus("idle"), 3000);
+      return;
+    }
+    applyCloudData(result.data as Record<string, unknown>);
+    reload();
+    setCloudStatus("loaded");
+    setCloudMsg(`Restored from ${result.savedAt ? new Date(result.savedAt).toLocaleDateString() : "cloud"}`);
+    setTimeout(() => setCloudStatus("idle"), 4000);
+  }
 
   async function generateWardensLog(story: ArchivedStory) {
     if (logLoading) return;
@@ -836,6 +867,30 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
         <p style={{ fontSize: "0.85rem", color: "rgba(200,200,220,0.45)", letterSpacing: "0.5px" }}>
           {stories.length} {stories.length === 1 ? "story" : "stories"} saved — browse, tag, export
         </p>
+      </div>
+
+      {/* Cloud Save bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.25rem", padding: "0.65rem 1rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "10px", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.55rem", letterSpacing: "3px", color: "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", marginRight: "auto" }}>☁ CLOUD SAVE</span>
+        {cloudMsg && (
+          <span style={{ fontSize: "0.62rem", color: cloudStatus === "error" ? "#FF6060" : cloudStatus === "saved" || cloudStatus === "loaded" ? "#34D399" : "rgba(200,200,220,0.45)", fontFamily: "'Montserrat', sans-serif" }}>
+            {cloudMsg}
+          </span>
+        )}
+        <button
+          onClick={handleCloudSave}
+          disabled={cloudStatus === "saving" || cloudStatus === "loading"}
+          style={{ padding: "0.35rem 0.8rem", borderRadius: "6px", border: "1px solid rgba(52,211,153,0.3)", background: "rgba(52,211,153,0.08)", color: "rgba(52,211,153,0.7)", fontSize: "0.6rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px", cursor: "pointer", transition: "all 0.15s", opacity: cloudStatus === "saving" ? 0.5 : 1 }}
+        >
+          {cloudStatus === "saving" ? "SAVING…" : "SAVE TO CLOUD"}
+        </button>
+        <button
+          onClick={handleCloudLoad}
+          disabled={cloudStatus === "saving" || cloudStatus === "loading"}
+          style={{ padding: "0.35rem 0.8rem", borderRadius: "6px", border: "1px solid rgba(99,102,241,0.3)", background: "rgba(99,102,241,0.08)", color: "rgba(99,102,241,0.7)", fontSize: "0.6rem", fontFamily: "'Cinzel', serif", letterSpacing: "1.5px", cursor: "pointer", transition: "all 0.15s", opacity: cloudStatus === "loading" ? 0.5 : 1 }}
+        >
+          {cloudStatus === "loading" ? "LOADING…" : "RESTORE FROM CLOUD"}
+        </button>
       </div>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>

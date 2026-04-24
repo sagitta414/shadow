@@ -43,9 +43,9 @@ export default function MindBreakMode({ onBack }: Props) {
   const [customHeroine, setCustomHeroine] = useState("");
   const [villain, setVillain] = useState("");
   const [customVillain, setCustomVillain] = useState("");
-  const [setting, setSetting] = useState("");
+  const [settings, setSettings] = useState<string[]>([]);
   const [customSetting, setCustomSetting] = useState("");
-  const [breakingPoint, setBreakingPoint] = useState("");
+  const [breakingPoints, setBreakingPoints] = useState<string[]>([]);
   const [customBreakingPoint, setCustomBreakingPoint] = useState("");
   const [chapters, setChapters] = useState<string[]>([]);
   const [streamingText, setStreamingText] = useState("");
@@ -56,7 +56,7 @@ export default function MindBreakMode({ onBack }: Props) {
   const [error, setError] = useState("");
   const [outfitId, setOutfitId] = useState("");
   const [universalConfig, setUniversalConfig] = useState<UniversalConfig>(UNIVERSAL_DEFAULTS);
-  const [methodFocus, setMethodFocus] = useState("");
+  const [methodFocuses, setMethodFocuses] = useState<string[]>([]);
   const [outfitDamage, setOutfitDamage] = useState(0);
   const [storyLength, setStoryLength] = useState<StoryLength>("standard");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -64,8 +64,8 @@ export default function MindBreakMode({ onBack }: Props) {
 
   const finalHeroine = customHeroine || heroine;
   const finalVillain = customVillain || villain;
-  const finalSetting = customSetting || setting;
-  const finalBreaking = customBreakingPoint || breakingPoint;
+  const finalSetting = customSetting || settings.join(" / ");
+  const finalBreaking = customBreakingPoint || breakingPoints.join(" + ");
 
   const psycheLog: PsycheEvent[] = useMemo(() =>
     chapters.map((_, i) => ({ ...PHASE_PSYCHE[i] ?? PHASE_PSYCHE[PHASE_PSYCHE.length - 1] })),
@@ -87,7 +87,7 @@ export default function MindBreakMode({ onBack }: Props) {
       const resp = await fetch(`${BASE}/api/story/mind-break`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _methodFocusMap: Record<string,string> = {"physical_exhaustion":"Physical Exhaustion","psychological":"Psychological Manipulation","sensory_overload":"Sensory Overload","chemical_assistance":"Chemical Assistance","combined":"Combined / All Methods"}; return [methodFocus ? `Primary Breaking Method: ${_methodFocusMap[methodFocus] ?? methodFocus}` : ""].filter(Boolean).join("\n"); })(), methodFocus, heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
+        body: JSON.stringify({ provider: getAiProvider(), outfitContext: outfitPromptLine(outfitId, outfitDamage), universalContext: universalPromptLines(universalConfig), modeContext: (() => { const _methodFocusMap: Record<string,string> = {"physical_exhaustion":"Physical Exhaustion","psychological":"Psychological Manipulation","sensory_overload":"Sensory Overload","chemical_assistance":"Chemical Assistance","combined":"Combined / All Methods"}; return [methodFocuses.length > 0 ? `Primary Breaking Methods: ${methodFocuses.map(m => _methodFocusMap[m] ?? m).join(", ")}` : ""].filter(Boolean).join("\n"); })(), methodFocus: methodFocuses.join(","), heroine: finalHeroine, villain: finalVillain, setting: finalSetting,
           breakingPoint: finalBreaking, currentPhase: isFirst ? 1 : phase, storyLength, chapters: isFirst ? [] : chapters, continueDir, }),
       });
       const reader = resp.body!.getReader();
@@ -218,16 +218,16 @@ export default function MindBreakMode({ onBack }: Props) {
 
         <Section title="SETTING" rgb={accRgb} acc={acc}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
-            {SETTINGS.map(s => pill(s, setting === s, () => { setSetting(s); setCustomSetting(""); }))}
+            {SETTINGS.map(s => pill(s, settings.includes(s), () => { setSettings(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]); setCustomSetting(""); }))}
           </div>
-          <input value={customSetting} onChange={e => { setCustomSetting(e.target.value); setSetting(""); }} placeholder="Or describe your own setting…" style={inputStyle} />
+          <input value={customSetting} onChange={e => { setCustomSetting(e.target.value); setSettings([]); }} placeholder="Or describe your own setting…" style={inputStyle} />
         </Section>
 
         <Section title="HER BREAKING POINT" rgb={accRgb} acc={acc}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
-            {BREAKING_POINTS.map(b => pill(b, breakingPoint === b, () => { setBreakingPoint(b); setCustomBreakingPoint(""); }))}
+            {BREAKING_POINTS.map(b => pill(b, breakingPoints.includes(b), () => { setBreakingPoints(prev => prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b]); setCustomBreakingPoint(""); }))}
           </div>
-          <input value={customBreakingPoint} onChange={e => { setCustomBreakingPoint(e.target.value); setBreakingPoint(""); }} placeholder="Or describe her specific vulnerability…" style={inputStyle} />
+          <input value={customBreakingPoint} onChange={e => { setCustomBreakingPoint(e.target.value); setBreakingPoints([]); }} placeholder="Or describe her specific vulnerability…" style={inputStyle} />
         </Section>
 
         {error && <div style={{ color: "#FF6060", fontSize: "0.75rem", marginBottom: "1rem" }}>Error: {error}</div>}
@@ -245,7 +245,7 @@ export default function MindBreakMode({ onBack }: Props) {
           <div style={{marginBottom:"0.875rem"}}>
             <div style={{fontSize:"0.57rem",fontFamily:"'Montserrat',sans-serif",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"rgba(200,195,240,0.35)",marginBottom:"0.5rem"}}>PRIMARY BREAKING METHOD</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
-              {[{"id":"physical_exhaustion","icon":"💪","label":"Physical Exhaustion"},{"id":"psychological","icon":"🧠","label":"Psychological Manipulation"},{"id":"sensory_overload","icon":"🌀","label":"Sensory Overload"},{"id":"chemical_assistance","icon":"💉","label":"Chemical Assistance"},{"id":"combined","icon":"⚡","label":"Combined / All Methods"}].map((opt:{id:string;icon:string;label:string}) => (<button key={opt.id} onClick={() => setMethodFocus(methodFocus === opt.id ? "" : opt.id)} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${methodFocus === opt.id ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:methodFocus === opt.id ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:methodFocus === opt.id ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:methodFocus === opt.id ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>))}
+              {[{"id":"physical_exhaustion","icon":"💪","label":"Physical Exhaustion"},{"id":"psychological","icon":"🧠","label":"Psychological Manipulation"},{"id":"sensory_overload","icon":"🌀","label":"Sensory Overload"},{"id":"chemical_assistance","icon":"💉","label":"Chemical Assistance"},{"id":"combined","icon":"⚡","label":"Combined / All Methods"}].map((opt:{id:string;icon:string;label:string}) => { const sel = methodFocuses.includes(opt.id); return (<button key={opt.id} onClick={() => setMethodFocuses(prev => sel ? prev.filter(x=>x!==opt.id) : [...prev, opt.id])} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.4rem 0.8rem",borderRadius:"20px",border:`1px solid ${sel ? "#A78BFA" : "rgba(200,195,240,0.15)"}`,background:sel ? "rgba(167,139,250,0.16)" : "rgba(255,255,255,0.03)",color:sel ? "#A78BFA" : "rgba(200,195,240,0.55)",fontSize:"0.7rem",fontFamily:"'Montserrat',sans-serif",fontWeight:sel ? 700:400,cursor:"pointer",transition:"all 0.18s",minHeight:"36px"}}><span>{opt.icon}</span><span>{opt.label}</span></button>); })}
             </div>
           </div>
           </div>

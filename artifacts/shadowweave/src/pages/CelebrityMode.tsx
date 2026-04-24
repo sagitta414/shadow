@@ -282,9 +282,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
   const [selectedActresses, setSelectedActresses] = useState<typeof ACTRESSES>([]);
   const [captorMode, setCaptorMode] = useState<"solo" | "team">("solo");
   const [captors, setCaptors] = useState<CaptorState[]>([defaultCaptor()]);
-  const [selectedSetting, setSelectedSetting] = useState("");
-  const [selectedEncounter, setSelectedEncounter] = useState("");
-  const [selectedTone, setSelectedTone] = useState("");
+  const [selectedSettings, setSelectedSettings] = useState<string[]>([]);
+  const [selectedEncounters, setSelectedEncounters] = useState<string[]>([]);
+  const [selectedTones, setSelectedTones] = useState<string[]>([]);
   const [selectedLength, setSelectedLength] = useState("standard");
   const [selectedRestraints, setSelectedRestraints] = useState<string[]>([]);
   const [selectedPowerDynamics, setSelectedPowerDynamics] = useState<string[]>([]);
@@ -349,7 +349,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
 
   function canProceed1() { return selectedActresses.length > 0; }
   function canProceed2() { return captors.every(c => c.name.trim()); }
-  function canProceed3() { return !!selectedSetting && !!selectedEncounter && !!selectedTone; }
+  function canProceed3() { return selectedSettings.length > 0 && selectedEncounters.length > 0 && selectedTones.length > 0; }
 
   async function generateStory() {
     setIsGenerating(true);
@@ -358,9 +358,9 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
     try {
       const captorDesc = captors.map(c => `${c.name}: ${c.profile} | Motivation: ${c.motivation} | Methods: ${c.methods.join(", ")}${c.rules ? ` | Rules: ${c.rules}` : ""}`).join(" | AND SECOND CAPTOR: ");
       const actressDesc = selectedActresses.map(a => `${a.name} (known for: ${a.known})`).join(" & ");
-      const settingLabel = SETTINGS.find(s => s.id === selectedSetting)?.label ?? selectedSetting;
-      const encounterLabel = ENCOUNTERS.find(e => e.id === selectedEncounter)?.label ?? selectedEncounter;
-      const toneLabel = TONES.find(t => t.id === selectedTone)?.label ?? selectedTone;
+      const settingLabel = selectedSettings.map(id => SETTINGS.find(s => s.id === id)?.label ?? id).join(", ");
+      const encounterLabel = selectedEncounters.map(id => ENCOUNTERS.find(e => e.id === id)?.label ?? id).join(", ");
+      const toneLabel = selectedTones.map(id => TONES.find(t => t.id === id)?.label ?? id).join(", ");
       const lengthLabel = LENGTHS.find(l => l.id === selectedLength)?.label ?? selectedLength;
 
       const restraintLabel = selectedRestraints.length ? selectedRestraints.map(id => RESTRAINTS.find(r => r.id === id)?.label).filter(Boolean).join(", ") : undefined;
@@ -423,7 +423,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
         chapterNumber: chapters.length + 1,
         actress: actressDesc,
         captor: captorDesc,
-        tone: TONES.find(t => t.id === selectedTone)?.label ?? "",
+        tone: selectedTones.map(id => TONES.find(t => t.id === id)?.label ?? id).join(", "),
         continueDirection: continueDir.trim() || undefined,
       };
       const response = await fetch(`${API}/story/celebrity-continue`, {
@@ -457,8 +457,8 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
 
   function resetAll() {
     setStep(1); setStory(""); setChapters([]); setSelectedActresses([]);
-    setCaptors([defaultCaptor()]); setSelectedSetting(""); setSelectedEncounter("");
-    setSelectedTone(""); setSelectedRestraints([]); setSelectedPowerDynamics([]);
+    setCaptors([defaultCaptor()]); setSelectedSettings([]); setSelectedEncounters([]);
+    setSelectedTones([]); setSelectedRestraints([]); setSelectedPowerDynamics([]);
     setSelectedKinkEscalations([]); setExtraDetails(""); setError(""); setSavedId(null);
   }
 
@@ -792,13 +792,17 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
           <div>
             <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>Setting <span style={{ color: "#FF4060" }}>*</span></label>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "150px" : "220px"}, 1fr))`, gap: "0.5rem" }}>
-              {SETTINGS.map(s => (
-                <button key={s.id} onClick={() => setSelectedSetting(s.id)}
-                  style={{ background: selectedSetting === s.id ? goldBg : cardBg, border: `1px solid ${selectedSetting === s.id ? gold + "66" : border}`, borderRadius: "10px", padding: "0.75rem 1rem", cursor: "pointer", textAlign: "left", color: "inherit", transition: "all 0.18s" }}>
-                  <div style={{ fontSize: "1rem", marginBottom: "0.25rem" }}>{s.icon}</div>
-                  <div style={{ fontSize: "0.68rem", color: selectedSetting === s.id ? gold : "#E8E8F5", fontFamily: "'Cinzel', serif" }}>{s.label}</div>
-                </button>
-              ))}
+              {SETTINGS.map(s => {
+                const sel = selectedSettings.includes(s.id);
+                return (
+                  <button key={s.id} onClick={() => setSelectedSettings(prev => sel ? prev.filter(x=>x!==s.id) : [...prev, s.id])}
+                    style={{ background: sel ? goldBg : cardBg, border: `1px solid ${sel ? gold + "66" : border}`, borderRadius: "10px", padding: "0.75rem 1rem", cursor: "pointer", textAlign: "left", color: "inherit", transition: "all 0.18s", position: "relative" }}>
+                    {sel && <div style={{ position: "absolute", top: "4px", right: "4px", fontSize: "0.5rem", color: gold }}>✓</div>}
+                    <div style={{ fontSize: "1rem", marginBottom: "0.25rem" }}>{s.icon}</div>
+                    <div style={{ fontSize: "0.68rem", color: sel ? gold : "#E8E8F5", fontFamily: "'Cinzel', serif" }}>{s.label}</div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -806,12 +810,15 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
           <div>
             <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>How It Begins <span style={{ color: "#FF4060" }}>*</span></label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-              {ENCOUNTERS.map(e => (
-                <button key={e.id} onClick={() => setSelectedEncounter(e.id)}
-                  style={{ padding: "0.45rem 1rem", background: selectedEncounter === e.id ? goldBg : cardBg, border: `1px solid ${selectedEncounter === e.id ? gold + "66" : border}`, borderRadius: "20px", color: selectedEncounter === e.id ? gold : "rgba(200,200,220,0.45)", fontSize: "0.68rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                  {e.label}
-                </button>
-              ))}
+              {ENCOUNTERS.map(e => {
+                const sel = selectedEncounters.includes(e.id);
+                return (
+                  <button key={e.id} onClick={() => setSelectedEncounters(prev => sel ? prev.filter(x=>x!==e.id) : [...prev, e.id])}
+                    style={{ padding: "0.45rem 1rem", background: sel ? goldBg : cardBg, border: `1px solid ${sel ? gold + "66" : border}`, borderRadius: "20px", color: sel ? gold : "rgba(200,200,220,0.45)", fontSize: "0.68rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                    {e.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -819,12 +826,15 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
           <div>
             <label style={{ fontSize: "0.58rem", color: goldDim, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.75rem" }}>Tone <span style={{ color: "#FF4060" }}>*</span></label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-              {TONES.map(t => (
-                <button key={t.id} onClick={() => setSelectedTone(t.id)}
-                  style={{ padding: "0.45rem 1rem", background: selectedTone === t.id ? goldBg : cardBg, border: `1px solid ${selectedTone === t.id ? gold + "66" : border}`, borderRadius: "20px", color: selectedTone === t.id ? gold : "rgba(200,200,220,0.45)", fontSize: "0.68rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
-                  {t.label}
-                </button>
-              ))}
+              {TONES.map(t => {
+                const sel = selectedTones.includes(t.id);
+                return (
+                  <button key={t.id} onClick={() => setSelectedTones(prev => sel ? prev.filter(x=>x!==t.id) : [...prev, t.id])}
+                    style={{ padding: "0.45rem 1rem", background: sel ? goldBg : cardBg, border: `1px solid ${sel ? gold + "66" : border}`, borderRadius: "20px", color: sel ? gold : "rgba(200,200,220,0.45)", fontSize: "0.68rem", fontFamily: "'Montserrat', sans-serif", cursor: "pointer", transition: "all 0.15s" }}>
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -944,7 +954,7 @@ export default function CelebrityMode({ onBack }: CelebrityModeProps) {
                 {selectedActresses.map(a => a.name).join(" & ")} · {captors.map(c => c.name).join(" & ")}
               </div>
               <div style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif" }}>
-                {SETTINGS.find(s => s.id === selectedSetting)?.label} · {TONES.find(t => t.id === selectedTone)?.label}
+                {selectedSettings.map(id => SETTINGS.find(s => s.id === id)?.label).join(", ")} · {selectedTones.map(id => TONES.find(t => t.id === id)?.label).join(", ")}
               </div>
             </div>
             <button onClick={resetAll} style={{ ...btnStyle, background: "rgba(0,0,0,0.4)", border: `1px solid ${border}`, color: goldDim, padding: "0.5rem 1rem", fontSize: "0.6rem" }}>New Session</button>
