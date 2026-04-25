@@ -81,7 +81,7 @@ export default function StoryArchive({ onBack, onRemix, onContinue }: Props) {
   const [logLoading, setLogLoading] = useState<string | null>(null);
   const [reportLoading, setReportLoading] = useState<string | null>(null);
   const [journalLoading, setJournalLoading] = useState<string | null>(null);
-  const [threatLevel] = useState(() => getThreatLevel());
+  const [threatLevel] = useState(() => { try { return getThreatLevel(); } catch { return null; } });
   const [readingStory, setReadingStory] = useState<ArchivedStory | null>(null);
   const [cloudStatus, setCloudStatus] = useState<"idle" | "saving" | "loading" | "saved" | "loaded" | "error">("idle");
   const [cloudMsg, setCloudMsg] = useState("");

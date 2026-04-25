@@ -27,7 +27,7 @@ const DARK_WORDS = /\b(broken|shattered|surrender|submit|comply|helpless|consume
 
 export function computeThreatScore(): number {
   const stories = getArchive();
-  if (stories.length === 0) return 0;
+  if (!stories || stories.length === 0) return 0;
 
   let score = 0;
 
@@ -35,7 +35,7 @@ export function computeThreatScore(): number {
   score += stories.length * 3;
 
   // Words: every 500 words = 1pt (cap at 30)
-  const totalWords = stories.reduce((s, st) => s + st.wordCount, 0);
+  const totalWords = stories.reduce((s, st) => s + (st.wordCount ?? 0), 0);
   score += Math.min(30, Math.floor(totalWords / 500));
 
   // High ratings: 5-star = +2pts each
@@ -43,7 +43,7 @@ export function computeThreatScore(): number {
 
   // Darkness: dark keyword density
   for (const story of stories) {
-    const text = story.chapters.join(" ");
+    const text = Array.isArray(story.chapters) ? story.chapters.join(" ") : "";
     const matches = text.match(DARK_WORDS) ?? [];
     score += Math.min(4, Math.floor(matches.length / 15));
   }
