@@ -1,72 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import ThemeSwitcher from "./components/ThemeSwitcher";
-import Login from "./pages/Login";
-import AdminPage from "./pages/AdminPage";
-import Homepage from "./pages/Homepage";
-import CharacterParameters from "./pages/CharacterParameters";
-import StoryEditor from "./pages/StoryEditor";
-import CaptorHomepage from "./pages/CaptorHomepage";
-import CaptorConfig from "./pages/CaptorConfig";
-import CaptorSummary from "./pages/CaptorSummary";
-import ScenarioGenerator from "./pages/ScenarioGenerator";
-import InteractiveStory from "./pages/InteractiveStory";
-import CharacterMapper from "./pages/CharacterMapper";
-import SoundingBoard from "./pages/SoundingBoard";
-import CaptorLogic from "./pages/CaptorLogic";
-import SuperheroMode from "./pages/SuperheroMode";
-import InterrogationRoom from "./pages/InterrogationRoom";
-import CelebrityMode from "./pages/CelebrityMode";
-import IntroSequence from "./pages/IntroSequence";
-import StoryArchive from "./pages/StoryArchive";
-import DailyScenarioPage from "./pages/DailyScenarioPage";
-import DailyChronicle from "./pages/DailyChronicle";
-import MindBreakMode from "./pages/MindBreakMode";
-import DualCaptureMode from "./pages/DualCaptureMode";
-import RescueGoneWrongMode from "./pages/RescueGoneWrongMode";
-import PowerDrainMode from "./pages/PowerDrainMode";
-import MassCaptureMode from "./pages/MassCaptureMode";
-import CorruptionArcMode from "./pages/CorruptionArcMode";
-import HeroAuctionMode from "./pages/HeroAuctionMode";
-import TrophyDisplayMode from "./pages/TrophyDisplayMode";
-import ObedienceTrainingMode from "./pages/ObedienceTrainingMode";
-import ShowcaseMode from "./pages/ShowcaseMode";
-import PublicPropertyMode from "./pages/PublicPropertyMode";
-import BettingPoolMode from "./pages/BettingPoolMode";
-import VillainTeamUpMode from "./pages/VillainTeamUpMode";
-import ChainOfCustodyMode from "./pages/ChainOfCustodyMode";
-import LongGameMode from "./pages/LongGameMode";
-import DarkMirrorMode from "./pages/DarkMirrorMode";
-import ArenaMode from "./pages/ArenaMode";
-import TheHandlerMode from "./pages/TheHandlerMode";
-import TimeLoopMode from "./pages/TimeLoopMode";
-import DreamSequenceMode from "./pages/DreamSequenceMode";
-import DirectorMode from "./pages/DirectorMode";
-import EscapeAttemptMode from "./pages/EscapeAttemptMode";
-import NegotiationRoomMode from "./pages/NegotiationRoomMode";
-import FactionMode from "./pages/FactionMode";
-import SlowBurnMode from "./pages/SlowBurnMode";
-import ConfinedSpaceMode from "./pages/ConfinedSpaceMode";
-import VillainInterrogation from "./pages/VillainInterrogation";
-import CivilianCapture from "./pages/CivilianCapture";
-import HeroineImageGen from "./pages/HeroineImageGen";
-import SequelGenerator from "./pages/SequelGenerator";
-import StoryContinuation from "./pages/StoryContinuation";
-import BountyBoard from "./pages/BountyBoard";
-import HeroineLore from "./pages/HeroineLore";
-import ArrowverseMode from "./pages/ArrowverseMode";
-import StoryTimeline from "./pages/StoryTimeline";
-import RewriteCanonMode from "./pages/RewriteCanonMode";
-import SeasonArcMode from "./pages/SeasonArcMode";
-import DarkDossier from "./pages/DarkDossier";
-import CWSpecialistHub from "./pages/CWSpecialistHub";
-import GenericHub from "./pages/GenericHub";
-import StoryArcs from "./pages/StoryArcs";
-import HeroineDossier from "./pages/HeroineDossier";
-import VillainBuilder from "./pages/VillainBuilder";
-import RelationshipMap from "./pages/RelationshipMap";
-import AchievementsPage from "./pages/AchievementsPage";
-import VaultPage from "./pages/VaultPage";
 import AchievementToastManager from "./components/AchievementToast";
 import SessionTimer from "./components/SessionTimer";
 import NightmareOverlay from "./components/NightmareOverlay";
@@ -78,6 +12,84 @@ import { recordModeVisit } from "./lib/recentModes";
 import { DirectorProvider } from "./contexts/DirectorContext";
 import DirectorPanel from "./components/DirectorPanel";
 import { directorStore } from "./lib/directorStore";
+
+// ── Lazy-loaded pages (each becomes its own JS chunk) ────────────────────────
+const Login                = lazy(() => import("./pages/Login"));
+const AdminPage            = lazy(() => import("./pages/AdminPage"));
+const Homepage             = lazy(() => import("./pages/Homepage"));
+const IntroSequence        = lazy(() => import("./pages/IntroSequence"));
+const CharacterParameters  = lazy(() => import("./pages/CharacterParameters"));
+const StoryEditor          = lazy(() => import("./pages/StoryEditor"));
+const CaptorHomepage       = lazy(() => import("./pages/CaptorHomepage"));
+const CaptorConfig         = lazy(() => import("./pages/CaptorConfig"));
+const CaptorSummary        = lazy(() => import("./pages/CaptorSummary"));
+const ScenarioGenerator    = lazy(() => import("./pages/ScenarioGenerator"));
+const InteractiveStory     = lazy(() => import("./pages/InteractiveStory"));
+const CharacterMapper      = lazy(() => import("./pages/CharacterMapper"));
+const SoundingBoard        = lazy(() => import("./pages/SoundingBoard"));
+const CaptorLogic          = lazy(() => import("./pages/CaptorLogic"));
+const SuperheroMode        = lazy(() => import("./pages/SuperheroMode"));
+const InterrogationRoom    = lazy(() => import("./pages/InterrogationRoom"));
+const CelebrityMode        = lazy(() => import("./pages/CelebrityMode"));
+const StoryArchive         = lazy(() => import("./pages/StoryArchive"));
+const DailyScenarioPage    = lazy(() => import("./pages/DailyScenarioPage"));
+const DailyChronicle       = lazy(() => import("./pages/DailyChronicle"));
+const MindBreakMode        = lazy(() => import("./pages/MindBreakMode"));
+const DualCaptureMode      = lazy(() => import("./pages/DualCaptureMode"));
+const RescueGoneWrongMode  = lazy(() => import("./pages/RescueGoneWrongMode"));
+const PowerDrainMode       = lazy(() => import("./pages/PowerDrainMode"));
+const MassCaptureMode      = lazy(() => import("./pages/MassCaptureMode"));
+const CorruptionArcMode    = lazy(() => import("./pages/CorruptionArcMode"));
+const HeroAuctionMode      = lazy(() => import("./pages/HeroAuctionMode"));
+const TrophyDisplayMode    = lazy(() => import("./pages/TrophyDisplayMode"));
+const ObedienceTrainingMode= lazy(() => import("./pages/ObedienceTrainingMode"));
+const ShowcaseMode         = lazy(() => import("./pages/ShowcaseMode"));
+const PublicPropertyMode   = lazy(() => import("./pages/PublicPropertyMode"));
+const BettingPoolMode      = lazy(() => import("./pages/BettingPoolMode"));
+const VillainTeamUpMode    = lazy(() => import("./pages/VillainTeamUpMode"));
+const ChainOfCustodyMode   = lazy(() => import("./pages/ChainOfCustodyMode"));
+const LongGameMode         = lazy(() => import("./pages/LongGameMode"));
+const DarkMirrorMode       = lazy(() => import("./pages/DarkMirrorMode"));
+const ArenaMode            = lazy(() => import("./pages/ArenaMode"));
+const TheHandlerMode       = lazy(() => import("./pages/TheHandlerMode"));
+const TimeLoopMode         = lazy(() => import("./pages/TimeLoopMode"));
+const DreamSequenceMode    = lazy(() => import("./pages/DreamSequenceMode"));
+const DirectorMode         = lazy(() => import("./pages/DirectorMode"));
+const EscapeAttemptMode    = lazy(() => import("./pages/EscapeAttemptMode"));
+const NegotiationRoomMode  = lazy(() => import("./pages/NegotiationRoomMode"));
+const FactionMode          = lazy(() => import("./pages/FactionMode"));
+const SlowBurnMode         = lazy(() => import("./pages/SlowBurnMode"));
+const ConfinedSpaceMode    = lazy(() => import("./pages/ConfinedSpaceMode"));
+const VillainInterrogation = lazy(() => import("./pages/VillainInterrogation"));
+const CivilianCapture      = lazy(() => import("./pages/CivilianCapture"));
+const HeroineImageGen      = lazy(() => import("./pages/HeroineImageGen"));
+const SequelGenerator      = lazy(() => import("./pages/SequelGenerator"));
+const StoryContinuation    = lazy(() => import("./pages/StoryContinuation"));
+const BountyBoard          = lazy(() => import("./pages/BountyBoard"));
+const HeroineLore          = lazy(() => import("./pages/HeroineLore"));
+const ArrowverseMode       = lazy(() => import("./pages/ArrowverseMode"));
+const StoryTimeline        = lazy(() => import("./pages/StoryTimeline"));
+const RewriteCanonMode     = lazy(() => import("./pages/RewriteCanonMode"));
+const SeasonArcMode        = lazy(() => import("./pages/SeasonArcMode"));
+const DarkDossier          = lazy(() => import("./pages/DarkDossier"));
+const CWSpecialistHub      = lazy(() => import("./pages/CWSpecialistHub"));
+const GenericHub           = lazy(() => import("./pages/GenericHub"));
+const StoryArcs            = lazy(() => import("./pages/StoryArcs"));
+const HeroineDossier       = lazy(() => import("./pages/HeroineDossier"));
+const VillainBuilder       = lazy(() => import("./pages/VillainBuilder"));
+const RelationshipMap      = lazy(() => import("./pages/RelationshipMap"));
+const AchievementsPage     = lazy(() => import("./pages/AchievementsPage"));
+const VaultPage            = lazy(() => import("./pages/VaultPage"));
+
+function PageLoader() {
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "#020008", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ width: "36px", height: "36px", borderRadius: "50%", border: "2px solid rgba(168,85,247,0.15)", borderTop: "2px solid #A855F7", animation: "spin 0.9s linear infinite" }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", letterSpacing: "4px", color: "rgba(168,85,247,0.45)" }}>LOADING</div>
+    </div>
+  );
+}
 
 type Page =
   | "login"
@@ -714,7 +726,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <DirectorProvider>
-        <AppInner />
+        <Suspense fallback={<PageLoader />}>
+          <AppInner />
+        </Suspense>
       </DirectorProvider>
     </ThemeProvider>
   );
