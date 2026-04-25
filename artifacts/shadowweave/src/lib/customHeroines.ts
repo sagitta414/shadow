@@ -11,8 +11,12 @@ export interface CustomHeroine {
 const KEY = "sw_custom_heroines_v1";
 
 export function getCustomHeroines(): CustomHeroine[] {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  catch { return []; }
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
 
 export function saveCustomHeroine(h: Omit<CustomHeroine, "id" | "createdAt">): CustomHeroine {

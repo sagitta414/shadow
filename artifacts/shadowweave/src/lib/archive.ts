@@ -139,7 +139,10 @@ const DAILY_KEY = "sw_daily_archive_v1";
 
 export function getDailyArchive(): DailyEntry[] {
   try {
-    return JSON.parse(localStorage.getItem(DAILY_KEY) || "[]");
+    const raw = localStorage.getItem(DAILY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

@@ -880,13 +880,21 @@ export const ACHIEVEMENTS: Achievement[] = [
 // ── STORAGE ───────────────────────────────────────────────────────────────────
 
 export function getUnlockedAchievements(): UnlockedAchievement[] {
-  try { return JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || "[]"); }
-  catch { return []; }
+  try {
+    const raw = localStorage.getItem(ACHIEVEMENTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
 
 export function getCompletedModes(): string[] {
-  try { return JSON.parse(localStorage.getItem(MODE_COMPLETIONS_KEY) || "[]"); }
-  catch { return []; }
+  try {
+    const raw = localStorage.getItem(MODE_COMPLETIONS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
 
 export function recordModeCompletion(toolName: string): void {
@@ -913,7 +921,7 @@ export function getUnlockCount(): number {
 
 function computeState(): AchievementCheckState {
   let archive: any[] = [];
-  try { archive = JSON.parse(localStorage.getItem("sw_archive_v1") || "[]"); } catch {}
+  try { const _p = JSON.parse(localStorage.getItem("sw_archive_v1") || "null"); if (Array.isArray(_p)) archive = _p; } catch {}
 
   let streakCount = 0;
   try {
@@ -1032,7 +1040,7 @@ export function checkAndUnlockAchievements(): Achievement[] {
 
   // Weekly mode diversity
   let archive: any[] = [];
-  try { archive = JSON.parse(localStorage.getItem("sw_archive_v1") || "[]"); } catch {}
+  try { const _p = JSON.parse(localStorage.getItem("sw_archive_v1") || "null"); if (Array.isArray(_p)) archive = _p; } catch {}
   const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recentModes = new Set<string>();
   for (const s of archive) {

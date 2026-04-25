@@ -52,7 +52,10 @@ export function recordModeVisit(page: string): void {
 
 export function getRecentModes(): RecentMode[] {
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

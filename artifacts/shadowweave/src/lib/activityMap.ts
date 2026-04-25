@@ -1,7 +1,7 @@
 // Returns a Set of "YYYY-MM-DD" date keys where at least one story was saved
 export function getWritingActivitySet(days = 91): Set<string> {
   let archive: any[] = [];
-  try { archive = JSON.parse(localStorage.getItem("sw_archive_v1") || "[]"); } catch {}
+  try { const _p = JSON.parse(localStorage.getItem("sw_archive_v1") || "null"); if (Array.isArray(_p)) archive = _p; } catch {}
 
   const active = new Set<string>();
   const cutoff = Date.now() - days * 86_400_000;

@@ -19,7 +19,12 @@ export interface ChallengeState {
 const STATE_KEY = "sw_bounty_v1";
 
 export function getBountyState(): ChallengeState[] {
-  try { return JSON.parse(localStorage.getItem(STATE_KEY) || "[]"); } catch { return []; }
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
 
 export function markChallengeComplete(id: string) {

@@ -36,7 +36,12 @@ const PERKS_BY_LEVEL = [
 ];
 
 function readAll(): Record<string, MasteryRecord> {
-  try { return JSON.parse(localStorage.getItem(MASTERY_KEY) || "{}"); } catch { return {}; }
+  try {
+    const raw = localStorage.getItem(MASTERY_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === "object" && !Array.isArray(parsed)) ? parsed : {};
+  } catch { return {}; }
 }
 
 function writeAll(data: Record<string, MasteryRecord>) {

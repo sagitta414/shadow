@@ -34,7 +34,7 @@ export interface VillainStat {
 
 export function getVillainAppearances(): Map<string, number> {
   let archive: any[] = [];
-  try { archive = JSON.parse(localStorage.getItem("sw_archive_v1") || "[]"); } catch {}
+  try { const _p = JSON.parse(localStorage.getItem("sw_archive_v1") || "null"); if (Array.isArray(_p)) archive = _p; } catch {}
 
   const counts = new Map<string, number>();
   for (const story of archive) {
