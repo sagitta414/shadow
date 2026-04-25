@@ -7,7 +7,12 @@ interface Props { onBack: () => void; }
 
 const NOTES_KEY = "sw_dossier_notes_v1";
 function getNotes(): Record<string, string> {
-  try { return JSON.parse(localStorage.getItem(NOTES_KEY) ?? "{}"); } catch { return {}; }
+  try {
+    const raw = localStorage.getItem(NOTES_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === "object" && !Array.isArray(parsed)) ? parsed : {};
+  } catch { return {}; }
 }
 function saveNote(heroine: string, note: string) {
   const n = getNotes(); n[heroine] = note;

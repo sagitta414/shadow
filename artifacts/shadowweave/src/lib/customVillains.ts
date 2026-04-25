@@ -25,7 +25,12 @@ export const VILLAIN_FACTIONS = [
 ];
 
 export function getCustomVillains(): CustomVillain[] {
-  try { return JSON.parse(localStorage.getItem(KEY) ?? "[]"); } catch { return []; }
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
 
 export function saveCustomVillain(v: CustomVillain): void {

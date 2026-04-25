@@ -19,7 +19,12 @@ export interface HeroineLoreRecord {
 const KEY = "sw_heroine_lore_v2";
 
 function load(): Record<string, HeroineLoreRecord> {
-  try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; }
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === "object" && !Array.isArray(parsed)) ? parsed : {};
+  } catch { return {}; }
 }
 
 function save(data: Record<string, HeroineLoreRecord>) {

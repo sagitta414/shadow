@@ -125,7 +125,10 @@ export function spendKeysToUnlock(modeTitle: string, cost: number): SpendResult 
   localStorage.setItem(SPENT_KEY, JSON.stringify(cur));
   // Persist unlock
   let map: Record<string, number> = {};
-  try { map = JSON.parse(localStorage.getItem(UNLOCKS_KEY) || "{}"); } catch {}
+  try {
+    const _pm = JSON.parse(localStorage.getItem(UNLOCKS_KEY) || "null");
+    if (_pm && typeof _pm === "object" && !Array.isArray(_pm)) map = _pm;
+  } catch {}
   map[modeTitle] = Date.now();
   localStorage.setItem(UNLOCKS_KEY, JSON.stringify(map));
   return { ok: true };

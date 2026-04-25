@@ -444,7 +444,12 @@ function isAbort(e: unknown) { return e instanceof DOMException && e.name === "A
 
 const PROGRESS_KEY = "sw_arrowverse_progress";
 function loadProgress(): Record<string, boolean> {
-  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? "{}"); } catch { return {}; }
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === "object" && !Array.isArray(parsed)) ? parsed : {};
+  } catch { return {}; }
 }
 function markEpisodeDone(seasonId: string, epNum: number) {
   const p = loadProgress();

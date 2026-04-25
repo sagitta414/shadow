@@ -724,7 +724,12 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
   // ── New Features ──
   const [favorites, setFavorites] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem("sw_favorites_v1") ?? "[]"); } catch { return []; }
+    try {
+      const raw = localStorage.getItem("sw_favorites_v1");
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
   });
   const [loreHero, setLoreHero] = useState<{ name: string; alias: string; power: string; icon: string; universe: string } | null>(null);
   const [intensity, setIntensity] = useState<1 | 2 | 3>(() => {
