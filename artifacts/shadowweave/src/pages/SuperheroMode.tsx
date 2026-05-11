@@ -1361,6 +1361,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       ══════════════════════════════════════════════════════ */}
       {step === 1 && (
         <div>
+          {/* Step 1 section header */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.25rem" }}>
+            <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #DC143C, transparent)", boxShadow: "0 0 14px rgba(220,20,60,0.85)", flexShrink: 0 }} />
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#DC143C", textTransform: "uppercase", fontWeight: 700 }}>Select Your Target</div>
+            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(220,20,60,0.35), transparent)" }} />
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Choose up to 3 — every one breakable</div>
+          </div>
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "auto", overflowY: "hidden", width: isMobile ? "100%" : undefined, flexShrink: 0 }}>
@@ -1377,7 +1384,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search heroes…"
                 style={{ width: "100%", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "0.6rem 1rem 0.6rem 2.25rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,184,0,0.4)")}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(220,20,60,0.5)")}
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
               />
             </div>
@@ -1575,6 +1582,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       ══════════════════════════════════════════════════════ */}
       {step === 2 && (
         <div>
+          {/* Step 2 section header */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.5rem" }}>
+            <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 14px rgba(255,64,96,0.85)", flexShrink: 0 }} />
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>Choose the Captor</div>
+            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.35), transparent)" }} />
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Who owns her now</div>
+          </div>
           {/* Solo / Duo toggle */}
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", alignItems: "center" }}>
             <div style={{ display: "flex", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", overflow: "hidden" }}>
@@ -1788,9 +1802,22 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       {step === 3 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
 
+          {/* Step 3 section header */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+            <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #A855F7, transparent)", boxShadow: "0 0 14px rgba(168,85,247,0.85)", flexShrink: 0 }} />
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#A855F7", textTransform: "uppercase", fontWeight: 700 }}>Configure the Fall</div>
+            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.35), transparent)" }} />
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Set the conditions of her breaking</div>
+          </div>
+
           {/* Setting */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Where She's Taken</div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.45), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FFB800, transparent)", boxShadow: "0 0 12px rgba(255,184,0,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FFB800", textTransform: "uppercase", fontWeight: 700 }}>Where She's Taken</div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {SETTINGS.map((s) => {
                 const isSel = selectedSettings.includes(s.id);
@@ -1809,8 +1836,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Stakes */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What She Stands to Lose</div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 12px rgba(255,64,96,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>What She Surrenders</div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {STAKES.map((s) => {
                 const isSel = selectedStakes.includes(s.id);
@@ -1828,8 +1860,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Intensity Slider */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How Far She Falls</div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 12px rgba(255,64,96,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>How Deep She Breaks</div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "flex", gap: "0.625rem" }}>
               {([
                 { val: 1 as const, label: "Tense", icon: "🌩", desc: "Charged atmosphere, power exchange, psychological dominance" },
@@ -1850,8 +1887,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Story Tone */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How It Unfolds <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(96,160,255,0.4), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #60A0FF, transparent)", boxShadow: "0 0 12px rgba(96,160,255,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#60A0FF", textTransform: "uppercase", fontWeight: 700 }}>How It Unfolds <span style={{ color: "rgba(200,200,220,0.22)", fontWeight: 400, fontSize: "0.35rem" }}>(optional)</span></div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(96,160,255,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {TONES.map((t) => {
                 const isSel = storyTones.includes(t.id);
@@ -2011,8 +2053,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           })()}
 
           {/* Villain's Capture Method */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How He Takes Her <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 12px rgba(255,64,96,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>How He Claims Her <span style={{ color: "rgba(200,200,220,0.22)", fontWeight: 400, fontSize: "0.35rem" }}>(optional)</span></div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
               {CAPTURE_METHODS.map((cm) => {
                 const isSel = captureMethod === cm.id;
@@ -2033,8 +2080,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Hero's Current State */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Her Condition When Taken <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.45), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FFB800, transparent)", boxShadow: "0 0 12px rgba(255,184,0,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FFB800", textTransform: "uppercase", fontWeight: 700 }}>Her State When Taken <span style={{ color: "rgba(200,200,220,0.22)", fontWeight: 400, fontSize: "0.35rem" }}>(optional)</span></div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {HERO_STATES.map((hs) => {
                 const isSel = heroState === hs.id;
@@ -2051,8 +2103,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Mission Context */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What She Was Doing When He Struck <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(96,160,255,0.4), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #60A0FF, transparent)", boxShadow: "0 0 12px rgba(96,160,255,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#60A0FF", textTransform: "uppercase", fontWeight: 700 }}>What She Was Doing When He Struck <span style={{ color: "rgba(200,200,220,0.22)", fontWeight: 400, fontSize: "0.35rem" }}>(optional)</span></div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(96,160,255,0.3), transparent)" }} />
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
               {MISSION_CONTEXTS.map((mc) => {
                 const isSel = missionContext === mc.id;
@@ -2073,9 +2130,14 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Restraints & Equipment */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(160,0,80,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#E040A0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.375rem" }}>Restraints &amp; Containment Gear <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional — pick any)</span></div>
-            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem" }}>Specify how the villain restrains and contains the hero's power during captivity.</p>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(224,64,160,0.18)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(224,64,160,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.8rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #E040A0, transparent)", boxShadow: "0 0 12px rgba(224,64,160,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#E040A0", textTransform: "uppercase", fontWeight: 700 }}>Restraints &amp; Containment Gear <span style={{ color: "rgba(200,200,220,0.22)", fontWeight: 400, fontSize: "0.35rem" }}>(optional)</span></div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(224,64,160,0.3), transparent)" }} />
+            </div>
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1rem" }}>Specify how the villain restrains and strips the hero's power during captivity.</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: "0.5rem", marginBottom: "1rem" }}>
               {RESTRAINTS.map((r) => {
                 const isSel = selectedRestraints.includes(r.id);
@@ -2100,13 +2162,16 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* ── DYNAMIC POWER DEGRADATION SYSTEM ── */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,100,0,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.3rem" }}>
-              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF6400", letterSpacing: "2.5px", textTransform: "uppercase" }}>⚡ Watch Her Power Drain Away</div>
-              <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(255,100,0,0.18)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,100,0,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.7rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF6400, transparent)", boxShadow: "0 0 12px rgba(255,100,0,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF6400", textTransform: "uppercase", fontWeight: 700 }}>Watch Her Power Drain Away</div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,100,0,0.3), transparent)" }} />
+              <span style={{ fontSize: "0.32rem", color: "rgba(200,200,220,0.22)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>optional</span>
             </div>
-            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
-              Define how the hero's powers progressively fade during captivity — tied to restraint choices for emergent storytelling.
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
+              Define how her powers progressively fail during captivity — each stage unlocks darker narrative choices.
             </p>
 
             {/* Degradation Rate Slider */}
@@ -2158,13 +2223,16 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* ── TRAUMA RESONANCE METER ── */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(180,0,60,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.3rem" }}>
-              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF2060", letterSpacing: "2.5px", textTransform: "uppercase" }}>💗 Trauma Resonance Meter</div>
-              <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(180,0,60,0.18)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,32,96,0.5), transparent)", borderRadius: "inherit" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.7rem" }}>
+              <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF2060, transparent)", boxShadow: "0 0 12px rgba(255,32,96,0.75)", flexShrink: 0 }} />
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF2060", textTransform: "uppercase", fontWeight: 700 }}>Trauma Resonance Meter</div>
+              <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,32,96,0.3), transparent)" }} />
+              <span style={{ fontSize: "0.32rem", color: "rgba(200,200,220,0.22)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>optional</span>
             </div>
-            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
-              Track the hero's psychological state. Each mode unlocks different narrative paths and AI writing choices.
+            <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
+              Track her psychological unraveling. Each stage unlocks darker narrative paths and forces the AI to write her collapse in full.
             </p>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.25rem" }}>
@@ -2362,7 +2430,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Special weapons */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#C060E0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Special Weapons / Power Elements <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional — pick any)</span></div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {WEAPONS.map((w) => {
@@ -2418,7 +2486,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           })()}
 
           {/* Story Length */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
             <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#D4AF37", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Length</div>
             <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
               {STORY_LENGTHS.map((sl) => {
@@ -2438,7 +2506,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           </div>
 
           {/* Extra details */}
-          <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
+          <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
             <label style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.35)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", display: "block", marginBottom: "0.5rem" }}>Additional Story Details <span style={{ color: "rgba(200,200,220,0.2)", fontWeight: 400 }}>(optional)</span></label>
             <textarea value={extraDetails} onChange={(e) => setExtraDetails(e.target.value)} placeholder="Any specific plot twists, character backstory, team members, specific scenes, or anything else you want included…" rows={3} style={{ width: "100%", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.75rem 1rem", color: "#E8E8F5", fontFamily: "'Raleway', sans-serif", fontSize: "0.9rem", lineHeight: 1.65, outline: "none", resize: "vertical", boxSizing: "border-box" }}
               onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,184,0,0.35)")}
