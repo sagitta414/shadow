@@ -1228,7 +1228,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.55rem" }}>
               <div style={{ width: "4px", height: "20px", borderRadius: "2px", background: "linear-gradient(to bottom, #DC143C, #A855F7)", boxShadow: "0 0 14px rgba(220,20,60,0.7)" }} />
-              <div style={{ padding: "0.22rem 0.75rem", background: "rgba(220,20,60,0.12)", border: "1px solid rgba(220,20,60,0.38)", borderRadius: "20px", fontSize: "0.3rem", color: "rgba(248,113,113,0.85)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "3px", textTransform: "uppercase", fontWeight: 700 }}>
+              <div style={{ padding: "0.22rem 0.75rem", background: "rgba(220,20,60,0.12)", border: "1px solid rgba(220,20,60,0.38)", borderRadius: "20px", fontSize: "0.6rem", color: "rgba(248,113,113,0.85)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>
                 ⚔ Heroine Forge · 210+ Targets
               </div>
             </div>
@@ -1249,18 +1249,18 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         {selectedHeroes.length > 0 && (
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.6rem 1rem", borderRadius: "10px", background: "rgba(4,1,12,0.8)", border: "1px solid rgba(220,20,60,0.12)", backdropFilter: "blur(16px)", flexWrap: "wrap" }}>
             <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 8px rgba(220,20,60,0.9)", flexShrink: 0 }} />
-            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.32rem", letterSpacing: "3px", color: "rgba(248,113,113,0.45)", textTransform: "uppercase" }}>Claimed</span>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "3px", color: "rgba(248,113,113,0.45)", textTransform: "uppercase" }}>Claimed</span>
             {selectedHeroes.map(h => (
               <span key={h.name} style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(248,200,200,0.85)", letterSpacing: "0.05em" }}>{h.name}</span>
             ))}
             {selectedVillain && (
               <>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(220,20,60,0.3)", textTransform: "uppercase", marginLeft: "0.25rem" }}>vs</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "2px", color: "rgba(220,20,60,0.45)", textTransform: "uppercase", marginLeft: "0.25rem" }}>vs</span>
                 <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(239,68,68,0.75)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
               </>
             )}
-            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.28rem", color: "rgba(239,68,68,0.5)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
-            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.28rem", color: "rgba(255,128,48,0.45)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
+            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.58rem", color: "rgba(239,68,68,0.6)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
+            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.58rem", color: "rgba(255,128,48,0.6)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
           </div>
         )}
       </div>
