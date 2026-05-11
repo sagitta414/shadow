@@ -1218,30 +1218,55 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     });
   }
 
-  const stepLabels = ["Choose Hero", "Choose Villain", "Scenario", "Story"];
+  const stepLabels = ["Select Target", "Choose Captor", "Configure the Fall", "The Story"];
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh" }}>
       {/* ── Header ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: isMobile ? "1rem" : "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", marginBottom: "0.5rem" }}>
-            <div style={{ padding: "0.25rem 0.75rem", background: "linear-gradient(135deg, rgba(255,180,0,0.2), rgba(255,80,0,0.15))", border: "1px solid rgba(255,180,0,0.4)", borderRadius: "20px", fontSize: "0.65rem", color: "#FFB800", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase" }}>
-              ⚡ Superhero Mode
+      <div style={{ marginBottom: isMobile ? "1.25rem" : "2rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1.1rem" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.55rem" }}>
+              <div style={{ width: "4px", height: "20px", borderRadius: "2px", background: "linear-gradient(to bottom, #DC143C, #A855F7)", boxShadow: "0 0 14px rgba(220,20,60,0.7)" }} />
+              <div style={{ padding: "0.22rem 0.75rem", background: "rgba(220,20,60,0.12)", border: "1px solid rgba(220,20,60,0.38)", borderRadius: "20px", fontSize: "0.3rem", color: "rgba(248,113,113,0.85)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "3px", textTransform: "uppercase", fontWeight: 700 }}>
+                ⚔ Heroine Forge · 210+ Targets
+              </div>
+            </div>
+            <h1 className="font-cinzel" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900, background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 25%, #DC143C 55%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", letterSpacing: "4px", lineHeight: 1, marginBottom: "0.4rem" }}>
+              HEROINE FORGE
+            </h1>
+            <div style={{ fontSize: "0.65rem", color: "rgba(200,190,240,0.38)", fontFamily: "'Raleway', sans-serif", letterSpacing: "0.08em" }}>
+              210+ targets. Every one breakable. You choose how.
             </div>
           </div>
-          <h1 className="font-cinzel" style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900, background: "linear-gradient(135deg, #FFB800 0%, #FF6B00 40%, #FF0080 80%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", letterSpacing: "3px" }}>
-            HERO STORY FORGE
-          </h1>
+          <button onClick={onBack} style={{ background: "none", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.5rem 1rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", flexShrink: 0 }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.75)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.35)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+          >← Back</button>
         </div>
-        <button onClick={onBack} style={{ background: "none", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.5rem 1rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", flexShrink: 0 }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(200,200,220,0.8)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(200,200,220,0.4)")}
-        >← Back to Studio</button>
+
+        {/* Selection summary bar — shows across all steps after step 1 */}
+        {selectedHeroes.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.6rem 1rem", borderRadius: "10px", background: "rgba(4,1,12,0.8)", border: "1px solid rgba(220,20,60,0.12)", backdropFilter: "blur(16px)", flexWrap: "wrap" }}>
+            <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 8px rgba(220,20,60,0.9)", flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.32rem", letterSpacing: "3px", color: "rgba(248,113,113,0.45)", textTransform: "uppercase" }}>Claimed</span>
+            {selectedHeroes.map(h => (
+              <span key={h.name} style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(248,200,200,0.85)", letterSpacing: "0.05em" }}>{h.name}</span>
+            ))}
+            {selectedVillain && (
+              <>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(220,20,60,0.3)", textTransform: "uppercase", marginLeft: "0.25rem" }}>vs</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(239,68,68,0.75)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
+              </>
+            )}
+            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.28rem", color: "rgba(239,68,68,0.5)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
+            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.28rem", color: "rgba(255,128,48,0.45)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
+          </div>
+        )}
       </div>
 
       {/* ── Step Progress ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: isMobile ? "1.25rem" : "2.5rem", background: "rgba(0,0,0,0.4)", borderRadius: "12px", padding: "0.5rem", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: isMobile ? "1.25rem" : "2rem", background: "rgba(3,0,10,0.75)", borderRadius: "12px", padding: "0.45rem", border: "1px solid rgba(220,20,60,0.08)", backdropFilter: "blur(20px)" }}>
         {stepLabels.map((label, i) => {
           const num = i + 1 as Step;
           const isActive = step === num;
@@ -1249,46 +1274,44 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           const canCurrentProceed = step === 1 ? canProceedStep1() : step === 2 ? canProceedStep2() : step === 3 ? canProceedStep3() : false;
           const isNext = num === step + 1 && canCurrentProceed;
           const isClickable = isDone || isNext;
+          const activeGrad = "linear-gradient(135deg, rgba(220,20,60,0.22), rgba(168,85,247,0.15))";
+          const activeBorder = "rgba(220,20,60,0.5)";
+          const nextGrad = "rgba(220,20,60,0.06)";
+          const nextBorder = "rgba(220,20,60,0.2)";
           return (
             <div key={num} style={{ flex: 1, display: "flex", alignItems: "center" }}>
               <button
-                onClick={() => {
-                  if (isDone) { setStep(num); }
-                  else if (isNext) { setStep(num); }
-                }}
+                onClick={() => { if (isDone) setStep(num); else if (isNext) setStep(num); }}
                 disabled={!isClickable}
                 style={{
-                  flex: 1,
-                  padding: "0.625rem 0.5rem",
-                  background: isActive
-                    ? "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,107,0,0.15))"
-                    : isNext
-                      ? "rgba(255,184,0,0.06)"
-                      : "transparent",
-                  border: `1px solid ${isActive ? "rgba(255,184,0,0.45)" : isNext ? "rgba(255,184,0,0.18)" : "transparent"}`,
-                  borderRadius: "8px",
-                  cursor: isClickable ? "pointer" : "default",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  justifyContent: "center",
-                  transition: "all 0.25s ease",
-                  color: "inherit",
+                  flex: 1, padding: "0.6rem 0.5rem",
+                  background: isActive ? activeGrad : isNext ? nextGrad : "transparent",
+                  border: `1px solid ${isActive ? activeBorder : isNext ? nextBorder : "transparent"}`,
+                  borderRadius: "8px", cursor: isClickable ? "pointer" : "default",
+                  display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center",
+                  transition: "all 0.25s ease", color: "inherit",
+                  boxShadow: isActive ? "0 0 18px rgba(220,20,60,0.18)" : "none",
                 }}
-                onMouseEnter={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(255,184,0,0.12)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.35)"; } }}
-                onMouseLeave={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(255,184,0,0.06)"; e.currentTarget.style.borderColor = "rgba(255,184,0,0.18)"; } }}
+                onMouseEnter={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(220,20,60,0.12)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.38)"; } }}
+                onMouseLeave={(e) => { if (isNext) { e.currentTarget.style.background = nextGrad; e.currentTarget.style.borderColor = nextBorder; } }}
               >
-                <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: isActive ? "rgba(255,184,0,0.3)" : isDone ? "rgba(0,200,100,0.25)" : isNext ? "rgba(255,184,0,0.15)" : "rgba(255,255,255,0.05)", border: `1px solid ${isActive ? "rgba(255,184,0,0.6)" : isDone ? "rgba(0,200,100,0.5)" : isNext ? "rgba(255,184,0,0.4)" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", flexShrink: 0 }}>
-                  {isDone ? <span style={{ color: "#00C870" }}>✓</span> : <span style={{ color: isActive ? "#FFB800" : isNext ? "rgba(255,184,0,0.7)" : "rgba(200,200,220,0.3)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.65rem" }}>{num}</span>}
+                <div style={{
+                  width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0,
+                  background: isActive ? "rgba(220,20,60,0.3)" : isDone ? "rgba(34,197,94,0.22)" : isNext ? "rgba(220,20,60,0.12)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${isActive ? "rgba(220,20,60,0.65)" : isDone ? "rgba(34,197,94,0.5)" : isNext ? "rgba(220,20,60,0.38)" : "rgba(255,255,255,0.08)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.62rem",
+                  boxShadow: isActive ? "0 0 10px rgba(220,20,60,0.5)" : "none",
+                }}>
+                  {isDone ? <span style={{ color: "#22C55E" }}>✓</span> : <span style={{ color: isActive ? "#F87171" : isNext ? "rgba(248,113,113,0.65)" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.62rem" }}>{num}</span>}
                 </div>
                 {!isMobile && (
-                  <span className="font-cinzel" style={{ fontSize: "0.65rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#FFB800" : isDone ? "#00C870" : isNext ? "rgba(255,184,0,0.6)" : "rgba(200,200,220,0.3)", whiteSpace: "nowrap" }}>
+                  <span className="font-cinzel" style={{ fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#F87171" : isDone ? "#22C55E" : isNext ? "rgba(248,113,113,0.55)" : "rgba(200,200,220,0.25)", whiteSpace: "nowrap", textShadow: isActive ? "0 0 16px rgba(220,20,60,0.6)" : "none" }}>
                     {label}
                   </span>
                 )}
               </button>
               {i < stepLabels.length - 1 && (
-                <div style={{ width: "20px", height: "1px", background: isDone && step > num + 1 ? "rgba(0,200,100,0.4)" : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
+                <div style={{ width: "16px", height: "1px", background: isDone ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.06)", flexShrink: 0 }} />
               )}
             </div>
           );
@@ -1336,9 +1359,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Selected heroines chips */}
           {selectedHeroes.length > 0 && (
-            <div style={{ marginBottom: "1.25rem", padding: "0.875rem 1.25rem", background: "linear-gradient(135deg, rgba(255,184,0,0.07), rgba(255,107,0,0.05))", border: "1px solid rgba(255,184,0,0.3)", borderRadius: "12px" }}>
-              <div className="font-montserrat" style={{ fontSize: "0.55rem", letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,184,0,0.55)", marginBottom: "0.6rem", fontWeight: 700 }}>
-                {selectedHeroes.length} Heroine{selectedHeroes.length !== 1 ? "s" : ""} Selected
+            <div style={{ marginBottom: "1.25rem", padding: "0.875rem 1.25rem", background: "linear-gradient(135deg, rgba(220,20,60,0.09), rgba(168,85,247,0.06))", border: "1px solid rgba(220,20,60,0.28)", borderRadius: "12px" }}>
+              <div className="font-montserrat" style={{ fontSize: "0.52rem", letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(248,113,113,0.55)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                {selectedHeroes.length === 1 ? "⚔ Target Claimed" : `⚔ ${selectedHeroes.length} Targets Claimed`}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 {selectedHeroes.map((h) => {
@@ -1477,11 +1500,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <button
               onClick={() => canProceedStep1() && setStep(2)}
               disabled={!canProceedStep1()}
-              style={{ padding: "0.875rem 2.5rem", background: canProceedStep1() ? "linear-gradient(135deg, rgba(255,184,0,0.25), rgba(255,107,0,0.2))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep1() ? "rgba(255,184,0,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep1() ? "#FFB800" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep1() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep1() ? "0 4px 20px rgba(255,184,0,0.2)" : "none" }}
-              onMouseEnter={(e) => { if (canProceedStep1()) e.currentTarget.style.boxShadow = "0 8px 30px rgba(255,184,0,0.35)"; }}
-              onMouseLeave={(e) => { if (canProceedStep1()) e.currentTarget.style.boxShadow = "0 4px 20px rgba(255,184,0,0.2)"; }}
+              style={{ padding: "0.875rem 2.5rem", background: canProceedStep1() ? "linear-gradient(135deg, rgba(220,20,60,0.28), rgba(168,85,247,0.18))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep1() ? "rgba(220,20,60,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep1() ? "#F87171" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep1() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep1() ? "0 4px 24px rgba(220,20,60,0.25)" : "none" }}
+              onMouseEnter={(e) => { if (canProceedStep1()) { e.currentTarget.style.boxShadow = "0 8px 36px rgba(220,20,60,0.42)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.38), rgba(168,85,247,0.25))"; } }}
+              onMouseLeave={(e) => { if (canProceedStep1()) { e.currentTarget.style.boxShadow = "0 4px 24px rgba(220,20,60,0.25)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.28), rgba(168,85,247,0.18))"; } }}
             >
-              Choose Villain →
+              ⚔ Select Captor →
             </button>
           </div>
         </div>
@@ -1692,8 +1715,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "space-between" }}>
             <button onClick={() => setStep(1)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Back</button>
-            <button onClick={() => canProceedStep2() && setStep(3)} disabled={!canProceedStep2()} style={{ padding: "0.875rem 2.5rem", background: canProceedStep2() ? "rgba(200,0,50,0.2)" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep2() ? "rgba(200,0,50,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep2() ? "#FF4060" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep2() ? "pointer" : "not-allowed", transition: "all 0.3s ease" }}>
-              Set Scenario →
+            <button onClick={() => canProceedStep2() && setStep(3)} disabled={!canProceedStep2()} style={{ padding: "0.875rem 2.5rem", background: canProceedStep2() ? "linear-gradient(135deg, rgba(220,20,60,0.28), rgba(168,85,247,0.18))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep2() ? "rgba(220,20,60,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep2() ? "#F87171" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep2() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep2() ? "0 4px 24px rgba(220,20,60,0.25)" : "none" }}>
+              Configure the Fall →
             </button>
           </div>
         </div>
@@ -1707,7 +1730,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Setting */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Battle Setting</div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Where She's Taken</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {SETTINGS.map((s) => {
                 const isSel = selectedSettings.includes(s.id);
@@ -1727,7 +1750,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Stakes */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What's at Stake</div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What She Stands to Lose</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {STAKES.map((s) => {
                 const isSel = selectedStakes.includes(s.id);
@@ -1746,7 +1769,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Intensity Slider */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Intensity Level</div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How Far She Falls</div>
             <div style={{ display: "flex", gap: "0.625rem" }}>
               {([
                 { val: 1 as const, label: "Tense", icon: "🌩", desc: "Charged atmosphere, power exchange, psychological dominance" },
@@ -1768,7 +1791,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Story Tone */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Story Tone <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How It Unfolds <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
               {TONES.map((t) => {
                 const isSel = storyTones.includes(t.id);
@@ -1929,7 +1952,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Villain's Capture Method */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How the Villain Subdues Her <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF4060", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>How He Takes Her <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
               {CAPTURE_METHODS.map((cm) => {
                 const isSel = captureMethod === cm.id;
@@ -1951,7 +1974,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Hero's Current State */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Hero's Condition Entering the Conflict <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FFB800", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>Her Condition When Taken <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {HERO_STATES.map((hs) => {
                 const isSel = heroState === hs.id;
@@ -1969,7 +1992,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           {/* Mission Context */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "1.5rem" }}>
-            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What Was She Doing When Captured <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
+            <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#60A0FF", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "1rem" }}>What She Was Doing When He Struck <span style={{ color: "rgba(200,200,220,0.3)", fontWeight: 400 }}>(optional)</span></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.625rem" }}>
               {MISSION_CONTEXTS.map((mc) => {
                 const isSel = missionContext === mc.id;
@@ -2019,7 +2042,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* ── DYNAMIC POWER DEGRADATION SYSTEM ── */}
           <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,100,0,0.25)", borderRadius: "16px", padding: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.3rem" }}>
-              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF6400", letterSpacing: "2.5px", textTransform: "uppercase" }}>⚡ Dynamic Power Degradation System</div>
+              <div className="font-cinzel" style={{ fontSize: "0.7rem", color: "#FF6400", letterSpacing: "2.5px", textTransform: "uppercase" }}>⚡ Watch Her Power Drain Away</div>
               <span style={{ fontSize: "0.55rem", color: "rgba(200,200,220,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px" }}>OPTIONAL</span>
             </div>
             <p style={{ fontSize: "0.68rem", color: "rgba(200,200,220,0.3)", fontFamily: "'Montserrat', sans-serif", marginBottom: "1.25rem" }}>
@@ -2365,8 +2388,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <button onClick={() => setStep(2)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Back</button>
-            <button onClick={() => { if (canProceedStep3()) { setStep(4); generateStory(); } }} disabled={!canProceedStep3()} style={{ padding: "0.875rem 2.5rem", background: canProceedStep3() ? "linear-gradient(135deg, rgba(255,184,0,0.25), rgba(255,0,128,0.2))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep3() ? "rgba(255,184,0,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep3() ? "#FFB800" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep3() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep3() ? "0 4px 24px rgba(255,184,0,0.25)" : "none" }}>
-              ⚡ Forge the Story
+            <button onClick={() => { if (canProceedStep3()) { setStep(4); generateStory(); } }} disabled={!canProceedStep3()} style={{ padding: "0.875rem 2.75rem", background: canProceedStep3() ? "linear-gradient(135deg, rgba(220,20,60,0.32), rgba(168,85,247,0.22))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep3() ? "rgba(220,20,60,0.6)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep3() ? "#F87171" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep3() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep3() ? "0 4px 28px rgba(220,20,60,0.35)" : "none" }}
+              onMouseEnter={(e) => { if (canProceedStep3()) { e.currentTarget.style.boxShadow = "0 8px 40px rgba(220,20,60,0.55)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.45), rgba(168,85,247,0.32))"; } }}
+              onMouseLeave={(e) => { if (canProceedStep3()) { e.currentTarget.style.boxShadow = "0 4px 28px rgba(220,20,60,0.35)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.32), rgba(168,85,247,0.22))"; } }}
+            >
+              BEGIN THE FALL →
             </button>
           </div>
         </div>
@@ -2378,25 +2404,25 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       {step === 4 && (
         <div>
           {/* Story header card */}
-          <div style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.7), rgba(10,0,20,0.9))", border: "1px solid rgba(255,184,0,0.25)", borderRadius: "20px", padding: "1.5rem 2rem", marginBottom: "1.5rem", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(90deg, transparent, #FFB800 30%, #FF0080 70%, transparent)" }} />
-            <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,184,0,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ background: "linear-gradient(135deg, rgba(5,0,15,0.9), rgba(30,0,10,0.85))", border: "1px solid rgba(220,20,60,0.22)", borderRadius: "20px", padding: "1.5rem 2rem", marginBottom: "1.5rem", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(90deg, transparent, #DC143C 30%, #A855F7 70%, transparent)" }} />
+            <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "220px", height: "220px", borderRadius: "50%", background: "radial-gradient(circle, rgba(220,20,60,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
             <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: "0.58rem", color: "rgba(255,184,0,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>
-                  {selectedHeroes.length === 1 ? "HERO" : "HEROES"}
+                <div style={{ fontSize: "0.55rem", color: "rgba(248,113,113,0.45)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>
+                  {selectedHeroes.length === 1 ? "⚔ CLAIMED TARGET" : `⚔ CLAIMED TARGETS`}
                 </div>
                 {selectedHeroes.map((h) => (
                   <div key={h.name} style={{ marginBottom: "0.15rem" }}>
-                    <span className="font-cinzel" style={{ color: "#FFB800", fontWeight: 700, fontSize: "0.9rem" }}>{h.name}</span>
-                    <span style={{ fontSize: "0.65rem", color: "rgba(200,200,220,0.4)", fontFamily: "'Montserrat', sans-serif", marginLeft: "0.4rem" }}>{h.alias}</span>
+                    <span className="font-cinzel" style={{ color: "#F87171", fontWeight: 700, fontSize: "0.9rem" }}>{h.name}</span>
+                    <span style={{ fontSize: "0.62rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", marginLeft: "0.4rem" }}>{h.alias}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ width: "1px", background: "rgba(255,255,255,0.08)" }} />
+              <div style={{ width: "1px", background: "rgba(255,255,255,0.06)" }} />
               <div>
-                <div style={{ fontSize: "0.58rem", color: "rgba(255,64,96,0.5)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>
-                  {isVillainDuo ? "VILLAIN DUO" : "VILLAIN"}
+                <div style={{ fontSize: "0.55rem", color: "rgba(255,64,96,0.45)", letterSpacing: "2.5px", textTransform: "uppercase", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.2rem" }}>
+                  {isVillainDuo ? "🔗 CAPTOR DUO" : "🔗 CAPTOR"}
                 </div>
                 <div className="font-cinzel" style={{ color: "#FF4060", fontWeight: 700, fontSize: "1rem" }}>{villainMode === "pick" ? selectedVillain?.name : customVillain}</div>
                 {isVillainDuo && selectedVillain2 && (
@@ -2424,7 +2450,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             isActive={loading}
             onStop={stopGeneration}
             accentColor="#FFB800"
-            label="Forging your story"
+            label="Initiating the fall…"
             chapterNum={chapters.length + 1}
           />
 
@@ -2614,7 +2640,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {chapters.length > 0 && !loading && !continuing && (
             <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(192,96,224,0.2)", borderRadius: "16px", padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
               <div className="font-cinzel" style={{ fontSize: "0.65rem", color: "#C060E0", letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "0.75rem" }}>
-                ✦ Continue the Story — Chapter {chapters.length + 1}
+                ✦ Push Her Further — Chapter {chapters.length + 1}
               </div>
               {/* Chapter Focus Tags */}
               <div style={{ marginBottom: "0.75rem" }}>
@@ -2650,7 +2676,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(192,96,224,0.3)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(192,96,224,0.3)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(192,96,224,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
                 >
-                  + Next Chapter
+                  Push Further →
                 </button>
               </div>
             </div>
@@ -2661,13 +2687,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             isActive={continuing}
             onStop={stopGeneration}
             accentColor="#C060E0"
-            label={`Writing Chapter ${chapters.length + 1}`}
+            label={`Pushing further — Chapter ${chapters.length + 1}`}
             chapterNum={chapters.length + 1}
           />
 
           {/* Actions */}
           <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "space-between" }}>
-            <button onClick={() => setStep(3)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Edit Scenario</button>
+            <button onClick={() => setStep(3)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.75rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Reconfigure</button>
             <div style={{ display: "flex", gap: "0.75rem" }}>
               {chapters.length > 0 && (
                 <>
@@ -2678,7 +2704,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                       ✓ Auto-saved
                     </div>
                   ) : null}
-                  <button onClick={() => { setSavedId(null); setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(255,184,0,0.2), rgba(255,0,128,0.15))", border: "1px solid rgba(255,184,0,0.45)", borderRadius: "10px", color: "#FFB800", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Regenerate</button>
+                  <button onClick={() => { setSavedId(null); setChapters([]); generateStory(); }} disabled={loading} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, rgba(220,20,60,0.22), rgba(168,85,247,0.15))", border: "1px solid rgba(220,20,60,0.45)", borderRadius: "10px", color: "#F87171", fontFamily: "'Cinzel', serif", fontSize: "0.78rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}>⚡ Begin Again</button>
                 </>
               )}
             </div>
