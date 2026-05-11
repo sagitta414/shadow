@@ -3909,7 +3909,50 @@ router.post("/story/auction-block", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
 });
 
+// ── HOMEPAGE HEROINE IMAGE ────────────────────────────────────────────────────
+router.post("/story/homepage-heroine-image", async (req, res) => {
+  try {
+    const { heroine = "Wonder Woman", style = "realistic" } = req.body as { heroine?: string; style?: string };
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const styleMap: Record<string, string> = {
+      realistic: "ultra-photorealistic, cinematic photography, award-winning, 8k, sharp focus",
+      dark: "dark fantasy, dramatic oil painting, gothic, hyper-detailed, professional illustration",
+      comic: "comic book art, dynamic, high contrast, vivid, Jim Lee style",
+    };
+    const styleTag = styleMap[style] || styleMap.realistic;
+
+    const poses = [
+      "kneeling on stone floor, head bowed, wrists bound behind her back, defeated expression, torn costume",
+      "restrained to a throne-like chair, villain looming behind her, exhausted and helpless, costume dishevelled",
+      "lying on ground, cape torn, reaching upward weakly, barely conscious, surrounded by darkness",
+      "suspended in glowing energy restraints, struggling, costume in tatters, desperate and afraid",
+      "pinned against a wall by shadow tendrils, mask cracked, defiance fading from her eyes",
+    ];
+    const pose = poses[Math.floor(Math.random() * poses.length)];
+
+    const prompt = `${heroine}, superhero, ${pose}, dramatic moody lighting, deep shadows, dungeon setting, highly detailed costume, ${styleTag}, masterpiece, cinematic composition, rule of thirds, depth of field`;
+    const negativePrompt = "text, watermark, logo, cartoon, anime, ugly, deformed, bad anatomy, blurry, low quality, censored, extra limbs, duplicate";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 896, height: 512, steps: 28, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) { const t = await imgResp.text(); throw new Error(`Venice ${imgResp.status}: ${t.slice(0,200)}`); }
+    const imgJson = await imgResp.json() as { images?: string[] };
+    const imageBase64 = imgJson.images?.[0];
+    if (!imageBase64) throw new Error("No image returned");
+    res.json({ imageBase64, heroine, prompt });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
+
 
 
 
