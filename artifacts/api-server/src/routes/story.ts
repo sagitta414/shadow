@@ -3923,17 +3923,62 @@ router.post("/story/homepage-heroine-image", async (req, res) => {
     };
     const styleTag = styleMap[style] || styleMap.realistic;
 
-    const poses = [
-      "kneeling on stone floor, head bowed, wrists bound behind her back, defeated expression, torn costume",
-      "restrained to a throne-like chair, villain looming behind her, exhausted and helpless, costume dishevelled",
-      "lying on ground, cape torn, reaching upward weakly, barely conscious, surrounded by darkness",
-      "suspended in glowing energy restraints, struggling, costume in tatters, desperate and afraid",
-      "pinned against a wall by shadow tendrils, mask cracked, defiance fading from her eyes",
+    const scenarios = [
+      {
+        pose: "wrists lashed above her head with iron chains, suspended from vaulted dungeon ceiling, costume torn and dishevelled, sweat-sheened skin, head hanging forward in exhaustion, barely conscious",
+        setting: "medieval stone dungeon, flickering torch light, iron chains, damp stone walls",
+        mood: "utterly broken, sweat-damp hair plastered to face, spirit crushed",
+      },
+      {
+        pose: "on her knees on cold black marble, wrists locked in steel cuffs behind her back, dark collar around her throat with a heavy chain leash, head bowed, mascara-streaked cheeks",
+        setting: "villain's opulent throne room, cold marble floors, dramatic overhead spotlight",
+        mood: "humiliated and subjugated, defiant eyes going glassy with defeat",
+      },
+      {
+        pose: "spread-eagled and bound to a stone altar with glowing enchanted shackles at wrist and ankle, arching her back against the bonds, costume shredded, power completely drained",
+        setting: "arcane ritual chamber, purple energy runes on the floor, dark candles, mystical shadows",
+        mood: "powerless and desperate, mouth open in a silent cry",
+      },
+      {
+        pose: "strapped upright to a metal rack with thick leather restraints across chest, waist and thighs, head forced back by a hand gripping her hair, costume jacket stripped from her shoulders",
+        setting: "Cold War-era interrogation room, harsh single bulb overhead, concrete walls",
+        mood: "gasping through clenched teeth, sweat-soaked, exhausted defiance",
+      },
+      {
+        pose: "on display behind ornate cage bars, kneeling with wrists cuffed to the cage frame, watching her captor with hollow defeated eyes, uniform torn, tiara discarded on the marble floor",
+        setting: "villain's trophy gallery, dim crimson lighting, other trophies visible behind glass",
+        mood: "trophy prize, humiliated and exhibited, all dignity stripped away",
+      },
+      {
+        pose: "collared and on all fours across black marble, leash in villain's gloved fist, costume reduced to rags, head tilted up to meet a cold merciless gaze",
+        setting: "darkened penthouse, floor-to-ceiling windows showing a storm-lit city skyline",
+        mood: "completely broken and submissive, tears on her cheeks, body trembling",
+      },
+      {
+        pose: "hanging limp in a web of dark energy tendrils that bind her arms and legs spread-wide, floating mid-air, head lolling back, eyes closed, all power drained from her body",
+        setting: "floating dark sanctum, pulsing dark energy, shadows swirling around her",
+        mood: "drained to nothing, limp and helpless, captured in darkness",
+      },
+      {
+        pose: "wrists bound with thick rope in front of her, kneeling in a ring of dark fire, hands clasped in forced supplication, glowing power-suppressing collar on her throat",
+        setting: "demonic summoning circle, hellfire, sulfur light, ancient stone",
+        mood: "kneeling in surrender, collar pulsing, pride obliterated",
+      },
+      {
+        pose: "seated in a heavy metal chair, wrists shackled to the armrests, ankles to the chair legs, head tilted back and mouth gagged with a strip of torn fabric, costume dishevelled",
+        setting: "underground black site, fluorescent lighting, bare metal walls, observation mirror",
+        mood: "exhausted captive, sweat-drenched, terror behind her eyes",
+      },
+      {
+        pose: "pinned face-first against a cracked stone wall by heavy iron manacles at her wrists and ankles, back arching, costume in shreds, shoulders trembling with effort",
+        setting: "ancient underground prison, torch sconces, crumbling stone, deep shadow",
+        mood: "straining against immovable bonds, gasping, strength completely spent",
+      },
     ];
-    const pose = poses[Math.floor(Math.random() * poses.length)];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
 
-    const prompt = `${heroine}, superhero, ${pose}, dramatic moody lighting, deep shadows, dungeon setting, highly detailed costume, ${styleTag}, masterpiece, cinematic composition, rule of thirds, depth of field`;
-    const negativePrompt = "text, watermark, logo, cartoon, anime, ugly, deformed, bad anatomy, blurry, low quality, censored, extra limbs, duplicate";
+    const prompt = `${heroine}, superhero, ${sc.pose}, ${sc.setting}, ${sc.mood}, dramatic moody cinematic lighting, deep shadows, highly detailed torn costume, ${styleTag}, masterpiece, cinematic composition, rule of thirds, depth of field, professional photography`;
+    const negativePrompt = "text, watermark, logo, cartoon, anime, ugly, deformed, bad anatomy, blurry, low quality, extra limbs, duplicate, childlike, child, minor, young face, underage";
 
     const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
       method: "POST",

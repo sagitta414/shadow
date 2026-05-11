@@ -56,8 +56,11 @@ interface HomepageProps {
 }
 
 const FEATURED_HEROINES = [
-  "Wonder Woman", "Black Canary", "Supergirl", "Scarlet Witch",
-  "Black Widow", "Zatanna", "Starfire", "Batgirl",
+  "Wonder Woman", "Supergirl", "Black Canary", "Batgirl",
+  "Zatanna", "Starfire", "Power Girl", "Huntress",
+  "Black Widow", "Scarlet Witch", "Rogue", "Jean Grey",
+  "Psylocke", "Storm", "Carol Danvers", "She-Hulk",
+  "Spider-Woman", "Hawkgirl", "Catwoman", "Artemis",
 ];
 
 function seededRand(seed: number) { const x = Math.sin(seed + 1) * 10000; return x - Math.floor(x); }
