@@ -1233,11 +1233,14 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       <div style={{
         position: "relative",
         marginBottom: isMobile ? "1.5rem" : "2.5rem",
-        borderRadius: "16px",
+        marginLeft: isMobile ? "-1rem" : "-2rem",
+        marginRight: isMobile ? "-1rem" : "-2rem",
+        marginTop: isMobile ? "-1rem" : "-2rem",
+        borderRadius: 0,
         overflow: "hidden",
-        background: "linear-gradient(135deg, rgba(55,0,15,0.97) 0%, rgba(8,0,18,0.99) 50%, rgba(30,0,50,0.97) 100%)",
-        border: "1px solid rgba(220,20,60,0.32)",
-        boxShadow: "0 0 60px rgba(139,0,0,0.32), 0 0 120px rgba(88,0,120,0.14), inset 0 1px 0 rgba(255,255,255,0.05)",
+        background: "linear-gradient(180deg, rgba(8,0,16,1) 0%, rgba(3,0,8,0.99) 100%)",
+        borderBottom: "1px solid rgba(220,20,60,0.22)",
+        boxShadow: "0 12px 80px rgba(0,0,0,0.9), 0 0 140px rgba(80,0,100,0.08)",
       }}>
         {/* Top crimson accent bar */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent 0%, #DC143C 25%, #A855F7 75%, transparent 100%)", zIndex: 2 }} />
@@ -1247,7 +1250,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 15% 60%, rgba(139,0,0,0.25) 0%, transparent 52%), radial-gradient(ellipse at 88% 40%, rgba(88,0,120,0.18) 0%, transparent 52%)", pointerEvents: "none", zIndex: 1 }} />
 
         {/* Main content row */}
-        <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "1.3rem 1.1rem 0" : "2rem 2.5rem 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", flexWrap: "wrap" }}>
+        <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "1.5rem 1.1rem 0" : "2.2rem 3rem 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", flexWrap: "wrap" }}>
           {/* Left: Title block */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.8rem" }}>
@@ -1485,8 +1488,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               })}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(255,184,0,0.3) transparent" }}>
-              {filteredHeroes.map((hero) => {
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "155px" : "210px"}, 1fr))`, gap: "0.875rem", maxHeight: "640px", overflowY: "auto", paddingRight: "6px", scrollbarWidth: "thin", scrollbarColor: "rgba(220,20,60,0.2) transparent" }}>
+              {filteredHeroes.map((hero, index) => {
                 const isMarvel = hero.universe === "MARVEL";
                 const isCW = hero.universe === "CW";
                 const isTB = hero.universe === "TB";
@@ -1497,67 +1500,74 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isGaming = hero.universe === "GAMING";
                 const isFilm = hero.universe === "FILM";
                 const isSelected = selectedHeroes.some((h) => h.name === hero.name);
+                const isHov = hoveredHero === hero.name;
                 const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
-                const accentBg = isMarvel ? "rgba(220,30,30,0.15)" : isCW ? "rgba(0,180,100,0.12)" : isTB ? "rgba(200,30,0,0.15)" : isPR ? "rgba(220,0,150,0.13)" : isAnim ? "rgba(160,0,255,0.13)" : isSW ? "rgba(0,180,255,0.12)" : isTV ? "rgba(255,150,60,0.12)" : isGaming ? "rgba(52,211,153,0.12)" : isFilm ? "rgba(252,211,77,0.12)" : "rgba(0,100,220,0.15)";
-                const selectedBg = isMarvel ? "rgba(220,30,30,0.2)" : isCW ? "rgba(0,180,100,0.18)" : isTB ? "rgba(200,30,0,0.2)" : isPR ? "rgba(220,0,150,0.2)" : isAnim ? "rgba(160,0,255,0.2)" : isSW ? "rgba(0,180,255,0.18)" : isTV ? "rgba(255,150,60,0.18)" : isGaming ? "rgba(52,211,153,0.18)" : isFilm ? "rgba(252,211,77,0.18)" : "rgba(0,100,220,0.2)";
                 return (
-                  <button
+                  <div
                     key={`${hero.universe}-${hero.name}`}
                     onClick={() => toggleHero(hero)}
+                    onMouseEnter={() => setHoveredHero(hero.name)}
+                    onMouseLeave={() => setHoveredHero(null)}
                     style={{
-                      background: isSelected ? `linear-gradient(135deg, ${selectedBg}, rgba(30,0,10,0.92))` : "rgba(4,0,10,0.78)",
-                      backdropFilter: "blur(12px)",
-                      border: `1px solid ${isSelected ? accentColor + "BB" : "rgba(220,20,60,0.09)"}`,
-                      borderRadius: "12px",
-                      padding: "0.875rem",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      transition: "all 0.25s ease",
-                      color: "inherit",
                       position: "relative",
-                      boxShadow: isSelected ? `0 0 24px ${accentColor}55, 0 0 60px ${accentColor}18, inset 0 1px 0 rgba(255,255,255,0.05)` : "0 2px 14px rgba(0,0,0,0.55)",
-                    }}
-                    onMouseEnter={(e) => {
-                      setHoveredHero(hero.name);
-                      if (!isSelected) {
-                        e.currentTarget.style.borderColor = "rgba(220,20,60,0.52)";
-                        e.currentTarget.style.background = "linear-gradient(135deg, rgba(60,0,15,0.94), rgba(10,0,20,0.97))";
-                        e.currentTarget.style.boxShadow = "0 4px 30px rgba(220,20,60,0.3), 0 0 60px rgba(139,0,0,0.12)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      setHoveredHero(null);
-                      if (!isSelected) {
-                        e.currentTarget.style.borderColor = "rgba(220,20,60,0.09)";
-                        e.currentTarget.style.background = "rgba(4,0,10,0.78)";
-                        e.currentTarget.style.boxShadow = "0 2px 14px rgba(0,0,0,0.55)";
-                      }
+                      cursor: "pointer",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      aspectRatio: "2/3",
+                      background: "#020006",
+                      border: `2px solid ${isSelected ? accentColor : isHov ? "rgba(220,20,60,0.55)" : "rgba(28,6,10,0.9)"}`,
+                      transition: "all 0.32s cubic-bezier(0.22,1,0.36,1)",
+                      transform: isHov && !isSelected ? "translateY(-8px) scale(1.02)" : isSelected ? "translateY(-4px)" : "none",
+                      boxShadow: isSelected
+                        ? `0 0 40px ${accentColor}55, 0 20px 50px rgba(0,0,0,0.9)`
+                        : isHov
+                          ? "0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(220,20,60,0.25)"
+                          : "0 4px 24px rgba(0,0,0,0.7)",
                     }}
                   >
-                    {/* CLAIM HER hover overlay */}
-                    {hoveredHero === hero.name && !isSelected && (
-                      <div style={{ position: "absolute", inset: 0, background: "rgba(22,0,7,0.85)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: "12px", zIndex: 10, backdropFilter: "blur(3px)", animation: "claimReveal 0.18s ease-out" }}>
-                        <div className="font-cinzel" style={{ fontSize: "0.9rem", fontWeight: 900, color: "#DC143C", letterSpacing: "3px", textShadow: "0 0 22px rgba(220,20,60,0.95), 0 0 50px rgba(220,20,60,0.45)", marginBottom: "0.3rem" }}>⚔ CLAIM HER</div>
-                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.47rem", letterSpacing: "2.5px", color: "rgba(248,113,113,0.52)", textTransform: "uppercase" }}>{hero.alias || hero.name}</div>
+                    {/* Full portrait image */}
+                    <img
+                      src={heroImg(hero.name)} alt={hero.name}
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", transition: "filter 0.32s", filter: isHov ? "brightness(0.45) saturate(0.55)" : isSelected ? "brightness(0.82) saturate(1.2) contrast(1.08)" : "brightness(0.75) saturate(0.88)" }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+                    />
+                    {/* Bottom vignette */}
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.52) 38%, rgba(0,0,0,0.1) 62%, transparent 100%)", pointerEvents: "none" }} />
+                    {/* Top fade */}
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "80px", background: "linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, transparent 100%)", pointerEvents: "none" }} />
+                    {/* Universe badge */}
+                    <div style={{ position: "absolute", top: "0.55rem", left: "0.55rem", padding: "0.15rem 0.45rem", background: "rgba(0,0,0,0.8)", border: `1px solid ${accentColor}55`, borderRadius: "3px", fontSize: "0.32rem", letterSpacing: "2px", color: accentColor, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(6px)", zIndex: 3 }}>
+                      {hero.universe}
+                    </div>
+                    {/* Dossier number */}
+                    <div style={{ position: "absolute", top: "0.55rem", right: "0.55rem", fontSize: "0.32rem", color: "rgba(255,255,255,0.1)", fontFamily: "'Courier New', monospace", letterSpacing: "1.5px", zIndex: 3 }}>
+                      #{(index + 1).toString().padStart(3, "0")}
+                    </div>
+                    {/* TARGET ACQUIRED hover */}
+                    {isHov && !isSelected && (
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "5px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1 }}>TARGET</div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "5px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1.4 }}>ACQUIRED</div>
+                        <div style={{ width: "38px", height: "1px", background: "rgba(220,20,60,0.7)", margin: "0.7rem 0 0.5rem" }} />
+                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(248,113,113,0.5)", textTransform: "uppercase" }}>click to claim</div>
                       </div>
                     )}
-                    {/* Selected checkmark */}
-                    {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "20px", height: "20px", borderRadius: "50%", background: `linear-gradient(135deg, ${accentColor}, rgba(220,20,60,0.7))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700, boxShadow: `0 0 12px ${accentColor}88` }}>✓</div>}
-                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Remove from favorites" : "Add to favorites"} style={{ position: "absolute", top: "0.4rem", left: "0.4rem", width: "22px", height: "22px", borderRadius: "50%", background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.72)", border: favorites.includes(hero.name) ? "none" : "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", zIndex: 11, transition: "all 0.2s", backdropFilter: "blur(4px)" }}>
-                      {favorites.includes(hero.name) ? "★" : "☆"}
-                    </button>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", filter: isSelected ? "brightness(1.08) saturate(1.1)" : "brightness(0.82) saturate(0.9)" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                      <div style={{ position: "absolute", inset: 0, background: isSelected ? `linear-gradient(to top, ${accentColor}60 0%, ${accentColor}18 40%, transparent 70%)` : "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.22) 45%, transparent 72%)", pointerEvents: "none" }} />
-                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.48rem", color: isSelected ? accentColor : "rgba(220,20,60,0.65)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
+                    {/* CLAIMED stamp */}
+                    {isSelected && (
+                      <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: "#DC143C", border: "3px solid #DC143C", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(220,20,60,0.9)", boxShadow: "0 0 28px rgba(220,20,60,0.35), inset 0 0 18px rgba(220,20,60,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                        CLAIMED
+                      </div>
+                    )}
+                    {/* Bottom info bar */}
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "3rem 0.72rem 0.72rem", zIndex: 4 }}>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.72rem" : "0.82rem", fontWeight: 900, color: isSelected ? accentColor : "#fff", letterSpacing: "0.04em", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,1)", marginBottom: "0.22rem", transition: "color 0.25s" }}>{hero.name}</div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.25rem" }}>
+                        <div style={{ fontSize: "0.38rem", color: isSelected ? accentColor : "rgba(220,20,60,0.65)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, transition: "color 0.25s" }}>{hero.alias || hero.power}</div>
+                        <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore" style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.35)", fontSize: "0.5rem", cursor: "pointer", flexShrink: 0, lineHeight: 1 }}>ℹ</button>
+                        <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Unfavorite" : "Favorite"} style={{ background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.55)", border: favorites.includes(hero.name) ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.5rem", cursor: "pointer", color: favorites.includes(hero.name) ? "#000" : "rgba(255,255,255,0.3)", flexShrink: 0 }}>{favorites.includes(hero.name) ? "★" : "☆"}</button>
+                      </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.15rem" }}>
-                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "rgba(232,220,232,0.92)", fontWeight: 700, lineHeight: 1.3 }}>{hero.name}</div>
-                      <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore card" style={{ background: "none", border: "none", color: `${accentColor}88`, fontSize: "0.75rem", cursor: "pointer", padding: "0 0.1rem", lineHeight: 1, flexShrink: 0 }}>ℹ</button>
-                    </div>
-                    <div style={{ fontSize: "0.55rem", color: "rgba(220,20,60,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem", letterSpacing: "0.5px" }}>{hero.alias}</div>
-                    <div style={{ fontSize: "0.58rem", color: "rgba(195,185,208,0.42)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -1627,8 +1637,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).length} villains
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: isVillainDuo ? "320px" : "520px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
-                {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).map((villain) => {
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "155px" : "210px"}, 1fr))`, gap: "0.875rem", maxHeight: isVillainDuo ? "360px" : "580px", overflowY: "auto", paddingRight: "6px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.2) transparent" }}>
+                {VILLAINS.filter((v) => villainFilter === "ALL" || v.universe === villainFilter).map((villain, vIdx) => {
                   const isSelected = selectedVillain?.name === villain.name;
                   const isMv = villain.universe === "Marvel";
                   const isCW = villain.universe === "CW";
@@ -1636,25 +1646,71 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   const isPR = villain.universe === "PR";
                   const isAnimV = villain.universe === "Animated";
                   const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnimV ? "#C084FC" : "#60A0FF";
-                  const accentBg   = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : isPR ? "rgba(220,0,150,0.15)" : isAnimV ? "rgba(160,0,255,0.15)" : "rgba(0,100,220,0.18)";
                   const isV2Taken = selectedVillain2?.name === villain.name;
+                  const isHovV = hoveredHero === `villain-${villain.name}`;
                   return (
-                    <button
+                    <div
                       key={villain.name}
                       onClick={() => !isV2Taken && setSelectedVillain(villain)}
-                      style={{ background: isSelected ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSelected ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: isV2Taken ? "not-allowed" : "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSelected ? "0 0 16px rgba(200,0,50,0.35)" : "none", opacity: isV2Taken ? 0.3 : 1 }}
-                      onMouseEnter={(e) => { if (!isSelected && !isV2Taken) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
-                      onMouseLeave={(e) => { if (!isSelected && !isV2Taken) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                      onMouseEnter={() => !isV2Taken && setHoveredHero(`villain-${villain.name}`)}
+                      onMouseLeave={() => setHoveredHero(null)}
+                      style={{
+                        position: "relative",
+                        cursor: isV2Taken ? "not-allowed" : "pointer",
+                        borderRadius: "6px",
+                        overflow: "hidden",
+                        aspectRatio: "2/3",
+                        background: "#030008",
+                        border: `2px solid ${isSelected ? "#FF4060" : isHovV ? "rgba(200,0,50,0.55)" : "rgba(30,4,8,0.9)"}`,
+                        transition: "all 0.32s cubic-bezier(0.22,1,0.36,1)",
+                        transform: isHovV && !isSelected ? "translateY(-8px) scale(1.02)" : isSelected ? "translateY(-4px)" : "none",
+                        boxShadow: isSelected
+                          ? "0 0 40px rgba(200,0,50,0.55), 0 20px 50px rgba(0,0,0,0.9)"
+                          : isHovV
+                            ? "0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(200,0,50,0.25)"
+                            : "0 4px 24px rgba(0,0,0,0.7)",
+                        opacity: isV2Taken ? 0.3 : 1,
+                      }}
                     >
-                      {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>1</div>}
-                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(30,0,0,0.6)" }}>
-                        <img src={villainImg(villain.name)} alt={villain.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? "rgba(200,0,50,0.45)" : "rgba(0,0,0,0.55)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
-                        <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{villain.universe}</div>
+                      {/* Full portrait */}
+                      <img
+                        src={villainImg(villain.name)} alt={villain.name}
+                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", transition: "filter 0.32s", filter: isHovV ? "brightness(0.42) saturate(0.5)" : isSelected ? "brightness(0.78) saturate(1.15) contrast(1.08)" : "brightness(0.7) saturate(0.82)" }}
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+                      />
+                      {/* Bottom vignette */}
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.5) 38%, rgba(0,0,0,0.1) 62%, transparent 100%)", pointerEvents: "none" }} />
+                      {/* Top fade */}
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "80px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)", pointerEvents: "none" }} />
+                      {/* Universe badge */}
+                      <div style={{ position: "absolute", top: "0.55rem", left: "0.55rem", padding: "0.15rem 0.45rem", background: "rgba(0,0,0,0.8)", border: `1px solid ${accentColor}55`, borderRadius: "3px", fontSize: "0.32rem", letterSpacing: "2px", color: accentColor, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(6px)", zIndex: 3 }}>
+                        {villain.universe}
                       </div>
-                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? "#FF4060" : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{villain.name}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.48)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{villain.scheme}</div>
-                    </button>
+                      {/* Threat index */}
+                      <div style={{ position: "absolute", top: "0.55rem", right: "0.55rem", fontSize: "0.32rem", color: "rgba(255,255,255,0.1)", fontFamily: "'Courier New', monospace", letterSpacing: "1.5px", zIndex: 3 }}>
+                        T-{(vIdx + 1).toString().padStart(3, "0")}
+                      </div>
+                      {/* UNLEASH hover */}
+                      {isHovV && !isSelected && (
+                        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1 }}>UNLEASH</div>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1.4 }}>HIM</div>
+                          <div style={{ width: "38px", height: "1px", background: "rgba(255,64,96,0.7)", margin: "0.7rem 0 0.5rem" }} />
+                          <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(255,120,136,0.5)", textTransform: "uppercase" }}>click to choose</div>
+                        </div>
+                      )}
+                      {/* CAPTOR stamp */}
+                      {isSelected && (
+                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(255,64,96,0.9)", boxShadow: "0 0 28px rgba(255,64,96,0.35), inset 0 0 18px rgba(255,64,96,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                          CAPTOR
+                        </div>
+                      )}
+                      {/* Bottom info */}
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "3rem 0.72rem 0.72rem", zIndex: 4 }}>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.72rem" : "0.82rem", fontWeight: 900, color: isSelected ? "#FF4060" : "#fff", letterSpacing: "0.04em", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,1)", marginBottom: "0.22rem", transition: "color 0.25s" }}>{villain.name}</div>
+                        <div style={{ fontSize: "0.38rem", color: isSelected ? "rgba(255,64,96,0.65)" : "rgba(200,0,50,0.55)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.2px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.25s" }}>{villain.scheme}</div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -1736,27 +1792,54 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                   ))}
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "140px" : "200px"}, 1fr))`, gap: "0.625rem", maxHeight: "280px", overflowY: "auto", paddingRight: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.3) transparent" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "155px" : "200px"}, 1fr))`, gap: "0.875rem", maxHeight: "340px", overflowY: "auto", paddingRight: "6px", scrollbarWidth: "thin", scrollbarColor: "rgba(200,0,50,0.2) transparent" }}>
                 {VILLAINS.filter((v) => (villainFilter2 === "ALL" || v.universe === villainFilter2) && v.name !== selectedVillain?.name).map((villain) => {
                   const isSel2 = selectedVillain2?.name === villain.name;
                   const isMv = villain.universe === "Marvel"; const isCW = villain.universe === "CW"; const isTB = villain.universe === "TB"; const isPR2 = villain.universe === "PR"; const isAnimV2 = villain.universe === "Animated";
                   const accentColor = isMv ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR2 ? "#FF69B4" : isAnimV2 ? "#C084FC" : "#60A0FF";
-                  const accentBg = isMv ? "rgba(220,30,30,0.18)" : isCW ? "rgba(0,180,100,0.15)" : isTB ? "rgba(200,30,0,0.18)" : isPR2 ? "rgba(220,0,150,0.15)" : isAnimV2 ? "rgba(160,0,255,0.15)" : "rgba(0,100,220,0.18)";
+                  const isHovV2 = hoveredHero === `villain2-${villain.name}`;
                   return (
-                    <button key={villain.name} onClick={() => setSelectedVillain2(villain)}
-                      style={{ background: isSel2 ? "rgba(200,0,50,0.22)" : "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", border: `1px solid ${isSel2 ? "rgba(200,0,50,0.65)" : "rgba(255,255,255,0.06)"}`, borderRadius: "12px", padding: "0.875rem", cursor: "pointer", textAlign: "left", transition: "all 0.2s ease", color: "inherit", position: "relative", boxShadow: isSel2 ? "0 0 16px rgba(200,0,50,0.35)" : "none" }}
-                      onMouseEnter={(e) => { if (!isSel2) { e.currentTarget.style.borderColor = "rgba(200,0,50,0.35)"; e.currentTarget.style.background = accentBg; } }}
-                      onMouseLeave={(e) => { if (!isSel2) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                    <div key={villain.name}
+                      onClick={() => setSelectedVillain2(villain)}
+                      onMouseEnter={() => setHoveredHero(`villain2-${villain.name}`)}
+                      onMouseLeave={() => setHoveredHero(null)}
+                      style={{
+                        position: "relative",
+                        cursor: "pointer",
+                        borderRadius: "6px",
+                        overflow: "hidden",
+                        aspectRatio: "2/3",
+                        background: "#030008",
+                        border: `2px solid ${isSel2 ? "#FF4060" : isHovV2 ? "rgba(200,0,50,0.55)" : "rgba(30,4,8,0.9)"}`,
+                        transition: "all 0.32s cubic-bezier(0.22,1,0.36,1)",
+                        transform: isHovV2 && !isSel2 ? "translateY(-8px) scale(1.02)" : isSel2 ? "translateY(-4px)" : "none",
+                        boxShadow: isSel2 ? "0 0 40px rgba(200,0,50,0.55), 0 20px 50px rgba(0,0,0,0.9)" : isHovV2 ? "0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(200,0,50,0.25)" : "0 4px 24px rgba(0,0,0,0.7)",
+                      }}
                     >
-                      {isSel2 && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: "#FF4060", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700 }}>2</div>}
-                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(30,0,0,0.6)" }}>
-                        <img src={villainImg(villain.name)} alt={villain.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSel2 ? "rgba(200,0,50,0.45)" : "rgba(0,0,0,0.55)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
-                        <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{villain.universe}</div>
+                      <img src={villainImg(villain.name)} alt={villain.name}
+                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", transition: "filter 0.32s", filter: isHovV2 ? "brightness(0.42) saturate(0.5)" : isSel2 ? "brightness(0.78) saturate(1.15)" : "brightness(0.7) saturate(0.82)" }}
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+                      />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.5) 38%, rgba(0,0,0,0.1) 62%, transparent 100%)", pointerEvents: "none" }} />
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "70px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)", pointerEvents: "none" }} />
+                      <div style={{ position: "absolute", top: "0.55rem", left: "0.55rem", padding: "0.15rem 0.45rem", background: "rgba(0,0,0,0.8)", border: `1px solid ${accentColor}55`, borderRadius: "3px", fontSize: "0.32rem", letterSpacing: "2px", color: accentColor, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(6px)", zIndex: 3 }}>
+                        {villain.universe}
                       </div>
-                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSel2 ? "#FF4060" : "#E8E8F0", fontWeight: 700, marginBottom: "0.15rem", lineHeight: 1.3 }}>{villain.name}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.48)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{villain.scheme}</div>
-                    </button>
+                      {isHovV2 && !isSel2 && (
+                        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.95rem", fontWeight: 900, color: "#FF4060", letterSpacing: "4px", textShadow: "0 0 30px rgba(255,64,96,1)", lineHeight: 1.2 }}>PICK HIM</div>
+                        </div>
+                      )}
+                      {isSel2 && (
+                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.12rem 0.45rem", letterSpacing: "4px", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                          CAPTOR 2
+                        </div>
+                      )}
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "2.5rem 0.72rem 0.65rem", zIndex: 4 }}>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 900, color: isSel2 ? "#FF4060" : "#fff", letterSpacing: "0.04em", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,1)", marginBottom: "0.2rem", transition: "color 0.25s" }}>{villain.name}</div>
+                        <div style={{ fontSize: "0.36rem", color: "rgba(200,0,50,0.5)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.2px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{villain.scheme}</div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
