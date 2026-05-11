@@ -1,0 +1,84 @@
+The Humiliation Registry
+Per heroine, a tracked record of every degrading act she's been subjected to — documented like a case file. Categories: Public Humiliation, Forced Performance, Rename/Relabel, Identity Stripping, Obedience Demonstrations, Exposure. Each category has a depth scale 1–10. The AI reads the registry and escalates appropriately — nothing gets repeated unless you want it to, everything gets more intense over time.
+
+The Rename Protocol
+A dedicated system for stripping a heroine of her name and replacing it with whatever her captor assigns. The new designation is tracked globally — once renamed, the AI uses only the new name throughout all future stories involving that captor. Multiple captors can give conflicting names. The heroine's internal monologue still uses her real name. The gap is the effect.
+
+The Obedience Scale
+A 10-point degradation ladder per heroine-captor pair. Each rung is a specific act of submission that must happen in a story before the next rung unlocks. The AI won't skip rungs — it escalates methodically. Rung 1 might be forced kneeling. Rung 10 is complete voluntary compliance with zero coercion needed. The journey between them is the whole app.
+
+The Shame Archive
+A separate, searchable archive of only the most degrading moments pulled from all your stories. Auto-tagged by type, character, and intensity. Browsable like a highlight reel of the worst things that have happened to each heroine in your canon.
+
+NEW DEPRAVED MODES
+The Exhibition Mode
+The heroine is put on display — for an audience, for cameras, for other captives to watch. The scenario is built around her being observed, evaluated, commented on, and rated while she can do nothing about it. The audience reacts in real time. Her captors narrate everything she's feeling to the crowd. The public nature of it is the degradation.
+
+The Evaluation Chamber
+Cold, clinical, utterly dehumanizing. A heroine is assessed like an asset — measurements, capability tests, resistance ratings, compliance scores — all documented in formal language. She is referred to throughout by a catalog number. The evaluators discuss her in third person while she's present. The report at the end is a full character profile written as if she's property.
+
+The Conditioning Log Mode
+Stories generated as first-person session logs written by the conditioning handler — detached, professional, noting what worked, what didn't, what changed, what needs repeating. The heroine's experiences are described from the outside, her internal state inferred clinically. The format makes the content colder and more disturbing.
+
+The Auction Block — Extended
+Not just sold but displayed, described, demonstrated. The auctioneer narrates her qualities, tests her responses publicly, handles objections from bidders. She must hold position, follow instructions, perform on command — in front of everyone — because the alternative is worse. The bidders ask specific questions. She has to answer them.
+
+The Pet Protocol
+A complete persona-replacement scenario. New name, new rules, new mode of communication, new expectations. No titles, no vigilante identity, no past self acknowledged. The AI writes entirely within the new framework — her old self exists only in her internal resistance, which erodes chapter by chapter. Treats the conditioning as entirely mundane and matter-of-fact from the captor's perspective, which is more disturbing than intensity would be.
+
+The Trophy Room
+Multiple heroines, all conditioned, maintained, and displayed. Stories told from the perspective of a new capture seeing the others — what they were, what they are now, the horror of recognition. Or from the captor's perspective, narrating his collection. Each trophy has a plaque. The plaques are editable.
+
+The Reprogramming Suite
+Lena Luthor / technological setting. A heroine is connected to a system that directly interfaces with her nervous system — not mind control, but stimulus-response conditioning at a physical level. The AI documents each session in technical detail. Responses are charted. The process is gradual, documented, and the heroine is aware of exactly what is happening to her, which is worse.
+
+The Handler's Diary
+Stories told as private diary entries from the handler assigned to manage a specific heroine. Personal, intimate, unprofessional — the handler has feelings about the work, complicated and disturbing ones. The heroine is seen through the handler's eyes, which shifts the power dynamic in an unsettling direction.
+
+The Initiation Rite
+League of Assassins ritual framework. Ancient, ceremonial, deeply formal. Multiple stages with specific requirements. The formality and tradition makes it worse — this has been done thousands of times, there is a script, everyone knows their role, there is no improvisation because none is needed. She's just the latest.
+
+The Compliance Test
+Periodic formal evaluations of conditioning progress. The heroine must demonstrate each behavior she's been conditioned to perform, in sequence, in front of her handler and assessors. Failures mean the session continues. The test is designed so that full compliance is the fastest way out — and she knows it.
+
+DEGRADATION MECHANICS
+The Dignity Meter
+A per-heroine stat — starts at 100, depletes through degrading story events. Hitting thresholds unlocks new scenario types that only work at low dignity levels. Certain modes are only accessible when dignity is critically low. Regenerates slowly if you write stories where she regains agency — or not at all, depending on your settings.
+
+The Forced Performance Tracker
+What has she been made to do in front of others. A specific log — not general "humiliation" but exact documented performances, each one a saved story moment she can't take back. Referenced by the AI in future stories as established fact.
+
+The Captor's Notes
+After each generated story, the AI generates a short in-character note from the captor's perspective — what worked, what she responded to, what to try next time. Saved alongside the story. Over time it builds into a genuine methodology document for that captor-heroine relationship.
+
+Conditioning Chains
+Scenarios that must be experienced in sequence because each one assumes the previous occurred. A chain might be: Isolation → First Break → Naming → Exhibition → Compliance Test → Full Integration. You can't access step 4 without completing steps 1–3. The AI validates story content against chain progress.
+
+The Degredation Tier List
+A visual ranking of every heroine by current degradation level across all your stories — from "Defiant" at the top to "Fully Conditioned" at the bottom. Changes dynamically based on story content. Clicking any heroine shows her full history and current status.
+
+DARK SCENARIO SPECIFIC IDEAS
+The Replacement
+A heroine is not just conditioned — she is deployed back into her old life as an asset. Stories follow her in both worlds: publicly herself, privately something else entirely. The tension between the two selves, the moments where the mask slips, the people who almost notice.
+
+The Lesson
+One heroine is made to condition another. She must choose between refusing — which has consequences — and complying, which has different consequences. The AI writes her internal state throughout: the justifications, the self-disgust, the way each act of compliance with her captor's instructions becomes its own kind of breaking point.
+
+The Correspondence
+A villain who conducts the entire scenario through written commands — notes, letters, instructions, evaluations — delivered to the heroine's cell. She never sees him directly. The AI writes her responses, both the written replies she's forced to produce and her internal ones. The distance makes it stranger and colder.
+
+The Documentary
+A fictional in-universe documentary being filmed about "rehabilitation of vigilante threats." Cameras, an interviewer who asks questions in careful euphemistic language, official-sounding explanations for everything happening. The heroine is expected to participate, to answer questions on camera, to demonstrate "progress." The institutional framing is the degradation.
+
+The Debt
+A heroine owes something — a life, a secret, a past act — and the captor is collecting. The scenario is framed entirely as a transaction. She entered into it willingly, in a way, which is what she can't stop thinking about. The AI explores what it means to have walked in rather than been dragged.
+
+INTERFACE IDEAS FOR THIS DIRECTION
+The Dossier Wall
+A full-screen visual display of every heroine in your canon — photo/silhouette, current designation (name or assigned label), dignity level, conditioning stage, captor, last story date. Feels like surveillance footage stills pinned to a board.
+
+The Session Scheduler
+A calendar-style interface where you "schedule" conditioning sessions for specific heroines with specific captors — and the app reminds you. Each session generates a new story. The calendar fills up with completed sessions. The completionist mechanic pulls toward consistency.
+
+The Briefing Format
+An optional story presentation format where the generated content is presented as an intelligence briefing — classified header, file number, subject designation (not her name), incident summary, detailed report, analyst notes, recommended next steps. Cold government language wrapped around deeply personal content.

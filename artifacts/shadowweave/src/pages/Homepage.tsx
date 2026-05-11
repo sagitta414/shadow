@@ -49,6 +49,13 @@ interface HomepageProps {
   onPsychDark?: () => void;
   onSpectacleHub?: () => void;
   onCaptivityHub?: () => void;
+  onCampaignMode?: () => void;
+  onVillainHub?: () => void;
+  onResearchFacility?: () => void;
+  onGladiatorProtocol?: () => void;
+  onTheWitness?: () => void;
+  onSleeperProtocol?: () => void;
+  onAuctionBlock?: () => void;
 }
 
 const DAILY_HEROINES = [
@@ -390,8 +397,11 @@ export default function Homepage(props: HomepageProps) {
     { icon: "▶", title: "STORY CONTINUATION", badge: "Continue Any Story", desc: "Pick up any saved story and add new chapters. No story from your archive ever has to end.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onStoryContinuation, img: `${BASE}/heroes/mode-story-continuation.png` },
     { icon: "⚡", title: "CW SPECIALIST MODE", badge: "Arrow · The Flash · Canon Rewrites · Seasons", desc: "Three CW dark-universe tools in one hub — play the darkest Arrow/Flash episodes, rewrite pivotal canon moments, or build a full villain season arc.", r: 74, g: 222, b: 128, accent: "#4ADE80", onClick: props.onCWSpecialist, img: `${BASE}/heroes/mode-director.png` },
     { icon: "🧠", title: "PSYCH DARK", badge: "6 Modes · Psychological Warfare", desc: "Six modes of psychological pressure — interrogation, mind break, dark mirror, dream sequences, negotiation, confined spaces. The mind is the real battlefield.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onPsychDark, img: `${BASE}/heroes/mode-mind-break.png` },
-    { icon: "🏛", title: "POWER & SPECTACLE", badge: "7 Modes · Display · Dominance", desc: "Seven modes built around power made visible — hero auctions, trophy displays, arenas, betting pools, villain team-ups. Victory as performance.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onSpectacleHub, img: `${BASE}/heroes/mode-arena-mode.png` },
-    { icon: "⛓", title: "CAPTIVITY ARCS", badge: "9 Modes · Long-Form Captivity", desc: "Nine long-form modes — corruption arcs, conditioning, slow burn, dual captures, faction wars, sequel generation. The grip deepens over time.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onCaptivityHub, img: `${BASE}/heroes/mode-corruption-arc.png` },
+    { icon: "🏛", title: "POWER & SPECTACLE", badge: "9 Modes · Display · Dominance", desc: "Nine modes built around power made visible — hero auctions, arenas, trophy displays, gladiator protocol, auction blocks, betting pools, villain team-ups. Victory as performance.", r: 252, g: 163, b: 17, accent: "#FCA311", onClick: props.onSpectacleHub, img: `${BASE}/heroes/mode-arena-mode.png` },
+    { icon: "⛓", title: "CAPTIVITY ARCS", badge: "11 Modes · Long-Form Captivity", desc: "Eleven long-form modes — corruption arcs, conditioning, slow burn, sleeper protocol, the witness, dual captures, faction wars, sequel generation. The grip deepens.", r: 52, g: 211, b: 153, accent: "#34D399", onClick: props.onCaptivityHub, img: `${BASE}/heroes/mode-corruption-arc.png` },
+    { icon: "📖", title: "CAMPAIGN SAGAS", badge: "Multi-Chapter · Linked Stories", desc: "Build linked multi-chapter sagas with persistent continuity — conditioning states, voice profiles, and chapter context carry forward into every new chapter.", r: 192, g: 132, b: 252, accent: "#C084FC", onClick: props.onCampaignMode, img: `${BASE}/heroes/mode-corruption-arc.png` },
+    { icon: "♟", title: "VILLAIN METHODOLOGY HUB", badge: "8 Villains · Villain-First", desc: "Choose your villain first. Each of eight villains has a distinct methodology — Joker chaos, Talia conditioning, Lena's clinical precision, Ra's inevitability. The story flows from who they are.", r: 239, g: 68, b: 68, accent: "#EF4444", onClick: props.onVillainHub, img: `${BASE}/heroes/mode-director.png` },
+    { icon: "⚗️", title: "RESEARCH FACILITY", badge: "Clinical · Classified", desc: "Behavioral research presented as formal research logs — hypothesis, procedure, observations, results, and a researcher's private note that breaks protocol. Horror through clinical distance.", r: 6, g: 182, b: 212, accent: "#06B6D4", onClick: props.onResearchFacility, img: `${BASE}/heroes/mode-mind-break.png` },
   ];
 
   const studioTools = [

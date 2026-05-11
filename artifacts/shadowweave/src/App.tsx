@@ -74,6 +74,13 @@ const SeasonArcMode        = lazy(() => import("./pages/SeasonArcMode"));
 const DarkDossier          = lazy(() => import("./pages/DarkDossier"));
 const CWSpecialistHub      = lazy(() => import("./pages/CWSpecialistHub"));
 const GenericHub           = lazy(() => import("./pages/GenericHub"));
+const CampaignMode         = lazy(() => import("./pages/CampaignMode"));
+const VillainHub           = lazy(() => import("./pages/VillainHub"));
+const ResearchFacilityMode = lazy(() => import("./pages/ResearchFacilityMode"));
+const GladiatorProtocolMode= lazy(() => import("./pages/GladiatorProtocolMode"));
+const TheWitnessMode       = lazy(() => import("./pages/TheWitnessMode"));
+const SleeperProtocolMode  = lazy(() => import("./pages/SleeperProtocolMode"));
+const AuctionBlockMode     = lazy(() => import("./pages/AuctionBlockMode"));
 const StoryArcs            = lazy(() => import("./pages/StoryArcs"));
 const HeroineDossier       = lazy(() => import("./pages/HeroineDossier"));
 const VillainBuilder       = lazy(() => import("./pages/VillainBuilder"));
@@ -159,6 +166,13 @@ type Page =
   | "psych-dark"
   | "spectacle-hub"
   | "captivity-hub"
+  | "campaign-mode"
+  | "villain-hub"
+  | "research-facility"
+  | "gladiator-protocol"
+  | "the-witness"
+  | "sleeper-protocol"
+  | "auction-block"
   | "admin";
 
 const STORY_MODE_PAGES = new Set<Page>([
@@ -172,7 +186,8 @@ const STORY_MODE_PAGES = new Set<Page>([
   "time-loop","dream-sequence","sequel-generator","story-continuation",
   "director-mode","escape-attempt","negotiation-room","faction-mode",
   "slow-burn","confined-space","villain-interrogation","civilian-capture",
-  "arrowverse-mode",
+  "arrowverse-mode","research-facility","gladiator-protocol","the-witness",
+  "sleeper-protocol","auction-block","villain-hub",
 ]);
 
 function BackgroundEffects() {
@@ -367,6 +382,13 @@ function AppInner() {
           onPsychDark={() => navigate("psych-dark")}
           onSpectacleHub={() => navigate("spectacle-hub")}
           onCaptivityHub={() => navigate("captivity-hub")}
+          onCampaignMode={() => navigate("campaign-mode")}
+          onVillainHub={() => navigate("villain-hub")}
+          onResearchFacility={() => navigate("research-facility")}
+          onGladiatorProtocol={() => navigate("gladiator-protocol")}
+          onTheWitness={() => navigate("the-witness")}
+          onSleeperProtocol={() => navigate("sleeper-protocol")}
+          onAuctionBlock={() => navigate("auction-block")}
         />
       )}
 
@@ -682,15 +704,17 @@ function AppInner() {
       {page === "spectacle-hub" && (
         <GenericHub
           title="POWER & SPECTACLE" icon="🏛" accent="#FCA311"
-          subtitle="DISPLAY · DOMINANCE · AUDIENCE · 7 MODES"
-          tagline="Seven modes built around power made visible — auctions, arenas, displays, wagers. Victory as performance."
+          subtitle="DISPLAY · DOMINANCE · AUDIENCE · 9 MODES"
+          tagline="Nine modes built around power made visible — auctions, arenas, displays, gladiator combat, wagers. Victory as performance."
           onBack={() => navigate("home")}
           onSelectMode={(id) => enterFromHub("spectacle-hub", id as Page)}
           modes={[
             { icon: "⚖", title: "HERO AUCTION", badge: "Bid · Live Auction", desc: "The highest bidder gets everything. Rising stakes, live bids, one inevitable outcome on the auction block.", color: "#FCA311", r: 252, g: 163, b: 17, pageId: "hero-auction" },
+            { icon: "🔨", title: "THE AUCTION BLOCK", badge: "Multi-Heroine · Full Event", desc: "Three to five heroines auctioned in a single evening. Choose the lots, choose the bidders. The auctioneer narrates everything.", color: "#FCA311", r: 252, g: 163, b: 17, pageId: "auction-block" },
             { icon: "👁", title: "TROPHY DISPLAY", badge: "Display · Public", desc: "Victory displayed for all to see. The heroine becomes the centerpiece of the villain's prized collection.", color: "#EF4444", r: 239, g: 68, b: 68, pageId: "trophy-display" },
             { icon: "🎭", title: "THE SHOWCASE", badge: "Staged · Audience", desc: "Staged for an audience. Every movement choreographed, every reaction studied and savored by the crowd.", color: "#E879F9", r: 232, g: 121, b: 249, pageId: "showcase" },
             { icon: "🏛", title: "ARENA MODE", badge: "Combat · Versus", desc: "Combat as spectacle. The villain pits the heroine against impossible odds while a crowd watches and bets.", color: "#EF4444", r: 239, g: 68, b: 68, pageId: "arena-mode" },
+            { icon: "⚔️", title: "GLADIATOR PROTOCOL", badge: "Two Heroines · Both Perspectives", desc: "Two captured heroines forced to compete. The AI writes both perspectives alternating paragraph by paragraph. Stakes are real. The designer watches.", color: "#EF4444", r: 239, g: 68, b: 68, pageId: "gladiator-protocol" },
             { icon: "🎲", title: "BETTING POOL", badge: "Wager · Live Odds", desc: "Her fate decided by strangers placing bets in real time. Live odds, rising wagers, one winner takes all.", color: "#34D399", r: 52, g: 211, b: 153, pageId: "betting-pool" },
             { icon: "🔓", title: "PUBLIC PROPERTY", badge: "Exposed · Open Access", desc: "Exposed, available, owned. The villain strips away every boundary while the world watches and does nothing.", color: "#FBBF24", r: 251, g: 191, b: 36, pageId: "public-property" },
             { icon: "🤝", title: "VILLAIN TEAM-UP", badge: "Duo Villain · Conflict", desc: "Two villains, one objective. The heroine faces double the cunning and not a shred of mercy between them.", color: "#F87171", r: 248, g: 113, b: 113, pageId: "villain-team-up" },
@@ -698,11 +722,39 @@ function AppInner() {
         />
       )}
 
+      {page === "campaign-mode" && (
+        <CampaignMode onBack={() => navigate("home")} />
+      )}
+
+      {page === "villain-hub" && (
+        <VillainHub onBack={() => navigate("home")} />
+      )}
+
+      {page === "research-facility" && (
+        <ResearchFacilityMode onBack={backFromMode} />
+      )}
+
+      {page === "gladiator-protocol" && (
+        <GladiatorProtocolMode onBack={backFromMode} />
+      )}
+
+      {page === "the-witness" && (
+        <TheWitnessMode onBack={backFromMode} />
+      )}
+
+      {page === "sleeper-protocol" && (
+        <SleeperProtocolMode onBack={backFromMode} />
+      )}
+
+      {page === "auction-block" && (
+        <AuctionBlockMode onBack={backFromMode} />
+      )}
+
       {page === "captivity-hub" && (
         <GenericHub
           title="CAPTIVITY ARCS" icon="⛓" accent="#34D399"
-          subtitle="LONG-FORM · ARC MODES · 9 MODES"
-          tagline="Nine modes for long-form captivity — conditioning, erosion, transfer, and the slow collapse of resistance over time."
+          subtitle="LONG-FORM · ARC MODES · 11 MODES"
+          tagline="Eleven modes for long-form captivity — conditioning, erosion, transfer, sleeper protocols, psychological observation, and the slow collapse of resistance."
           onBack={() => navigate("home")}
           onSelectMode={(id) => enterFromHub("captivity-hub", id as Page)}
           modes={[
@@ -711,6 +763,8 @@ function AppInner() {
             { icon: "⏳", title: "THE LONG GAME", badge: "Long Burn · Chapters", desc: "Months of slow manipulation. No rush, no force — just patience, proximity, and inevitability.", color: "#C084FC", r: 168, g: 85, b: 247, pageId: "long-game" },
             { icon: "🔗", title: "CHAIN OF CUSTODY", badge: "Transfer · Multi-Arc", desc: "Passed between captors. Each handler leaves their mark before the transfer. None leave empty-handed.", color: "#60A5FA", r: 96, g: 165, b: 250, pageId: "chain-of-custody" },
             { icon: "🕯️", title: "SLOW BURN", badge: "Day by Day · Captivity", desc: "Each chapter is a new day. Track weeks of captivity in intimate increments — no action, just the slow erosion of will.", color: "#7C3AED", r: 124, g: 58, b: 237, pageId: "slow-burn" },
+            { icon: "🕵", title: "SLEEPER PROTOCOL", badge: "Dual Track · Public/Private", desc: "Conditioned and returned undetected. The story alternates between her normal life and her activated self. Her team has no idea.", color: "#34D399", r: 52, g: 211, b: 153, pageId: "sleeper-protocol" },
+            { icon: "👁", title: "THE WITNESS", badge: "Pure Psychology · Observer POV", desc: "She cannot intervene. She can only watch. Written entirely from the witness's perspective — her helplessness, her horror, what watching someone she knows breaks in her.", color: "#A78BFA", r: 167, g: 139, b: 250, pageId: "the-witness" },
             { icon: "⛓", title: "DUAL CAPTURE", badge: "Duo · Shared Cell", desc: "Two heroines, one cell. Shared captivity breeds desperation — and bonds neither expected.", color: "#34D399", r: 52, g: 211, b: 153, pageId: "dual-capture" },
             { icon: "🗡", title: "MASS CAPTURE", badge: "Group · 3–5 Heroines", desc: "Three to five heroines swept up in one operation. The villain's greatest conquest — delivered all at once.", color: "#F87171", r: 248, g: 113, b: 113, pageId: "mass-capture" },
             { icon: "⚔️", title: "FACTION WAR", badge: "5 Factions · Dark Alliance", desc: "Avengers vs HYDRA. Justice League vs Gotham Rogues. The Guild vs the Sith. Pick two factions and write the conflict.", color: "#C8A830", r: 200, g: 168, b: 75, pageId: "faction-mode" },

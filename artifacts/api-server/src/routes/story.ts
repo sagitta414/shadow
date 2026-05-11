@@ -3814,7 +3814,103 @@ router.post("/heroine-portrait", async (req, res) => {
   }
 });
 
+// ── CAMPAIGN CHAPTER ─────────────────────────────────────────────────────────
+router.post("/story/campaign-chapter", async (req, res) => {
+  try {
+    const { title, heroine, villain, arc, chapterNumber, chapterTitle, setting, direction, contextSummary, voiceInstruction = "", degradationInstruction = "" } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a chapter of a multi-chapter campaign saga. Each chapter is a full scene that continues directly from the previous chapters. The story has a persistent continuity — conditioning, relationships, and psychological states carry forward.\n\nCAMPAIGN ARC: ${arc}\n${voiceInstruction}${degradationInstruction}`;
+    const previousContext = contextSummary ? `\n\nPREVIOUS CHAPTERS SUMMARY:\n${contextSummary}\n\nWrite CHAPTER ${chapterNumber} — "${chapterTitle}" as a direct continuation.` : `Write CHAPTER 1 — "${chapterTitle}" — the opening chapter of this saga.`;
+    const userPrompt = `SAGA: ${title}\nHEROINE: ${heroine}\nVILLAIN: ${villain}\nSETTING: ${setting}\nCHAPTER: ${chapterNumber} — ${chapterTitle}${direction ? `\nDIRECTION FOR THIS CHAPTER: ${direction}` : ""}${previousContext}\n\nWrite 2800-4000 words. This chapter must feel earned — it continues naturally from what came before, advances the arc, and ends at a meaningful stopping point that sets up the next chapter.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.87, chapterNumber);
+    const summaryText = await completeChat({ messages: [{ role: "system", content: "Summarize this story chapter in 2-3 sentences covering the key events, the heroine's state at the end, and any important developments. Be specific. No spoiler warnings." }, { role: "user", content: full.slice(0, 3000) }], maxTokens: 200, temperature: 0.5 });
+    res.write(`data: ${JSON.stringify({ done: true, story: full, summary: summaryText.trim() })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── VILLAIN HUB ──────────────────────────────────────────────────────────────
+router.post("/story/villain-hub", async (req, res) => {
+  try {
+    const { villain, heroine, setting, intensity = 65, methodology = "" } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a story where the villain's methodology is the primary creative force. Every narrative decision — pacing, tone, method, escalation — flows from who this villain is and how they work.\n\nVILLAIN METHODOLOGY:\n${methodology}\n\nINTENSITY: ${intensity}/100. ${intensity < 30 ? "Psychological, restrained." : intensity > 70 ? "Explicit and extreme." : "Dark and visceral, building steadily."}\n\nWrite entirely in character with the villain's established approach. Their voice, their methods, their logic should permeate every paragraph.`;
+    const userPrompt = `VILLAIN: ${villain}\nHEROINE: ${heroine}\nSETTING: ${setting}\n\nWrite a complete story (2800-4000 words) that showcases this villain at their most characteristic — every choice they make, every word they say, every method they use should be unmistakably, specifically THEM.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.88);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── RESEARCH FACILITY ─────────────────────────────────────────────────────────
+router.post("/story/research-facility", async (req, res) => {
+  try {
+    const { subject, subjectId, researcher, facility, experiment, session, additionalNotes = "" } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a classified behavioral research document. The format is a formal research log — clinical, precise, and deeply disturbing in its detachment. The subject is never named, only designated. The researcher's voice is professional throughout — except for a private note at the end that breaks protocol slightly.\n\nFORMAT STRICTLY:\n1. DOCUMENT HEADER (classification, file number, date, facility, researcher, subject designation)\n2. EXPERIMENT TYPE AND HYPOTHESIS\n3. PROCEDURE (what was done, step by step)\n4. OBSERVATIONS (detailed description — this is the core narrative, 1800-2500 words, written as clinical notes but vivid and specific)\n5. RESULTS (outcomes, behavioral changes noted)\n6. RECOMMENDATIONS FOR NEXT SESSION\n7. RESEARCHER'S PRIVATE NOTE (brief, personal, unprofessional — the researcher's actual feelings about the subject, which break the clinical tone entirely)\n\nThe horror comes from the format. Clinical language describing what should never be clinical. Write every section fully and completely.`;
+    const userPrompt = `SUBJECT: ${subject} | DESIGNATION: ${subjectId}\nRESEARCHER: ${researcher}\nFACILITY: ${facility}\nEXPERIMENT: ${experiment}\nSESSION: ${session}${additionalNotes ? `\nSESSION NOTES: ${additionalNotes}` : ""}\n\nGenerate the complete research log. All sections. Full detail. Do not abbreviate.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.82);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── GLADIATOR PROTOCOL ────────────────────────────────────────────────────────
+router.post("/story/gladiator-protocol", async (req, res) => {
+  try {
+    const { heroine1, heroine2, relationship, designer, arena, stakes, additionalContext = "" } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a story about two captured heroines made to compete against each other by a villain who designed this scenario specifically for maximum psychological impact.\n\nNARRATIVE TECHNIQUE: Alternate perspectives paragraph by paragraph. Label each section clearly:\n[${heroine1.toUpperCase()}] — her experience, thoughts, choices\n[${heroine2.toUpperCase()}] — her experience, thoughts, choices\n\nBoth heroines are fully realized characters. The horror is not just the competition — it is what it means for each of them to be in this situation with someone they know. Show both sides of every moment. Show how they see each other across the arena. Show what winning costs. Show what losing means.\n\nThe villain designer: ${designer}. This is their scenario — it reflects their psychology.`;
+    const userPrompt = `COMPETITOR ONE: ${heroine1}\nCOMPETITOR TWO: ${heroine2}\nRELATIONSHIP: ${relationship}\nDESIGNER: ${designer}\nARENAT: ${arena}\nSTAKES: ${stakes}${additionalContext ? `\nCONTEXT: ${additionalContext}` : ""}\n\nWrite the full gladiator protocol (2800-4000 words). Alternate perspectives throughout. Show both heroines completely. The competition must be visceral, the psychology must be devastating, the outcome must be earned.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.88);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── THE WITNESS ───────────────────────────────────────────────────────────────
+router.post("/story/the-witness", async (req, res) => {
+  try {
+    const { witness, subject, relationship, captor, captorMethod, observationPoint, witnessKnows } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a pure psychological horror story told entirely from the witness's perspective. She watches. She cannot intervene. She cannot look away.\n\nNARRATIVE RULES:\n- ENTIRE story is in ${witness}'s POV — third-person limited, her thoughts, her sensations, her horror\n- The subject (${subject}) is seen from the outside — we infer her internal state from what the witness observes\n- No action from the witness. She watches. Her helplessness is total.\n- The captor (${captor}) may or may not acknowledge the witness's presence\n- The psychological weight is on the witness — what it does to her to watch someone she knows, in this situation, unable to stop it\n- The horror escalates through observation, not participation\n\nThis is not an action story. It is a study of what witnessing does to a person.`;
+    const userPrompt = `WITNESS (POV): ${witness}\nSUBJECT (OBSERVED): ${subject}\nRELATIONSHIP: ${relationship}\nCAPTOR: ${captor} — METHOD: ${captorMethod}\nOBSERVATION POINT: ${observationPoint}\nWHAT THE WITNESS KNOWS: ${witnessKnows}\n\nWrite the complete observation (2800-4000 words). Entirely from ${witness}'s perspective. Show what she sees, what it does to her, what she can't stop feeling, what she tells herself, what breaks through every defense she has. The event happens to ${subject}. The story is about ${witness}.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.87);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── SLEEPER PROTOCOL ──────────────────────────────────────────────────────────
+router.post("/story/sleeper-protocol", async (req, res) => {
+  try {
+    const { heroine, handler, team, trigger, depth, mission } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a dual-track psychological story about a conditioned sleeper agent who has been returned to her team undetected.\n\nFORMAT: Alternate between two clearly labeled narrative tracks:\n\n▸ PUBLIC: [Normal life — her interactions with her team, her public persona, her cover. Warm, professional, trusted. The real her straining against what she's been made.]\n\n▪ PRIVATE: [Her conditioned self — what activates, what she does without choosing to, the suppressed resistance, the horror of compliance, what the handler's directives make her do.]\n\nThe two tracks bleed into each other. Sometimes a PUBLIC scene contains a moment where the mask almost slips. Sometimes a PRIVATE scene contains a flash of who she was before.\n\nDEPTH OF CONDITIONING: ${depth}\nTRIGGER: ${trigger}\n\nThis is a slow-burn psychological horror story. The public track should feel real and warm — which makes the private track more devastating.`;
+    const userPrompt = `SLEEPER: ${heroine}\nHANDLER: ${handler}\nTEAM (who trusts her): ${team}\nCURRENT MISSION: ${mission}\n\nWrite the complete sleeper protocol story (2800-4000 words). Use the ▸ PUBLIC / ▪ PRIVATE format throughout. Let the story breathe — the public sections should feel genuinely normal. The private sections should be visceral and specific. End on a moment that shows both tracks simultaneously.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4000, res, 0.87);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
+// ── AUCTION BLOCK ─────────────────────────────────────────────────────────────
+router.post("/story/auction-block", async (req, res) => {
+  try {
+    const { heroines = [], bidders = [], auctioneer, venue, tone } = req.body;
+    const provider = getProvider();
+    const systemPrompt = VENICE_PREAMBLE + `\n\nYou are writing a full auction event where multiple captured heroines are sold to the highest bidder. The story is told from multiple perspectives — the auctioneer, the bidders, and crucially, the heroines themselves.\n\nSTRUCTURE:\n1. The venue and atmosphere — arriving bidders, the room's setup, the anticipation\n2. Each lot presented in sequence — the auctioneer's narration is theatrical and specific, each heroine is described and demonstrated\n3. The bidding for each — competitive, revealed character of each bidder\n4. The outcomes — who wins each heroine, immediate aftermath\n5. After the auction — the room clears, what happens to each heroine next\n\nAUCTIONEER: ${auctioneer}\nTONE: ${tone}\n\nThe auctioneer's voice is consistent throughout — they have done this many times. The heroines' internal states contrast brutally with the transactional language of the auction. Both are shown fully.`;
+    const heroesList = (heroines as string[]).map((h, i) => `LOT ${i + 1}: ${h}`).join("\n");
+    const biddersList = (bidders as string[]).map(b => `- ${b}`).join("\n");
+    const userPrompt = `VENUE: ${venue}\nLOTS:\n${heroesList}\nBIDDERS:\n${biddersList}\n\nWrite the complete auction event (3000-4500 words). Every lot gets proper treatment — their presentation, the bidding, the outcome. Every bidder has a distinct voice and intention. The heroines are never just objects — we hear their thoughts throughout, in contrast to how they are being described. End when the last lot has been collected and the venue falls quiet.`;
+    const full = await doStream(provider, [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], 4500, res, 0.88);
+    res.write(`data: ${JSON.stringify({ done: true, story: full })}\n\n`);
+    res.end();
+  } catch (err) { res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" }); }
+});
+
 export default router;
+
 
 
 

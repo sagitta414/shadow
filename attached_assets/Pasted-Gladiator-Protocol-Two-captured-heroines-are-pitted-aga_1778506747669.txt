@@ -1,0 +1,54 @@
+Gladiator Protocol
+Two captured heroines are pitted against each other. Not just fighting — being made to compete in whatever scenario the captor designs. The loser faces worse consequences. The winner faces the knowledge of what she just did. AI writes both perspectives alternating by paragraph.
+
+The Witness
+A heroine is made to watch another heroine's conditioning session rather than participate. Pure psychological scenario — her helplessness, the manipulation of using someone she cares about as leverage, the threat that she's next. No physical action, entirely psychological.
+
+PROGRESSION & RPG SYSTEMS
+The Darkness Economy
+A full resource system. Darkness Points earned from generating stories, completing scenarios, finishing campaigns. Spent on: unlocking new modes, new characters, new villain methodologies, new settings. The Vault system you have becomes more elaborate — multiple currencies, upgrade trees, permanent unlocks vs. consumable boosts.
+
+The Infamy Leaderboard
+Your villain roster has an infamy ranking based on how many times they've appeared in successful stories, how many heroines they've broken, what methods they've used. Top villains get special treatment — expanded methodology cards, unique scenario types, special dialogue styles. The ranking shifts as you write more.
+
+Mastery Trees
+Each mode has a mastery tree — a grid of unlockable story elements specific to that mode. Arrowverse mode has League Ritual unlocks, A.R.G.U.S. Black Site unlocks, Joker Theatre unlocks. Unlocking a node changes what's available in the mode's generation. More stories in a mode = deeper tree access.
+
+The Prestige System
+When you've maxed out a heroine's conditioning arc, instead of stopping, you can Prestige — reset her arc but carry forward permanent narrative scars. The AI knows she's been through it before. Second arc is different from the first. Third arc is different again. Infinite depth.
+
+Daily Missions with Narrative Consequences
+Daily missions that aren't just "write a story in X mode" — they're narrative events that affect the world state. "The League is moving on Star City tonight — complete a League scenario to determine the outcome." Success or failure affects faction control, character availability, and what scenarios are offered tomorrow.
+
+PRESENTATION & IMMERSION
+The War Room Dashboard
+Replace the homepage with a full-screen command center aesthetic. Live faction power meters. Active campaign status. Character condition registry summary. Chronicle feed. Vault key balance. Infamy rankings. Writing streak visualization. All on one atmospheric dark screen that feels like an intelligence briefing.
+
+Cinematic Story Presentation
+Stories presented with: chapter title cards, atmospheric particle effects (falling ash, snow, fog), ambient audio layers (tension drone, chains, rain, heartbeat — toggleable), typewriter reveal with adjustable pace, full-screen immersion mode. Reading a story feels like watching a dark film.
+
+The Red Room — Admin's View
+A separate interface for you as the architect. Shows everything: every heroine's global state across all stories, faction map, campaign status, character relationships, the full Codex. Feels like a mission control center. Different from the public-facing app.
+
+Dynamic Homepage Themes
+The homepage atmosphere shifts based on what's happening in your world. If the League is dominant, the homepage gains League aesthetic elements. If you're mid-campaign, campaign-specific art and music cues appear. If a major event just happened, the Chronicle headline takes over.
+
+The Dossier Printer
+Any character — heroine or villain — can be printed as a physical dossier. A styled PDF with their photo (or silhouette), stats, methodology, relationship web, story history, current condition. Looks like an actual intelligence file. Something you could genuinely print.
+
+TOOLS
+The Prompt Architect
+A visual tool for building custom scenario prompts from components — drag and drop elements (character, villain, setting, restraint type, tone, pacing, specific beats you want hit, elements to avoid). Preview the assembled prompt before sending. Save prompt templates for reuse.
+
+The Remix Engine
+Take any saved story and remix it — change the heroine, change the villain, keep the plot structure. Or keep the characters, swap the setting. Or keep everything and just shift the tone from brutal to psychological. The Remix Engine preserves what worked and changes what you specify.
+
+The Continuity Checker
+Before generating a new story, scan your archive for contradictions. If you're writing Nyssa as working alone but previously established she lost authority over the League, the checker flags it and asks if you want to acknowledge the contradiction, ignore it, or write around it.
+
+Story Stitcher
+Take any two saved stories and have the AI write the connective tissue between them — what happened in between, how one state of affairs became the other. Turns a collection of disconnected one-shots into a coherent timeline automatically.
+
+The Tone Dial
+A persistent setting — not just intensity — but tone axis: Clinical vs. Theatrical, Brutal vs. Psychological, Fast vs. Slow Burn, Chaos vs. Control. Each axis is a slider. The combination defines the flavor of every generation until you change it. Currently the app has a mood dial but this is a full multi-dimensional tone system.
+
