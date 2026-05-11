@@ -1219,7 +1219,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
     });
   }
 
-  const stepLabels = ["Select Target", "Choose Captor", "Configure the Fall", "The Story"];
+  const stepLabels = ["Select Target", "Assign Captor", "Configure Her Fall", "Her Story"];
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh", position: "relative" }}>
@@ -1264,7 +1264,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </h1>
             </div>
             <div style={{ fontFamily: "'Crimson Text', serif", fontSize: isMobile ? "0.88rem" : "1.02rem", color: "rgba(215,175,190,0.5)", fontStyle: "italic", letterSpacing: "0.04em" }}>
-              210+ targets. Every one breakable. You choose how.
+              210+ heroines. Every last one breakable. You decide how she falls.
             </div>
           </div>
 
@@ -1300,14 +1300,14 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 700, color: "rgba(239,68,68,0.9)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
               </>
             )}
-            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(239,68,68,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
+            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(239,68,68,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>💀 Merciless</span>}
             {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(255,140,50,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
           </div>
         )}
       </div>
 
       {/* ── Step Progress ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: isMobile ? "1.25rem" : "2rem", background: "rgba(3,0,10,0.75)", borderRadius: "12px", padding: "0.45rem", border: "1px solid rgba(220,20,60,0.08)", backdropFilter: "blur(20px)" }}>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: isMobile ? "1.5rem" : "2.2rem", background: "rgba(2,0,8,0.88)", borderRadius: "14px", padding: isMobile ? "0.6rem 0.75rem" : "0.75rem 1.5rem", border: "1px solid rgba(220,20,60,0.12)", backdropFilter: "blur(20px)", boxShadow: "0 4px 32px rgba(0,0,0,0.6)" }}>
         {stepLabels.map((label, i) => {
           const num = i + 1 as Step;
           const isActive = step === num;
@@ -1315,44 +1315,59 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           const canCurrentProceed = step === 1 ? canProceedStep1() : step === 2 ? canProceedStep2() : step === 3 ? canProceedStep3() : false;
           const isNext = num === step + 1 && canCurrentProceed;
           const isClickable = isDone || isNext;
-          const activeGrad = "linear-gradient(135deg, rgba(220,20,60,0.22), rgba(168,85,247,0.15))";
-          const activeBorder = "rgba(220,20,60,0.5)";
-          const nextGrad = "rgba(220,20,60,0.06)";
-          const nextBorder = "rgba(220,20,60,0.2)";
           return (
             <div key={num} style={{ flex: 1, display: "flex", alignItems: "center" }}>
               <button
                 onClick={() => { if (isDone) setStep(num); else if (isNext) setStep(num); }}
                 disabled={!isClickable}
                 style={{
-                  flex: 1, padding: "0.6rem 0.5rem",
-                  background: isActive ? activeGrad : isNext ? nextGrad : "transparent",
-                  border: `1px solid ${isActive ? activeBorder : isNext ? nextBorder : "transparent"}`,
-                  borderRadius: "8px", cursor: isClickable ? "pointer" : "default",
-                  display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center",
+                  flex: 1, padding: isMobile ? "0.5rem 0.35rem" : "0.65rem 0.75rem",
+                  background: isActive ? "linear-gradient(135deg, rgba(220,20,60,0.18), rgba(168,85,247,0.1))" : "transparent",
+                  border: `1px solid ${isActive ? "rgba(220,20,60,0.45)" : "transparent"}`,
+                  borderRadius: "10px", cursor: isClickable ? "pointer" : "default",
+                  display: "flex", alignItems: "center", gap: isMobile ? "0.35rem" : "0.6rem", justifyContent: "center",
                   transition: "all 0.25s ease", color: "inherit",
-                  boxShadow: isActive ? "0 0 18px rgba(220,20,60,0.18)" : "none",
+                  boxShadow: isActive ? "0 0 20px rgba(220,20,60,0.15)" : "none",
                 }}
-                onMouseEnter={(e) => { if (isNext) { e.currentTarget.style.background = "rgba(220,20,60,0.12)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.38)"; } }}
-                onMouseLeave={(e) => { if (isNext) { e.currentTarget.style.background = nextGrad; e.currentTarget.style.borderColor = nextBorder; } }}
+                onMouseEnter={(e) => { if (isNext && !isActive) { e.currentTarget.style.background = "rgba(220,20,60,0.09)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.3)"; } }}
+                onMouseLeave={(e) => { if (isNext && !isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "transparent"; } }}
               >
+                {/* Numbered badge */}
                 <div style={{
-                  width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0,
-                  background: isActive ? "rgba(220,20,60,0.3)" : isDone ? "rgba(34,197,94,0.22)" : isNext ? "rgba(220,20,60,0.12)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${isActive ? "rgba(220,20,60,0.65)" : isDone ? "rgba(34,197,94,0.5)" : isNext ? "rgba(220,20,60,0.38)" : "rgba(255,255,255,0.08)"}`,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.62rem",
-                  boxShadow: isActive ? "0 0 10px rgba(220,20,60,0.5)" : "none",
+                  width: isMobile ? "26px" : "30px", height: isMobile ? "26px" : "30px", borderRadius: "50%", flexShrink: 0,
+                  background: isActive
+                    ? "linear-gradient(135deg, rgba(220,20,60,0.45), rgba(168,85,247,0.3))"
+                    : isDone
+                      ? "rgba(34,197,94,0.18)"
+                      : isNext
+                        ? "rgba(220,20,60,0.1)"
+                        : "rgba(255,255,255,0.03)",
+                  border: `1.5px solid ${isActive ? "rgba(220,20,60,0.75)" : isDone ? "rgba(34,197,94,0.55)" : isNext ? "rgba(220,20,60,0.3)" : "rgba(255,255,255,0.07)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: isActive ? "0 0 14px rgba(220,20,60,0.55), 0 0 30px rgba(220,20,60,0.18)" : isDone ? "0 0 10px rgba(34,197,94,0.2)" : "none",
                 }}>
-                  {isDone ? <span style={{ color: "#22C55E" }}>✓</span> : <span style={{ color: isActive ? "#F87171" : isNext ? "rgba(248,113,113,0.65)" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: "0.62rem" }}>{num}</span>}
+                  {isDone
+                    ? <span style={{ color: "#22C55E", fontSize: "0.7rem" }}>✓</span>
+                    : <span style={{ color: isActive ? "#F87171" : isNext ? "rgba(248,113,113,0.55)" : "rgba(200,200,220,0.2)", fontFamily: "'Cinzel', serif", fontWeight: 900, fontSize: isMobile ? "0.6rem" : "0.68rem" }}>{num}</span>
+                  }
                 </div>
                 {!isMobile && (
-                  <span className="font-cinzel" style={{ fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#F87171" : isDone ? "#22C55E" : isNext ? "rgba(248,113,113,0.55)" : "rgba(200,200,220,0.25)", whiteSpace: "nowrap", textShadow: isActive ? "0 0 16px rgba(220,20,60,0.6)" : "none" }}>
-                    {label}
-                  </span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.05rem" }}>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "2px", textTransform: "uppercase", color: isActive ? "rgba(220,20,60,0.6)" : isDone ? "rgba(34,197,94,0.45)" : "rgba(200,200,220,0.15)", fontWeight: 700 }}>
+                      {isDone ? "complete" : isActive ? "active" : "locked"}
+                    </span>
+                    <span className="font-cinzel" style={{ fontSize: "0.62rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#F87171" : isDone ? "#22C55E" : isNext ? "rgba(248,113,113,0.45)" : "rgba(200,200,220,0.18)", whiteSpace: "nowrap", textShadow: isActive ? "0 0 18px rgba(220,20,60,0.65)" : "none", fontWeight: 700 }}>
+                      {label}
+                    </span>
+                  </div>
                 )}
               </button>
               {i < stepLabels.length - 1 && (
-                <div style={{ width: "16px", height: "1px", background: isDone ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.06)", flexShrink: 0 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: "3px", paddingLeft: "6px", paddingRight: "6px", flexShrink: 0 }}>
+                  {[0,1,2].map(d => (
+                    <div key={d} style={{ width: "4px", height: "4px", borderRadius: "50%", background: isDone ? "rgba(34,197,94,0.4)" : isNext && d === 0 ? "rgba(220,20,60,0.4)" : "rgba(255,255,255,0.07)", transition: "background 0.3s" }} />
+                  ))}
+                </div>
               )}
             </div>
           );
@@ -1367,9 +1382,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Step 1 section header */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.25rem" }}>
             <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #DC143C, transparent)", boxShadow: "0 0 14px rgba(220,20,60,0.85)", flexShrink: 0 }} />
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#DC143C", textTransform: "uppercase", fontWeight: 700 }}>Select Your Target</div>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#DC143C", textTransform: "uppercase", fontWeight: 700 }}>Select Your Prey</div>
             <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(220,20,60,0.35), transparent)" }} />
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Choose up to 3 — every one breakable</div>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Choose up to 3 — none will resist forever</div>
           </div>
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
@@ -1409,7 +1424,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {selectedHeroes.length > 0 && (
             <div style={{ marginBottom: "1.25rem", padding: "0.875rem 1.25rem", background: "linear-gradient(135deg, rgba(220,20,60,0.09), rgba(168,85,247,0.06))", border: "1px solid rgba(220,20,60,0.28)", borderRadius: "12px" }}>
               <div className="font-montserrat" style={{ fontSize: "0.52rem", letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(248,113,113,0.55)", marginBottom: "0.6rem", fontWeight: 700 }}>
-                {selectedHeroes.length === 1 ? "⚔ Target Claimed" : `⚔ ${selectedHeroes.length} Targets Claimed`}
+                {selectedHeroes.length === 1 ? "⛓ Prey Selected" : `⛓ ${selectedHeroes.length} Marked`}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 {selectedHeroes.map((h) => {
@@ -1539,30 +1554,30 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     <div style={{ position: "absolute", top: "0.55rem", left: "0.55rem", padding: "0.15rem 0.45rem", background: "rgba(0,0,0,0.8)", border: `1px solid ${accentColor}55`, borderRadius: "3px", fontSize: "0.32rem", letterSpacing: "2px", color: accentColor, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(6px)", zIndex: 3 }}>
                       {hero.universe}
                     </div>
-                    {/* Dossier number */}
-                    <div style={{ position: "absolute", top: "0.55rem", right: "0.55rem", fontSize: "0.32rem", color: "rgba(255,255,255,0.1)", fontFamily: "'Courier New', monospace", letterSpacing: "1.5px", zIndex: 3 }}>
-                      #{(index + 1).toString().padStart(3, "0")}
+                    {/* FALL badge */}
+                    <div style={{ position: "absolute", top: "0.55rem", right: "0.55rem", padding: "0.1rem 0.35rem", background: "rgba(0,0,0,0.75)", border: "1px solid rgba(220,20,60,0.3)", borderRadius: "3px", fontSize: "0.3rem", letterSpacing: "2px", color: "rgba(220,20,60,0.55)", fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(4px)", zIndex: 3 }}>
+                      FALL
                     </div>
-                    {/* TARGET ACQUIRED hover */}
+                    {/* MARK HER hover */}
                     {isHov && !isSelected && (
                       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "5px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1 }}>TARGET</div>
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "5px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1.4 }}>ACQUIRED</div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "6px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1 }}>MARK</div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.15rem", fontWeight: 900, color: "#DC143C", letterSpacing: "6px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 70px rgba(220,20,60,0.55)", lineHeight: 1.4 }}>HER</div>
                         <div style={{ width: "38px", height: "1px", background: "rgba(220,20,60,0.7)", margin: "0.7rem 0 0.5rem" }} />
-                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(248,113,113,0.5)", textTransform: "uppercase" }}>click to claim</div>
+                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(248,113,113,0.5)", textTransform: "uppercase" }}>click to claim her</div>
                       </div>
                     )}
-                    {/* CLAIMED stamp */}
+                    {/* PROPERTY stamp */}
                     {isSelected && (
-                      <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: "#DC143C", border: "3px solid #DC143C", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(220,20,60,0.9)", boxShadow: "0 0 28px rgba(220,20,60,0.35), inset 0 0 18px rgba(220,20,60,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
-                        CLAIMED
+                      <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-15deg)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", fontWeight: 900, color: "#DC143C", border: "3px solid #DC143C", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(220,20,60,0.9)", boxShadow: "0 0 28px rgba(220,20,60,0.35), inset 0 0 18px rgba(220,20,60,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                        PROPERTY
                       </div>
                     )}
                     {/* Bottom info bar */}
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "3rem 0.72rem 0.72rem", zIndex: 4 }}>
                       <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.72rem" : "0.82rem", fontWeight: 900, color: isSelected ? accentColor : "#fff", letterSpacing: "0.04em", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,1)", marginBottom: "0.22rem", transition: "color 0.25s" }}>{hero.name}</div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.25rem" }}>
-                        <div style={{ fontSize: "0.38rem", color: isSelected ? accentColor : "rgba(220,20,60,0.65)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, transition: "color 0.25s" }}>{hero.alias || hero.power}</div>
+                        <div style={{ fontSize: "0.38rem", color: isSelected ? accentColor : "rgba(220,20,60,0.75)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, transition: "color 0.25s" }}>{hero.alias || hero.power}</div>
                         <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore" style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.35)", fontSize: "0.5rem", cursor: "pointer", flexShrink: 0, lineHeight: 1 }}>ℹ</button>
                         <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Unfavorite" : "Favorite"} style={{ background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.55)", border: favorites.includes(hero.name) ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.5rem", cursor: "pointer", color: favorites.includes(hero.name) ? "#000" : "rgba(255,255,255,0.3)", flexShrink: 0 }}>{favorites.includes(hero.name) ? "★" : "☆"}</button>
                       </div>
@@ -1581,7 +1596,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               onMouseEnter={(e) => { if (canProceedStep1()) { e.currentTarget.style.boxShadow = "0 8px 36px rgba(220,20,60,0.42)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.38), rgba(168,85,247,0.25))"; } }}
               onMouseLeave={(e) => { if (canProceedStep1()) { e.currentTarget.style.boxShadow = "0 4px 24px rgba(220,20,60,0.25)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(220,20,60,0.28), rgba(168,85,247,0.18))"; } }}
             >
-              ⚔ Select Captor →
+              ⛓ Assign Her Captor →
             </button>
           </div>
         </div>
@@ -1595,9 +1610,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Step 2 section header */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1.5rem" }}>
             <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 14px rgba(255,64,96,0.85)", flexShrink: 0 }} />
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>Choose the Captor</div>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>Choose Her Owner</div>
             <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.35), transparent)" }} />
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Who owns her now</div>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Who takes ownership of her tonight</div>
           </div>
           {/* Solo / Duo toggle */}
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", alignItems: "center" }}>
@@ -1690,19 +1705,19 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                       <div style={{ position: "absolute", top: "0.55rem", right: "0.55rem", fontSize: "0.32rem", color: "rgba(255,255,255,0.1)", fontFamily: "'Courier New', monospace", letterSpacing: "1.5px", zIndex: 3 }}>
                         T-{(vIdx + 1).toString().padStart(3, "0")}
                       </div>
-                      {/* UNLEASH hover */}
+                      {/* TAKE HER hover */}
                       {isHovV && !isSelected && (
                         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
-                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1 }}>UNLEASH</div>
-                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1.4 }}>HIM</div>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "6px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1 }}>TAKE</div>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.05rem", fontWeight: 900, color: "#FF4060", letterSpacing: "6px", textShadow: "0 0 30px rgba(255,64,96,1), 0 0 70px rgba(255,64,96,0.55)", lineHeight: 1.4 }}>HER</div>
                           <div style={{ width: "38px", height: "1px", background: "rgba(255,64,96,0.7)", margin: "0.7rem 0 0.5rem" }} />
-                          <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(255,120,136,0.5)", textTransform: "uppercase" }}>click to choose</div>
+                          <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3px", color: "rgba(255,120,136,0.5)", textTransform: "uppercase" }}>click to assign</div>
                         </div>
                       )}
-                      {/* CAPTOR stamp */}
+                      {/* OWNER stamp */}
                       {isSelected && (
-                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "1rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(255,64,96,0.9)", boxShadow: "0 0 28px rgba(255,64,96,0.35), inset 0 0 18px rgba(255,64,96,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
-                          CAPTOR
+                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-15deg)", fontFamily: "'Cinzel', serif", fontSize: "0.95rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.15rem 0.5rem", letterSpacing: "5px", textShadow: "0 0 24px rgba(255,64,96,0.9)", boxShadow: "0 0 28px rgba(255,64,96,0.35), inset 0 0 18px rgba(255,64,96,0.08)", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                          OWNER
                         </div>
                       )}
                       {/* Bottom info */}
@@ -1827,12 +1842,13 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                       </div>
                       {isHovV2 && !isSel2 && (
                         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
-                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.95rem", fontWeight: 900, color: "#FF4060", letterSpacing: "4px", textShadow: "0 0 30px rgba(255,64,96,1)", lineHeight: 1.2 }}>PICK HIM</div>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.95rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1)", lineHeight: 1 }}>GIVE</div>
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.95rem", fontWeight: 900, color: "#FF4060", letterSpacing: "5px", textShadow: "0 0 30px rgba(255,64,96,1)", lineHeight: 1.3 }}>HER</div>
                         </div>
                       )}
                       {isSel2 && (
-                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-18deg)", fontFamily: "'Cinzel', serif", fontSize: "0.9rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.12rem 0.45rem", letterSpacing: "4px", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
-                          CAPTOR 2
+                        <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%) rotate(-15deg)", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", fontWeight: 900, color: "#FF4060", border: "3px solid #FF4060", padding: "0.12rem 0.45rem", letterSpacing: "4px", opacity: 0.9, zIndex: 5, whiteSpace: "nowrap", pointerEvents: "none" }}>
+                          CO-OWNER
                         </div>
                       )}
                       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "2.5rem 0.72rem 0.65rem", zIndex: 4 }}>
@@ -1873,7 +1889,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "space-between" }}>
             <button onClick={() => setStep(1)} style={{ padding: "0.75rem 1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", color: "rgba(200,200,220,0.4)", fontFamily: "'Cinzel', serif", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "1.5px" }}>← Back</button>
             <button onClick={() => canProceedStep2() && setStep(3)} disabled={!canProceedStep2()} style={{ padding: "0.875rem 2.5rem", background: canProceedStep2() ? "linear-gradient(135deg, rgba(220,20,60,0.28), rgba(168,85,247,0.18))" : "rgba(255,255,255,0.04)", border: `1px solid ${canProceedStep2() ? "rgba(220,20,60,0.55)" : "rgba(255,255,255,0.07)"}`, borderRadius: "12px", color: canProceedStep2() ? "#F87171" : "rgba(200,200,220,0.25)", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", letterSpacing: "3px", textTransform: "uppercase", cursor: canProceedStep2() ? "pointer" : "not-allowed", transition: "all 0.3s ease", boxShadow: canProceedStep2() ? "0 4px 24px rgba(220,20,60,0.25)" : "none" }}>
-              Configure the Fall →
+              ⛓ Configure Her Fall →
             </button>
           </div>
         </div>
@@ -1888,9 +1904,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           {/* Step 3 section header */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
             <div style={{ width: "3px", height: "18px", borderRadius: "2px", background: "linear-gradient(to bottom, #A855F7, transparent)", boxShadow: "0 0 14px rgba(168,85,247,0.85)", flexShrink: 0 }} />
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#A855F7", textTransform: "uppercase", fontWeight: 700 }}>Configure the Fall</div>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.42rem", letterSpacing: "4.5px", color: "#A855F7", textTransform: "uppercase", fontWeight: 700 }}>Configure Her Fall</div>
             <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(168,85,247,0.35), transparent)" }} />
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Set the conditions of her breaking</div>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "2px", color: "rgba(200,200,220,0.2)", textTransform: "uppercase" }}>Decide the terms of her submission</div>
           </div>
 
           {/* Setting */}
@@ -1898,7 +1914,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,184,0,0.45), transparent)", borderRadius: "inherit" }} />
             <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
               <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FFB800, transparent)", boxShadow: "0 0 12px rgba(255,184,0,0.75)", flexShrink: 0 }} />
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FFB800", textTransform: "uppercase", fontWeight: 700 }}>Where She's Taken</div>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FFB800", textTransform: "uppercase", fontWeight: 700 }}>Where She's Taken to Break</div>
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,184,0,0.3), transparent)" }} />
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
@@ -1923,7 +1939,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.5), transparent)", borderRadius: "inherit" }} />
             <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
               <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 12px rgba(255,64,96,0.75)", flexShrink: 0 }} />
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>What She Surrenders</div>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>What She Loses Forever</div>
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.3), transparent)" }} />
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "0.625rem" }}>
@@ -1947,14 +1963,14 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.5), transparent)", borderRadius: "inherit" }} />
             <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "1rem" }}>
               <div style={{ width: "3px", height: "16px", borderRadius: "2px", background: "linear-gradient(to bottom, #FF4060, transparent)", boxShadow: "0 0 12px rgba(255,64,96,0.75)", flexShrink: 0 }} />
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>How Deep She Breaks</div>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.4rem", letterSpacing: "4px", color: "#FF4060", textTransform: "uppercase", fontWeight: 700 }}>How Completely She Breaks</div>
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255,64,96,0.3), transparent)" }} />
             </div>
             <div style={{ display: "flex", gap: "0.625rem" }}>
               {([
                 { val: 1 as const, label: "Tense", icon: "🌩", desc: "Charged atmosphere, power exchange, psychological dominance" },
                 { val: 2 as const, label: "Explicit", icon: "🔥", desc: "Graphic sexual content, domination, full explicit detail" },
-                { val: 3 as const, label: "Brutal", icon: "💀", desc: "No limits, maximum depravity, extreme degradation" },
+                { val: 3 as const, label: "Merciless", icon: "💀", desc: "No limits, maximum depravity, total humiliation and degradation" },
               ] as const).map(({ val, label, icon, desc }) => {
                 const isSel = intensity === val;
                 const col = val === 1 ? "#60A0FF" : val === 2 ? "#FF8030" : "#FF2020";
@@ -2932,6 +2948,34 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           onCreated={(h) => setCustomHeroesList(prev => [h, ...prev])}
           onDeleted={(id) => setCustomHeroesList(prev => prev.filter(h => h.id !== id))}
         />
+      )}
+
+      {/* ── Bottom ENGINE / EXPLICIT status bar ── */}
+      {step === 1 && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, pointerEvents: "none" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 2rem 1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ pointerEvents: "all", display: "flex", alignItems: "center", gap: "0.6rem", background: "rgba(2,0,8,0.92)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "0.55rem 1rem", backdropFilter: "blur(20px)", boxShadow: "0 4px 32px rgba(0,0,0,0.85)" }}>
+              <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 8px rgba(74,222,128,0.8)", flexShrink: 0 }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.05rem" }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.3rem", letterSpacing: "2px", color: "rgba(200,200,220,0.28)", textTransform: "uppercase", fontWeight: 700 }}>Engine</div>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: "rgba(200,200,220,0.6)", fontWeight: 700, letterSpacing: "1px" }}>NICE AI</div>
+              </div>
+            </div>
+            <button
+              onClick={() => setIntensity(prev => prev === 3 ? 1 : 3)}
+              style={{ pointerEvents: "all", display: "flex", alignItems: "center", gap: "0.6rem", background: intensity === 3 ? "rgba(220,20,60,0.15)" : "rgba(2,0,8,0.92)", border: `1px solid ${intensity === 3 ? "rgba(220,20,60,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: "10px", padding: "0.55rem 1.1rem", backdropFilter: "blur(20px)", cursor: "pointer", color: "inherit", boxShadow: intensity === 3 ? "0 0 20px rgba(220,20,60,0.18), 0 4px 32px rgba(0,0,0,0.85)" : "0 4px 32px rgba(0,0,0,0.85)", transition: "all 0.25s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(220,20,60,0.4)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = intensity === 3 ? "rgba(220,20,60,0.5)" : "rgba(255,255,255,0.07)"; }}
+              title={intensity === 3 ? "Switch to Tense mode" : "Switch to Explicit mode"}
+            >
+              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: intensity === 3 ? "#DC143C" : "rgba(200,200,220,0.18)", boxShadow: intensity === 3 ? "0 0 12px rgba(220,20,60,1)" : "none", flexShrink: 0, transition: "all 0.25s" }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.05rem" }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.3rem", letterSpacing: "2px", color: "rgba(200,200,220,0.28)", textTransform: "uppercase", fontWeight: 700 }}>Content</div>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", color: intensity === 3 ? "#F87171" : "rgba(200,200,220,0.45)", fontWeight: 700, letterSpacing: "1px" }}>{intensity === 3 ? "EXPLICIT ON" : "EXPLICIT"}</div>
+              </div>
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Lore Card Modal */}
