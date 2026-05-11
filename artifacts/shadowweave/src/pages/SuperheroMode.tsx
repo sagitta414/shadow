@@ -671,6 +671,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [villainFilter, setVillainFilter] = useState<VillainFilter>("ALL");
   const [search, setSearch] = useState("");
   const [heroViewMode, setHeroViewMode] = useState<"grid" | "list">("grid");
+  const [hoveredHero, setHoveredHero] = useState<string | null>(null);
 
   // Selections
   const [selectedHeroes, setSelectedHeroes] = useState<(typeof MARVEL_HEROES[0] & { universe: string })[]>([]);
@@ -1221,46 +1222,83 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const stepLabels = ["Select Target", "Choose Captor", "Configure the Fall", "The Story"];
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh" }}>
-      {/* ── Header ── */}
-      <div style={{ marginBottom: isMobile ? "1.25rem" : "2rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1.1rem" }}>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh", position: "relative" }}>
+      {/* Atmospheric background glow blobs */}
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "-15%", left: "-5%", width: "55vw", height: "55vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(139,0,0,0.13) 0%, transparent 70%)", animation: "bannerDrift 20s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", bottom: "-10%", right: "-8%", width: "45vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(88,0,120,0.1) 0%, transparent 70%)", animation: "bannerDrift 25s ease-in-out infinite reverse" }} />
+        <div style={{ position: "absolute", top: "40%", left: "60%", width: "30vw", height: "30vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(60,0,80,0.08) 0%, transparent 70%)", animation: "orbFloat 30s ease-in-out infinite" }} />
+      </div>
+      {/* ── Cinematic Header Banner ── */}
+      <div style={{
+        position: "relative",
+        marginBottom: isMobile ? "1.5rem" : "2.5rem",
+        borderRadius: "16px",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, rgba(55,0,15,0.97) 0%, rgba(8,0,18,0.99) 50%, rgba(30,0,50,0.97) 100%)",
+        border: "1px solid rgba(220,20,60,0.32)",
+        boxShadow: "0 0 60px rgba(139,0,0,0.32), 0 0 120px rgba(88,0,120,0.14), inset 0 1px 0 rgba(255,255,255,0.05)",
+      }}>
+        {/* Top crimson accent bar */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent 0%, #DC143C 25%, #A855F7 75%, transparent 100%)", zIndex: 2 }} />
+        {/* Bottom subtle line */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(220,20,60,0.38) 50%, transparent 100%)", zIndex: 2 }} />
+        {/* Inner atmospheric glow */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 15% 60%, rgba(139,0,0,0.25) 0%, transparent 52%), radial-gradient(ellipse at 88% 40%, rgba(88,0,120,0.18) 0%, transparent 52%)", pointerEvents: "none", zIndex: 1 }} />
+
+        {/* Main content row */}
+        <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "1.3rem 1.1rem 0" : "2rem 2.5rem 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", flexWrap: "wrap" }}>
+          {/* Left: Title block */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.55rem" }}>
-              <div style={{ width: "4px", height: "20px", borderRadius: "2px", background: "linear-gradient(to bottom, #DC143C, #A855F7)", boxShadow: "0 0 14px rgba(220,20,60,0.7)" }} />
-              <div style={{ padding: "0.22rem 0.75rem", background: "rgba(220,20,60,0.12)", border: "1px solid rgba(220,20,60,0.38)", borderRadius: "20px", fontSize: "0.6rem", color: "rgba(248,113,113,0.85)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>
-                ⚔ Heroine Forge · 210+ Targets
-              </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.8rem" }}>
+              <div style={{ width: "36px", height: "1.5px", background: "linear-gradient(90deg, #DC143C, transparent)" }} />
+              <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.58rem", letterSpacing: "4px", color: "rgba(220,20,60,0.88)", textTransform: "uppercase", fontWeight: 800 }}>⚔ Heroine Forge</span>
+              <div style={{ width: "36px", height: "1.5px", background: "linear-gradient(90deg, transparent, #A855F7)" }} />
             </div>
-            <h1 className="font-cinzel" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900, background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 25%, #DC143C 55%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", letterSpacing: "4px", lineHeight: 1, marginBottom: "0.4rem" }}>
-              HEROINE FORGE
-            </h1>
-            <div style={{ fontSize: "0.65rem", color: "rgba(200,190,240,0.38)", fontFamily: "'Raleway', sans-serif", letterSpacing: "0.08em" }}>
+            <div style={{ animation: "forgeGlow 5s ease-in-out infinite" }}>
+              <h1 className="font-cinzel" style={{ fontSize: isMobile ? "clamp(1.9rem, 8vw, 2.5rem)" : "clamp(2.5rem, 4.5vw, 3.8rem)", fontWeight: 900, background: "linear-gradient(135deg, #F5D67A 0%, #E8B830 18%, #DC143C 56%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", letterSpacing: "7px", lineHeight: 1, marginBottom: "0.6rem", display: "block" }}>
+                HEROINE FORGE
+              </h1>
+            </div>
+            <div style={{ fontFamily: "'Crimson Text', serif", fontSize: isMobile ? "0.88rem" : "1.02rem", color: "rgba(215,175,190,0.5)", fontStyle: "italic", letterSpacing: "0.04em" }}>
               210+ targets. Every one breakable. You choose how.
             </div>
           </div>
-          <button onClick={onBack} style={{ background: "none", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.5rem 1rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.7rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s", flexShrink: 0 }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.75)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.35)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
-          >← Back</button>
+
+          {/* Right: Stats + back */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.8rem", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: isMobile ? "1.1rem" : "1.8rem", alignItems: "center" }}>
+              {[["210+", "TARGETS"], ["DC·MARVEL", "UNIVERSE"]].map(([num, label]) => (
+                <div key={label} style={{ textAlign: "center" }}>
+                  <div className="font-cinzel" style={{ fontSize: isMobile ? "0.88rem" : "1.08rem", fontWeight: 900, color: "rgba(248,113,113,0.92)", lineHeight: 1 }}>{num}</div>
+                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.4rem", letterSpacing: "2px", color: "rgba(200,165,185,0.32)", textTransform: "uppercase", marginTop: "3px" }}>{label}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={onBack}
+              style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "0.42rem 0.95rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Cinzel', serif", fontSize: "0.65rem", cursor: "pointer", letterSpacing: "1px", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(248,113,113,0.75)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.38)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.35)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+            >← Exit</button>
+          </div>
         </div>
 
-        {/* Selection summary bar — shows across all steps after step 1 */}
+        {/* Selection summary bar */}
         {selectedHeroes.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.6rem 1rem", borderRadius: "10px", background: "rgba(4,1,12,0.8)", border: "1px solid rgba(220,20,60,0.12)", backdropFilter: "blur(16px)", flexWrap: "wrap" }}>
-            <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 8px rgba(220,20,60,0.9)", flexShrink: 0 }} />
-            <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "3px", color: "rgba(248,113,113,0.45)", textTransform: "uppercase" }}>Claimed</span>
+          <div style={{ position: "relative", zIndex: 2, margin: "0.85rem 0 0", padding: isMobile ? "0.65rem 1.1rem" : "0.72rem 2.5rem", borderTop: "1px solid rgba(220,20,60,0.15)", background: "rgba(0,0,0,0.38)", display: "flex", alignItems: "center", gap: "0.8rem", flexWrap: "wrap" }}>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 10px rgba(220,20,60,1)", flexShrink: 0, animation: "crimsonPulse 2s ease-in-out infinite" }} />
+            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.52rem", letterSpacing: "3.5px", color: "rgba(248,113,113,0.55)", textTransform: "uppercase", fontWeight: 800 }}>Claimed</span>
             {selectedHeroes.map(h => (
-              <span key={h.name} style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(248,200,200,0.85)", letterSpacing: "0.05em" }}>{h.name}</span>
+              <span key={h.name} style={{ fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 700, color: "rgba(248,205,212,0.92)", letterSpacing: "0.05em" }}>{h.name}</span>
             ))}
             {selectedVillain && (
               <>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "2px", color: "rgba(220,20,60,0.45)", textTransform: "uppercase", marginLeft: "0.25rem" }}>vs</span>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 700, color: "rgba(239,68,68,0.75)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
+                <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.52rem", letterSpacing: "2px", color: "rgba(220,20,60,0.52)", textTransform: "uppercase" }}>vs</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.8rem", fontWeight: 700, color: "rgba(239,68,68,0.9)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
               </>
             )}
-            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.58rem", color: "rgba(239,68,68,0.6)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
-            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.58rem", color: "rgba(255,128,48,0.6)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
+            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(239,68,68,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>💀 Brutal</span>}
+            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.6rem", color: "rgba(255,140,50,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 700 }}>🔥 Explicit</span>}
           </div>
         )}
       </div>
@@ -1460,36 +1498,58 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     key={`${hero.universe}-${hero.name}`}
                     onClick={() => toggleHero(hero)}
                     style={{
-                      background: isSelected ? selectedBg : "rgba(0,0,0,0.5)",
-                      backdropFilter: "blur(10px)",
-                      border: `1px solid ${isSelected ? accentColor : "rgba(255,255,255,0.06)"}`,
+                      background: isSelected ? `linear-gradient(135deg, ${selectedBg}, rgba(30,0,10,0.92))` : "rgba(4,0,10,0.78)",
+                      backdropFilter: "blur(12px)",
+                      border: `1px solid ${isSelected ? accentColor + "BB" : "rgba(220,20,60,0.09)"}`,
                       borderRadius: "12px",
                       padding: "0.875rem",
                       cursor: "pointer",
                       textAlign: "left",
-                      transition: "all 0.2s ease",
+                      transition: "all 0.25s ease",
                       color: "inherit",
                       position: "relative",
-                      boxShadow: isSelected ? `0 0 16px ${accentColor}44` : "none",
+                      boxShadow: isSelected ? `0 0 24px ${accentColor}55, 0 0 60px ${accentColor}18, inset 0 1px 0 rgba(255,255,255,0.05)` : "0 2px 14px rgba(0,0,0,0.55)",
                     }}
-                    onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = `${accentColor}60`; e.currentTarget.style.background = accentBg; } }}
-                    onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; } }}
+                    onMouseEnter={(e) => {
+                      setHoveredHero(hero.name);
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = "rgba(220,20,60,0.52)";
+                        e.currentTarget.style.background = "linear-gradient(135deg, rgba(60,0,15,0.94), rgba(10,0,20,0.97))";
+                        e.currentTarget.style.boxShadow = "0 4px 30px rgba(220,20,60,0.3), 0 0 60px rgba(139,0,0,0.12)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      setHoveredHero(null);
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = "rgba(220,20,60,0.09)";
+                        e.currentTarget.style.background = "rgba(4,0,10,0.78)";
+                        e.currentTarget.style.boxShadow = "0 2px 14px rgba(0,0,0,0.55)";
+                      }
+                    }}
                   >
-                    {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "18px", height: "18px", borderRadius: "50%", background: accentColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#000", zIndex: 2, fontWeight: 700 }}>✓</div>}
-                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Remove from favorites" : "Add to favorites"} style={{ position: "absolute", top: "0.4rem", left: "0.4rem", width: "22px", height: "22px", borderRadius: "50%", background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.6)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", zIndex: 2, transition: "all 0.2s", backdropFilter: "blur(4px)" }}>
+                    {/* CLAIM HER hover overlay */}
+                    {hoveredHero === hero.name && !isSelected && (
+                      <div style={{ position: "absolute", inset: 0, background: "rgba(22,0,7,0.85)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: "12px", zIndex: 10, backdropFilter: "blur(3px)", animation: "claimReveal 0.18s ease-out" }}>
+                        <div className="font-cinzel" style={{ fontSize: "0.9rem", fontWeight: 900, color: "#DC143C", letterSpacing: "3px", textShadow: "0 0 22px rgba(220,20,60,0.95), 0 0 50px rgba(220,20,60,0.45)", marginBottom: "0.3rem" }}>⚔ CLAIM HER</div>
+                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.47rem", letterSpacing: "2.5px", color: "rgba(248,113,113,0.52)", textTransform: "uppercase" }}>{hero.alias || hero.name}</div>
+                      </div>
+                    )}
+                    {/* Selected checkmark */}
+                    {isSelected && <div style={{ position: "absolute", top: "0.4rem", right: "0.4rem", width: "20px", height: "20px", borderRadius: "50%", background: `linear-gradient(135deg, ${accentColor}, rgba(220,20,60,0.7))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff", zIndex: 2, fontWeight: 700, boxShadow: `0 0 12px ${accentColor}88` }}>✓</div>}
+                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Remove from favorites" : "Add to favorites"} style={{ position: "absolute", top: "0.4rem", left: "0.4rem", width: "22px", height: "22px", borderRadius: "50%", background: favorites.includes(hero.name) ? "rgba(255,184,0,0.9)" : "rgba(0,0,0,0.72)", border: favorites.includes(hero.name) ? "none" : "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", cursor: "pointer", zIndex: 11, transition: "all 0.2s", backdropFilter: "blur(4px)" }}>
                       {favorites.includes(hero.name) ? "★" : "☆"}
                     </button>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${isSelected ? accentColor + "33" : "rgba(0,0,0,0.45)"} 0%, transparent 55%)`, pointerEvents: "none" }} />
-                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.5rem", color: accentColor, fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "8px", overflow: "hidden", marginBottom: "0.55rem", background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <img src={heroImg(hero.name)} alt={hero.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", filter: isSelected ? "brightness(1.08) saturate(1.1)" : "brightness(0.82) saturate(0.9)" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                      <div style={{ position: "absolute", inset: 0, background: isSelected ? `linear-gradient(to top, ${accentColor}60 0%, ${accentColor}18 40%, transparent 70%)` : "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.22) 45%, transparent 72%)", pointerEvents: "none" }} />
+                      <div style={{ position: "absolute", bottom: "0.4rem", left: "0.4rem", fontSize: "0.48rem", color: isSelected ? accentColor : "rgba(220,20,60,0.65)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.5px", fontWeight: 700, textTransform: "uppercase" }}>{hero.universe}</div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.15rem" }}>
-                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "#E8E8F0", fontWeight: 700, lineHeight: 1.3 }}>{hero.name}</div>
+                      <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSelected ? accentColor : "rgba(232,220,232,0.92)", fontWeight: 700, lineHeight: 1.3 }}>{hero.name}</div>
                       <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore card" style={{ background: "none", border: "none", color: `${accentColor}88`, fontSize: "0.75rem", cursor: "pointer", padding: "0 0.1rem", lineHeight: 1, flexShrink: 0 }}>ℹ</button>
                     </div>
-                    <div style={{ fontSize: "0.58rem", color: "rgba(200,200,220,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem" }}>{hero.alias}</div>
-                    <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.5)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
+                    <div style={{ fontSize: "0.55rem", color: "rgba(220,20,60,0.38)", fontFamily: "'Montserrat', sans-serif", marginBottom: "0.3rem", letterSpacing: "0.5px" }}>{hero.alias}</div>
+                    <div style={{ fontSize: "0.58rem", color: "rgba(195,185,208,0.42)", fontFamily: "'Raleway', sans-serif", lineHeight: 1.4 }}>{hero.power}</div>
                   </button>
                 );
               })}
