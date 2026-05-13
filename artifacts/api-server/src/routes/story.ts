@@ -3996,6 +3996,46 @@ router.post("/story/homepage-heroine-image", async (req, res) => {
   }
 });
 
+// ── Heroine card image — portrait Venice AI ──
+router.post("/story/forge-card-image", async (req, res) => {
+  try {
+    const { name, power } = req.body as { name?: string; power?: string };
+    const heroineName = (name ?? "Heroine").trim();
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const scenarios = [
+      `${heroineName}, wrists shackled above her head with heavy iron chains suspended from dungeon vault, head hanging forward in exhaustion, costume torn and dishevelled, sweat-sheened trembling skin, spirit crushed, dark dungeon cell with torchlight`,
+      `${heroineName}, kneeling on cold obsidian marble, wrists locked in steel cuffs behind her back, dark leather collar around her throat, chain leash trailing from collar, head bowed in submission, mascara tears on her cheeks, villain's penthouse at night`,
+      `${heroineName}, spread-eagled and bound to a stone altar with glowing enchanted shackles at wrists and ankles, costume shredded, arching her back in agony against the restraints, power completely drained, silent scream, arcane ritual chamber with purple energy runes`,
+      `${heroineName}, strapped upright to a metal examination rack with thick leather restraints across wrists and thighs, head tilted back exposing her throat, costume jacket stripped off, gasping through gritted teeth, underground black site laboratory`,
+      `${heroineName}, collared and leashed on her knees across dark marble, on display as a trophy captive, hollow defeated eyes, costume reduced to rags, completely broken, villain's trophy room with dim red lighting`,
+      `${heroineName}, suspended by writhing dark energy tendrils binding her spread-eagled in mid-air, head lolling back, all power drained, limp and helpless, floating in a dark sanctum with pulsing shadow magic`,
+      `${heroineName}, wrists bound with black rope in front of her, forced to kneel in glowing power-suppressing collar, pride obliterated, kneeling in surrender at captor's feet, demonic summoning circle, hellfire and sulfur light`,
+      `${heroineName}, seated in heavy metal chair with wrists shackled to armrests and ankles to chair legs, head tilted back and mouth gagged with torn fabric, costume dishevelled and sweat-drenched, underground interrogation room, harsh single overhead light`,
+    ];
+
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const styleTag = "ultra-photorealistic, cinematic photography, award-winning, 8k, sharp focus, dramatic chiaroscuro lighting, deep shadows, masterpiece, cinematic composition, depth of field";
+    const prompt = `${sc}, ${power ? `her powers are ${power}, ` : ""}highly detailed torn costume, ${styleTag}`;
+    const negativePrompt = "text, watermark, logo, cartoon, anime, ugly, deformed, bad anatomy, blurry, low quality, extra limbs, duplicate, childlike, child, minor, young face, underage";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 512, height: 896, steps: 28, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) { const t = await imgResp.text(); throw new Error(`Venice ${imgResp.status}: ${t.slice(0, 200)}`); }
+    const imgJson = await imgResp.json() as { images?: string[] };
+    const imageBase64 = imgJson.images?.[0];
+    if (!imageBase64) throw new Error("No image returned");
+    res.json({ imageBase64, name: heroineName });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
 
 
