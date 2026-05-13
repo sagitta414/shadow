@@ -1244,110 +1244,91 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: isMobile ? "1rem" : "2rem", minHeight: "100vh", position: "relative" }}>
-      {/* Atmospheric background glow blobs */}
+      {/* Tactical grid background */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "-15%", left: "-5%", width: "55vw", height: "55vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(139,0,0,0.13) 0%, transparent 70%)", animation: "bannerDrift 20s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", bottom: "-10%", right: "-8%", width: "45vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(88,0,120,0.1) 0%, transparent 70%)", animation: "bannerDrift 25s ease-in-out infinite reverse" }} />
-        <div style={{ position: "absolute", top: "40%", left: "60%", width: "30vw", height: "30vh", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(60,0,80,0.08) 0%, transparent 70%)", animation: "orbFloat 30s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(220,20,60,0.032) 59px, rgba(220,20,60,0.032) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(220,20,60,0.032) 59px, rgba(220,20,60,0.032) 60px)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 10% 8%, rgba(100,0,0,0.22) 0%, transparent 45%), radial-gradient(ellipse at 90% 92%, rgba(60,0,80,0.16) 0%, transparent 40%), radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.45) 0%, transparent 80%)" }} />
       </div>
-      {/* ── Cinematic Header Banner ── */}
-      <div style={{
-        position: "relative",
-        marginBottom: isMobile ? "1.5rem" : "2.5rem",
-        marginLeft: isMobile ? "-1rem" : "-2rem",
-        marginRight: isMobile ? "-1rem" : "-2rem",
-        marginTop: isMobile ? "-1rem" : "-2rem",
-        borderRadius: 0,
-        overflow: "hidden",
-        background: "linear-gradient(180deg, rgba(4,0,10,1) 0%, rgba(8,0,18,1) 60%, rgba(12,0,6,1) 100%)",
-        borderBottom: "1px solid rgba(220,20,60,0.32)",
-        boxShadow: "0 16px 100px rgba(0,0,0,0.95), 0 0 200px rgba(100,0,30,0.12)",
-      }}>
-        {/* Top dual accent bar */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent 0%, #8B0000 10%, #DC143C 40%, #FF1A1A 50%, #A855F7 80%, transparent 100%)", zIndex: 2 }} />
-        <div style={{ position: "absolute", top: "3px", left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent 10%, rgba(220,20,60,0.2) 35%, rgba(220,20,60,0.2) 65%, transparent 90%)", zIndex: 2 }} />
-        {/* Scanline overlay */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px)", zIndex: 1, pointerEvents: "none", opacity: 0.6 }} />
-        {/* Deep atmospheric glows */}
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 10% 55%, rgba(160,0,0,0.28) 0%, transparent 50%), radial-gradient(ellipse at 88% 35%, rgba(80,0,110,0.2) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(60,0,0,0.35) 0%, transparent 60%)", pointerEvents: "none", zIndex: 1 }} />
-        {/* Corner grid decoration — top left */}
-        <div style={{ position: "absolute", top: "1rem", left: "1.5rem", width: "90px", height: "55px", borderLeft: "1px solid rgba(220,20,60,0.18)", borderTop: "1px solid rgba(220,20,60,0.18)", zIndex: 2, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: "6px", left: "6px", width: "22px", height: "22px", borderLeft: "1px solid rgba(220,20,60,0.35)", borderTop: "1px solid rgba(220,20,60,0.35)" }} />
-        </div>
-        {/* Corner grid decoration — top right */}
-        <div style={{ position: "absolute", top: "1rem", right: "1.5rem", width: "90px", height: "55px", borderRight: "1px solid rgba(168,85,247,0.18)", borderTop: "1px solid rgba(168,85,247,0.18)", zIndex: 2, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: "6px", right: "6px", width: "22px", height: "22px", borderRight: "1px solid rgba(168,85,247,0.35)", borderTop: "1px solid rgba(168,85,247,0.35)" }} />
+      {/* ── DARKFORGE COMMAND HEADER ── */}
+      <div style={{ position: "relative", marginLeft: isMobile ? "-1rem" : "-2rem", marginRight: isMobile ? "-1rem" : "-2rem", marginTop: isMobile ? "-1rem" : "-2rem", marginBottom: isMobile ? "1.2rem" : "1.8rem", background: "#05000b", borderBottom: "2px solid rgba(220,20,60,0.45)", overflow: "hidden" }}>
+        {/* Vertical grid lines */}
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(220,20,60,0.025) 99px, rgba(220,20,60,0.025) 100px)", pointerEvents: "none", zIndex: 0 }} />
+        {/* Red left-edge bar */}
+        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "4px", background: "linear-gradient(to bottom, #DC143C, rgba(168,85,247,0.6))", zIndex: 3 }} />
+
+        {/* Classification strip */}
+        <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.32rem 2.5rem 0.32rem 1.8rem", borderBottom: "1px solid rgba(220,20,60,0.15)", background: "rgba(220,20,60,0.07)", gap: "1rem", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 8px #DC143C", animation: "crimsonPulse 1.4s ease-in-out infinite", flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "4px", color: "rgba(220,20,60,0.62)", textTransform: "uppercase", fontWeight: 800 }}>CLASSIFICATION: RESTRICTED — ADULT CONTENT</span>
+          </div>
+          <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.36rem", letterSpacing: "3px", color: "rgba(200,200,220,0.14)", textTransform: "uppercase" }}>VENICE AI · UNCENSORED ENGINE v4.1 · ONLINE</span>
+          <button onClick={onBack}
+            style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(220,20,60,0.28)", padding: "0.25rem 0.8rem", color: "rgba(220,20,60,0.55)", fontFamily: "'Cinzel', serif", fontSize: "0.58rem", letterSpacing: "1.5px", cursor: "pointer", transition: "all 0.2s", borderRadius: 0 }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(80,0,0,0.7)"; e.currentTarget.style.color = "rgba(248,113,113,0.9)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.6)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.6)"; e.currentTarget.style.color = "rgba(220,20,60,0.55)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.28)"; }}
+          >← ABORT</button>
         </div>
 
-        {/* Main content row */}
-        <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "1.8rem 1.2rem 1.4rem" : "2.4rem 3.5rem 1.8rem", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", flexWrap: "wrap" }}>
-          {/* Left: Title block */}
-          <div>
-            {/* Protocol badge row */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1rem" }}>
-              <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 12px #DC143C, 0 0 24px rgba(220,20,60,0.5)", flexShrink: 0, animation: "crimsonPulse 1.4s ease-in-out infinite" }} />
-              <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.46rem", letterSpacing: "5px", color: "rgba(220,20,60,0.72)", textTransform: "uppercase", fontWeight: 800 }}>CAPTURE PROTOCOL — INITIATED</span>
-              <div style={{ width: "50px", height: "1px", background: "linear-gradient(90deg, rgba(220,20,60,0.5), transparent)" }} />
-            </div>
-            {/* Title */}
-            <div style={{ animation: "forgeGlow 5s ease-in-out infinite" }}>
-              <h1 className="font-cinzel" style={{ fontSize: isMobile ? "clamp(2.2rem, 9vw, 2.8rem)" : "clamp(3rem, 5.5vw, 5rem)", fontWeight: 900, background: "linear-gradient(135deg, #FFB3B3 0%, #FF3030 20%, #DC143C 48%, #C0392B 65%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", letterSpacing: "9px", lineHeight: 0.92, marginBottom: "0.8rem", display: "block", textShadow: "none" }}>
-                HEROINE<br />FORGE
-              </h1>
-            </div>
-            {/* Sub tagline */}
-            <div style={{ fontFamily: "'Crimson Text', serif", fontSize: isMobile ? "0.85rem" : "1rem", color: "rgba(215,155,170,0.48)", fontStyle: "italic", letterSpacing: "0.07em", lineHeight: 1.6 }}>
-              Every heroine is a target. Every target breaks.<br />You decide how she falls.
+        {/* Main body: left data panel + center title */}
+        <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "stretch" }}>
+          {/* Left: mission data */}
+          <div style={{ width: isMobile ? "130px" : "195px", flexShrink: 0, borderRight: "1px solid rgba(220,20,60,0.15)", padding: isMobile ? "1.2rem 1rem" : "1.8rem 1.5rem", display: "flex", flexDirection: "column", gap: "1rem", background: "rgba(220,20,60,0.04)" }}>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "3.5px", color: "rgba(220,20,60,0.45)", textTransform: "uppercase", fontWeight: 800, paddingBottom: "0.5rem", borderBottom: "1px solid rgba(220,20,60,0.12)" }}>MISSION DATA</div>
+            {[["210+", "TARGETS"], ["DC · MARVEL", "UNIVERSE"], ["VENICE AI", "UNCENSORED"], ["ZERO", "ESCAPE"]].map(([v, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.68rem" : "0.78rem", fontWeight: 900, color: l === "UNCENSORED" ? "rgba(168,85,247,0.88)" : "rgba(248,113,113,0.88)", lineHeight: 1 }}>{v}</div>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.28rem", letterSpacing: "2px", color: "rgba(200,150,170,0.22)", textTransform: "uppercase", marginTop: "2px" }}>{l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Center: title */}
+          <div style={{ flex: 1, padding: isMobile ? "1.5rem" : "2rem 3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.4rem", letterSpacing: "7px", color: "rgba(220,20,60,0.35)", textTransform: "uppercase", fontWeight: 800, marginBottom: "0.6rem" }}>OPERATION</div>
+            <h1 className="font-cinzel" style={{ fontWeight: 900, letterSpacing: "10px", lineHeight: 0.88, marginBottom: "1.1rem", fontSize: isMobile ? "clamp(2rem,9vw,3rem)" : "clamp(3rem,5.5vw,5.5rem)" }}>
+              <span style={{ display: "block", color: "#f0f0f8", textShadow: "0 2px 0 rgba(0,0,0,1)" }}>HEROINE</span>
+              <span style={{ display: "block", background: "linear-gradient(135deg, #FF4040 0%, #DC143C 40%, #B91C1C 65%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FORGE</span>
+            </h1>
+            <div style={{ fontFamily: "'Crimson Text', serif", fontSize: isMobile ? "0.82rem" : "0.95rem", color: "rgba(215,140,158,0.38)", fontStyle: "italic", letterSpacing: "0.07em", lineHeight: 1.75 }}>
+              Every heroine is an acquisition target.<br />Not one will escape this forge.
             </div>
           </div>
 
-          {/* Right: Stats + back */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1.1rem", flexShrink: 0 }}>
-            <div style={{ display: "flex", gap: isMobile ? "1rem" : "1.6rem", alignItems: "center" }}>
-              {([["210+", "TARGETS"], ["DC·MARVEL", "UNIVERSE"], ["VENICE", "UNCENSORED"]] as const).map(([num, label]) => (
-                <div key={label} style={{ textAlign: "center" }}>
-                  <div className="font-cinzel" style={{ fontSize: isMobile ? "0.85rem" : "1.05rem", fontWeight: 900, color: label === "UNCENSORED" ? "rgba(168,85,247,0.92)" : "rgba(248,113,113,0.92)", lineHeight: 1 }}>{num}</div>
-                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.36rem", letterSpacing: "2.5px", color: "rgba(200,155,175,0.28)", textTransform: "uppercase", marginTop: "4px" }}>{label}</div>
-                </div>
-              ))}
+          {/* Right decorative corner brackets */}
+          {!isMobile && (
+            <div style={{ width: "64px", flexShrink: 0, position: "relative" }}>
+              <div style={{ position: "absolute", top: "1.2rem", right: "1.2rem", width: "20px", height: "20px", borderTop: "1.5px solid rgba(168,85,247,0.28)", borderRight: "1.5px solid rgba(168,85,247,0.28)" }} />
+              <div style={{ position: "absolute", bottom: "1.2rem", right: "1.2rem", width: "20px", height: "20px", borderBottom: "1.5px solid rgba(220,20,60,0.28)", borderRight: "1.5px solid rgba(220,20,60,0.28)" }} />
             </div>
-            <button onClick={onBack}
-              style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "6px", padding: "0.4rem 1rem", color: "rgba(200,200,220,0.32)", fontFamily: "'Cinzel', serif", fontSize: "0.62rem", cursor: "pointer", letterSpacing: "1.5px", transition: "all 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(248,113,113,0.75)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.4)"; e.currentTarget.style.background = "rgba(80,0,0,0.35)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,200,220,0.32)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.background = "rgba(0,0,0,0.55)"; }}
-            >← EXIT</button>
-          </div>
+          )}
         </div>
 
-        {/* Selection summary bar */}
+        {/* Captured roster strip */}
         {selectedHeroes.length > 0 && (
-          <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "0.55rem 1.2rem" : "0.6rem 3.5rem", borderTop: "1px solid rgba(220,20,60,0.2)", background: "linear-gradient(90deg, rgba(60,0,0,0.55), rgba(30,0,50,0.4), rgba(60,0,0,0.55))", display: "flex", alignItems: "center", gap: "0.8rem", flexWrap: "wrap" }}>
-            <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 10px rgba(220,20,60,1)", flexShrink: 0, animation: "crimsonPulse 2s ease-in-out infinite" }} />
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.45rem", letterSpacing: "4px", color: "rgba(248,113,113,0.52)", textTransform: "uppercase", fontWeight: 800 }}>ABDUCTED</span>
+          <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "0.45rem 1.5rem" : "0.52rem 2.5rem", borderTop: "1px solid rgba(220,20,60,0.18)", background: "rgba(50,0,0,0.4)", display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "4px", color: "rgba(220,20,60,0.5)", textTransform: "uppercase", fontWeight: 800 }}>⛓ CAPTURED</span>
             {selectedHeroes.map(h => (
-              <div key={h.name} style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(220,20,60,0.5)" }} />
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: "rgba(248,205,212,0.92)", letterSpacing: "0.05em" }}>{h.name}</span>
-                {veniceCards[h.name] && <span style={{ fontSize: "0.35rem", color: "rgba(168,85,247,0.7)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1px", background: "rgba(88,0,120,0.4)", padding: "0.08rem 0.3rem", borderRadius: "2px" }}>AI</span>}
+              <div key={h.name} style={{ display: "flex", alignItems: "center", gap: "0.28rem" }}>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: "rgba(248,205,212,0.9)" }}>{h.name}</span>
+                {veniceCards[h.name] && <span style={{ fontSize: "0.27rem", color: "rgba(168,85,247,0.75)", background: "rgba(80,0,110,0.5)", padding: "0.07rem 0.28rem", fontFamily: "'Montserrat', sans-serif", fontWeight: 900, letterSpacing: "1px" }}>⚡AI</span>}
               </div>
             ))}
             {selectedVillain && (
               <>
-                <div style={{ marginLeft: "0.3rem", height: "14px", width: "1px", background: "rgba(220,20,60,0.3)" }} />
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.42rem", letterSpacing: "2px", color: "rgba(220,20,60,0.45)", textTransform: "uppercase" }}>OWNED BY</span>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: "rgba(239,68,68,0.9)", letterSpacing: "0.05em" }}>{selectedVillain.name}</span>
+                <span style={{ color: "rgba(220,20,60,0.25)", fontSize: "0.55rem", margin: "0 0.15rem" }}>|</span>
+                <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "2px", color: "rgba(220,20,60,0.38)", textTransform: "uppercase" }}>CAPTOR</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.78rem", fontWeight: 700, color: "rgba(239,68,68,0.88)" }}>{selectedVillain.name}</span>
               </>
             )}
-            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.55rem", color: "rgba(239,68,68,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>💀 MERCILESS</span>}
-            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.55rem", color: "rgba(255,140,50,0.78)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>🔥 EXPLICIT</span>}
+            {intensity === 3 && <span style={{ marginLeft: "auto", fontSize: "0.5rem", color: "rgba(239,68,68,0.72)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>💀 MERCILESS</span>}
+            {intensity === 2 && <span style={{ marginLeft: "auto", fontSize: "0.5rem", color: "rgba(255,140,50,0.72)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700 }}>🔥 EXPLICIT</span>}
           </div>
         )}
-        {/* Bottom accent line */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(220,20,60,0.4) 40%, rgba(168,85,247,0.3) 60%, transparent 100%)", zIndex: 2 }} />
       </div>
 
-      {/* ── Step Progress ── */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: isMobile ? "1.5rem" : "2.2rem", background: "rgba(2,0,8,0.88)", borderRadius: "14px", padding: isMobile ? "0.6rem 0.75rem" : "0.75rem 1.5rem", border: "1px solid rgba(220,20,60,0.12)", backdropFilter: "blur(20px)", boxShadow: "0 4px 32px rgba(0,0,0,0.6)" }}>
+      {/* ── PHASE TRACKER ── */}
+      <div style={{ display: "flex", alignItems: "stretch", marginBottom: isMobile ? "1.2rem" : "1.6rem", background: "rgba(3,0,8,0.96)", borderLeft: "3px solid rgba(220,20,60,0.4)", borderRight: "1px solid rgba(255,255,255,0.04)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
         {stepLabels.map((label, i) => {
           const num = i + 1 as Step;
           const isActive = step === num;
@@ -1355,60 +1336,47 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           const canCurrentProceed = step === 1 ? canProceedStep1() : step === 2 ? canProceedStep2() : step === 3 ? canProceedStep3() : false;
           const isNext = num === step + 1 && canCurrentProceed;
           const isClickable = isDone || isNext;
+          const phaseAccent = isActive ? "#DC143C" : isDone ? "#22C55E" : "rgba(255,255,255,0.07)";
           return (
-            <div key={num} style={{ flex: 1, display: "flex", alignItems: "center" }}>
+            <div key={num} style={{ flex: 1, display: "flex", alignItems: "stretch", borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
               <button
                 onClick={() => { if (isDone) setStep(num); else if (isNext) setStep(num); }}
                 disabled={!isClickable}
                 style={{
-                  flex: 1, padding: isMobile ? "0.5rem 0.35rem" : "0.65rem 0.75rem",
-                  background: isActive ? "linear-gradient(135deg, rgba(220,20,60,0.18), rgba(168,85,247,0.1))" : "transparent",
-                  border: `1px solid ${isActive ? "rgba(220,20,60,0.45)" : "transparent"}`,
-                  borderRadius: "10px", cursor: isClickable ? "pointer" : "default",
-                  display: "flex", alignItems: "center", gap: isMobile ? "0.35rem" : "0.6rem", justifyContent: "center",
-                  transition: "all 0.25s ease", color: "inherit",
-                  boxShadow: isActive ? "0 0 20px rgba(220,20,60,0.15)" : "none",
+                  flex: 1, padding: isMobile ? "0.65rem 0.4rem" : "0.85rem 1rem",
+                  background: isActive ? "rgba(220,20,60,0.08)" : "transparent",
+                  border: "none", borderTop: `2px solid ${phaseAccent}`,
+                  cursor: isClickable ? "pointer" : "default",
+                  display: "flex", alignItems: "center", gap: isMobile ? "0.4rem" : "0.7rem",
+                  transition: "all 0.2s", color: "inherit",
                 }}
-                onMouseEnter={(e) => { if (isNext && !isActive) { e.currentTarget.style.background = "rgba(220,20,60,0.09)"; e.currentTarget.style.borderColor = "rgba(220,20,60,0.3)"; } }}
-                onMouseLeave={(e) => { if (isNext && !isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "transparent"; } }}
+                onMouseEnter={(e) => { if (isClickable && !isActive) e.currentTarget.style.background = "rgba(220,20,60,0.05)"; }}
+                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
               >
-                {/* Numbered badge */}
+                {/* Phase number block */}
                 <div style={{
-                  width: isMobile ? "26px" : "30px", height: isMobile ? "26px" : "30px", borderRadius: "50%", flexShrink: 0,
-                  background: isActive
-                    ? "linear-gradient(135deg, rgba(220,20,60,0.45), rgba(168,85,247,0.3))"
-                    : isDone
-                      ? "rgba(34,197,94,0.18)"
-                      : isNext
-                        ? "rgba(220,20,60,0.1)"
-                        : "rgba(255,255,255,0.03)",
-                  border: `1.5px solid ${isActive ? "rgba(220,20,60,0.75)" : isDone ? "rgba(34,197,94,0.55)" : isNext ? "rgba(220,20,60,0.3)" : "rgba(255,255,255,0.07)"}`,
+                  width: isMobile ? "28px" : "36px", height: isMobile ? "22px" : "28px", flexShrink: 0,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: isActive ? "0 0 14px rgba(220,20,60,0.55), 0 0 30px rgba(220,20,60,0.18)" : isDone ? "0 0 10px rgba(34,197,94,0.2)" : "none",
+                  background: isActive ? "rgba(220,20,60,0.22)" : isDone ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.03)",
+                  borderLeft: `2px solid ${isActive ? "#DC143C" : isDone ? "#22C55E" : "rgba(255,255,255,0.1)"}`,
+                  transition: "all 0.2s",
                 }}>
                   {isDone
-                    ? <span style={{ color: "#22C55E", fontSize: "0.7rem" }}>✓</span>
-                    : <span style={{ color: isActive ? "#F87171" : isNext ? "rgba(248,113,113,0.55)" : "rgba(200,200,220,0.2)", fontFamily: "'Cinzel', serif", fontWeight: 900, fontSize: isMobile ? "0.6rem" : "0.68rem" }}>{num}</span>
+                    ? <span style={{ color: "#22C55E", fontSize: "0.8rem", fontWeight: 900 }}>✓</span>
+                    : <span style={{ fontFamily: "'Cinzel', serif", fontWeight: 900, fontSize: isMobile ? "0.58rem" : "0.65rem", color: isActive ? "#F87171" : "rgba(200,200,220,0.18)" }}>0{num}</span>
                   }
                 </div>
                 {!isMobile && (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.05rem" }}>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "2px", textTransform: "uppercase", color: isActive ? "rgba(220,20,60,0.6)" : isDone ? "rgba(34,197,94,0.45)" : "rgba(200,200,220,0.15)", fontWeight: 700 }}>
-                      {isDone ? "complete" : isActive ? "active" : "locked"}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.08rem", textAlign: "left" }}>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.3rem", letterSpacing: "2.5px", textTransform: "uppercase", color: isActive ? "rgba(220,20,60,0.55)" : isDone ? "rgba(34,197,94,0.4)" : "rgba(200,200,220,0.1)", fontWeight: 800 }}>
+                      PHASE {String(num).padStart(2,"0")}
                     </span>
-                    <span className="font-cinzel" style={{ fontSize: "0.62rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#F87171" : isDone ? "#22C55E" : isNext ? "rgba(248,113,113,0.45)" : "rgba(200,200,220,0.18)", whiteSpace: "nowrap", textShadow: isActive ? "0 0 18px rgba(220,20,60,0.65)" : "none", fontWeight: 700 }}>
+                    <span className="font-cinzel" style={{ fontSize: "0.58rem", letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? "#F87171" : isDone ? "#22C55E" : isNext ? "rgba(248,113,113,0.35)" : "rgba(200,200,220,0.15)", fontWeight: 700, whiteSpace: "nowrap" }}>
                       {label}
                     </span>
                   </div>
                 )}
               </button>
-              {i < stepLabels.length - 1 && (
-                <div style={{ display: "flex", alignItems: "center", gap: "3px", paddingLeft: "6px", paddingRight: "6px", flexShrink: 0 }}>
-                  {[0,1,2].map(d => (
-                    <div key={d} style={{ width: "4px", height: "4px", borderRadius: "50%", background: isDone ? "rgba(34,197,94,0.4)" : isNext && d === 0 ? "rgba(220,20,60,0.4)" : "rgba(255,255,255,0.07)", transition: "background 0.3s" }} />
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}
@@ -1420,14 +1388,15 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       {step === 1 && (
         <div>
           {/* Step 1 section header */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", marginBottom: "1.25rem", padding: "0.7rem 1rem", background: "linear-gradient(90deg, rgba(60,0,0,0.35), rgba(30,0,50,0.2), transparent)", borderLeft: "3px solid #DC143C", borderRadius: "0 6px 6px 0", boxShadow: "inset 0 0 30px rgba(80,0,0,0.15)" }}>
-            <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 12px rgba(220,20,60,1), 0 0 24px rgba(220,20,60,0.5)", flexShrink: 0, animation: "crimsonPulse 1.8s ease-in-out infinite" }} />
-            <div>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", letterSpacing: "5px", color: "#DC143C", textTransform: "uppercase", fontWeight: 700, lineHeight: 1 }}>Mark Your Prey</div>
-              <div style={{ fontFamily: "'Crimson Text', serif", fontSize: "0.7rem", color: "rgba(200,140,155,0.38)", fontStyle: "italic", marginTop: "2px" }}>Select up to 3 — not one will escape</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem", borderLeft: "4px solid #DC143C", background: "rgba(220,20,60,0.06)", borderBottom: "1px solid rgba(220,20,60,0.18)" }}>
+            <div style={{ padding: "0.6rem 1rem" }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.62rem", letterSpacing: "5px", color: "#DC143C", textTransform: "uppercase", fontWeight: 700, lineHeight: 1 }}>ACQUISITION TARGETS</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.28rem", letterSpacing: "2.5px", color: "rgba(200,200,220,0.18)", textTransform: "uppercase", marginTop: "3px" }}>Select up to 3 — not one will escape</div>
             </div>
-            <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(220,20,60,0.28), transparent)" }} />
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.3rem", letterSpacing: "2.5px", color: "rgba(200,200,220,0.18)", textTransform: "uppercase" }}>{filteredHeroes.length} targets catalogued</div>
+            <div style={{ padding: "0.6rem 1rem", textAlign: "right" }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.75rem", fontWeight: 900, color: "rgba(220,20,60,0.42)", lineHeight: 1 }}>{filteredHeroes.length}</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.27rem", letterSpacing: "2px", color: "rgba(200,200,220,0.15)", textTransform: "uppercase", marginTop: "2px" }}>CATALOGUED</div>
+            </div>
           </div>
           {/* Filters */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap", alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
@@ -1546,8 +1515,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               })}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "148px" : "190px"}, 1fr))`, gap: "0.75rem", maxHeight: "680px", overflowY: "auto", paddingRight: "6px", paddingBottom: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(220,20,60,0.25) transparent" }}>
-              {filteredHeroes.map((hero) => {
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? "145px" : "188px"}, 1fr))`, gap: "4px", maxHeight: "680px", overflowY: "auto", paddingRight: "4px", paddingBottom: "4px", scrollbarWidth: "thin", scrollbarColor: "rgba(220,20,60,0.2) transparent" }}>
+              {filteredHeroes.map((hero, index) => {
                 const isMarvel = hero.universe === "MARVEL";
                 const isCW = hero.universe === "CW";
                 const isTB = hero.universe === "TB";
@@ -1561,8 +1530,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                 const isHov = hoveredHero === hero.name;
                 const isGenning = generatingCards.has(hero.name);
                 const hasVenice = !!veniceCards[hero.name];
-                const accentColor = isMarvel ? "#FF6060" : isCW ? "#40E090" : isTB ? "#FF3D00" : isPR ? "#FF69B4" : isAnim ? "#C084FC" : isSW ? "#4DC8FF" : isTV ? "#FF9640" : isGaming ? "#34D399" : isFilm ? "#FCD34D" : "#60A0FF";
-                const cardBorder = isSelected ? `2px solid ${accentColor}` : isHov ? "2px solid rgba(220,20,60,0.7)" : hasVenice ? "2px solid rgba(168,85,247,0.45)" : "2px solid rgba(20,4,8,1)";
+                const accentColor = isMarvel ? "#FF5050" : isCW ? "#34D399" : isTB ? "#FF4020" : isPR ? "#F472B6" : isAnim ? "#C084FC" : isSW ? "#38BDF8" : isTV ? "#FB923C" : isGaming ? "#34D399" : isFilm ? "#FBBF24" : "#60A0FF";
                 return (
                   <div
                     key={`${hero.universe}-${hero.name}`}
@@ -1572,107 +1540,113 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
                     style={{
                       position: "relative",
                       cursor: "pointer",
-                      borderRadius: "8px",
+                      borderRadius: 0,
                       overflow: "hidden",
                       aspectRatio: "2/3",
-                      background: "linear-gradient(160deg, #0a0010 0%, #050008 100%)",
-                      border: cardBorder,
-                      transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-                      transform: isHov && !isSelected ? "translateY(-10px) scale(1.025)" : isSelected ? "translateY(-5px) scale(1.01)" : "none",
+                      background: "#030008",
+                      border: `1.5px solid ${isSelected ? accentColor : isHov ? "rgba(220,20,60,0.55)" : hasVenice ? "rgba(130,60,200,0.3)" : "rgba(25,5,12,1)"}`,
+                      transition: "all 0.22s ease",
+                      transform: isHov && !isSelected ? "translateY(-8px)" : isSelected ? "translateY(-4px)" : "none",
                       boxShadow: isSelected
-                        ? `0 0 50px ${accentColor}44, 0 0 20px ${accentColor}22, 0 24px 60px rgba(0,0,0,0.95)`
+                        ? `0 0 0 1px ${accentColor}44, 0 0 24px ${accentColor}28, 0 18px 48px rgba(0,0,0,0.95)`
                         : isHov
-                          ? "0 22px 60px rgba(0,0,0,0.95), 0 0 40px rgba(220,20,60,0.22), 0 0 80px rgba(80,0,0,0.15)"
-                          : hasVenice
-                            ? "0 4px 28px rgba(0,0,0,0.75), 0 0 18px rgba(168,85,247,0.12)"
-                            : "0 4px 20px rgba(0,0,0,0.72)",
+                          ? "0 18px 50px rgba(0,0,0,0.95), 0 0 28px rgba(220,20,60,0.14)"
+                          : "0 2px 10px rgba(0,0,0,0.75)",
                     }}
                   >
-                    {/* Hero image — Venice override when available */}
+                    {/* Left universe accent stripe */}
+                    <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", background: `linear-gradient(to bottom, ${accentColor}, ${accentColor}33)`, zIndex: 6, opacity: isSelected ? 1 : isHov ? 0.9 : 0.45, transition: "opacity 0.2s" }} />
+
+                    {/* Hero image */}
                     <img
                       src={hasVenice ? veniceCards[hero.name] : heroImg(hero.name)}
                       alt={hero.name}
                       style={{
                         position: "absolute", inset: 0, width: "100%", height: "100%",
                         objectFit: "cover", objectPosition: hasVenice ? "center center" : "center top",
-                        display: "block", transition: "filter 0.35s, opacity 0.4s",
-                        filter: isHov ? "brightness(0.38) saturate(0.4)" : isSelected ? "brightness(0.78) saturate(1.25) contrast(1.1)" : "brightness(0.72) saturate(0.85)",
+                        display: "block", transition: "filter 0.28s",
+                        filter: isHov ? "brightness(0.28) saturate(0.25)" : isSelected ? "brightness(0.62) saturate(1.1)" : "brightness(0.52) saturate(0.75)",
                       }}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
                     />
 
-                    {/* Venice generating shimmer overlay */}
+                    {/* Generating overlay */}
                     {isGenning && (
-                      <div style={{ position: "absolute", inset: 0, zIndex: 8, background: "linear-gradient(135deg, rgba(30,0,60,0.92), rgba(80,0,40,0.85))", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.6rem" }}>
-                        <div style={{ width: "28px", height: "28px", border: "2px solid rgba(168,85,247,0.25)", borderTop: "2px solid rgba(168,85,247,0.9)", borderRadius: "50%", animation: "cardSpin 0.75s linear infinite" }} />
-                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.38rem", letterSpacing: "3.5px", color: "rgba(168,85,247,0.85)", textTransform: "uppercase", fontWeight: 800 }}>GENERATING</div>
-                        <div style={{ fontFamily: "'Crimson Text', serif", fontSize: "0.6rem", color: "rgba(200,150,220,0.5)", fontStyle: "italic" }}>{hero.name}</div>
+                      <div style={{ position: "absolute", inset: 0, zIndex: 9, background: "rgba(8,0,18,0.94)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.55rem" }}>
+                        <div style={{ width: "24px", height: "24px", border: "2px solid rgba(168,85,247,0.18)", borderTop: "2px solid rgba(168,85,247,0.88)", borderRadius: "50%", animation: "cardSpin 0.7s linear infinite" }} />
+                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.32rem", letterSpacing: "3px", color: "rgba(168,85,247,0.78)", textTransform: "uppercase", fontWeight: 800 }}>GENERATING</div>
                       </div>
                     )}
 
-                    {/* Deep vignette gradient */}
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.08) 58%, transparent 100%)", pointerEvents: "none", zIndex: 2 }} />
-                    {/* Top fade */}
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "70px", background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)", pointerEvents: "none", zIndex: 2 }} />
+                    {/* Targeting brackets — top left */}
+                    <div style={{ position: "absolute", top: "7px", left: "7px", width: "13px", height: "13px", borderTop: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, borderLeft: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, opacity: isHov || isSelected ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", transform: isHov || isSelected ? "translate(0,0)" : "translate(-4px,-4px)", zIndex: 7 }} />
+                    {/* Targeting brackets — top right */}
+                    <div style={{ position: "absolute", top: "7px", right: "7px", width: "13px", height: "13px", borderTop: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, borderRight: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, opacity: isHov || isSelected ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", transform: isHov || isSelected ? "translate(0,0)" : "translate(4px,-4px)", zIndex: 7 }} />
+                    {/* Targeting brackets — bottom left */}
+                    <div style={{ position: "absolute", bottom: "76px", left: "7px", width: "13px", height: "13px", borderBottom: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, borderLeft: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, opacity: isHov || isSelected ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", transform: isHov || isSelected ? "translate(0,0)" : "translate(-4px,4px)", zIndex: 7 }} />
+                    {/* Targeting brackets — bottom right */}
+                    <div style={{ position: "absolute", bottom: "76px", right: "7px", width: "13px", height: "13px", borderBottom: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, borderRight: `1.5px solid ${isSelected ? accentColor : "rgba(220,20,60,0.85)"}`, opacity: isHov || isSelected ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", transform: isHov || isSelected ? "translate(0,0)" : "translate(4px,4px)", zIndex: 7 }} />
 
-                    {/* Universe badge — top left */}
-                    <div style={{ position: "absolute", top: "0.5rem", left: "0.5rem", padding: "0.12rem 0.42rem", background: "rgba(0,0,0,0.85)", border: `1px solid ${accentColor}44`, borderRadius: "3px", fontSize: "0.3rem", letterSpacing: "1.8px", color: accentColor, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(8px)", zIndex: 4 }}>
+                    {/* Universe label — top left */}
+                    <div style={{ position: "absolute", top: "0.42rem", left: "0.55rem", zIndex: 5, fontFamily: "'Montserrat', sans-serif", fontSize: "0.27rem", letterSpacing: "1.5px", color: `${accentColor}bb`, fontWeight: 800, textTransform: "uppercase", background: "rgba(0,0,0,0.72)", padding: "0.08rem 0.28rem" }}>
                       {hero.universe}
                     </div>
 
-                    {/* Venice AI badge — top right (only when generated) */}
-                    {hasVenice && !isGenning ? (
-                      <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", padding: "0.1rem 0.32rem", background: "rgba(60,0,90,0.9)", border: "1px solid rgba(168,85,247,0.65)", borderRadius: "3px", fontSize: "0.28rem", letterSpacing: "1.5px", color: "rgba(200,150,255,0.95)", fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(6px)", zIndex: 4 }}>
+                    {/* Venice badge — top right */}
+                    {hasVenice && !isGenning && (
+                      <div style={{ position: "absolute", top: "0.42rem", right: "0.42rem", zIndex: 5, fontFamily: "'Montserrat', sans-serif", fontSize: "0.26rem", letterSpacing: "1px", color: "rgba(200,140,255,0.9)", fontWeight: 900, background: "rgba(55,0,80,0.9)", padding: "0.08rem 0.28rem", border: "1px solid rgba(168,85,247,0.5)" }}>
                         ⚡ AI
                       </div>
-                    ) : !hasVenice && !isGenning ? (
-                      <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", padding: "0.1rem 0.35rem", background: "rgba(0,0,0,0.75)", border: "1px solid rgba(220,20,60,0.28)", borderRadius: "3px", fontSize: "0.28rem", letterSpacing: "1.8px", color: "rgba(220,20,60,0.5)", fontFamily: "'Montserrat', sans-serif", fontWeight: 800, textTransform: "uppercase", backdropFilter: "blur(4px)", zIndex: 4 }}>
-                        FALL
-                      </div>
-                    ) : null}
+                    )}
 
-                    {/* MARK HER hover overlay */}
+                    {/* Crosshair + MARK HER on hover */}
                     {isHov && !isSelected && !isGenning && (
-                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, animation: "claimReveal 0.18s ease-out" }}>
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.2rem", fontWeight: 900, color: "#DC143C", letterSpacing: "7px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 80px rgba(220,20,60,0.5)", lineHeight: 1 }}>MARK</div>
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.2rem", fontWeight: 900, color: "#DC143C", letterSpacing: "7px", textShadow: "0 0 30px rgba(220,20,60,1), 0 0 80px rgba(220,20,60,0.5)", lineHeight: 1.4 }}>HER</div>
-                        <div style={{ width: "42px", height: "1px", background: "linear-gradient(90deg, transparent, rgba(220,20,60,0.8), transparent)", margin: "0.65rem 0 0.55rem" }} />
-                        <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.36rem", letterSpacing: "3.5px", color: "rgba(248,113,113,0.52)", textTransform: "uppercase" }}>claim her</div>
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: "76px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 8 }}>
+                        <div style={{ position: "relative", width: "36px", height: "36px", marginBottom: "0.55rem" }}>
+                          <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: "1px", background: "rgba(220,20,60,0.6)", transform: "translateY(-50%)" }} />
+                          <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: "1px", background: "rgba(220,20,60,0.6)", transform: "translateX(-50%)" }} />
+                          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", boxShadow: "0 0 10px rgba(220,20,60,1)" }} />
+                        </div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 900, color: "#DC143C", letterSpacing: "7px", textShadow: "0 0 20px rgba(220,20,60,0.9)", lineHeight: 1.2 }}>MARK</div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.72rem", fontWeight: 900, color: "#DC143C", letterSpacing: "7px", textShadow: "0 0 20px rgba(220,20,60,0.9)", lineHeight: 1.2 }}>HER</div>
                       </div>
                     )}
 
-                    {/* PROPERTY stamp */}
+                    {/* Selected corner ribbon */}
                     {isSelected && (
-                      <div style={{ position: "absolute", top: "36%", left: "50%", transform: "translate(-50%, -50%) rotate(-12deg)", fontFamily: "'Cinzel', serif", fontSize: "0.85rem", fontWeight: 900, color: "#DC143C", border: "3px solid #DC143C", padding: "0.15rem 0.55rem", letterSpacing: "5px", textShadow: "0 0 22px rgba(220,20,60,0.9)", boxShadow: "0 0 30px rgba(220,20,60,0.4), inset 0 0 20px rgba(220,20,60,0.08)", opacity: 0.92, zIndex: 6, whiteSpace: "nowrap", pointerEvents: "none" }}>
-                        PROPERTY
+                      <div style={{ position: "absolute", top: "22px", right: "-16px", transform: "rotate(45deg)", background: accentColor, width: "58px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 8 }}>
+                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.25rem", letterSpacing: "1.5px", color: "rgba(0,0,0,0.85)", fontWeight: 900, textTransform: "uppercase" }}>TAKEN</span>
                       </div>
                     )}
 
-                    {/* Bottom info bar */}
-                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "2.8rem 0.65rem 0.65rem", zIndex: 5 }}>
-                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.7rem" : "0.8rem", fontWeight: 900, color: isSelected ? accentColor : isHov ? "#fff" : "rgba(255,255,255,0.92)", letterSpacing: "0.03em", lineHeight: 1.2, textShadow: "0 2px 14px rgba(0,0,0,1)", marginBottom: "0.28rem", transition: "color 0.25s" }}>{hero.name}</div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.22rem" }}>
-                        <div style={{ fontSize: "0.35rem", color: isSelected ? `${accentColor}cc` : "rgba(220,20,60,0.68)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "1.2px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, transition: "color 0.25s" }}>{hero.alias || hero.power}</div>
-                        {/* Venice AI generate button */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); void generateCardImage(hero); }}
-                          title={hasVenice ? "Regenerate Venice AI image" : "Generate Venice AI image"}
-                          style={{
-                            background: hasVenice ? "rgba(80,0,120,0.85)" : "rgba(0,0,0,0.6)",
-                            border: hasVenice ? "1px solid rgba(168,85,247,0.65)" : "1px solid rgba(255,255,255,0.1)",
-                            borderRadius: "3px", width: "20px", height: "16px",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            color: hasVenice ? "rgba(200,140,255,0.95)" : isGenning ? "rgba(168,85,247,0.6)" : "rgba(255,255,255,0.32)",
-                            fontSize: "0.5rem", cursor: isGenning ? "wait" : "pointer",
-                            flexShrink: 0, lineHeight: 1, transition: "all 0.2s",
-                          }}
-                          onMouseEnter={(e) => { if (!isGenning) { e.currentTarget.style.background = "rgba(80,0,120,0.85)"; e.currentTarget.style.borderColor = "rgba(168,85,247,0.65)"; e.currentTarget.style.color = "rgba(200,140,255,0.95)"; } }}
-                          onMouseLeave={(e) => { if (!isGenning && !hasVenice) { e.currentTarget.style.background = "rgba(0,0,0,0.6)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "rgba(255,255,255,0.32)"; } }}
-                        >
-                          {isGenning ? "·" : "⚡"}
-                        </button>
-                        <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} title="Lore" style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "16px", height: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.45rem", cursor: "pointer", flexShrink: 0, lineHeight: 1 }}>ℹ</button>
-                        <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} title={favorites.includes(hero.name) ? "Unfavorite" : "Favorite"} style={{ background: favorites.includes(hero.name) ? "rgba(255,184,0,0.88)" : "rgba(0,0,0,0.6)", border: favorites.includes(hero.name) ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "16px", height: "16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.45rem", cursor: "pointer", color: favorites.includes(hero.name) ? "#000" : "rgba(255,255,255,0.28)", flexShrink: 0 }}>{favorites.includes(hero.name) ? "★" : "☆"}</button>
+                    {/* File index */}
+                    <div style={{ position: "absolute", bottom: "76px", left: "3px", right: 0, zIndex: 5, paddingLeft: "0.6rem", paddingBottom: "0.18rem" }}>
+                      <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.25rem", letterSpacing: "1.5px", color: "rgba(200,200,220,0.12)", textTransform: "uppercase" }}>FILE #{String(index + 1).padStart(3, "0")}</div>
+                    </div>
+
+                    {/* Hard-cut dossier panel */}
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 5 }}>
+                      {/* Universe color separator line */}
+                      <div style={{ height: "1.5px", background: isSelected ? accentColor : `${accentColor}55`, boxShadow: isSelected ? `0 0 5px ${accentColor}` : "none", transition: "all 0.22s" }} />
+                      {/* Info panel */}
+                      <div style={{ background: "rgba(3,0,8,0.98)", padding: "0.42rem 0.6rem 0.32rem 0.7rem" }}>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.65rem" : "0.74rem", fontWeight: 900, color: isSelected ? accentColor : "#e5e5f0", letterSpacing: "0.02em", lineHeight: 1.15, marginBottom: "0.18rem", transition: "color 0.2s" }}>{hero.name}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.18rem" }}>
+                          <div style={{ fontSize: "0.28rem", color: "rgba(200,200,220,0.25)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "0.8px", fontWeight: 700, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{hero.alias || hero.power}</div>
+                          <button onClick={(e) => { e.stopPropagation(); setLoreHero(hero); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.2)", fontSize: "0.45rem", cursor: "pointer", padding: "0.08rem", flexShrink: 0, lineHeight: 1 }}>ℹ</button>
+                          <button onClick={(e) => { e.stopPropagation(); toggleFavorite(hero.name); }} style={{ background: "none", border: "none", fontSize: "0.45rem", cursor: "pointer", color: favorites.includes(hero.name) ? "#FBBF24" : "rgba(255,255,255,0.18)", flexShrink: 0, lineHeight: 1, padding: "0.08rem" }}>{favorites.includes(hero.name) ? "★" : "☆"}</button>
+                        </div>
+                      </div>
+                      {/* Venice full-width generate strip */}
+                      <div
+                        onClick={(e) => { e.stopPropagation(); void generateCardImage(hero); }}
+                        onMouseEnter={(e) => { if (!isGenning) (e.currentTarget as HTMLDivElement).style.background = "rgba(65,0,95,0.85)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = hasVenice ? "rgba(45,0,70,0.82)" : "rgba(0,0,0,0.55)"; }}
+                        style={{ height: "19px", display: "flex", alignItems: "center", justifyContent: "center", cursor: isGenning ? "wait" : "pointer", background: hasVenice ? "rgba(45,0,70,0.82)" : "rgba(0,0,0,0.55)", borderTop: `1px solid ${hasVenice ? "rgba(130,60,200,0.35)" : "rgba(255,255,255,0.04)"}`, transition: "background 0.18s" }}
+                      >
+                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.27rem", letterSpacing: "2.5px", color: isGenning ? "rgba(168,85,247,0.65)" : hasVenice ? "rgba(168,85,247,0.72)" : "rgba(200,200,220,0.16)", textTransform: "uppercase", fontWeight: 800 }}>
+                          {isGenning ? "⟳ GENERATING..." : hasVenice ? "⚡ REGEN DOSSIER" : "⚡ GENERATE DOSSIER"}
+                        </span>
                       </div>
                     </div>
                   </div>
