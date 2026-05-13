@@ -4036,6 +4036,41 @@ router.post("/story/forge-card-image", async (req, res) => {
   }
 });
 
+router.post("/story/forge-scene-image", async (req, res) => {
+  try {
+    const { sceneId } = req.body as { sceneId?: string };
+    const veniceKey = process.env.VENICE_API_KEY;
+    if (!veniceKey) throw new Error("VENICE_API_KEY not set");
+
+    const SCENE_PROMPTS: Record<string, string> = {
+      city:      "dark rain-soaked neon cyberpunk metropolis under aerial attack, burning skyscrapers reflected in wet streets, dark storm clouds, cinematic drone shot, ultra-photorealistic 8k",
+      space:     "deep cosmic void, massive swirling purple and blue nebula, distant galaxies, cold empty space, floating asteroid debris, ultra-photorealistic cinematic",
+      dimension: "surreal alternate dimension portal, fractal impossible architecture, reality distorting, ethereal violet and crimson energy beams, otherworldly dreamscape",
+      base:      "gothic villain fortress dungeon interior, black obsidian stone walls, crimson torch flames, iron chains hanging, massive dark throne room, cinematic chiaroscuro lighting",
+      ruins:     "ancient stone ruins at night, moonlit crumbling columns, overgrown vines and moss, mysterious purple glowing runes, thick fog, cinematic atmospheric",
+      station:   "interior of dark space station, sleek metallic corridors, cold blue emergency lighting, zero gravity chamber, dark sterile sci-fi environment, ultra-realistic",
+    };
+
+    const prompt = (SCENE_PROMPTS[sceneId ?? ""] ?? SCENE_PROMPTS.city) +
+      ", no people, no characters, no faces, cinematic composition, dramatic lighting, masterpiece";
+    const negativePrompt = "text, watermark, logo, cartoon, anime, people, characters, faces, person, human, body, ugly, deformed, blurry, low quality";
+
+    const imgResp = await fetch("https://api.venice.ai/api/v1/image/generate", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${veniceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "lustify-sdxl", prompt, negative_prompt: negativePrompt, width: 640, height: 360, steps: 22, safe_mode: false }),
+    });
+
+    if (!imgResp.ok) { const t = await imgResp.text(); throw new Error(`Venice ${imgResp.status}: ${t.slice(0, 200)}`); }
+    const imgJson = await imgResp.json() as { images?: string[] };
+    const imageBase64 = imgJson.images?.[0];
+    if (!imageBase64) throw new Error("No image returned");
+    res.json({ imageBase64, sceneId });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 export default router;
 
 

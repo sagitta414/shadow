@@ -702,6 +702,9 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
   const [sensoryModeActive, setSensoryModeActive] = useState(false);
   const [sensoryMode, setSensoryMode] = useState<string>("");
   const [sensoryScrambler, setSensoryScrambler] = useState<string[]>([]);
+  const [step3Tab, setStep3Tab] = useState<"scenario" | "narrative" | "capture" | "control">("scenario");
+  const [sceneImages, setSceneImages] = useState<Record<string, string>>({});
+  const [generatingScenes, setGeneratingScenes] = useState<Set<string>>(new Set());
 
   // ── Team-up Mode ──
   const [isVillainDuo, setIsVillainDuo] = useState(false);
@@ -810,6 +813,32 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
       setGeneratingCards(prev => { const next = new Set(prev); next.delete(hero.name); return next; });
     }
   }
+
+  async function generateSceneImage(sceneId: string) {
+    if (generatingScenes.has(sceneId) || sceneImages[sceneId]) return;
+    setGeneratingScenes(prev => new Set([...prev, sceneId]));
+    try {
+      const res = await fetch("/api/story/forge-scene-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sceneId }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json() as { imageBase64: string };
+      if (data.imageBase64) {
+        setSceneImages(prev => ({ ...prev, [sceneId]: `data:image/webp;base64,${data.imageBase64}` }));
+      }
+    } catch { /* silently fail */ } finally {
+      setGeneratingScenes(prev => { const next = new Set(prev); next.delete(sceneId); return next; });
+    }
+  }
+
+  useEffect(() => {
+    if (step === 3) {
+      SETTINGS.forEach(s => { void generateSceneImage(s.id); });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // Story generation & chapters
   const [chapters, setChapters] = useState<string[]>([]);
@@ -1966,7 +1995,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
           STEP 3 — Scenario Details
       ══════════════════════════════════════════════════════ */}
       {step === 3 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
 
           {/* Step 3 section header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginLeft: isMobile ? "-1rem" : "-2rem", marginRight: isMobile ? "-1rem" : "-2rem", borderLeft: "4px solid #A855F7", background: "rgba(168,85,247,0.07)", borderBottom: "1px solid rgba(168,85,247,0.2)", borderTop: "1px solid rgba(168,85,247,0.1)" }}>
@@ -1982,6 +2011,43 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             )}
           </div>
 
+          {/* ── TAB NAVIGATION ── */}
+          <div style={{ display: "flex", background: "rgba(2,0,5,0.99)", borderBottom: "1px solid rgba(255,255,255,0.07)", marginLeft: isMobile ? "-1rem" : "-2rem", marginRight: isMobile ? "-1rem" : "-2rem" }}>
+            {([
+              { id: "scenario"  as const, label: "SCENARIO",  sub: "Site · Stakes · Protocol", col: "#FFB800" },
+              { id: "narrative" as const, label: "NARRATIVE",  sub: "Tone · Marketplace",        col: "#4080D0" },
+              { id: "capture"   as const, label: "CAPTURE",    sub: "Method · Context · Bonds",  col: "#C02040" },
+              { id: "control"   as const, label: "CONTROL",    sub: "Power · Mind · Senses",     col: "#8040C0" },
+            ]).map((tab) => {
+              const isActive = step3Tab === tab.id;
+              const completionMap = {
+                scenario:  (selectedSettings.length > 0 ? 1 : 0) + (selectedStakes.length > 0 ? 1 : 0) + 1,
+                narrative: (storyTones.length > 0 ? 1 : 0) + (marketplaceActive ? 1 : 0),
+                capture:   (captureMethod ? 1 : 0) + (heroState ? 1 : 0) + (missionContext ? 1 : 0) + (selectedRestraints.length > 0 || !!customRestraints ? 1 : 0),
+                control:   (powerDegradation > 0 ? 1 : 0) + (traumaState ? 1 : 0) + (sensoryModeActive ? 1 : 0) + (sensoryScrambler.length > 0 ? 1 : 0),
+              };
+              const count = completionMap[tab.id];
+              const bgRgb = tab.id === "scenario" ? "255,184,0" : tab.id === "narrative" ? "64,128,208" : tab.id === "capture" ? "192,32,64" : "128,64,192";
+              return (
+                <button key={tab.id} onClick={() => setStep3Tab(tab.id)}
+                  style={{ flex: "1 1 0", minWidth: isMobile ? "58px" : "88px", padding: isMobile ? "0.7rem 0.15rem" : "0.8rem 1.25rem", background: isActive ? `rgba(${bgRgb},0.1)` : "transparent", border: "none", borderBottom: `2px solid ${isActive ? tab.col : "transparent"}`, borderRight: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", color: isActive ? tab.col : "rgba(200,200,220,0.32)", transition: "all 0.18s", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.15rem" }}
+                  onMouseEnter={(e) => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(200,200,220,0.72)"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.03)"; } }}
+                  onMouseLeave={(e) => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(200,200,220,0.32)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; } }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                    <span style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? "0.44rem" : "0.54rem", fontWeight: 700, letterSpacing: "3px" }}>{tab.label}</span>
+                    {count > 0 && <span style={{ width: "14px", height: "14px", borderRadius: "50%", background: isActive ? tab.col : "rgba(200,200,220,0.12)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.4rem", color: isActive ? "#000" : "rgba(200,200,220,0.4)", fontWeight: 900, flexShrink: 0, lineHeight: 1 }}>{count}</span>}
+                  </div>
+                  {!isMobile && <div style={{ fontSize: "0.25rem", letterSpacing: "1.5px", color: isActive ? `${tab.col}88` : "rgba(200,200,220,0.14)", fontFamily: "'Montserrat', sans-serif", textTransform: "uppercase" }}>{tab.sub}</div>}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── TAB CONTENT ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1.5rem" }}>
+            {step3Tab === "scenario" && (<>
+
           {/* Setting */}
           <div style={{ background: "rgba(3,0,8,0.97)", borderLeft: "4px solid #FFB800" }}>
             <div style={{ background: "rgba(255,184,0,0.06)", borderBottom: "1px solid rgba(255,184,0,0.18)", padding: "0.6rem 1.2rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -1991,18 +2057,26 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </div>
               {selectedSettings.length > 0 && <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.28rem", letterSpacing: "2px", color: "rgba(255,184,0,0.45)", textTransform: "uppercase", fontWeight: 800 }}>{selectedSettings.length} SELECTED</div>}
             </div>
-            <div style={{ padding: "0.75rem 1rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(168px, 1fr))", gap: "3px" }}>
+            <div style={{ padding: "0.75rem 1rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "3px" }}>
               {SETTINGS.map((s) => {
                 const isSel = selectedSettings.includes(s.id);
+                const img = sceneImages[s.id];
+                const isGen = generatingScenes.has(s.id);
                 return (
                   <button key={s.id} onClick={() => setSelectedSettings(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])}
-                    style={{ background: isSel ? "rgba(255,184,0,0.1)" : "rgba(0,0,0,0.5)", border: "none", borderLeft: `3px solid ${isSel ? "#FFB800" : "rgba(255,255,255,0.04)"}`, padding: "0.875rem 1rem", cursor: "pointer", textAlign: "left", transition: "all 0.18s", color: "inherit" }}
-                    onMouseEnter={(e) => { if (!isSel) { (e.currentTarget as HTMLButtonElement).style.borderLeftColor = "rgba(255,184,0,0.35)"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,184,0,0.04)"; } }}
-                    onMouseLeave={(e) => { if (!isSel) { (e.currentTarget as HTMLButtonElement).style.borderLeftColor = "rgba(255,255,255,0.04)"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.5)"; } }}
+                    style={{ position: "relative", overflow: "hidden", height: "160px", background: "rgba(0,0,0,0.88)", border: "none", borderLeft: `3px solid ${isSel ? "#FFB800" : "rgba(255,255,255,0.04)"}`, cursor: "pointer", transition: "border-left-color 0.18s", color: "inherit", display: "block", padding: 0 }}
+                    onMouseEnter={(e) => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.borderLeftColor = "rgba(255,184,0,0.4)"; }}
+                    onMouseLeave={(e) => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.borderLeftColor = "rgba(255,255,255,0.04)"; }}
                   >
-                    <div style={{ fontSize: "1.3rem", marginBottom: "0.35rem", filter: isSel ? "none" : "grayscale(0.6) opacity(0.55)", transition: "filter 0.18s" }}>{s.icon}</div>
-                    <div className="font-cinzel" style={{ fontSize: "0.72rem", color: isSel ? "#FFB800" : "#C0C0D0", fontWeight: 700, marginBottom: "0.2rem", transition: "color 0.18s" }}>{s.label}</div>
-                    <div style={{ fontSize: "0.6rem", color: "rgba(200,200,220,0.35)", fontFamily: "'Montserrat', sans-serif", lineHeight: 1.4 }}>{s.desc}</div>
+                    {img && <img src={img} alt={s.label} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: isSel ? 0.6 : 0.25, transition: "opacity 0.28s", pointerEvents: "none" }} />}
+                    {!img && isGen && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: "0.42rem", color: "rgba(255,184,0,0.28)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "3px", textTransform: "uppercase" }}>Generating…</span></div>}
+                    {!img && !isGen && <div style={{ position: "absolute", top: "1rem", left: "1rem", fontSize: "2.2rem", opacity: isSel ? 1 : 0.22, filter: isSel ? "none" : "grayscale(1)", transition: "all 0.28s", pointerEvents: "none" }}>{s.icon}</div>}
+                    <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(0,0,0,${isSel ? "0.93" : "0.8"}) 0%, rgba(0,0,0,${isSel ? "0.12" : "0.52"}) 100%)`, transition: "background 0.28s", pointerEvents: "none" }} />
+                    {isSel && <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", width: "20px", height: "20px", background: "#FFB800", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.58rem", color: "#000", fontWeight: 900, pointerEvents: "none" }}>✓</div>}
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0.9rem 1rem", pointerEvents: "none" }}>
+                      <div className="font-cinzel" style={{ fontSize: "0.8rem", color: isSel ? "#FFB800" : "#EEEEFF", fontWeight: 700, marginBottom: "0.2rem", transition: "color 0.28s", textShadow: "0 1px 8px rgba(0,0,0,1)" }}>{s.label}</div>
+                      <div style={{ fontSize: "0.58rem", color: isSel ? "rgba(255,220,100,0.9)" : "rgba(200,200,220,0.55)", fontFamily: "'Montserrat', sans-serif", lineHeight: 1.35, textShadow: "0 1px 5px rgba(0,0,0,1)", transition: "color 0.28s" }}>{s.desc}</div>
+                    </div>
                   </button>
                 );
               })}
@@ -2094,6 +2168,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               })}
             </div>
           </div>
+            </>)}
+            {step3Tab === "narrative" && (<>
 
           {/* Story Tone */}
           <div style={{ background: "rgba(3,0,8,0.97)", borderLeft: "4px solid #4080D0" }}>
@@ -2262,6 +2338,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </div>
             );
           })()}
+            </>)}
+            {step3Tab === "capture" && (<>
 
           {/* Villain's Capture Method */}
           <div style={{ background: "rgba(3,0,8,0.97)", borderLeft: "4px solid #C02040" }}>
@@ -2380,6 +2458,8 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </div>
             </div>
           </div>
+            </>)}
+            {step3Tab === "control" && (<>
 
           {/* ── DYNAMIC POWER DEGRADATION SYSTEM ── */}
           <div style={{ background: "rgba(3,0,8,0.97)", borderLeft: "4px solid #D05000" }}>
@@ -2651,6 +2731,11 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
               </div>
             )}
           </div>
+            </>)}
+          </div>
+
+          {/* ── ALWAYS-VISIBLE DETAILS ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1.5rem" }}>
 
           {/* Special weapons */}
           <div style={{ background: "linear-gradient(145deg, rgba(6,0,16,0.94) 0%, rgba(2,0,8,0.97) 100%)", border: "1px solid rgba(220,20,60,0.14)", borderRadius: "16px", padding: "1.5rem", position: "relative" }}>
@@ -2745,6 +2830,7 @@ export default function SuperheroMode({ onBack, surprise, reimagineHero, onSurpr
             >
               BEGIN THE FALL →
             </button>
+          </div>
           </div>
         </div>
       )}
